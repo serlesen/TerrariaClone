@@ -1,25 +1,15 @@
 package com.sergio.refacto;
 
-import java.applet.Applet;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.*;
-import java.io.*;
-import java.net.URL;
-import java.text.*;
-import java.util.*;
-import java.util.Arrays.*;
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 public class TextField {
 
-    int width, height;
+    private int width, height;
     String text;
-    Font font;
+    private Font font;
     BufferedImage image;
 
     public TextField(int width, String text) {

@@ -1,6 +1,8 @@
 /.idea/
 /log.txt
 /out/
+target/
 /TerraFrame.iml
 /worlds/
 *~
+*.class

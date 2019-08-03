@@ -1,9 +1,8 @@
 package com.sergio.refacto;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
-import java.lang.Math;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.net.URL;
 import javax.imageio.ImageIO;
 
@@ -11,17 +10,17 @@ public class Player implements Serializable {
     transient BufferedImage image;
     int ix, iy, ivx, ivy, width, height, bx1, by1, bx2, by2, thp, hp;
     double x, y, vx, vy, pvy, oldx, oldy;
-    boolean onGround, onGroundDelay, grounded;
-    boolean ghost = true;
+    private boolean onGround, onGroundDelay, grounded;
+    private boolean ghost = true;
     Rectangle rect;
-    short[] blocklist;
+    private short[] blocklist;
 
-    int i, j, n;
+    private int i, j, n;
 
-    int imgDelay;
+    private int imgDelay;
     String imgState;
 
-    int BLOCKSIZE = TerrariaClone.getBLOCKSIZE();
+    private int BLOCKSIZE = TerrariaClone.getBLOCKSIZE();
 
     public Player(double x, double y) {
         oldx = this.x = x; oldy = this.y = y;

@@ -5,15 +5,15 @@ import java.util.Random;
 
 public class World {
 
-    static int x, y;
-    static int x2, y2, i, j, n, xpos, ypos, xpos2, ypos2;
-    static double f;
-    static short type;
+    private static int x, y;
+    private static int x2, y2, i, j, n, xpos, ypos, xpos2, ypos2;
+    private static double f;
+    private static short type;
 
-    static Random random;
+    private static Random random;
 
-    static boolean[][] coordlist;
-    static boolean[][] coordlist2;
+    private static boolean[][] coordlist;
+    private static boolean[][] coordlist2;
 
     public static Object[] generateChunk(int cx, int cy, Random random) {
         int size = TerrariaClone.CHUNKBLOCKS;

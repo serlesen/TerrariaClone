@@ -10,31 +10,31 @@ import javax.imageio.ImageIO;
 public class Inventory implements Serializable {
 
     int i, j, k, x, y, n, px, py, selection, width, height;
-    double fpx, fpy;
-    short r;
+    private double fpx, fpy;
+    private short r;
 
     transient BufferedImage image, box, box_selected;
-    Font font = new Font("Chalkboard", Font.PLAIN, 12);
+    private Font font = new Font("Chalkboard", Font.PLAIN, 12);
 
-    transient Graphics2D g2;
+    private transient Graphics2D g2;
 
     short[] ids;
     short[] nums;
     short[] durs;
-    Short[][] list_thing;
-    short[][] r1;
-    short[] r2;
+    private Short[][] list_thing;
+    private short[][] r1;
+    private short[] r2;
 
-    int trolx = 37;
-    int troly = 17;
+    private int trolx = 37;
+    private int troly = 17;
 
     int CX, CY;
 
-    boolean valid = false;
+    private boolean valid = false;
 
-    ItemCollection ic;
+    private ItemCollection ic;
 
-    Map<String,Short[][]> RECIPES;
+    private Map<String,Short[][]> RECIPES;
 
     public Inventory() {
         ids = new short[40];

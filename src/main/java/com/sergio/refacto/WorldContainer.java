@@ -15,7 +15,7 @@ public class WorldContainer implements Serializable {
     Boolean[][] lsources;
     ArrayList<Integer> lqx, lqy;
     Boolean[][] lqd;
-    Boolean[][] drawn, ldrawn, rdrawn;
+    private Boolean[][] drawn, ldrawn, rdrawn;
     Player player;
     Inventory inventory;
     ItemCollection cic;
