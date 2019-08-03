@@ -1,0 +1,22 @@
+package com.sergio.refacto.init;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.sergio.refacto.tools.Constants.*;
+
+public class FSpeedInitializer {
+
+    public static Map<Short, Double> init() {
+        Map<Short,Double> fSpeed = new HashMap<>();
+
+        for (int i = 0; i < BLOCK_NAMES.length; i++) {
+            fSpeed.put((short) i, 0.001);
+        }
+
+        fSpeed.put((short) 85, -0.001);
+        fSpeed.put((short) 86, -0.001);
+
+        return fSpeed;
+    }
+}

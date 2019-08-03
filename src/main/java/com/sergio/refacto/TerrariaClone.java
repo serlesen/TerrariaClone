@@ -9,16 +9,77 @@ Project mission: To program a 2D sandbox game similar to, but with many more
 
 **/
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.io.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Transparency;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JApplet;
+import javax.swing.JFrame;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
+import com.sergio.refacto.init.ArmorInitializer;
+import com.sergio.refacto.init.BlockCDInitializer;
+import com.sergio.refacto.init.BlockDropsInitializer;
+import com.sergio.refacto.init.BlockLightsInitializer;
+import com.sergio.refacto.init.BlockToolsInitializer;
+import com.sergio.refacto.init.DDelayInitializer;
+import com.sergio.refacto.init.DurabilityInitializer;
+import com.sergio.refacto.init.FSpeedInitializer;
+import com.sergio.refacto.init.FuelsInitializer;
+import com.sergio.refacto.init.GSupportInitializer;
+import com.sergio.refacto.init.GrassDirtInitializer;
+import com.sergio.refacto.init.ItemBlocksInitializer;
+import com.sergio.refacto.init.MaxStacksInitializer;
+import com.sergio.refacto.init.OutlinesInitializer;
+import com.sergio.refacto.init.SkyColorsInitializer;
+import com.sergio.refacto.init.SkyLightsInitializer;
+import com.sergio.refacto.init.ToolDamageInitializer;
+import com.sergio.refacto.init.ToolDursInitializer;
+import com.sergio.refacto.init.ToolSpeedInitializer;
+import com.sergio.refacto.init.TorchesBInitializer;
+import com.sergio.refacto.init.TorchesLInitializer;
+import com.sergio.refacto.init.TorchesRInitializer;
+import com.sergio.refacto.init.UIBlocksInitializer;
+import com.sergio.refacto.init.UIEntitiesInitializer;
+import com.sergio.refacto.init.WirePInitializer;
 import com.sergio.refacto.items.Chunk;
+
+import static com.sergio.refacto.tools.Constants.*;
 
 /*
 
@@ -607,198 +668,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
 
     BufferedImage image, tool, mobImage;
 
-    Short[] toolList = {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173};
-
-    String[] blocknames = {"air", "dirt", "stone",
-        "copper_ore", "iron_ore", "silver_ore", "gold_ore",
-        "wood", "workbench",
-        "wooden_chest", "stone_chest",
-        "copper_chest", "iron_chest", "silver_chest", "gold_chest",
-        "tree", "leaves", "furnace", "coal",
-        "lumenstone",
-        "wooden_torch", "coal_torch", "lumenstone_torch",
-        "furnace_on",
-        "wooden_torch_left", "wooden_torch_right",
-        "coal_torch_left", "coal_torch_right",
-        "lumenstone_torch_left", "lumenstone_torch_right",
-        "tree_root",
-        "zinc_ore", "rhymestone_ore", "obdurite_ore",
-        "aluminum_ore", "lead_ore", "uranium_ore",
-        "zythium_ore", "zythium_ore_on", "silicon_ore",
-        "irradium_ore", "nullstone", "meltstone", "skystone",
-        "magnetite_ore",
-        "sand", "snow", "glass",
-        "sunflower_stage_1", "sunflower_stage_2", "sunflower_stage_3",
-        "moonflower_stage_1", "moonflower_stage_2", "moonflower_stage_3",
-        "dryweed_stage_1", "dryweed_stage_2", "dryweed_stage_3",
-        "greenleaf_stage_1", "greenleaf_stage_2", "greenleaf_stage_3",
-        "frostleaf_stage_1", "frostleaf_stage_2", "frostleaf_stage_3",
-        "caveroot_stage_1", "caveroot_stage_2", "caveroot_stage_3",
-        "skyblossom_stage_1", "skyblossom_stage_2", "skyblossom_stage_3",
-        "void_rot_stage_1", "void_rot_stage_2", "void_rot_stage_3",
-        "grass", "jungle_grass", "swamp_grass",
-        "mud", "sandstone",
-        "marshleaf_stage_1", "marshleaf_stage_2", "marshleaf_stage_3",
-        "zinc_chest", "rhymestone_chest", "obdurite_chest",
-        "tree_no_bark", "cobblestone",
-        "chiseled_stone", "chiseled_cobblestone", "stone_bricks",
-        "clay", "clay_bricks", "varnished_wood",
-        "dirt_trans", "magnetite_ore_trans", "grass_trans",
-        "zythium_wire_0", "zythium_wire_1", "zythium_wire_2", "zythium_wire_3", "zythium_wire_4", "zythium_wire_5",
-        "zythium_torch", "zythium_torch_left", "zythium_torch_right", "zythium_lamp", "zythium_lamp_on",
-        "lever", "lever_on", "lever_left", "lever_left_on", "lever_right", "lever_right_on",
-        "zythium_amplifier_right", "zythium_amplifier_down", "zythium_amplifier_left", "zythium_amplifier_up",
-        "zythium_amplifier_right_on", "zythium_amplifier_down_on", "zythium_amplifier_left_on", "zythium_amplifier_up_on",
-        "zythium_inverter_right", "zythium_inverter_down", "zythium_inverter_left", "zythium_inverter_up",
-        "zythium_inverter_right_on", "zythium_inverter_down_on", "zythium_inverter_left_on", "zythium_inverter_up_on",
-        "button_left", "button_left_on", "button_right", "button_right_on", "wooden_pressure_plate", "wooden_pressure_plate_on",
-        "stone_pressure_plate", "stone_pressure_plate_on", "zythium_pressure_plate", "zythium_pressure_plate_on",
-        "zythium_delayer_1_right", "zythium_delayer_1_down", "zythium_delayer_1_left", "zythium_delayer_1_up",
-        "zythium_delayer_1_right_on", "zythium_delayer_1_down_on", "zythium_delayer_1_left_on", "zythium_delayer_1_up_on",
-        "zythium_delayer_2_right", "zythium_delayer_2_down", "zythium_delayer_2_left", "zythium_delayer_2_up",
-        "zythium_delayer_2_right_on", "zythium_delayer_2_down_on", "zythium_delayer_2_left_on", "zythium_delayer_2_up_on",
-        "zythium_delayer_4_right", "zythium_delayer_4_down", "zythium_delayer_4_left", "zythium_delayer_4_up",
-        "zythium_delayer_4_right_on", "zythium_delayer_4_down_on", "zythium_delayer_4_left_on", "zythium_delayer_4_up_on",
-        "zythium_delayer_8_right", "zythium_delayer_8_down", "zythium_delayer_8_left", "zythium_delayer_8_up",
-        "zythium_delayer_8_right_on", "zythium_delayer_8_down_on", "zythium_delayer_8_left_on", "zythium_delayer_8_up_on"};
-
-    String[] dirs = {"center", "tdown_both", "tdown_cw", "tdown_ccw",
-        "tdown", "tup_both", "tup_cw", "tup_ccw",
-        "tup", "leftright", "tright_both", "tright_cw",
-        "tright_ccw", "tright", "upleftdiag", "upleft",
-        "downleftdiag", "downleft", "left", "tleft_both",
-        "tleft_cw", "tleft_ccw", "tleft", "uprightdiag",
-        "upright", "downrightdiag", "downright", "right",
-        "updown", "up", "down", "single"};
-
-    String[] ui_items = {"Air", "Dirt", "Stone",
-        "Copper Ore", "Iron Ore", "Silver Ore", "Gold Ore",
-        "Copper Pick", "Iron Pick", "Silver Pick", "Gold Pick",
-        "Copper Axe", "Iron Axe", "Silver Axe", "Gold Axe",
-        "Wood", "Copper Sword", "Iron Sword", "Silver Sword", "Gold Sword",
-        "Workbench",
-        "Wooden Chest", "Stone Chest",
-        "Copper Chest", "Iron Chest", "Silver Chest", "Gold Chest",
-        "Furnace", "Coal",
-        "Copper Ingot", "Iron Ingot", "Silver Ingot", "Gold Ingot",
-        "Stone Lighter", "Lumenstone",
-        "Wooden Torch", "Coal Torch", "Lumenstone Torch",
-        "Zinc Ore", "Rhymestone Ore", "Obdurite Ore",
-        "Aluminum Ore", "Lead Ore", "Uranium Ore",
-        "Zythium Ore", "Silicon Ore",
-        "Irradium Ore", "Nullstone", "Meltstone", "Skystone",
-        "Magnetite Ore",
-        "Zinc Pick", "Zinc Axe", "Zinc Sword",
-        "Rhymestone Pick", "Rhymestone Axe", "Rhymestone Sword",
-        "Obdurite Pick", "Obdurite Axe", "Obdurite Sword",
-        "Zinc Ingot", "Rhymestone Ingot", "Obdurite Ingot",
-        "Aluminum Ingot", "Lead Ingot", "Uranium Bar", "Refined Uranium",
-        "Zythium Bar", "Silicon Bar",
-        "Irradium Ingot", "Nullstone Bar", "Meltstone Bar", "Skystone Bar",
-        "Magnetite Ingot",
-        "Sand", "Snow", "Glass",
-        "Sunflower Seeds", "Sunflower", "Moonflower Seeds", "Moonflower",
-        "Dryweed Seeds", "Dryweed", "Greenleaf Seeds", "Greenleaf",
-        "Frostleaf Seeds", "Frostleaf", "Caveroot Seeds", "Caveroot",
-        "Skyblossom Seeds", "Skyblossom", "Void Rot Seeds", "Void Rot",
-        "Mud", "Sandstone",
-        "Marshleaf Seeds", "Marshleaf",
-        "Blue Goo", "Green Goo", "Red Goo", "Yellow Goo", "Black Goo", "White Goo",
-        "Astral Shard", "Rotten Chunk",
-        "Copper Helmet", "Copper Chestplate", "Copper Leggings", "Copper Greaves",
-        "Iron Helmet", "Iron Chestplate", "Iron Leggings", "Iron Greaves",
-        "Silver Helmet", "Silver Chestplate", "Silver Leggings", "Silver Greaves",
-        "Gold Helmet", "Gold Chestplate", "Gold Leggings", "Gold Greaves",
-        "Zinc Helmet", "Zinc Chestplate", "Zinc Leggings", "Zinc Greaves",
-        "Rhymestone Helmet", "Rhymestone Chestplate", "Rhymestone Leggings", "Rhymestone Greaves",
-        "Obdurite Helmet", "Obdurite Chestplate", "Obdurite Leggings", "Obdurite Greaves",
-        "Aluminum Helmet", "Aluminum Chestplate", "Aluminum Leggings", "Aluminum Greaves",
-        "Lead Helmet", "Lead Chestplate", "Lead Leggings", "Lead Greaves",
-        "Zythium Helmet", "Zythium Chestplate", "Zythium Leggings", "Zythium Greaves",
-        "Aluminum Pick", "Aluminum Axe", "Aluminum Sword",
-        "Lead Pick", "Lead Axe", "Lead Sword",
-        "Zinc Chest", "Rhymestone Chest", "Obdurite Chest",
-        "Wooden Pick", "Wooden Axe", "Wooden Sword",
-        "Stone Pick", "Stone Axe", "Stone Sword",
-        "Bark", "Cobblestone",
-        "Chiseled Stone", "Chiseled Cobblestone", "Stone Bricks",
-        "Clay", "Clay Bricks", "Varnish", "Varnished Wood",
-        "Magnetite Pick", "Magnetite Axe", "Magnetite Sword",
-        "Irradium Pick", "Irradium Axe", "Irradium Sword",
-        "Zythium Wire", "Zythium Torch", "Zythium Lamp", "Lever",
-        "Charcoal", "Zythium Amplifier", "Zythium Inverter", "Button",
-        "Wooden Pressure Plate", "Stone Pressure Plate", "Zythium Pressure Plate",
-        "Zythium Delayer", "Zythium Delayer", "Zythium Delayer", "Zythium Delayer", "Wrench"};
-
-    static String[] items = {"air", "blocks/dirt", "blocks/stone", "ores/copper_ore",
-        "ores/iron_ore", "ores/silver_ore", "ores/gold_ore", "tools/copper_pick",
-        "tools/iron_pick", "tools/silver_pick", "tools/gold_pick", "tools/copper_axe",
-        "tools/iron_axe", "tools/silver_axe", "tools/gold_axe", "blocks/wood",
-        "tools/copper_sword", "tools/iron_sword", "tools/silver_sword", "tools/gold_sword",
-        "machines/workbench",
-        "machines/wooden_chest", "machines/stone_chest",
-        "machines/copper_chest", "machines/iron_chest", "machines/silver_chest", "machines/gold_chest",
-        "machines/furnace",
-        "ores/coal", "ingots/copper_ingot", "ingots/iron_ingot", "ingots/silver_ingot", "ingots/gold_ingot",
-        "tools/stone_lighter", "ores/lumenstone",
-        "torches/wooden_torch", "torches/coal_torch", "torches/lumenstone_torch",
-        "ores/zinc_ore", "ores/rhymestone_ore", "ores/obdurite_ore",
-        "ores/aluminum_ore", "ores/lead_ore", "ores/uranium_ore",
-        "ores/zythium_ore", "ores/silicon_ore",
-        "ores/irradium_ore", "ores/nullstone", "ores/meltstone", "ores/skystone",
-        "ores/magnetite_ore",
-        "tools/zinc_pick", "tools/zinc_axe", "tools/zinc_sword",
-        "tools/rhymestone_pick", "tools/rhymestone_axe", "tools/rhymestone_sword",
-        "tools/obdurite_pick", "tools/obdurite_axe", "tools/obdurite_sword",
-        "ingots/zinc_ingot", "ingots/rhymestone_ingot", "ingots/obdurite_ingot",
-        "ingots/aluminum_ingot", "ingots/lead_ingot", "ingots/uranium_bar", "ingots/refined_uranium",
-        "ingots/zythium_bar", "ingots/silicon_bar",
-        "ingots/irradium_ingot", "ingots/nullstone_bar", "ingots/meltstone_bar", "ingots/skystone_bar",
-        "ingots/magnetite_ingot",
-        "blocks/sand", "blocks/snow", "blocks/glass",
-        "seeds/sunflower_seeds", "herbs/sunflower", "seeds/moonflower_seeds", "herbs/moonflower",
-        "seeds/dryweed_seeds", "herbs/dryweed", "seeds/greenleaf_seeds", "herbs/greenleaf",
-        "seeds/frostleaf_seeds", "herbs/frostleaf", "seeds/caveroot_seeds", "herbs/caveroot",
-        "seeds/skyblossom_seeds", "herbs/skyblossom", "seeds/void_rot_seeds", "herbs/void_rot",
-        "blocks/mud", "blocks/sandstone",
-        "seeds/marshleaf_seeds", "herbs/marshleaf",
-        "goo/blue_goo", "goo/green_goo", "goo/red_goo", "goo/yellow_goo", "goo/black_goo", "goo/white_goo",
-        "goo/astral_shard", "goo/rotten_chunk",
-        "armor/copper_helmet", "armor/copper_chestplate", "armor/copper_leggings", "armor/copper_greaves",
-        "armor/iron_helmet", "armor/iron_chestplate", "armor/iron_leggings", "armor/iron_greaves",
-        "armor/silver_helmet", "armor/silver_chestplate", "armor/silver_leggings", "armor/silver_greaves",
-        "armor/gold_helmet", "armor/gold_chestplate", "armor/gold_leggings", "armor/gold_greaves",
-        "armor/zinc_helmet", "armor/zinc_chestplate", "armor/zinc_leggings", "armor/zinc_greaves",
-        "armor/rhymestone_helmet", "armor/rhymestone_chestplate", "armor/rhymestone_leggings", "armor/rhymestone_greaves",
-        "armor/obdurite_helmet", "armor/obdurite_chestplate", "armor/obdurite_leggings", "armor/obdurite_greaves",
-        "armor/aluminum_helmet", "armor/aluminum_chestplate", "armor/aluminum_leggings", "armor/aluminum_greaves",
-        "armor/lead_helmet", "armor/lead_chestplate", "armor/lead_leggings", "armor/lead_greaves",
-        "armor/zythium_helmet", "armor/zythium_chestplate", "armor/zythium_leggings", "armor/zythium_greaves",
-        "tools/aluminum_pick", "tools/aluminum_axe", "tools/aluminum_sword",
-        "tools/lead_pick", "tools/lead_axe", "tools/lead_sword",
-        "machines/zinc_chest", "machines/rhymestone_chest", "machines/obdurite_chest",
-        "tools/wooden_pick", "tools/wooden_axe", "tools/wooden_sword",
-        "tools/stone_pick", "tools/stone_axe", "tools/stone_sword",
-        "goo/bark", "blocks/cobblestone",
-        "blocks/chiseled_stone", "blocks/chiseled_cobblestone", "blocks/stone_bricks",
-        "blocks/clay", "blocks/clay_bricks", "potions/varnish", "blocks/varnished_wood",
-        "tools/magnetite_pick", "tools/magnetite_axe", "tools/magnetite_sword",
-        "tools/irradium_pick", "tools/irradium_axe", "tools/irradium_sword",
-        "wires/zythium_wire", "torches/zythium_torch", "blocks/zythium_lamp", "misc/lever",
-        "dust/charcoal", "wires/zythium_amplifier", "wires/zythium_inverter", "misc/button",
-        "misc/wooden_pressure_plate", "misc/stone_pressure_plate", "misc/zythium_pressure_plate",
-        "wires/zythium_delayer_1", "wires/zythium_delayer_2", "wires/zythium_delayer_4", "wires/zythium_delayer_8", "tools/wrench"};
-
     static String version = "0.3_01";
-
-    static boolean[] blockcds = {false, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
-    static boolean[] solid = {false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, false, false, false, true, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
-    static boolean[] ltrans = {false, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, false, false, false, false, false, false, false, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
-    static boolean[] powers = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, false, false, false, true, false, true, false, true, false, false, false, false, true, true, true, true, true, true, true, true, false, false, false, false, false, true, false, true, false, true, false, true, false, true, false, false, false, false, true, true, true, true, false, false, false, false, true, true, true, true, false, false, false, false, true, true, true, true, false, false, false, false, true, true, true, true};
-    static double[] conducts = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0, 0, 0, -1, -1, -1, 0, -1, 0, -1, 0, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    static boolean[] receives = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, false, false, false, true, true, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true};
-    static boolean[] wirec = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true};
-    static int[] skycolors = {28800, 28980, 29160, 29340, 29520, 29700, 29880, 30060, 30240, 30420, 30600, 30780, 30960, 31140, 31320, 31500, 31680, 31860, 32040, 32220, 72000, 72180, 72360, 72540, 72720, 72900, 73080, 73260, 73440, 73620, 73800, 73980, 74160, 74340, 74520, 74700, 74880, 75060, 75240, 75420};
 
     static Map<Byte,BufferedImage> backgroundImgs;
     static Map<Short,BufferedImage> itemImgs;
@@ -882,7 +752,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
 
             repaint();
 
-            backgroundImgs = new HashMap<Byte,BufferedImage>();
+            backgroundImgs = new HashMap<>();
 
             String[] bgs = {"solid/empty", "dirt_none/downleft", "dirt_none/downright", "dirt_none/left", "dirt_none/right", "dirt_none/up", "dirt_none/upleft", "dirt_none/upright",
                 "solid/dirt", "stone_dirt/downleft", "stone_dirt/downright", "stone_dirt/left", "stone_dirt/right", "stone_dirt/up", "stone_dirt/upleft", "stone_dirt/upright",
@@ -892,915 +762,129 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                 backgroundImgs.put((byte)i, loadImage("backgrounds/" + bgs[i] + ".png"));
             }
 
-            itemImgs = new HashMap<Short,BufferedImage>();
+            itemImgs = new HashMap<>();
 
-            for (i=1; i<items.length; i++) {
-                itemImgs.put(new Short((short)i), loadImage("items/" + items[i] + ".png"));
+            for (i=1; i< ITEMS.length; i++) {
+                itemImgs.put((short) i, loadImage("items/" + ITEMS[i] + ".png"));
                 if (itemImgs.get((short)i) == null) {
-                    System.out.println("[ERROR] Could not load item graphic '" + items[i] + "'.");
+                    System.out.println("[ERROR] Could not load item graphic '" + ITEMS[i] + "'.");
                 }
             }
 
-            blockImgs = new HashMap<String,BufferedImage>();
+            blockImgs = new HashMap<>();
 
-            for (i=1; i<blocknames.length; i++) {
+            for (i=1; i< BLOCK_NAMES.length; i++) {
                 for (j=0; j<8; j++) {
-                    blockImgs.put("blocks/" + blocknames[i] + "/texture" + (j+1) + ".png",
-                        loadImage("blocks/" + blocknames[i] + "/texture" + (j+1) + ".png"));
-                    if (blockImgs.get("blocks/" + blocknames[i] + "/texture" + (j+1) + ".png") == null) {
-                        System.out.println("[ERROR] Could not load block graphic '" + blocknames[i] + "'.");
+                    blockImgs.put("blocks/" + BLOCK_NAMES[i] + "/texture" + (j+1) + ".png",
+                        loadImage("blocks/" + BLOCK_NAMES[i] + "/texture" + (j+1) + ".png"));
+                    if (blockImgs.get("blocks/" + BLOCK_NAMES[i] + "/texture" + (j+1) + ".png") == null) {
+                        System.out.println("[ERROR] Could not load block graphic '" + BLOCK_NAMES[i] + "'.");
                     }
                 }
             }
 
-            outlineImgs = new HashMap<String,BufferedImage>();
+            outlineImgs = new HashMap<>();
 
             String[] outlineNameList = {"default", "wood", "none", "tree", "tree_root", "square", "wire"};
 
             for (i=0; i<outlineNameList.length; i++) {
-                for (j=0; j<dirs.length; j++) {
+                for (j=0; j< DIRS.length; j++) {
                     for (k=0; k<5; k++) {
-                        outlineImgs.put("outlines/" + outlineNameList[i] + "/" + dirs[j] + (k+1) + ".png",
-                            loadImage("outlines/" + outlineNameList[i] + "/" + dirs[j] + (k+1) + ".png"));
+                        outlineImgs.put("outlines/" + outlineNameList[i] + "/" + DIRS[j] + (k+1) + ".png",
+                            loadImage("outlines/" + outlineNameList[i] + "/" + DIRS[j] + (k+1) + ".png"));
                     }
                 }
             }
 
-            DURABILITY = new HashMap<Short,Map<Integer,Integer>>();
+            DURABILITY = DurabilityInitializer.init();
 
-            codeTooLarge();
+            BLOCKTOOLS = BlockToolsInitializer.init();
 
-            BLOCKTOOLS = new HashMap<Integer,Short[]>();
+            TOOLSPEED = ToolSpeedInitializer.init();
 
-            Short[][] blocktools = {{},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {11, 12, 13, 14, 52, 55, 58, 146, 149, 155, 158, 170, 173},
-                                    {11, 12, 13, 14, 52, 55, 58, 146, 149, 155, 158, 170, 173},
-                                    {11, 12, 13, 14, 52, 55, 58, 146, 149, 155, 158, 170, 173},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {11, 12, 13, 14, 52, 55, 58, 146, 149, 155, 158, 170, 173},
-                                    {},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {11, 12, 13, 14, 52, 55, 58, 146, 149, 155, 158, 170, 173},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {11, 12, 13, 14, 52, 55, 58, 146, 149, 155, 158, 170, 173},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 11, 12, 13, 14, 51, 52, 54, 55, 57, 58, 145, 146, 148, 149, 154, 155, 157, 158, 169, 170, 172, 173},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {11, 12, 13, 14, 52, 55, 58, 146, 149, 155, 158, 170, 173},
-                                    {11, 12, 13, 14, 52, 55, 58, 146, 149, 155, 158, 170, 173},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172},
-                                    {7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172}};
+            TOOLDAMAGE = ToolDamageInitializer.init();
 
-            for (i=0; i<blocktools.length; i++) {
-                for (j=0; j<blocktools[i].length; j++) {
-                    blocktools[i][j] = new Short((short)blocktools[i][j]);
-                }
-            }
+            BLOCKDROPS = BlockDropsInitializer.init();
 
-            for (i=1; i<blocknames.length; i++) {
-                BLOCKTOOLS.put(i, blocktools[i]);
-            }
+            ITEMBLOCKS = ItemBlocksInitializer.init();
 
-            TOOLSPEED = new HashMap<Short,Double>();
+            OUTLINES = OutlinesInitializer.init();
 
-            for (i=1; i<items.length; i++) {
-                TOOLSPEED.put(new Short((short)i), 0.175);
-            }
+            UIBLOCKS = UIBlocksInitializer.init();
 
-            TOOLSPEED.put(new Short((short)154), 0.100);// wood:   P100 S100
-            TOOLSPEED.put(new Short((short)155), 0.100);
-            TOOLSPEED.put(new Short((short)156), 0.100);
-            TOOLSPEED.put(new Short((short)157), 0.110);// stone:  P110 S105
-            TOOLSPEED.put(new Short((short)158), 0.110);
-            TOOLSPEED.put(new Short((short)159), 0.105);
-            TOOLSPEED.put(new Short((short)7), 0.120);  // copper: P120 S110
-            TOOLSPEED.put(new Short((short)11), 0.120);
-            TOOLSPEED.put(new Short((short)16), 0.110);
-            TOOLSPEED.put(new Short((short)8), 0.130);  // iron:   P130 S115
-            TOOLSPEED.put(new Short((short)12), 0.130);
-            TOOLSPEED.put(new Short((short)17), 0.115);
-            TOOLSPEED.put(new Short((short)9), 0.140);  // silver: P140 S120
-            TOOLSPEED.put(new Short((short)13), 0.140);
-            TOOLSPEED.put(new Short((short)18), 0.120);
-            TOOLSPEED.put(new Short((short)10), 0.150); // gold:   P150 S125
-            TOOLSPEED.put(new Short((short)14), 0.150);
-            TOOLSPEED.put(new Short((short)19), 0.125);
-            TOOLSPEED.put(new Short((short)51), 0.160); // zinc:   P160 S130
-            TOOLSPEED.put(new Short((short)52), 0.160);
-            TOOLSPEED.put(new Short((short)53), 0.130);
-            TOOLSPEED.put(new Short((short)54), 0.170); // rhyme:  P170 S135
-            TOOLSPEED.put(new Short((short)55), 0.170);
-            TOOLSPEED.put(new Short((short)56), 0.135);
-            TOOLSPEED.put(new Short((short)57), 0.180); // obdur:  P180 S140
-            TOOLSPEED.put(new Short((short)58), 0.180);
-            TOOLSPEED.put(new Short((short)59), 0.140);
-            TOOLSPEED.put(new Short((short)145), 0.350);// alumin: P250 S175
-            TOOLSPEED.put(new Short((short)146), 0.350);
-            TOOLSPEED.put(new Short((short)147), 0.245);
-            TOOLSPEED.put(new Short((short)148), 0.130);// lead:   P130 S115
-            TOOLSPEED.put(new Short((short)149), 0.130);
-            TOOLSPEED.put(new Short((short)150), 0.115);
-            TOOLSPEED.put(new Short((short)169), 0.250); // magne:  P350 S245
-            TOOLSPEED.put(new Short((short)170), 0.250);
-            TOOLSPEED.put(new Short((short)171), 0.175);
-            TOOLSPEED.put(new Short((short)172), 0.350); // irrad:  P350 S245
-            TOOLSPEED.put(new Short((short)173), 0.350);
-            TOOLSPEED.put(new Short((short)174), 0.245);
+            UIENTITIES = UIEntitiesInitializer.init();
 
-            TOOLSPEED.put(new Short((short)33), 0.125); // stone lighter
+            BLOCKCD = BlockCDInitializer.init();
 
-            TOOLDAMAGE = new HashMap<Short,Integer>();
+            MAXSTACKS = MaxStacksInitializer.init();
 
-            for (i=0; i<items.length; i++) {
-                TOOLDAMAGE.put(new Short((short)i), 1);
-            }
+            SKYCOLORS = SkyColorsInitializer.init();
 
-            TOOLDAMAGE.put(new Short((short)7), 2);
-            TOOLDAMAGE.put(new Short((short)8), 3);
-            TOOLDAMAGE.put(new Short((short)9), 3);
-            TOOLDAMAGE.put(new Short((short)10), 4);
-            TOOLDAMAGE.put(new Short((short)11), 3);
-            TOOLDAMAGE.put(new Short((short)12), 4);
-            TOOLDAMAGE.put(new Short((short)13), 5);
-            TOOLDAMAGE.put(new Short((short)14), 6);
-            TOOLDAMAGE.put(new Short((short)16), 5);
-            TOOLDAMAGE.put(new Short((short)17), 8);
-            TOOLDAMAGE.put(new Short((short)18), 13);
-            TOOLDAMAGE.put(new Short((short)19), 18);
-            TOOLDAMAGE.put(new Short((short)51), 6);
-            TOOLDAMAGE.put(new Short((short)52), 9);
-            TOOLDAMAGE.put(new Short((short)53), 24);
-            TOOLDAMAGE.put(new Short((short)54), 8);
-            TOOLDAMAGE.put(new Short((short)55), 11);
-            TOOLDAMAGE.put(new Short((short)56), 30);
-            TOOLDAMAGE.put(new Short((short)57), 10);
-            TOOLDAMAGE.put(new Short((short)58), 15);
-            TOOLDAMAGE.put(new Short((short)59), 38);
-            TOOLDAMAGE.put(new Short((short)145), 7);
-            TOOLDAMAGE.put(new Short((short)146), 10);
-            TOOLDAMAGE.put(new Short((short)147), 27);
-            TOOLDAMAGE.put(new Short((short)148), 4);
-            TOOLDAMAGE.put(new Short((short)149), 5);
-            TOOLDAMAGE.put(new Short((short)150), 9);
-            TOOLDAMAGE.put(new Short((short)154), 1);
-            TOOLDAMAGE.put(new Short((short)155), 1);
-            TOOLDAMAGE.put(new Short((short)156), 3);
-            TOOLDAMAGE.put(new Short((short)157), 1);
-            TOOLDAMAGE.put(new Short((short)158), 2);
-            TOOLDAMAGE.put(new Short((short)159), 4);
-            TOOLDAMAGE.put(new Short((short)57), 20);
-            TOOLDAMAGE.put(new Short((short)58), 30);
-            TOOLDAMAGE.put(new Short((short)59), 75);
+            SKYLIGHTS = SkyLightsInitializer.init();
 
-            short[] drops = {0, 1, 2, 3, 4, 5, 6, 15, 20, 21, 22, 23, 24, 25, 26, 15, 0, 27, 28, 34, 35, 36, 37, 27, 35, 35, 36, 36, 37, 37, 0, 38, 39, 40, 41, 42, 43, 44, 44, 45, 46, 47, 48, 49, 50, 74, 75, 0, 0, 0, 78, 0, 0, 80, 0, 0, 82, 0, 0, 84, 0, 0, 86, 0, 0, 88, 0, 0, 90, 0, 0, 92, 1, 1, 93, 93, 94, 0, 0, 96, 151, 152, 153, 15, 161, 162, 163, 164, 165, 166, 168, 1, 50, 1, 175, 175, 175, 175, 175, 175, 176, 176, 176, 177, 177, 178, 178, 178, 178, 178, 178, 180, 180, 180, 180, 180, 180, 180, 180, 181, 181, 181, 181, 181, 181, 181, 181, 182, 182, 182, 182, 183, 183, 184, 184, 185, 185, 186, 186, 186, 186, 186, 186, 186, 186, 187, 187, 187, 187, 187, 187, 187, 187, 188, 188, 188, 188, 188, 188, 188, 188, 189, 189, 189, 189, 189, 189, 189, 189};
-
-            BLOCKDROPS = new HashMap<Integer,Short>();
-
-            for (i=1; i<blocknames.length; i++) {
-                BLOCKDROPS.put(i, drops[i]);
-            }
-
-            int[] itemblocks = {0, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 8, 9, 10, 11, 12, 13, 14, 17, 18, 0, 0, 0, 0, 0, 19, 20, 21, 22, 31, 32, 33, 34, 35, 36, 37, 39, 40, 41, 42, 43, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45/*72*/, 46, 47, 48, 0, 51, 0, 54, 0, 57, 0, 60, 0, 63, 0, 66, 0, 69, 0, 75, 76, 77, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 81, 82, 0, 0, 0, 0, 0, 0, 0, 84, 85, 86, 87, 88, 89, 0, 90, 0, 0, 0, 0, 0, 0, 94, 100, 103, 105, 0, 111, 119, 127, 131, 133, 135, 137, 145, 153, 161, 0};
-
-            ITEMBLOCKS = new HashMap<Short,Integer>();
-
-            for (i=1; i<items.length; i++) {
-                ITEMBLOCKS.put(new Short((short)i), itemblocks[i]);
-            }
-
-            OUTLINES = new HashMap<Integer,String>();
-
-            for (i=1; i<blocknames.length; i++) {
-                OUTLINES.put(i, "default");
-            }
-
-            OUTLINES.put(7, "wood");
-            OUTLINES.put(8, "none");
-            OUTLINES.put(9, "none");
-            OUTLINES.put(10, "none");
-            OUTLINES.put(11, "none");
-            OUTLINES.put(12, "none");
-            OUTLINES.put(13, "none");
-            OUTLINES.put(14, "none");
-            OUTLINES.put(15, "tree");
-            OUTLINES.put(17, "none");
-            OUTLINES.put(20, "none");
-            OUTLINES.put(21, "none");
-            OUTLINES.put(22, "none");
-            OUTLINES.put(23, "none");
-            OUTLINES.put(24, "none");
-            OUTLINES.put(25, "none");
-            OUTLINES.put(26, "none");
-            OUTLINES.put(27, "none");
-            OUTLINES.put(28, "none");
-            OUTLINES.put(29, "none");
-            OUTLINES.put(30, "tree_root");
-            OUTLINES.put(47, "square");
-            OUTLINES.put(77, "none");
-            OUTLINES.put(78, "none");
-            OUTLINES.put(79, "none");
-            OUTLINES.put(80, "none");
-            OUTLINES.put(81, "none");
-            OUTLINES.put(82, "none");
-            OUTLINES.put(83, "tree");
-            OUTLINES.put(84, "square");
-            OUTLINES.put(85, "square");
-            OUTLINES.put(86, "square");
-            OUTLINES.put(87, "square");
-            OUTLINES.put(89, "square");
-            OUTLINES.put(90, "wood");
-            OUTLINES.put(94, "wire");
-            OUTLINES.put(95, "wire");
-            OUTLINES.put(96, "wire");
-            OUTLINES.put(97, "wire");
-            OUTLINES.put(98, "wire");
-            OUTLINES.put(99, "wire");
-            OUTLINES.put(100, "none");
-            OUTLINES.put(101, "none");
-            OUTLINES.put(102, "none");
-            OUTLINES.put(103, "square");
-            OUTLINES.put(104, "square");
-            OUTLINES.put(105, "none");
-            OUTLINES.put(106, "none");
-            OUTLINES.put(107, "none");
-            OUTLINES.put(108, "none");
-            OUTLINES.put(109, "none");
-            OUTLINES.put(110, "none");
-            OUTLINES.put(111, "none");
-            OUTLINES.put(112, "none");
-            OUTLINES.put(113, "none");
-            OUTLINES.put(114, "none");
-            OUTLINES.put(115, "none");
-            OUTLINES.put(116, "none");
-            OUTLINES.put(117, "none");
-            OUTLINES.put(118, "none");
-            OUTLINES.put(119, "none");
-            OUTLINES.put(120, "none");
-            OUTLINES.put(121, "none");
-            OUTLINES.put(122, "none");
-            OUTLINES.put(123, "none");
-            OUTLINES.put(124, "none");
-            OUTLINES.put(125, "none");
-            OUTLINES.put(126, "none");
-            OUTLINES.put(127, "none");
-            OUTLINES.put(128, "none");
-            OUTLINES.put(129, "none");
-            OUTLINES.put(130, "none");
-            OUTLINES.put(131, "none");
-            OUTLINES.put(132, "none");
-            OUTLINES.put(133, "none");
-            OUTLINES.put(134, "none");
-            OUTLINES.put(135, "none");
-            OUTLINES.put(136, "none");
-
-            for (i=48; i<72; i++) {
-                OUTLINES.put(i, "none");
-            }
-
-            for (i=137; i<169; i++) {
-                OUTLINES.put(i, "none");
-            }
-
-            UIBLOCKS = new HashMap<String,String>();
-
-            for (i=1; i<items.length; i++) {
-                UIBLOCKS.put(items[i], ui_items[i]);
-            }
-
-            UIENTITIES = new HashMap<String,String>();
-
-            UIENTITIES.put("blue_bubble", "Blue Bubble");
-            UIENTITIES.put("green_bubble", "Green Bubble");
-            UIENTITIES.put("red_bubble", "Red Bubble");
-            UIENTITIES.put("black_bubble", "Black Bubble");
-            UIENTITIES.put("white_bubble", "White Bubble");
-            UIENTITIES.put("zombie", "Zombie");
-            UIENTITIES.put("armored_zombie", "Armored Zombie");
-            UIENTITIES.put("shooting_star", "Shooting Star");
-            UIENTITIES.put("sandbot", "Sandbot");
-            UIENTITIES.put("snowman", "Snowman");
-            UIENTITIES.put("bat", "Bat");
-            UIENTITIES.put("bee", "Bee");
-            UIENTITIES.put("skeleton", "Skeleton");
-
-            BLOCKCD = new HashMap<Integer,Boolean>();
-
-            for (i=1; i<blockcds.length; i++) {
-                BLOCKCD.put(i, blockcds[i]);
-            }
-
-            MAXSTACKS = new HashMap<Short,Short>();
-
-            short[] stacks = {100, 100, 100, 100, 100, 100, 100, 1, 1, 1, 1, 1, 1, 1, 1, 100, 1, 1, 1, 1, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 1, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 1, 1, 1, 1, 1, 1, 1, 1, 1, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 100, 100, 100, 1, 1, 1, 1, 1, 1, 100, 100, 100, 100, 100, 100, 100, 100, 100, 1, 1, 1, 1, 1, 1, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 1};
-
-            for (i=0; i<items.length; i++) {
-                MAXSTACKS.put(new Short((short)i), stacks[i]);
-            }
-
-            SKYCOLORS = new HashMap<Integer,Color>();
-
-            SKYCOLORS.put(28800, new Color(71, 154, 230));
-            SKYCOLORS.put(28980, new Color(67, 146, 218));
-            SKYCOLORS.put(29160, new Color(63, 138, 206));
-            SKYCOLORS.put(29340, new Color(60, 130, 194));
-            SKYCOLORS.put(29520, new Color(56, 122, 182));
-            SKYCOLORS.put(29700, new Color(52, 114, 170));
-            SKYCOLORS.put(29880, new Color(48, 105, 157));
-            SKYCOLORS.put(30060, new Color(45, 97, 145));
-            SKYCOLORS.put(30240, new Color(41, 89, 133));
-            SKYCOLORS.put(30420, new Color(37, 81, 121));
-            SKYCOLORS.put(30600, new Color(33, 73, 109));
-            SKYCOLORS.put(30780, new Color(30, 65, 97));
-            SKYCOLORS.put(30960, new Color(26, 57, 85));
-            SKYCOLORS.put(31140, new Color(22, 48, 72));
-            SKYCOLORS.put(31320, new Color(18, 40, 60));
-            SKYCOLORS.put(31500, new Color(15, 32, 48));
-            SKYCOLORS.put(31680, new Color(11, 24, 36));
-            SKYCOLORS.put(31860, new Color(7, 16, 24));
-            SKYCOLORS.put(32040, new Color(3, 8, 12));
-            SKYCOLORS.put(32220, new Color(0, 0, 0));
-
-            SKYCOLORS.put(72000, new Color(3, 8, 12));
-            SKYCOLORS.put(72180, new Color(7, 16, 24));
-            SKYCOLORS.put(72360, new Color(11, 24, 36));
-            SKYCOLORS.put(72540, new Color(15, 32, 48));
-            SKYCOLORS.put(72720, new Color(18, 40, 60));
-            SKYCOLORS.put(72900, new Color(22, 48, 72));
-            SKYCOLORS.put(73080, new Color(26, 57, 85));
-            SKYCOLORS.put(73260, new Color(30, 65, 97));
-            SKYCOLORS.put(73440, new Color(33, 73, 109));
-            SKYCOLORS.put(73620, new Color(37, 81, 121));
-            SKYCOLORS.put(73800, new Color(41, 89, 133));
-            SKYCOLORS.put(73980, new Color(45, 97, 145));
-            SKYCOLORS.put(74160, new Color(48, 105, 157));
-            SKYCOLORS.put(74340, new Color(52, 114, 170));
-            SKYCOLORS.put(74520, new Color(56, 122, 182));
-            SKYCOLORS.put(74700, new Color(60, 130, 194));
-            SKYCOLORS.put(74880, new Color(63, 138, 206));
-            SKYCOLORS.put(75060, new Color(67, 146, 218));
-            SKYCOLORS.put(75240, new Color(71, 154, 230));
-            SKYCOLORS.put(75420, new Color(75, 163, 243));
-
-            SKYLIGHTS = new HashMap<Integer,Integer>();
-
-            SKYLIGHTS.put(28883, 18);
-            SKYLIGHTS.put(29146, 17);
-            SKYLIGHTS.put(29409, 16);
-            SKYLIGHTS.put(29672, 15);
-            SKYLIGHTS.put(29935, 14);
-            SKYLIGHTS.put(30198, 13);
-            SKYLIGHTS.put(30461, 12);
-            SKYLIGHTS.put(30724, 11);
-            SKYLIGHTS.put(30987, 10);
-            SKYLIGHTS.put(31250, 9);
-            SKYLIGHTS.put(31513, 8);
-            SKYLIGHTS.put(31776, 7);
-            SKYLIGHTS.put(32039, 6);
-            SKYLIGHTS.put(32302, 5);
-            SKYLIGHTS.put(72093, 6);
-            SKYLIGHTS.put(72336, 7);
-            SKYLIGHTS.put(72639, 8);
-            SKYLIGHTS.put(72912, 9);
-            SKYLIGHTS.put(73185, 10);
-            SKYLIGHTS.put(73458, 11);
-            SKYLIGHTS.put(73731, 12);
-            SKYLIGHTS.put(74004, 13);
-            SKYLIGHTS.put(74277, 14);
-            SKYLIGHTS.put(74550, 15);
-            SKYLIGHTS.put(74823, 16);
-            SKYLIGHTS.put(75096, 17);
-            SKYLIGHTS.put(75369, 18);
-            SKYLIGHTS.put(75642, 19);
-
-            LIGHTLEVELS = new HashMap<Integer,BufferedImage>();
+            LIGHTLEVELS = new HashMap<>();
 
             for (i=0; i<17; i++) {
                 LIGHTLEVELS.put(i, loadImage("light/" + i + ".png"));
             }
 
-            BLOCKLIGHTS = new HashMap<Integer,Integer>();
+            BLOCKLIGHTS = BlockLightsInitializer.init();
 
-            for (i=0; i<blocknames.length; i++) {
-                BLOCKLIGHTS.put(i, 0);
-            }
+            GRASSDIRT = GrassDirtInitializer.init();
 
-            BLOCKLIGHTS.put(19, 21);
-            BLOCKLIGHTS.put(20, 15);
-            BLOCKLIGHTS.put(21, 18);
-            BLOCKLIGHTS.put(22, 21);
-            BLOCKLIGHTS.put(23, 15);
-            BLOCKLIGHTS.put(24, 15);
-            BLOCKLIGHTS.put(25, 15);
-            BLOCKLIGHTS.put(26, 18);
-            BLOCKLIGHTS.put(27, 18);
-            BLOCKLIGHTS.put(28, 21);
-            BLOCKLIGHTS.put(29, 21);
-            BLOCKLIGHTS.put(36, 15);
-            BLOCKLIGHTS.put(36, 15);
-            BLOCKLIGHTS.put(38, 18);
-            BLOCKLIGHTS.put(51, 15);
-            BLOCKLIGHTS.put(52, 15);
-            BLOCKLIGHTS.put(53, 15);
-            BLOCKLIGHTS.put(95, 6);
-            BLOCKLIGHTS.put(96, 7);
-            BLOCKLIGHTS.put(97, 8);
-            BLOCKLIGHTS.put(98, 9);
-            BLOCKLIGHTS.put(99, 10);
-            BLOCKLIGHTS.put(100, 12);
-            BLOCKLIGHTS.put(101, 12);
-            BLOCKLIGHTS.put(102, 12);
-            BLOCKLIGHTS.put(104, 21);
-            BLOCKLIGHTS.put(112, 12);
-            BLOCKLIGHTS.put(114, 12);
-            BLOCKLIGHTS.put(116, 12);
-            BLOCKLIGHTS.put(118, 12);
-            BLOCKLIGHTS.put(123, 12);
-            BLOCKLIGHTS.put(124, 12);
-            BLOCKLIGHTS.put(125, 12);
-            BLOCKLIGHTS.put(126, 12);
+            ARMOR = ArmorInitializer.init();
 
-            BLOCKLIGHTS.put(137, 12);
-            BLOCKLIGHTS.put(138, 12);
-            BLOCKLIGHTS.put(139, 12);
-            BLOCKLIGHTS.put(140, 12);
-            BLOCKLIGHTS.put(145, 12);
-            BLOCKLIGHTS.put(146, 12);
-            BLOCKLIGHTS.put(147, 12);
-            BLOCKLIGHTS.put(148, 12);
-            BLOCKLIGHTS.put(153, 12);
-            BLOCKLIGHTS.put(154, 12);
-            BLOCKLIGHTS.put(155, 12);
-            BLOCKLIGHTS.put(156, 12);
-            BLOCKLIGHTS.put(161, 12);
-            BLOCKLIGHTS.put(162, 12);
-            BLOCKLIGHTS.put(163, 12);
-            BLOCKLIGHTS.put(164, 12);
+            TOOLDURS = ToolDursInitializer.init();
 
-            GRASSDIRT = new HashMap<Integer,Integer>();
+            FUELS = FuelsInitializer.init();
 
-            GRASSDIRT.put(72, 1);
-            GRASSDIRT.put(73, 1);
-            GRASSDIRT.put(74, 75);
-            GRASSDIRT.put(93, 91);
+            WIREP = WirePInitializer.init();
 
-            ARMOR = new HashMap<Short,Integer>();
+            TORCHESL = TorchesLInitializer.init();
 
-            for (i=0; i<items.length; i++) {
-                ARMOR.put(new Short((short)i), 0);
-            }
+            TORCHESR = TorchesRInitializer.init();
 
-            ARMOR.put(new Short((short)105), 1);
-            ARMOR.put(new Short((short)106), 2);
-            ARMOR.put(new Short((short)107), 1);
-            ARMOR.put(new Short((short)108), 1);
-            ARMOR.put(new Short((short)109), 1);
-            ARMOR.put(new Short((short)110), 3);
-            ARMOR.put(new Short((short)111), 2);
-            ARMOR.put(new Short((short)112), 1);
-            ARMOR.put(new Short((short)113), 2);
-            ARMOR.put(new Short((short)114), 4);
-            ARMOR.put(new Short((short)115), 3);
-            ARMOR.put(new Short((short)116), 1);
-            ARMOR.put(new Short((short)117), 3);
-            ARMOR.put(new Short((short)118), 6);
-            ARMOR.put(new Short((short)119), 5);
-            ARMOR.put(new Short((short)120), 2);
-            ARMOR.put(new Short((short)121), 4);
-            ARMOR.put(new Short((short)122), 7);
-            ARMOR.put(new Short((short)123), 6);
-            ARMOR.put(new Short((short)124), 3);
-            ARMOR.put(new Short((short)125), 5);
-            ARMOR.put(new Short((short)126), 9);
-            ARMOR.put(new Short((short)127), 7);
-            ARMOR.put(new Short((short)128), 4);
-            ARMOR.put(new Short((short)129), 7);
-            ARMOR.put(new Short((short)130), 12);
-            ARMOR.put(new Short((short)131), 10);
-            ARMOR.put(new Short((short)132), 6);
-            ARMOR.put(new Short((short)133), 4);
-            ARMOR.put(new Short((short)134), 7);
-            ARMOR.put(new Short((short)135), 6);
-            ARMOR.put(new Short((short)136), 3);
-            ARMOR.put(new Short((short)137), 2);
-            ARMOR.put(new Short((short)138), 4);
-            ARMOR.put(new Short((short)139), 3);
-            ARMOR.put(new Short((short)140), 1);
-            ARMOR.put(new Short((short)141), 10);
-            ARMOR.put(new Short((short)142), 18);
-            ARMOR.put(new Short((short)143), 14);
-            ARMOR.put(new Short((short)144), 8);
+            TORCHESB = TorchesBInitializer.init();
 
-            TOOLDURS = new HashMap<Short,Short>();
+            GSUPPORT = GSupportInitializer.init();
 
-            TOOLDURS.put(new Short((short)7), new Short((short)400));   // copper: P0200 A0200 S0125
-            TOOLDURS.put(new Short((short)8), new Short((short)500));   // iron:   P0250 A0250 S0150
-            TOOLDURS.put(new Short((short)9), new Short((short)600));   // silver: P0300 A0300 S0200
-            TOOLDURS.put(new Short((short)10), new Short((short)800));  // gold:   P0400 A0400 S0300
-            TOOLDURS.put(new Short((short)11), new Short((short)400));
-            TOOLDURS.put(new Short((short)12), new Short((short)500));
-            TOOLDURS.put(new Short((short)13), new Short((short)600));
-            TOOLDURS.put(new Short((short)14), new Short((short)800));
-            TOOLDURS.put(new Short((short)16), new Short((short)250));
-            TOOLDURS.put(new Short((short)17), new Short((short)300));
-            TOOLDURS.put(new Short((short)18), new Short((short)400));
-            TOOLDURS.put(new Short((short)19), new Short((short)600));
-            TOOLDURS.put(new Short((short)33), new Short((short)100));
-            TOOLDURS.put(new Short((short)51), new Short((short)1100));  // zinc:   P0550 A0550 S0475
-            TOOLDURS.put(new Short((short)52), new Short((short)1100));
-            TOOLDURS.put(new Short((short)53), new Short((short)950));
-            TOOLDURS.put(new Short((short)54), new Short((short)1350));  // rhyme:  P0675 A0675 S0625
-            TOOLDURS.put(new Short((short)55), new Short((short)1350));
-            TOOLDURS.put(new Short((short)56), new Short((short)1250));
-            TOOLDURS.put(new Short((short)57), new Short((short)1600));  // obdur:  P0800 A0800 S0800
-            TOOLDURS.put(new Short((short)58), new Short((short)1600));
-            TOOLDURS.put(new Short((short)59), new Short((short)1600));
-            TOOLDURS.put(new Short((short)145), new Short((short)200)); // alumin: P0100 A0100 S0050
-            TOOLDURS.put(new Short((short)146), new Short((short)200));
-            TOOLDURS.put(new Short((short)147), new Short((short)100));
-            TOOLDURS.put(new Short((short)148), new Short((short)2400));// lead:   P1200 A1200 S0800
-            TOOLDURS.put(new Short((short)149), new Short((short)2400));
-            TOOLDURS.put(new Short((short)150), new Short((short)1600));
-            TOOLDURS.put(new Short((short)154), new Short((short)200)); // wood:   P0100 A0100 S0050
-            TOOLDURS.put(new Short((short)155), new Short((short)200));
-            TOOLDURS.put(new Short((short)156), new Short((short)100));
-            TOOLDURS.put(new Short((short)157), new Short((short)300)); // stone:  P0150 A0150 S0075
-            TOOLDURS.put(new Short((short)158), new Short((short)300));
-            TOOLDURS.put(new Short((short)159), new Short((short)150));
-            TOOLDURS.put(new Short((short)169), new Short((short)1200)); // magne:  P0600 A0600 S0600
-            TOOLDURS.put(new Short((short)170), new Short((short)1200));
-            TOOLDURS.put(new Short((short)171), new Short((short)1200));
-            TOOLDURS.put(new Short((short)172), new Short((short)4000));// irrad:  P2000 A2000 S2000
-            TOOLDURS.put(new Short((short)173), new Short((short)4000));
-            TOOLDURS.put(new Short((short)174), new Short((short)4000));
-            TOOLDURS.put(new Short((short)190), new Short((short)400));
+            FSPEED = FSpeedInitializer.init();
 
-            TOOLDURS.put(new Short((short)105), new Short((short)200)); // copper: 0300
-            TOOLDURS.put(new Short((short)106), new Short((short)200)); // copper: 0300
-            TOOLDURS.put(new Short((short)107), new Short((short)200)); // copper: 0300
-            TOOLDURS.put(new Short((short)108), new Short((short)200)); // copper: 0300
-            TOOLDURS.put(new Short((short)109), new Short((short)200)); // iron:   0400
-            TOOLDURS.put(new Short((short)110), new Short((short)200)); // iron:   0400
-            TOOLDURS.put(new Short((short)111), new Short((short)200)); // iron:   0400
-            TOOLDURS.put(new Short((short)112), new Short((short)200)); // iron:   0400
-            TOOLDURS.put(new Short((short)113), new Short((short)200)); // silver: 0550
-            TOOLDURS.put(new Short((short)114), new Short((short)200)); // silver: 0550
-            TOOLDURS.put(new Short((short)115), new Short((short)200)); // silver: 0550
-            TOOLDURS.put(new Short((short)116), new Short((short)200)); // silver: 0550
-            TOOLDURS.put(new Short((short)117), new Short((short)200)); // gold:   0700
-            TOOLDURS.put(new Short((short)118), new Short((short)200)); // gold:   0700
-            TOOLDURS.put(new Short((short)119), new Short((short)200)); // gold:   0700
-            TOOLDURS.put(new Short((short)120), new Short((short)200)); // gold:   0700
-            TOOLDURS.put(new Short((short)121), new Short((short)200)); // zinc:   0875
-            TOOLDURS.put(new Short((short)122), new Short((short)200)); // zinc:   0875
-            TOOLDURS.put(new Short((short)123), new Short((short)200)); // zinc:   0875
-            TOOLDURS.put(new Short((short)124), new Short((short)200)); // zinc:   0875
-            TOOLDURS.put(new Short((short)125), new Short((short)200)); // rhyme:  1000
-            TOOLDURS.put(new Short((short)126), new Short((short)200)); // rhyme:  1000
-            TOOLDURS.put(new Short((short)127), new Short((short)200)); // rhyme:  1000
-            TOOLDURS.put(new Short((short)128), new Short((short)200)); // rhyme:  1000
-            TOOLDURS.put(new Short((short)129), new Short((short)200)); // obdur:  1400
-            TOOLDURS.put(new Short((short)130), new Short((short)200)); // obdur:  1400
-            TOOLDURS.put(new Short((short)131), new Short((short)200)); // obdur:  1400
-            TOOLDURS.put(new Short((short)132), new Short((short)200)); // obdur:  1400
-            TOOLDURS.put(new Short((short)133), new Short((short)200)); // alumin: 0150
-            TOOLDURS.put(new Short((short)134), new Short((short)200)); // alumin: 0150
-            TOOLDURS.put(new Short((short)135), new Short((short)200)); // alumin: 0150
-            TOOLDURS.put(new Short((short)136), new Short((short)200)); // alumin: 0150
-            TOOLDURS.put(new Short((short)137), new Short((short)200)); // lead:   2000
-            TOOLDURS.put(new Short((short)138), new Short((short)200)); // lead:   2000
-            TOOLDURS.put(new Short((short)139), new Short((short)200)); // lead:   2000
-            TOOLDURS.put(new Short((short)140), new Short((short)200)); // lead:   2000
-
-            FUELS = new HashMap<Short,Double>();
-
-            FUELS.put(new Short((short)15), 0.01);
-            FUELS.put(new Short((short)28), 0.001);
-            FUELS.put(new Short((short)160), 0.02);
-            FUELS.put(new Short((short)168), 0.01);
-            FUELS.put(new Short((short)179), 0.0035);
-            FUELS.put(new Short((short)20), 0.0025);
-            FUELS.put(new Short((short)21), 0.00125);
-            FUELS.put(new Short((short)35), 0.02);
-            FUELS.put(new Short((short)36), 0.011);
-            FUELS.put(new Short((short)77), 0.02);
-            FUELS.put(new Short((short)79), 0.02);
-            FUELS.put(new Short((short)81), 0.02);
-            FUELS.put(new Short((short)83), 0.02);
-            FUELS.put(new Short((short)85), 0.02);
-            FUELS.put(new Short((short)87), 0.02);
-            FUELS.put(new Short((short)89), 0.0035);
-            FUELS.put(new Short((short)91), 0.02);
-            FUELS.put(new Short((short)95), 0.02);
-            FUELS.put(new Short((short)78), 0.01);
-            FUELS.put(new Short((short)80), 0.01);
-            FUELS.put(new Short((short)82), 0.01);
-            FUELS.put(new Short((short)84), 0.01);
-            FUELS.put(new Short((short)86), 0.01);
-            FUELS.put(new Short((short)88), 0.01);
-            FUELS.put(new Short((short)90), 0.01);
-            FUELS.put(new Short((short)92), 0.01);
-            FUELS.put(new Short((short)96), 0.01);
-            for (i=97; i<103; i++) {
-                FUELS.put(new Short((short)i), 0.0035);
-            }
-            FUELS.put(new Short((short)154), 0.002);
-            FUELS.put(new Short((short)155), 0.002);
-            FUELS.put(new Short((short)156), 0.00333);
-
-            WIREP = new HashMap<Integer,Integer>();
-
-            WIREP.put(0, 94);
-            WIREP.put(1, 95);
-            WIREP.put(2, 96);
-            WIREP.put(3, 97);
-            WIREP.put(4, 98);
-            WIREP.put(5, 99);
-
-            TORCHESL = new HashMap<Integer,Integer>();
-
-            TORCHESL.put(20, 24);
-            TORCHESL.put(21, 26);
-            TORCHESL.put(22, 28);
-            TORCHESL.put(100, 101);
-            TORCHESL.put(105, 107);
-            TORCHESL.put(106, 108);
-            TORCHESL.put(127, 127);
-            TORCHESL.put(128, 128);
-
-            TORCHESR = new HashMap<Integer,Integer>();
-
-            TORCHESR.put(20, 25);
-            TORCHESR.put(21, 27);
-            TORCHESR.put(22, 29);
-            TORCHESR.put(100, 102);
-            TORCHESR.put(105, 109);
-            TORCHESR.put(106, 110);
-            TORCHESR.put(127, 129);
-
-            TORCHESB = new HashMap<Integer,Boolean>();
-
-            for (i=0; i<blocknames.length; i++) {
-                TORCHESB.put(i, false);
-            }
-
-            TORCHESB.put(20, true);
-            TORCHESB.put(21, true);
-            TORCHESB.put(22, true);
-            TORCHESB.put(100, true);
-            TORCHESB.put(24, true);
-            TORCHESB.put(26, true);
-            TORCHESB.put(28, true);
-            TORCHESB.put(101, true);
-            TORCHESB.put(25, true);
-            TORCHESB.put(27, true);
-            TORCHESB.put(29, true);
-            TORCHESB.put(102, true);
-            TORCHESB.put(105, true);
-            TORCHESB.put(106, true);
-            TORCHESB.put(107, true);
-            TORCHESB.put(108, true);
-            TORCHESB.put(109, true);
-            TORCHESB.put(110, true);
-            TORCHESB.put(127, true);
-            TORCHESB.put(128, true);
-            TORCHESB.put(129, true);
-            TORCHESB.put(130, true);
-
-            GSUPPORT = new HashMap<Integer,Boolean>();
-
-            for (i=0; i<blocknames.length; i++) {
-                GSUPPORT.put(i, false);
-            }
-
-            GSUPPORT.put(15, true);
-            GSUPPORT.put(83, true);
-            GSUPPORT.put(20, true);
-            GSUPPORT.put(21, true);
-            GSUPPORT.put(22, true);
-            GSUPPORT.put(77, true);
-            GSUPPORT.put(78, true);
-            GSUPPORT.put(100, true);
-            GSUPPORT.put(105, true);
-            GSUPPORT.put(106, true);
-            GSUPPORT.put(131, true);
-            GSUPPORT.put(132, true);
-            GSUPPORT.put(133, true);
-            GSUPPORT.put(134, true);
-            GSUPPORT.put(135, true);
-            GSUPPORT.put(136, true);
-
-            for (i=48; i<73; i++) {
-                GSUPPORT.put(i, true);
-            }
-
-            FSPEED = new HashMap<Short,Double>();
-
-            for (i=0; i<blocknames.length; i++) {
-                FSPEED.put(new Short((short)i), 0.001);
-            }
-
-            FSPEED.put(new Short((short)85), -0.001);
-            FSPEED.put(new Short((short)86), -0.001);
-
-            DDELAY = new HashMap<Integer,Integer>();
-
-            for (i=137; i<145; i++) {
-                DDELAY.put(i, 10);
-            }
-            for (i=145; i<153; i++) {
-                DDELAY.put(i, 20);
-            }
-            for (i=153; i<161; i++) {
-                DDELAY.put(i, 40);
-            }
-            for (i=161; i<169; i++) {
-                DDELAY.put(i, 80);
-            }
+            DDELAY = DDelayInitializer.init();
 
             sun = loadImage("environment/sun.png");
             moon = loadImage("environment/moon.png");
-            FRI1 = new ArrayList<Short>(0);
-            FRN1 = new ArrayList<Short>(0);
-            FRI2 = new ArrayList<Short>(0);
-            FRN2 = new ArrayList<Short>(0);
+            FRI1 = new ArrayList<>(0);
+            FRN1 = new ArrayList<>(0);
+            FRI2 = new ArrayList<>(0);
+            FRN2 = new ArrayList<>(0);
 
-            FRI1.add(new Short((short)3)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)29)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)4)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)30)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)5)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)31)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)6)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)32)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)38)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)60)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)39)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)61)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)40)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)62)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)41)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)63)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)42)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)64)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)43)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)65)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)44)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)67)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)45)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)68)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)46)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)69)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)47)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)70)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)48)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)71)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)49)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)72)); FRN2.add(new Short((short)1));
-            FRI1.add(new Short((short)50)); FRN1.add(new Short((short)4)); FRI2.add(new Short((short)73)); FRN2.add(new Short((short)1));
+            FRI1.add((short) 3); FRN1.add((short) 4); FRI2.add((short) 29); FRN2.add((short) 1);
+            FRI1.add((short) 4); FRN1.add((short) 4); FRI2.add((short) 30); FRN2.add((short) 1);
+            FRI1.add((short) 5); FRN1.add((short) 4); FRI2.add((short) 31); FRN2.add((short) 1);
+            FRI1.add((short) 6); FRN1.add((short) 4); FRI2.add((short) 32); FRN2.add((short) 1);
+            FRI1.add((short) 38); FRN1.add((short) 4); FRI2.add((short) 60); FRN2.add((short) 1);
+            FRI1.add((short) 39); FRN1.add((short) 4); FRI2.add((short) 61); FRN2.add((short) 1);
+            FRI1.add((short) 40); FRN1.add((short) 4); FRI2.add((short) 62); FRN2.add((short) 1);
+            FRI1.add((short) 41); FRN1.add((short) 4); FRI2.add((short) 63); FRN2.add((short) 1);
+            FRI1.add((short) 42); FRN1.add((short) 4); FRI2.add((short) 64); FRN2.add((short) 1);
+            FRI1.add((short) 43); FRN1.add((short) 4); FRI2.add((short) 65); FRN2.add((short) 1);
+            FRI1.add((short) 44); FRN1.add((short) 4); FRI2.add((short) 67); FRN2.add((short) 1);
+            FRI1.add((short) 45); FRN1.add((short) 4); FRI2.add((short) 68); FRN2.add((short) 1);
+            FRI1.add((short) 46); FRN1.add((short) 4); FRI2.add((short) 69); FRN2.add((short) 1);
+            FRI1.add((short) 47); FRN1.add((short) 4); FRI2.add((short) 70); FRN2.add((short) 1);
+            FRI1.add((short) 48); FRN1.add((short) 4); FRI2.add((short) 71); FRN2.add((short) 1);
+            FRI1.add((short) 49); FRN1.add((short) 4); FRI2.add((short) 72); FRN2.add((short) 1);
+            FRI1.add((short) 50); FRN1.add((short) 4); FRI2.add((short) 73); FRN2.add((short) 1);
             for (i=8; i>2; i--) {
-                FRI1.add(new Short((short)74)); FRN1.add(new Short((short)i)); FRI2.add(new Short((short)76)); FRN2.add(new Short((short)i));
-                FRI1.add(new Short((short)2)); FRN1.add(new Short((short)i)); FRI2.add(new Short((short)162)); FRN2.add(new Short((short)i));
-                FRI1.add(new Short((short)161)); FRN1.add(new Short((short)i)); FRI2.add(new Short((short)163)); FRN2.add(new Short((short)i));
-                FRI1.add(new Short((short)165)); FRN1.add(new Short((short)i)); FRI2.add(new Short((short)166)); FRN2.add(new Short((short)i));
-                FRI1.add(new Short((short)15)); FRN1.add(new Short((short)i)); FRI2.add(new Short((short)179)); FRN2.add(new Short((short)i));
+                FRI1.add((short) 74); FRN1.add((short) i); FRI2.add((short) 76); FRN2.add((short) i);
+                FRI1.add((short) 2); FRN1.add((short) i); FRI2.add((short) 162); FRN2.add((short) i);
+                FRI1.add((short) 161); FRN1.add((short) i); FRI2.add((short) 163); FRN2.add((short) i);
+                FRI1.add((short) 165); FRN1.add((short) i); FRI2.add((short) 166); FRN2.add((short) i);
+                FRI1.add((short) 15); FRN1.add((short) i); FRI2.add((short) 179); FRN2.add((short) i);
             }
             for (j=97; j<103; j++) {
-                FRI1.add(new Short((short)j)); FRN1.add(new Short((short)1)); FRI2.add(new Short((short)167)); FRN2.add(new Short((short)8));
+                FRI1.add(new Short((short)j)); FRN1.add((short) 1); FRI2.add((short) 167); FRN2.add((short) 8);
             }
 
             bg = CYANISH;
@@ -1940,13 +1024,13 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                                                             for (int l=0; l<3; l++) {
                                                                                 if (blocks[l][ty][tx] != 0) {
                                                                                     if (l == 2) {
-                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], blocknames, dirs, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
                                                                                     }
                                                                                     else {
-                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], blocknames, dirs, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
@@ -1999,13 +1083,13 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                                                             for (int l=0; l<3; l++) {
                                                                                 if (blocks[l][ty][tx] != 0) {
                                                                                     if (l == 2) {
-                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], blocknames, dirs, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
                                                                                     }
                                                                                     else {
-                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], blocknames, dirs, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
@@ -2058,13 +1142,13 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                                                             for (int l=0; l<3; l++) {
                                                                                 if (blocks[l][ty][tx] != 0) {
                                                                                     if (l == 2) {
-                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], blocknames, dirs, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
                                                                                     }
                                                                                     else {
-                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], blocknames, dirs, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
@@ -2240,76 +1324,6 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
         }
     }
 
-    public void codeTooLarge() {
-        int M = Integer.MAX_VALUE;
-        //                     DirStoCopIroSilGolWooWor                  TreLeaFurCoaLum         Fur                     ZinRhyObdAluLeaUraZytZytSilIrrNulMelSkyMagSanSnoGla                                                                        GraJGrSGrMudSSt                  TreCobCStCCoSBrClaCBrVWoTDiTMaTGrZyW
-        int[][] durList = {{0, 2, 4, 4, 4, 4, M, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 4, 3, M, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 0, M, M, M, 4, M, M, M, M, M, M, M, M, M, M, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 1, 1, 1, 2, 2, 2, 0, 4, 4, 4, 4, 2, 4, 0, 2, M, 2, 1, 1, 1, 1, 1, 1}, // Copper Pick
-                           {0, 2, 4, 4, 4, 4, 4, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 4, 3, 4, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 0, M, M, M, 4, M, M, M, M, M, M, M, M, 4, 4, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 1, 1, 1, 2, 2, 2, 0, 4, 4, 4, 4, 2, 4, 0, 2, 4, 2, 1, 1, 1, 1, 1, 1}, // Iron Pick
-                           {0, 2, 3, 4, 4, 4, 4, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 4, 2, 4, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 0, 4, M, M, 3, M, 4, M, M, M, M, M, M, 4, 4, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 0, 3, 3, 3, 3, 2, 3, 0, 2, 4, 2, 1, 1, 1, 1, 1, 1}, // Silver Pick
-                           {0, 2, 3, 3, 3, 4, 4, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 3, 2, 4, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 0, 4, 4, M, 3, 4, 4, M, M, M, M, M, M, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 0, 3, 3, 3, 3, 2, 3, 0, 2, 3, 2, 1, 1, 1, 1, 1, 1}, // Gold Pick
-                           {0, 0, 0, 0, 0, 0, 0, 3, 2, 2, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Copper Axe
-                           {0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Iron Axe
-                           {0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Silver Axe
-                           {0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Gold Axe
-                           {0, 1, 2, 3, 3, 3, 3, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 3, 1, 3, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 0, 4, 4, M, 2, 4, 3, 4, 4, 4, M, M, M, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 2, 2, 0, 2, 2, 2, 2, 1, 2, 0, 1, 3, 1, 1, 1, 1, 1, 1, 1}, // Zinc Pick
-                           {0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Zinc Axe
-                           {0, 1, 2, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0, 3, 3, 4, 1, 3, 2, 3, 3, 3, M, 4, 4, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 0, 2, 2, 2, 2, 1, 2, 0, 1, 2, 1, 1, 1, 1, 1, 1, 1}, // Rhymestone Pick
-                           {0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Rhymestone Axe
-                           {0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0, 2, 2, 3, 1, 2, 2, 2, 2, 2, 4, 4, 4, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // Obdurite Pick
-                           {0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Obdurite Axe
-                           {0, 2, 3, 3, 3, 4, 4, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 3, 2, 4, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 0, 4, 4, M, 3, 4, 4, M, M, M, M, M, M, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 0, 3, 3, 3, 3, 2, 3, 0, 2, 3, 2, 1, 1, 1, 1, 1, 1}, // Aluminum Pick
-                           {0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Aluminum Axe
-                           {0, 1, 2, 3, 3, 3, 3, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 3, 1, 3, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 0, 4, 4, M, 2, 4, 3, 4, 4, 4, M, M, M, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 2, 2, 0, 2, 2, 2, 2, 1, 2, 0, 1, 3, 1, 1, 1, 1, 1, 1, 1}, // Lead Pick
-                           {0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Lead Axe
-                           {0, 4, 6, 6, M, M, M, 0, 0, 0, 4, 4, 4, 4, 4, 0, 0, 6, 5, M, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 0, M, M, M, M, M, M, M, M, M, M, M, M, M, M, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 5, 1, 1, 1, 4, 4, 4, 0, 6, 6, 6, 6, 4, 6, 0, 4, M, 4, 1, 1, 1, 1, 1, 1}, // Wooden Pick
-                           {0, 0, 0, 0, 0, 0, 0, 5, 4, 4, 0, 0, 0, 0, 0, 15,0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 15,0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Wooden Axe
-                           {0, 3, 5, 5, 6, M, M, 0, 0, 0, 3, 3, 3, 3, 3, 0, 0, 5, 4, M, 1, 1, 1, 5, 1, 1, 1, 1, 1, 1, 0, M, M, M, 5, M, M, M, M, M, M, M, M, M, M, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 4, 1, 1, 1, 3, 3, 3, 0, 5, 5, 5, 5, 3, 5, 0, 3, M, 3, 1, 1, 1, 1, 1, 1}, // Stone Pick
-                           {0, 0, 0, 0, 0, 0, 0, 4, 3, 3, 0, 0, 0, 0, 0, 11,0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 11,0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Stone Axe
-                           {0, 2, 3, 3, 3, 4, 4, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 3, 2, 4, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 0, 4, 4, M, 3, 4, 4, M, M, M, M, M, M, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 0, 3, 3, 3, 3, 2, 3, 0, 2, 3, 2, 1, 1, 1, 1, 1, 1}, // Magnetite Pick
-                           {0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1}, // Magnetite Axe
-                           {0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // Irradium Pick
-                           {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1}};// Irradium Axe
-
-        //                  ZyT      ZyLZyLLev               ZyR                     ZyI                     But         WoP   StP   ZyP   ZyD
-        int[][] durLis2 = {{1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3}, // Copper Pick
-                           {1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3}, // Iron Pick
-                           {1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Silver Pick
-                           {1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Gold Pick
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Copper Axe
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Iron Axe
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Silver Axe
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Gold Axe
-                           {1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Zinc Pick
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Zinc Axe
-                           {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // Rhymestone Pick
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Rhymestone Axe
-                           {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // Obdurite Pick
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Obdurite Axe
-                           {1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Aluminum Pick
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Aluminum Axe
-                           {1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Lead Pick
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Lead Axe
-                           {1, 1, 1, 5, 5, 5, 1, 1, 1, 1, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5}, // Wooden Pick
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Wooden Axe
-                           {1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4}, // Stone Pick
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Stone Axe
-                           {1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}, // Magnetite Pick
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Magnetite Axe
-                           {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // Irradium Pick
-                           {1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};// Irradium Axe
-
-        for (i=0; i<toolList.length; i++) {
-            dur = new HashMap<Integer,Integer>();
-            for (j=0; j<durList[i].length; j++) {
-                dur.put(j, durList[i][j]);
-            }
-            for (j=0; j<durLis2[i].length; j++) {
-                dur.put(j+100, durList[i][j]);
-            }
-            DURABILITY.put(new Short((short)toolList[i]), dur);
-        }
-    }
-
     public void findWorlds() {
         folder = new File("worlds");
         folder.mkdir();
@@ -2350,91 +1364,91 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
 
         if (DEBUG_ITEMS != null) {
             if (DEBUG_ITEMS.equals("normal")) {
-                inventory.addItem(new Short((short)172), new Short((short)1));
-                inventory.addItem(new Short((short)173), new Short((short)1));
-                inventory.addItem(new Short((short)174), new Short((short)1));
-                inventory.addItem(new Short((short)164), new Short((short)100));
-                inventory.addItem(new Short((short)35), new Short((short)100));
-                inventory.addItem(new Short((short)36), new Short((short)100));
-                inventory.addItem(new Short((short)37), new Short((short)100));
-                inventory.addItem(new Short((short)20), new Short((short)5));
-                inventory.addItem(new Short((short)27), new Short((short)5));
-                inventory.addItem(new Short((short)33), new Short((short)1));
-                inventory.addItem(new Short((short)28), new Short((short)100));
-                inventory.addItem(new Short((short)50), new Short((short)100));
-                inventory.addItem(new Short((short)1), new Short((short)100));
-                inventory.addItem(new Short((short)2), new Short((short)100));
-                inventory.addItem(new Short((short)15), new Short((short)100));
+                inventory.addItem((short) 172, (short) 1);
+                inventory.addItem((short) 173, (short) 1);
+                inventory.addItem((short) 174, (short) 1);
+                inventory.addItem((short) 164, (short) 100);
+                inventory.addItem((short) 35, (short) 100);
+                inventory.addItem((short) 36, (short) 100);
+                inventory.addItem((short) 37, (short) 100);
+                inventory.addItem((short) 20, (short) 5);
+                inventory.addItem((short) 27, (short) 5);
+                inventory.addItem((short) 33, (short) 1);
+                inventory.addItem((short) 28, (short) 100);
+                inventory.addItem((short) 50, (short) 100);
+                inventory.addItem((short) 1, (short) 100);
+                inventory.addItem((short) 2, (short) 100);
+                inventory.addItem((short) 15, (short) 100);
             }
             if (DEBUG_ITEMS.equals("tools")) {
-                inventory.addItem(new Short((short)154), new Short((short)1));
-                inventory.addItem(new Short((short)155), new Short((short)1));
-                inventory.addItem(new Short((short)156), new Short((short)1));
-                inventory.addItem(new Short((short)157), new Short((short)1));
-                inventory.addItem(new Short((short)158), new Short((short)1));
-                inventory.addItem(new Short((short)159), new Short((short)1));
-                inventory.addItem(new Short((short)7), new Short((short)1));
-                inventory.addItem(new Short((short)11), new Short((short)1));
-                inventory.addItem(new Short((short)12), new Short((short)1));
-                inventory.addItem(new Short((short)8), new Short((short)1));
-                inventory.addItem(new Short((short)13), new Short((short)1));
-                inventory.addItem(new Short((short)14), new Short((short)1));
-                inventory.addItem(new Short((short)9), new Short((short)1));
-                inventory.addItem(new Short((short)16), new Short((short)1));
-                inventory.addItem(new Short((short)17), new Short((short)1));
-                inventory.addItem(new Short((short)10), new Short((short)1));
-                inventory.addItem(new Short((short)18), new Short((short)1));
-                inventory.addItem(new Short((short)33), new Short((short)1));
-                inventory.addItem(new Short((short)51), new Short((short)1));
-                inventory.addItem(new Short((short)52), new Short((short)1));
-                inventory.addItem(new Short((short)53), new Short((short)1));
-                inventory.addItem(new Short((short)54), new Short((short)1));
-                inventory.addItem(new Short((short)55), new Short((short)1));
-                inventory.addItem(new Short((short)56), new Short((short)1));
-                inventory.addItem(new Short((short)57), new Short((short)1));
-                inventory.addItem(new Short((short)58), new Short((short)1));
-                inventory.addItem(new Short((short)59), new Short((short)1));
-                inventory.addItem(new Short((short)145), new Short((short)1));
-                inventory.addItem(new Short((short)146), new Short((short)1));
-                inventory.addItem(new Short((short)147), new Short((short)1));
-                inventory.addItem(new Short((short)148), new Short((short)1));
-                inventory.addItem(new Short((short)149), new Short((short)1));
-                inventory.addItem(new Short((short)150), new Short((short)1));
-                inventory.addItem(new Short((short)169), new Short((short)1));
-                inventory.addItem(new Short((short)170), new Short((short)1));
-                inventory.addItem(new Short((short)171), new Short((short)1));
-                inventory.addItem(new Short((short)172), new Short((short)1));
-                inventory.addItem(new Short((short)173), new Short((short)1));
-                inventory.addItem(new Short((short)174), new Short((short)1));
+                inventory.addItem((short) 154, (short) 1);
+                inventory.addItem((short) 155, (short) 1);
+                inventory.addItem((short) 156, (short) 1);
+                inventory.addItem((short) 157, (short) 1);
+                inventory.addItem((short) 158, (short) 1);
+                inventory.addItem((short) 159, (short) 1);
+                inventory.addItem((short) 7, (short) 1);
+                inventory.addItem((short) 11, (short) 1);
+                inventory.addItem((short) 12, (short) 1);
+                inventory.addItem((short) 8, (short) 1);
+                inventory.addItem((short) 13, (short) 1);
+                inventory.addItem((short) 14, (short) 1);
+                inventory.addItem((short) 9, (short) 1);
+                inventory.addItem((short) 16, (short) 1);
+                inventory.addItem((short) 17, (short) 1);
+                inventory.addItem((short) 10, (short) 1);
+                inventory.addItem((short) 18, (short) 1);
+                inventory.addItem((short) 33, (short) 1);
+                inventory.addItem((short) 51, (short) 1);
+                inventory.addItem((short) 52, (short) 1);
+                inventory.addItem((short) 53, (short) 1);
+                inventory.addItem((short) 54, (short) 1);
+                inventory.addItem((short) 55, (short) 1);
+                inventory.addItem((short) 56, (short) 1);
+                inventory.addItem((short) 57, (short) 1);
+                inventory.addItem((short) 58, (short) 1);
+                inventory.addItem((short) 59, (short) 1);
+                inventory.addItem((short) 145, (short) 1);
+                inventory.addItem((short) 146, (short) 1);
+                inventory.addItem((short) 147, (short) 1);
+                inventory.addItem((short) 148, (short) 1);
+                inventory.addItem((short) 149, (short) 1);
+                inventory.addItem((short) 150, (short) 1);
+                inventory.addItem((short) 169, (short) 1);
+                inventory.addItem((short) 170, (short) 1);
+                inventory.addItem((short) 171, (short) 1);
+                inventory.addItem((short) 172, (short) 1);
+                inventory.addItem((short) 173, (short) 1);
+                inventory.addItem((short) 174, (short) 1);
 
-                inventory.addItem(new Short((short)19), new Short((short)1));
+                inventory.addItem((short) 19, (short) 1);
             }
             if (DEBUG_ITEMS.equals("testing")) {
-                inventory.addItem(new Short((short)172), new Short((short)1));
-                inventory.addItem(new Short((short)173), new Short((short)1));
-                inventory.addItem(new Short((short)175), new Short((short)100));
-                inventory.addItem(new Short((short)15), new Short((short)100));
-                inventory.addItem(new Short((short)35), new Short((short)100));
-                inventory.addItem(new Short((short)36), new Short((short)100));
-                inventory.addItem(new Short((short)37), new Short((short)100));
-                inventory.addItem(new Short((short)176), new Short((short)100));
-                inventory.addItem(new Short((short)177), new Short((short)100));
-                inventory.addItem(new Short((short)178), new Short((short)100));
-                inventory.addItem(new Short((short)27), new Short((short)100));
-                inventory.addItem(new Short((short)33), new Short((short)1));
-                inventory.addItem(new Short((short)86), new Short((short)100));
-                inventory.addItem(new Short((short)49), new Short((short)100));
-                inventory.addItem(new Short((short)180), new Short((short)100));
-                inventory.addItem(new Short((short)181), new Short((short)100));
-                inventory.addItem(new Short((short)182), new Short((short)100));
-                inventory.addItem(new Short((short)183), new Short((short)100));
-                inventory.addItem(new Short((short)184), new Short((short)100));
-                inventory.addItem(new Short((short)185), new Short((short)100));
-                inventory.addItem(new Short((short)186), new Short((short)100));
-                inventory.addItem(new Short((short)187), new Short((short)100));
-                inventory.addItem(new Short((short)188), new Short((short)100));
-                inventory.addItem(new Short((short)189), new Short((short)100));
-                inventory.addItem(new Short((short)190), new Short((short)1));
+                inventory.addItem((short) 172, (short) 1);
+                inventory.addItem((short) 173, (short) 1);
+                inventory.addItem((short) 175, (short) 100);
+                inventory.addItem((short) 15, (short) 100);
+                inventory.addItem((short) 35, (short) 100);
+                inventory.addItem((short) 36, (short) 100);
+                inventory.addItem((short) 37, (short) 100);
+                inventory.addItem((short) 176, (short) 100);
+                inventory.addItem((short) 177, (short) 100);
+                inventory.addItem((short) 178, (short) 100);
+                inventory.addItem((short) 27, (short) 100);
+                inventory.addItem((short) 33, (short) 1);
+                inventory.addItem((short) 86, (short) 100);
+                inventory.addItem((short) 49, (short) 100);
+                inventory.addItem((short) 180, (short) 100);
+                inventory.addItem((short) 181, (short) 100);
+                inventory.addItem((short) 182, (short) 100);
+                inventory.addItem((short) 183, (short) 100);
+                inventory.addItem((short) 184, (short) 100);
+                inventory.addItem((short) 185, (short) 100);
+                inventory.addItem((short) 186, (short) 100);
+                inventory.addItem((short) 187, (short) 100);
+                inventory.addItem((short) 188, (short) 100);
+                inventory.addItem((short) 189, (short) 100);
+                inventory.addItem((short) 190, (short) 1);
             }
         }
 
@@ -2513,10 +1527,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
         mousePos2[0] = mousePos[0] + player.ix - getWidth()/2 + player.width/2;
         mousePos2[1] = mousePos[1] + player.iy - getHeight()/2 + player.height/2;
 
-        currentSkyLight = skycolors[0];
-        for (i=0; i<skycolors.length; i++) {
-            if (timeOfDay >= skycolors[i]) {
-                currentSkyLight = skycolors[i];
+        currentSkyLight = SKY_COLORS[0];
+        for (i=0; i< SKY_COLORS.length; i++) {
+            if (timeOfDay >= SKY_COLORS[i]) {
+                currentSkyLight = SKY_COLORS[i];
             }
         }
         if (player.y/16 > HEIGHT * 0.55) {
@@ -2808,8 +1822,8 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                             ypos = ay+random.nextInt(20)-10;
                             xpos2 = ax+random.nextInt(20)-10;
                             ypos2 = ay+random.nextInt(20)-10;
-                            if (xpos > 0 && xpos < WIDTH-1 && ypos > 0 && ypos < HEIGHT-1 && (blocks[1][ypos][xpos] == 0 || !blockcds[blocks[1][ypos][xpos]] &&
-                                xpos2 > 0 && xpos2 < WIDTH-1 && ypos2 > 0 && ypos2 < HEIGHT-1 && blocks[1][ypos2][xpos2] != 0 && blockcds[blocks[1][ypos2][xpos2]])) {
+                            if (xpos > 0 && xpos < WIDTH-1 && ypos > 0 && ypos < HEIGHT-1 && (blocks[1][ypos][xpos] == 0 || !BLOCK_CDS[blocks[1][ypos][xpos]] &&
+                                xpos2 > 0 && xpos2 < WIDTH-1 && ypos2 > 0 && ypos2 < HEIGHT-1 && blocks[1][ypos2][xpos2] != 0 && BLOCK_CDS[blocks[1][ypos2][xpos2]])) {
                                 mobSpawn = null;
                                 if (!checkBiome(xpos, ypos).equals("underground")) {
                                     if ((day != 0 || DEBUG_HOSTILE > 1) && (timeOfDay >= 75913 || timeOfDay < 28883)) {
@@ -2920,7 +1934,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                 doMobSpawn = true;
                                 for (x=(int)(xpos/BLOCKSIZE); x<(int)(xpos/BLOCKSIZE+xmax); x++) {
                                     for (y=(int)(ypos/BLOCKSIZE); y<(int)(ypos/BLOCKSIZE+ymax); y++) {
-                                        if (y > 0 && y < HEIGHT-1 && blocks[1][y][x] != 0 && blockcds[blocks[1][y][x]]) {
+                                        if (y > 0 && y < HEIGHT-1 && blocks[1][y][x] != 0 && BLOCK_CDS[blocks[1][y][x]]) {
                                             doMobSpawn = false;
                                         }
                                     }
@@ -3284,7 +2298,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         Math.sqrt(Math.pow(player.x+player.image.getWidth()-ux2*BLOCKSIZE+BLOCKSIZE/2+WIDTH*BLOCKSIZE, 2) + Math.pow(player.y+player.image.getHeight()-uy2*BLOCKSIZE+BLOCKSIZE/2, 2)) <= 160 || DEBUG_REACH) {
                         ucx = ux - CHUNKBLOCKS * ((int)(ux/CHUNKBLOCKS));
                         ucy = uy - CHUNKBLOCKS * ((int)(uy/CHUNKBLOCKS));
-                        if (Arrays.asList(toolList).contains(inventory.tool())) {
+                        if (Arrays.asList(TOOL_LIST).contains(inventory.tool())) {
                             if (blocks[layer][uy][ux] != 0 && Arrays.asList(BLOCKTOOLS.get(blocks[layer][uy][ux])).contains(inventory.tool())) {
                                 blockdns[uy][ux] = (byte)random.nextInt(5);
                                 drawn[uy][ux] = false;
@@ -3377,19 +2391,19 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                                       blockTemp == 63 && (blocks[layer][uy+1][ux] != 2) || // caveroot
                                                       blockTemp == 66 && (blocks[layer][uy+1][ux] != 1 && blocks[layer][uy+1][ux] != 72 && blocks[layer][uy+1][ux] != 73) || // skyblossom
                                                       blockTemp == 69 && (blocks[layer][uy+1][ux] != 2))) { // void_rot
-                                if (!(TORCHESL.get(blockTemp) != null) || uy < HEIGHT - 1 && (solid[blocks[layer][uy+1][ux]] && blockTemp != 127 || solid[blocks[layer][uy][ux+1]] || solid[blocks[layer][uy][ux-1]])) {
+                                if (!(TORCHESL.get(blockTemp) != null) || uy < HEIGHT - 1 && (SOLID[blocks[layer][uy+1][ux]] && blockTemp != 127 || SOLID[blocks[layer][uy][ux+1]] || SOLID[blocks[layer][uy][ux-1]])) {
                                     if (TORCHESL.get(blockTemp) != null) {
-                                        if (solid[blocks[layer][uy+1][ux]] && blockTemp != 127) {
+                                        if (SOLID[blocks[layer][uy+1][ux]] && blockTemp != 127) {
                                             blockTemp = blockTemp;
                                         }
-                                        else if (solid[blocks[layer][uy][ux-1]]) {
+                                        else if (SOLID[blocks[layer][uy][ux-1]]) {
                                             blockTemp = TORCHESL.get(blockTemp);
                                         }
-                                        else if (solid[blocks[layer][uy][ux+1]]) {
+                                        else if (SOLID[blocks[layer][uy][ux+1]]) {
                                             blockTemp = TORCHESR.get(blockTemp);
                                         }
                                     }
-                                    if (layer == 1 && !DEBUG_GPLACE && blockcds[blockTemp]) {
+                                    if (layer == 1 && !DEBUG_GPLACE && BLOCK_CDS[blockTemp]) {
                                         for (i=0; i<entities.size(); i++) {
                                             if (entities.get(i).getName() != null && entities.get(i).getRect().intersects(new Rectangle(ux*BLOCKSIZE, uy*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                                                 blockTemp = 0;
@@ -3401,13 +2415,13 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                     }
                                     if (blockTemp != 0) {
                                         blocks[layer][uy][ux] = blockTemp;
-                                        if (receives[blocks[layer][uy][ux]]) {
+                                        if (RECEIVES[blocks[layer][uy][ux]]) {
                                             addAdjacentTilesToPQueue(ux, uy);
                                         }
-                                        if (powers[blocks[layer][uy][ux]]) {
+                                        if (POWERS[blocks[layer][uy][ux]]) {
                                             addBlockPower(ux, uy);
                                         }
-                                        if (ltrans[blocks[layer][uy][ux]]) {
+                                        if (L_TRANS[blocks[layer][uy][ux]]) {
                                             removeSunLighting(ux, uy);
                                             redoBlockLighting(ux, uy);
                                         }
@@ -4147,7 +3161,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         }
                         entities.remove(i);
                     }
-                    if (!Arrays.asList(toolList).contains(inventory.ids[inventory.selection])) {
+                    if (!Arrays.asList(TOOL_LIST).contains(inventory.ids[inventory.selection])) {
                         inventory.durs[inventory.selection] -= 1;
                     }
                     else {
@@ -4208,14 +3222,14 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
 
     public boolean hasOpenSpace(int x, int y, int l) {
         try {
-            return (blocks[l][y-1][x-1] == 0 || !blockcds[blocks[l][y-1][x-1]] ||
-                    blocks[l][y-1][x] == 0 || !blockcds[blocks[l][y-1][x]] ||
-                    blocks[l][y-1][x+1] == 0 || !blockcds[blocks[l][y-1][x+1]] ||
-                    blocks[l][y][x-1] == 0 || !blockcds[blocks[l][y][x-1]] ||
-                    blocks[l][y][x+1] == 0 || !blockcds[blocks[l][y][x+1]] ||
-                    blocks[l][y+1][x-1] == 0 || !blockcds[blocks[l][y+1][x-1]] ||
-                    blocks[l][y+1][x] == 0 || !blockcds[blocks[l][y+1][x]] ||
-                    blocks[l][y+1][x+1] == 0 || !blockcds[blocks[l][y+1][x+1]]);
+            return (blocks[l][y-1][x-1] == 0 || !BLOCK_CDS[blocks[l][y-1][x-1]] ||
+                    blocks[l][y-1][x] == 0 || !BLOCK_CDS[blocks[l][y-1][x]] ||
+                    blocks[l][y-1][x+1] == 0 || !BLOCK_CDS[blocks[l][y-1][x+1]] ||
+                    blocks[l][y][x-1] == 0 || !BLOCK_CDS[blocks[l][y][x-1]] ||
+                    blocks[l][y][x+1] == 0 || !BLOCK_CDS[blocks[l][y][x+1]] ||
+                    blocks[l][y+1][x-1] == 0 || !BLOCK_CDS[blocks[l][y+1][x-1]] ||
+                    blocks[l][y+1][x] == 0 || !BLOCK_CDS[blocks[l][y+1][x]] ||
+                    blocks[l][y+1][x+1] == 0 || !BLOCK_CDS[blocks[l][y+1][x+1]]);
         }
         catch (ArrayIndexOutOfBoundsException e) {
             return false;
@@ -4223,14 +3237,14 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
     }
 
     public static boolean hasOpenSpace(int x, int y, Integer[][] blocks) {
-        return (blocks[y-1][x-1] == 0 || !blockcds[blocks[y-1][x-1]] ||
-                blocks[y-1][x] == 0 || !blockcds[blocks[y-1][x]] ||
-                blocks[y-1][x+1] == 0 || !blockcds[blocks[y-1][x+1]] ||
-                blocks[y][x-1] == 0 || !blockcds[blocks[y][x-1]] ||
-                blocks[y][x+1] == 0 || !blockcds[blocks[y][x+1]] ||
-                blocks[y+1][x-1] == 0 || !blockcds[blocks[y+1][x-1]] ||
-                blocks[y+1][x] == 0 || !blockcds[blocks[y+1][x]] ||
-                blocks[y+1][x+1] == 0 || !blockcds[blocks[y+1][x+1]]);
+        return (blocks[y-1][x-1] == 0 || !BLOCK_CDS[blocks[y-1][x-1]] ||
+                blocks[y-1][x] == 0 || !BLOCK_CDS[blocks[y-1][x]] ||
+                blocks[y-1][x+1] == 0 || !BLOCK_CDS[blocks[y-1][x+1]] ||
+                blocks[y][x-1] == 0 || !BLOCK_CDS[blocks[y][x-1]] ||
+                blocks[y][x+1] == 0 || !BLOCK_CDS[blocks[y][x+1]] ||
+                blocks[y+1][x-1] == 0 || !BLOCK_CDS[blocks[y+1][x-1]] ||
+                blocks[y+1][x] == 0 || !BLOCK_CDS[blocks[y+1][x]] ||
+                blocks[y+1][x+1] == 0 || !BLOCK_CDS[blocks[y+1][x+1]]);
     }
 
     public boolean empty(int x, int y) {
@@ -4400,10 +3414,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
             if (blockTemp >= 94 && blockTemp <= 99) {
                 redoBlockPower(ux, uy, layer);
             }
-            if (powers[blockTemp]) {
+            if (POWERS[blockTemp]) {
                 removeBlockPower(ux, uy, layer);
             }
-            if (ltrans[blockTemp]) {
+            if (L_TRANS[blockTemp]) {
                 addSunLighting(ux, uy);
                 redoBlockLighting(ux, uy);
             }
@@ -4458,7 +3472,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                     if (blockTemp >= 94 && blockTemp <= 99) {
                         redoBlockPower(ux, uy, layer);
                     }
-                    if (powers[blockTemp]) {
+                    if (POWERS[blockTemp]) {
                         removeBlockPower(ux, uy, layer);
                     }
                     drawn[uy][ux-1] = false;
@@ -4474,7 +3488,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                     if (blockTemp >= 94 && blockTemp <= 99) {
                         redoBlockPower(ux, uy, layer);
                     }
-                    if (powers[blockTemp]) {
+                    if (POWERS[blockTemp]) {
                         removeBlockPower(ux, uy, layer);
                     }
                     drawn[uy][ux+1] = false;
@@ -4529,10 +3543,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                 if (blockTemp >= 94 && blockTemp <= 99) {
                     redoBlockPower(ux, uy, layer);
                 }
-                if (powers[blockTemp]) {
+                if (POWERS[blockTemp]) {
                     removeBlockPower(ux, uy, layer);
                 }
-                if (ltrans[blockTemp]) {
+                if (L_TRANS[blockTemp]) {
                     addSunLighting(ux, uy);
                     redoBlockLighting(ux, uy);
                 }
@@ -4617,7 +3631,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
     }
 
     public void addBlockPower(int ux, int uy) {
-        if (powers[blocks[1][uy][ux]]) {
+        if (POWERS[blocks[1][uy][ux]]) {
             if (blocks[1][uy][ux] >= 137 && blocks[1][uy][ux] <= 168) {
                 print("Whaaat?");
                 updatex.add(ux);
@@ -4628,18 +3642,18 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
             else {
                 addTileToPZQueue(ux, uy);
                 power[1][uy][ux] = (float)5;
-                if (conducts[blocks[1][uy][ux]] >= 0 && wcnct[uy][ux]) {
-                    if (receives[blocks[0][uy][ux]]) {
-                        power[0][uy][ux] = power[1][uy][ux] - (float)conducts[blocks[1][uy][ux]];
+                if (CONDUCTS[blocks[1][uy][ux]] >= 0 && wcnct[uy][ux]) {
+                    if (RECEIVES[blocks[0][uy][ux]]) {
+                        power[0][uy][ux] = power[1][uy][ux] - (float) CONDUCTS[blocks[1][uy][ux]];
                     }
-                    if (receives[blocks[2][uy][ux]]) {
-                        power[2][uy][ux] = power[1][uy][ux] - (float)conducts[blocks[1][uy][ux]];
+                    if (RECEIVES[blocks[2][uy][ux]]) {
+                        power[2][uy][ux] = power[1][uy][ux] - (float) CONDUCTS[blocks[1][uy][ux]];
                     }
                 }
                 addTileToPQueue(ux, uy);
             }
         }
-        if (powers[blocks[0][uy][ux]]) {
+        if (POWERS[blocks[0][uy][ux]]) {
             if (blocks[0][uy][ux] >= 137 && blocks[0][uy][ux] <= 168) {
                 print("Whaaat?");
                 updatex.add(ux);
@@ -4650,18 +3664,18 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
             else {
                 addTileToPZQueue(ux, uy);
                 power[0][uy][ux] = (float)5;
-                if (conducts[blocks[0][uy][ux]] >= 0 && wcnct[uy][ux]) {
-                    if (receives[blocks[1][uy][ux]]) {
-                        power[1][uy][ux] = power[0][uy][ux] - (float)conducts[blocks[0][uy][ux]];
+                if (CONDUCTS[blocks[0][uy][ux]] >= 0 && wcnct[uy][ux]) {
+                    if (RECEIVES[blocks[1][uy][ux]]) {
+                        power[1][uy][ux] = power[0][uy][ux] - (float) CONDUCTS[blocks[0][uy][ux]];
                     }
-                    if (receives[blocks[2][uy][ux]]) {
-                        power[2][uy][ux] = power[0][uy][ux] - (float)conducts[blocks[0][uy][ux]];
+                    if (RECEIVES[blocks[2][uy][ux]]) {
+                        power[2][uy][ux] = power[0][uy][ux] - (float) CONDUCTS[blocks[0][uy][ux]];
                     }
                 }
                 addTileToPQueue(ux, uy);
             }
         }
-        if (powers[blocks[2][uy][ux]]) {
+        if (POWERS[blocks[2][uy][ux]]) {
             if (blocks[2][uy][ux] >= 137 && blocks[2][uy][ux] <= 168) {
                 print("Whaaat?");
                 updatex.add(ux);
@@ -4672,12 +3686,12 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
             else {
                 addTileToPZQueue(ux, uy);
                 power[2][uy][ux] = (float)5;
-                if (conducts[blocks[2][uy][ux]] >= 0 && wcnct[uy][ux]) {
-                    if (receives[blocks[0][uy][ux]]) {
-                        power[0][uy][ux] = power[2][uy][ux] - (float)conducts[blocks[2][uy][ux]];
+                if (CONDUCTS[blocks[2][uy][ux]] >= 0 && wcnct[uy][ux]) {
+                    if (RECEIVES[blocks[0][uy][ux]]) {
+                        power[0][uy][ux] = power[2][uy][ux] - (float) CONDUCTS[blocks[2][uy][ux]];
                     }
-                    if (receives[blocks[1][uy][ux]]) {
-                        power[1][uy][ux] = power[2][uy][ux] - (float)conducts[blocks[2][uy][ux]];
+                    if (RECEIVES[blocks[1][uy][ux]]) {
+                        power[1][uy][ux] = power[2][uy][ux] - (float) CONDUCTS[blocks[2][uy][ux]];
                     }
                 }
                 addTileToPQueue(ux, uy);
@@ -4723,7 +3737,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
             ax3 = ux+cl[ir][0];
             ay3 = uy+cl[ir][1];
             if (ay3 >= 0 && ay3 < HEIGHT && power[lyr][ay3][ax3] != 0) {
-                if (power[lyr][ay3][ax3] != 0 && !(power[lyr][ay3][ax3] == power[lyr][uy][ux] - conducts[blocks[lyr][uy][ux]]) &&
+                if (power[lyr][ay3][ax3] != 0 && !(power[lyr][ay3][ax3] == power[lyr][uy][ux] - CONDUCTS[blocks[lyr][uy][ux]]) &&
                  (!(blocks[lyr][ay3][ax3] >= 111 && blocks[lyr][ay3][ax3] <= 118 || blocks[lyr][ay3][ax3] >= 119 && blocks[lyr][ay3][ax3] <= 126) ||
                   !(blocks[lyr][ay3][ax3] >= 111 && blocks[lyr][ay3][ax3] <= 118 && ux > ax3 && blocks[lyr][ay3][ax3] != 111 && blocks[lyr][ay3][ax3] != 115 ||
                     blocks[lyr][ay3][ax3] >= 111 && blocks[lyr][ay3][ax3] <= 118 && uy > ay3 && blocks[lyr][ay3][ax3] != 112 && blocks[lyr][ay3][ax3] != 116 ||
@@ -4749,8 +3763,8 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
             ay3 = uy+cl[ir][1];
             print("[rpbRecur2] " + ax3 + " " + ay3 + " " + power[lyr][ay3][ax3]);
             if (ay3 >= 0 && ay3 < HEIGHT && power[lyr][ay3][ax3] != 0) {
-                print("[rbpRecur] " + power[lyr][ay3][ax3] + " " + power[lyr][uy][ux] + " " + conducts[blocks[lyr][uy][ux]]);
-                if ((power[lyr][ay3][ax3] == power[lyr][uy][ux] - conducts[blocks[lyr][uy][ux]]) &&
+                print("[rbpRecur] " + power[lyr][ay3][ax3] + " " + power[lyr][uy][ux] + " " + CONDUCTS[blocks[lyr][uy][ux]]);
+                if ((power[lyr][ay3][ax3] == power[lyr][uy][ux] - CONDUCTS[blocks[lyr][uy][ux]]) &&
                  (!(blocks[lyr][ay3][ax3] >= 111 && blocks[lyr][ay3][ax3] <= 118 || blocks[lyr][ay3][ax3] >= 119 && blocks[lyr][ay3][ax3] <= 126) ||
                   !(blocks[lyr][uy][ux] >= 111 && blocks[lyr][uy][ux] <= 118 && ux < ax3 && blocks[lyr][uy][ux] != 111 && blocks[lyr][uy][ux] != 115 ||
                     blocks[lyr][uy][ux] >= 111 && blocks[lyr][uy][ux] <= 118 && uy < ay3 && blocks[lyr][uy][ux] != 112 && blocks[lyr][uy][ux] != 116 ||
@@ -4766,45 +3780,45 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                     blocks[lyr][uy][ux] >= 137 && blocks[lyr][uy][ux] <= 168 && uy > ay3 && blocks[lyr][uy][ux] != 140 && blocks[lyr][uy][ux] != 144 && blocks[lyr][uy][ux] != 148 && blocks[lyr][uy][ux] != 152 && blocks[lyr][uy][ux] != 156 && blocks[lyr][uy][ux] != 160 && blocks[lyr][uy][ux] != 164 && blocks[lyr][uy][ux] != 168))) {
                     if (!arbprd[lyr][ay3][ax3]) {
                         rbpRecur(ax3, ay3, lyr);
-                        if (conducts[blocks[lyr][ay3][ax3]] >= 0 && wcnct[ay3][ax3]) {
+                        if (CONDUCTS[blocks[lyr][ay3][ax3]] >= 0 && wcnct[ay3][ax3]) {
                             if (lyr == 0) {
-                                if (receives[blocks[1][ay3][ax3]]) {
+                                if (RECEIVES[blocks[1][ay3][ax3]]) {
                                     rbpRecur(ax3, ay3, 1);
-                                    if (powers[blocks[1][ay3][ax3]]) {
+                                    if (POWERS[blocks[1][ay3][ax3]]) {
                                         addTileToPQueue(ax3, ay3);
                                     }
                                 }
-                                if (receives[blocks[2][ay3][ax3]]) {
+                                if (RECEIVES[blocks[2][ay3][ax3]]) {
                                     rbpRecur(ax3, ay3, 2);
-                                    if (powers[blocks[2][ay3][ax3]]) {
+                                    if (POWERS[blocks[2][ay3][ax3]]) {
                                         addTileToPQueue(ax3, ay3);
                                     }
                                 }
                             }
                             if (lyr == 1) {
-                                if (receives[blocks[0][ay3][ax3]]) {
+                                if (RECEIVES[blocks[0][ay3][ax3]]) {
                                     rbpRecur(ax3, ay3, 0);
-                                    if (powers[blocks[0][ay3][ax3]]) {
+                                    if (POWERS[blocks[0][ay3][ax3]]) {
                                         addTileToPQueue(ax3, ay3);
                                     }
                                 }
-                                if (receives[blocks[2][ay3][ax3]]) {
+                                if (RECEIVES[blocks[2][ay3][ax3]]) {
                                     rbpRecur(ax3, ay3, 2);
-                                    if (powers[blocks[2][ay3][ax3]]) {
+                                    if (POWERS[blocks[2][ay3][ax3]]) {
                                         addTileToPQueue(ax3, ay3);
                                     }
                                 }
                             }
                             if (lyr == 2) {
-                                if (receives[blocks[0][ay3][ax3]]) {
+                                if (RECEIVES[blocks[0][ay3][ax3]]) {
                                     rbpRecur(ax3, ay3, 0);
-                                    if (powers[blocks[0][ay3][ax3]]) {
+                                    if (POWERS[blocks[0][ay3][ax3]]) {
                                         addTileToPQueue(ax3, ay3);
                                     }
                                 }
-                                if (receives[blocks[1][ay3][ax3]]) {
+                                if (RECEIVES[blocks[1][ay3][ax3]]) {
                                     rbpRecur(ax3, ay3, 1);
-                                    if (powers[blocks[1][ay3][ax3]]) {
+                                    if (POWERS[blocks[1][ay3][ax3]]) {
                                         addTileToPQueue(ax3, ay3);
                                     }
                                 }
@@ -4858,7 +3872,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                 ax3 = ux+cl[ir][0];
                 ay3 = uy+cl[ir][1];
                 if (ay3 >= 0 && ay3 < HEIGHT && power[lyr][ay3][ax3] != 0) {
-                    if (!(power[lyr][ay3][ax3] == power[lyr][uy][ux] - conducts[blocks[lyr][uy][ux]]) &&
+                    if (!(power[lyr][ay3][ax3] == power[lyr][uy][ux] - CONDUCTS[blocks[lyr][uy][ux]]) &&
                      (!(blocks[lyr][ay3][ax3] >= 111 && blocks[lyr][ay3][ax3] <= 118 || blocks[lyr][ay3][ax3] >= 119 && blocks[lyr][ay3][ax3] <= 126) ||
                       !(blocks[lyr][ay3][ax3] >= 111 && blocks[lyr][ay3][ax3] <= 118 && ux > ax3 && blocks[lyr][ay3][ax3] != 111 && blocks[lyr][ay3][ax3] != 115 ||
                         blocks[lyr][ay3][ax3] >= 111 && blocks[lyr][ay3][ax3] <= 118 && uy > ay3 && blocks[lyr][ay3][ax3] != 112 && blocks[lyr][ay3][ax3] != 116 ||
@@ -4882,8 +3896,8 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                 ay3 = uy+cl[ir][1];
                 print(blocks[lyr][ay3][ax3] + " " + power[lyr][ay3][ax3]);
                 if (ay3 >= 0 && ay3 < HEIGHT && power[lyr][ay3][ax3] != 0) {
-                    print(power[lyr][uy][ux] + " " + power[lyr][ay3][ax3] + " " + conducts[blocks[lyr][uy][ux]]);
-                    if (power[lyr][ay3][ax3] == power[lyr][uy][ux] - conducts[blocks[lyr][uy][ux]]) {
+                    print(power[lyr][uy][ux] + " " + power[lyr][ay3][ax3] + " " + CONDUCTS[blocks[lyr][uy][ux]]);
+                    if (power[lyr][ay3][ax3] == power[lyr][uy][ux] - CONDUCTS[blocks[lyr][uy][ux]]) {
                         if (!(blocks[lyr][ay3][ax3] >= 111 && blocks[lyr][ay3][ax3] <= 118 || blocks[lyr][ay3][ax3] >= 119 && blocks[lyr][ay3][ax3] <= 126) ||
                           !(blocks[lyr][uy][ux] >= 111 && blocks[lyr][uy][ux] <= 118 && ux < ax3 && blocks[lyr][uy][ux] != 111 && blocks[lyr][uy][ux] != 115 ||
                             blocks[lyr][uy][ux] >= 111 && blocks[lyr][uy][ux] <= 118 && uy < ay3 && blocks[lyr][uy][ux] != 112 && blocks[lyr][uy][ux] != 116 ||
@@ -4899,45 +3913,45 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                             blocks[lyr][uy][ux] >= 137 && blocks[lyr][uy][ux] <= 168 && uy > ay3 && blocks[lyr][uy][ux] != 140 && blocks[lyr][uy][ux] != 144 && blocks[lyr][uy][ux] != 148 && blocks[lyr][uy][ux] != 152 && blocks[lyr][uy][ux] != 156 && blocks[lyr][uy][ux] != 160 && blocks[lyr][uy][ux] != 164 && blocks[lyr][uy][ux] != 168)) {
                             if (!arbprd[lyr][ay3][ax3]) {
                                 rbpRecur(ax3, ay3, lyr);
-                                if (conducts[blocks[lyr][ay3][ax3]] >= 0 && wcnct[ay3][ax3]) {
+                                if (CONDUCTS[blocks[lyr][ay3][ax3]] >= 0 && wcnct[ay3][ax3]) {
                                     if (lyr == 0) {
-                                        if (receives[blocks[1][ay3][ax3]]) {
+                                        if (RECEIVES[blocks[1][ay3][ax3]]) {
                                             rbpRecur(ax3, ay3, 1);
-                                            if (powers[blocks[1][ay3][ax3]]) {
+                                            if (POWERS[blocks[1][ay3][ax3]]) {
                                                 addTileToPQueue(ax3, ay3);
                                             }
                                         }
-                                        if (receives[blocks[2][ay3][ax3]]) {
+                                        if (RECEIVES[blocks[2][ay3][ax3]]) {
                                             rbpRecur(ax3, ay3, 2);
-                                            if (powers[blocks[2][ay3][ax3]]) {
+                                            if (POWERS[blocks[2][ay3][ax3]]) {
                                                 addTileToPQueue(ax3, ay3);
                                             }
                                         }
                                     }
                                     if (lyr == 1) {
-                                        if (receives[blocks[0][ay3][ax3]]) {
+                                        if (RECEIVES[blocks[0][ay3][ax3]]) {
                                             rbpRecur(ax3, ay3, 0);
-                                            if (powers[blocks[0][ay3][ax3]]) {
+                                            if (POWERS[blocks[0][ay3][ax3]]) {
                                                 addTileToPQueue(ax3, ay3);
                                             }
                                         }
-                                        if (receives[blocks[2][ay3][ax3]]) {
+                                        if (RECEIVES[blocks[2][ay3][ax3]]) {
                                             rbpRecur(ax3, ay3, 2);
-                                            if (powers[blocks[2][ay3][ax3]]) {
+                                            if (POWERS[blocks[2][ay3][ax3]]) {
                                                 addTileToPQueue(ax3, ay3);
                                             }
                                         }
                                     }
                                     if (lyr == 2) {
-                                        if (receives[blocks[0][ay3][ax3]]) {
+                                        if (RECEIVES[blocks[0][ay3][ax3]]) {
                                             rbpRecur(ax3, ay3, 0);
-                                            if (powers[blocks[0][ay3][ax3]]) {
+                                            if (POWERS[blocks[0][ay3][ax3]]) {
                                                 addTileToPQueue(ax3, ay3);
                                             }
                                         }
-                                        if (receives[blocks[1][ay3][ax3]]) {
+                                        if (RECEIVES[blocks[1][ay3][ax3]]) {
                                             rbpRecur(ax3, ay3, 1);
-                                            if (powers[blocks[1][ay3][ax3]]) {
+                                            if (POWERS[blocks[1][ay3][ax3]]) {
                                                 addTileToPQueue(ax3, ay3);
                                             }
                                         }
@@ -5018,7 +4032,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
     }
 
     public void redoBlockPower(int ux, int uy, int lyr) {
-        if (powers[blocks[lyr][uy][ux]] || blocks[lyr][uy][ux] >= 94 && blocks[lyr][uy][ux] <= 99) {
+        if (POWERS[blocks[lyr][uy][ux]] || blocks[lyr][uy][ux] >= 94 && blocks[lyr][uy][ux] <= 99) {
             addAdjacentTilesToPQueue(ux, uy);
         }
         else {
@@ -5028,19 +4042,19 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
 
     public void addSunLighting(int ux, int uy) { // And including
         for (y=0; y<uy; y++) {
-            if (ltrans[blocks[1][y][ux]]) {
+            if (L_TRANS[blocks[1][y][ux]]) {
                 return;
             }
         }
         addSources = false;
         for (y=uy; y<HEIGHT-1; y++) {
-            if (ltrans[blocks[1][y+1][ux-1]] || ltrans[blocks[1][y+1][ux+1]]) {
+            if (L_TRANS[blocks[1][y+1][ux-1]] || L_TRANS[blocks[1][y+1][ux+1]]) {
                 addSources = true;
             }
             if (addSources) {
                 addTileToQueue(ux, y);
             }
-            if (ltrans[blocks[1][y][ux]]) {
+            if (L_TRANS[blocks[1][y][ux]]) {
                 return;
             }
             addTileToZQueue(ux, y);
@@ -5052,13 +4066,13 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
     public void removeSunLighting(int ux, int uy) { // And including
         n = sunlightlevel;
         for (y=0; y<uy; y++) {
-            if (ltrans[blocks[1][y][ux]]) {
+            if (L_TRANS[blocks[1][y][ux]]) {
                 return;
             }
         }
         for (y=uy; y<HEIGHT; y++) {
             lsources[y][ux] = isBlockLightSource(ux, y);
-            if (y != uy && ltrans[blocks[1][y][ux]]) {
+            if (y != uy && L_TRANS[blocks[1][y][ux]]) {
                 break;
             }
         }
@@ -5083,7 +4097,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
 
     public boolean isReachedBySunlight(int ux, int uy) {
         for (ay=0; ay<uy+1; ay++) {
-            if (ltrans[blocks[1][ay][ux]]) {
+            if (L_TRANS[blocks[1][ay][ux]]) {
                 return false;
             }
         }
@@ -5199,7 +4213,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                     x2 = x + cl[i][0];
                     y2 = y + cl[i][1];
                     if (y2 >= 0 && y2 < HEIGHT) {
-                        if (!ltrans[blocks[1][y2][x2]]) {
+                        if (!L_TRANS[blocks[1][y2][x2]]) {
                             if (lights[y2][x2] <= lights[y][x] - (float)1.0) {
                                 addTileToZQueue(x2, y2);
                                 lights[y2][x2] = lights[y][x] - (float)1.0;
@@ -5241,7 +4255,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                 x = pqx.get(0);
                 y = pqy.get(0);
                 for (int l=0; l<3; l++) {
-                    if (powers[blocks[l][y][x]]) {
+                    if (POWERS[blocks[l][y][x]]) {
                         if (!(blocks[l][y][x] >= 137 && blocks[l][y][x] <= 168)) {
                             addTileToPQueue(x, y);
                             power[l][y][x] = (float)5;
@@ -5254,7 +4268,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                     if (y2 >= 0 && y2 < HEIGHT) {
                         for (int l=0; l<3; l++) {
                             if (power[l][y][x] > 0) {
-                                if (conducts[blocks[l][y][x]] >= 0 && receives[blocks[l][y2][x2]] && !(blocks[l][y2][x2] >= 111 && blocks[l][y2][x2] <= 118 && x < x2 && blocks[l][y2][x2] != 111 && blocks[l][y2][x2] != 115 ||
+                                if (CONDUCTS[blocks[l][y][x]] >= 0 && RECEIVES[blocks[l][y2][x2]] && !(blocks[l][y2][x2] >= 111 && blocks[l][y2][x2] <= 118 && x < x2 && blocks[l][y2][x2] != 111 && blocks[l][y2][x2] != 115 ||
                                                                                                  blocks[l][y2][x2] >= 111 && blocks[l][y2][x2] <= 118 && y < y2 && blocks[l][y2][x2] != 112 && blocks[l][y2][x2] != 116 ||
                                                                                                  blocks[l][y2][x2] >= 111 && blocks[l][y2][x2] <= 118 && x > x2 && blocks[l][y2][x2] != 113 && blocks[l][y2][x2] != 117 ||
                                                                                                  blocks[l][y2][x2] >= 111 && blocks[l][y2][x2] <= 118 && y > y2 && blocks[l][y2][x2] != 114 && blocks[l][y2][x2] != 118) &&
@@ -5278,7 +4292,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                                                                                  blocks[l][y][x] >= 137 && blocks[l][y][x] <= 168 && y < y2 && blocks[l][y][x] != 138 && blocks[l][y][x] != 142 && blocks[l][y][x] != 146 && blocks[l][y][x] != 150 && blocks[l][y][x] != 154 && blocks[l][y][x] != 158 && blocks[l][y][x] != 162 && blocks[l][y][x] != 166 ||
                                                                                                  blocks[l][y][x] >= 137 && blocks[l][y][x] <= 168 && x > x2 && blocks[l][y][x] != 139 && blocks[l][y][x] != 143 && blocks[l][y][x] != 147 && blocks[l][y][x] != 151 && blocks[l][y][x] != 155 && blocks[l][y][x] != 159 && blocks[l][y][x] != 163 && blocks[l][y][x] != 167 ||
                                                                                                  blocks[l][y][x] >= 137 && blocks[l][y][x] <= 168 && y > y2 && blocks[l][y][x] != 140 && blocks[l][y][x] != 144 && blocks[l][y][x] != 148 && blocks[l][y][x] != 152 && blocks[l][y][x] != 156 && blocks[l][y][x] != 160 && blocks[l][y][x] != 164 && blocks[l][y][x] != 168)) {
-                                    if (power[l][y2][x2] <= power[l][y][x] - conducts[blocks[l][y][x]]) {
+                                    if (power[l][y2][x2] <= power[l][y][x] - CONDUCTS[blocks[l][y][x]]) {
                                         addTileToPZQueue(x2, y2);
                                         if (blocks[l][y2][x2] >= 137 && blocks[l][y2][x2] <= 140 ||
                                             blocks[l][y2][x2] >= 145 && blocks[l][y2][x2] <= 148 ||
@@ -5291,30 +4305,30 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                             updatel.add(l);
                                         }
                                         else {
-                                            power[l][y2][x2] = power[l][y][x] - (float)conducts[blocks[l][y][x]];
-                                            if (conducts[blocks[l][y2][x2]] >= 0 && wcnct[y2][x2]) {
+                                            power[l][y2][x2] = power[l][y][x] - (float) CONDUCTS[blocks[l][y][x]];
+                                            if (CONDUCTS[blocks[l][y2][x2]] >= 0 && wcnct[y2][x2]) {
                                                 if (l == 0) {
-                                                    if (receives[blocks[1][y2][x2]]) {
-                                                        power[1][y2][x2] = power[0][y2][x2] - (float)conducts[blocks[0][y2][x2]];
+                                                    if (RECEIVES[blocks[1][y2][x2]]) {
+                                                        power[1][y2][x2] = power[0][y2][x2] - (float) CONDUCTS[blocks[0][y2][x2]];
                                                     }
-                                                    if (receives[blocks[2][y2][x2]]) {
-                                                        power[2][y2][x2] = power[0][y2][x2] - (float)conducts[blocks[0][y2][x2]];
+                                                    if (RECEIVES[blocks[2][y2][x2]]) {
+                                                        power[2][y2][x2] = power[0][y2][x2] - (float) CONDUCTS[blocks[0][y2][x2]];
                                                     }
                                                 }
                                                 if (l == 1) {
-                                                    if (receives[blocks[0][y2][x2]]) {
-                                                        power[0][y2][x2] = power[1][y2][x2] - (float)conducts[blocks[1][y2][x2]];
+                                                    if (RECEIVES[blocks[0][y2][x2]]) {
+                                                        power[0][y2][x2] = power[1][y2][x2] - (float) CONDUCTS[blocks[1][y2][x2]];
                                                     }
-                                                    if (receives[blocks[2][y2][x2]]) {
-                                                        power[2][y2][x2] = power[1][y2][x2] - (float)conducts[blocks[1][y2][x2]];
+                                                    if (RECEIVES[blocks[2][y2][x2]]) {
+                                                        power[2][y2][x2] = power[1][y2][x2] - (float) CONDUCTS[blocks[1][y2][x2]];
                                                     }
                                                 }
                                                 if (l == 2) {
-                                                    if (receives[blocks[0][y2][x2]]) {
-                                                        power[0][y2][x2] = power[2][y2][x2] - (float)conducts[blocks[2][y2][x2]];
+                                                    if (RECEIVES[blocks[0][y2][x2]]) {
+                                                        power[0][y2][x2] = power[2][y2][x2] - (float) CONDUCTS[blocks[2][y2][x2]];
                                                     }
-                                                    if (receives[blocks[1][y2][x2]]) {
-                                                        power[1][y2][x2] = power[2][y2][x2] - (float)conducts[blocks[2][y2][x2]];
+                                                    if (RECEIVES[blocks[1][y2][x2]]) {
+                                                        power[1][y2][x2] = power[2][y2][x2] - (float) CONDUCTS[blocks[2][y2][x2]];
                                                     }
                                                 }
                                             }
@@ -5323,7 +4337,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                             addTileToPQueue(x2, y2);
                                         }
                                     }
-                                    if (power[l][y][x] - conducts[blocks[l][y][x]] > 0 && blocks[l][y2][x2] >= 119 && blocks[l][y2][x2] <= 122) {
+                                    if (power[l][y][x] - CONDUCTS[blocks[l][y][x]] > 0 && blocks[l][y2][x2] >= 119 && blocks[l][y2][x2] <= 122) {
                                         removeBlockPower(x2, y2, l);
                                         blocks[l][y2][x2] += 4;
                                         removeBlockLighting(x2, y2);
@@ -5598,10 +4612,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)inventory.ids[uy*10+ux]) != null) {
-                            pg2.drawString(UIBLOCKS.get(items[inventory.ids[uy*10+ux]]) + " (" + (int)((double)inventory.durs[uy*10+ux]/TOOLDURS.get(inventory.ids[uy*10+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[inventory.ids[uy*10+ux]]) + " (" + (int)((double)inventory.durs[uy*10+ux]/TOOLDURS.get(inventory.ids[uy*10+ux])*100) + "%)", mousePos[0], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(items[inventory.ids[uy*10+ux]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[inventory.ids[uy*10+ux]]), mousePos[0], mousePos[1]);
                         }
                     }
                 }
@@ -5625,10 +4639,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                             pg2.setFont(mobFont);
                             pg2.setColor(Color.WHITE);
                             if (TOOLDURS.get((short)cic.ids[uy*2+ux]) != null) {
-                                pg2.drawString(UIBLOCKS.get(items[cic.ids[uy*2+ux]]) + " (" + (int)((double)cic.durs[uy*2+ux]/TOOLDURS.get(cic.ids[uy*2+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                                pg2.drawString(UIBLOCKS.get(ITEMS[cic.ids[uy*2+ux]]) + " (" + (int)((double)cic.durs[uy*2+ux]/TOOLDURS.get(cic.ids[uy*2+ux])*100) + "%)", mousePos[0], mousePos[1]);
                             }
                             else {
-                                pg2.drawString(UIBLOCKS.get(items[cic.ids[uy*2+ux]]), mousePos[0], mousePos[1]);
+                                pg2.drawString(UIBLOCKS.get(ITEMS[cic.ids[uy*2+ux]]), mousePos[0], mousePos[1]);
                             }
                         }
                     }
@@ -5639,10 +4653,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                     pg2.setFont(mobFont);
                     pg2.setColor(Color.WHITE);
                     if (TOOLDURS.get((short)cic.ids[4]) != null) {
-                        pg2.drawString(UIBLOCKS.get(items[cic.ids[4]]) + " (" + (int)((double)cic.durs[4]/TOOLDURS.get(cic.ids[4])*100) + "%)", mousePos[0], mousePos[1]);
+                        pg2.drawString(UIBLOCKS.get(ITEMS[cic.ids[4]]) + " (" + (int)((double)cic.durs[4]/TOOLDURS.get(cic.ids[4])*100) + "%)", mousePos[0], mousePos[1]);
                     }
                     else {
-                        pg2.drawString(UIBLOCKS.get(items[cic.ids[4]]), mousePos[0], mousePos[1]);
+                        pg2.drawString(UIBLOCKS.get(ITEMS[cic.ids[4]]), mousePos[0], mousePos[1]);
                     }
                 }
                 for (uy=0; uy<4; uy++) {
@@ -5651,10 +4665,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)armor.ids[uy]) != null) {
-                            pg2.drawString(UIBLOCKS.get(items[armor.ids[uy]]) + " (" + (int)((double)armor.durs[uy]/TOOLDURS.get(armor.ids[uy])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[armor.ids[uy]]) + " (" + (int)((double)armor.durs[uy]/TOOLDURS.get(armor.ids[uy])*100) + "%)", mousePos[0], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(items[armor.ids[uy]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[armor.ids[uy]]), mousePos[0], mousePos[1]);
                         }
                     }
                 }
@@ -5670,10 +4684,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                 pg2.setFont(mobFont);
                                 pg2.setColor(Color.WHITE);
                                 if (TOOLDURS.get((short)ic.ids[uy*3+ux]) != null) {
-                                    pg2.drawString(UIBLOCKS.get(items[ic.ids[uy*3+ux]]) + " (" + (int)((double)ic.durs[uy*3+ux]/TOOLDURS.get(ic.ids[uy*3+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[uy*3+ux]]) + " (" + (int)((double)ic.durs[uy*3+ux]/TOOLDURS.get(ic.ids[uy*3+ux])*100) + "%)", mousePos[0], mousePos[1]);
                                 }
                                 else {
-                                    pg2.drawString(UIBLOCKS.get(items[ic.ids[uy*3+ux]]), mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[uy*3+ux]]), mousePos[0], mousePos[1]);
                                 }
                             }
                         }
@@ -5685,10 +4699,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[9]) != null) {
-                            pg2.drawString(UIBLOCKS.get(items[ic.ids[9]]) + " (" + (int)((double)ic.durs[9]/TOOLDURS.get(ic.ids[9])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[9]]) + " (" + (int)((double)ic.durs[9]/TOOLDURS.get(ic.ids[9])*100) + "%)", mousePos[0], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(items[ic.ids[9]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[9]]), mousePos[0], mousePos[1]);
                         }
                     }
                 }
@@ -5706,10 +4720,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                 pg2.setFont(mobFont);
                                 pg2.setColor(Color.WHITE);
                                 if (TOOLDURS.get((short)ic.ids[uy*inventory.CX+ux]) != null) {
-                                    pg2.drawString(UIBLOCKS.get(items[ic.ids[uy*inventory.CX+ux]]) + " (" + (int)((double)ic.durs[uy*inventory.CX+ux]/TOOLDURS.get(ic.ids[uy*inventory.CX+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[uy*inventory.CX+ux]]) + " (" + (int)((double)ic.durs[uy*inventory.CX+ux]/TOOLDURS.get(ic.ids[uy*inventory.CX+ux])*100) + "%)", mousePos[0], mousePos[1]);
                                 }
                                 else {
-                                    pg2.drawString(UIBLOCKS.get(items[ic.ids[uy*inventory.CX+ux]]), mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[uy*inventory.CX+ux]]), mousePos[0], mousePos[1]);
                                 }
                             }
                         }
@@ -5722,10 +4736,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[0]) != null) {
-                            pg2.drawString(UIBLOCKS.get(items[ic.ids[0]]) + " (" + (int)((double)ic.durs[0]/TOOLDURS.get(ic.ids[0])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[0]]) + " (" + (int)((double)ic.durs[0]/TOOLDURS.get(ic.ids[0])*100) + "%)", mousePos[0], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(items[ic.ids[0]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[0]]), mousePos[0], mousePos[1]);
                         }
                     }
                     if (mousePos[0] >= 6 && mousePos[0] < 46 &&
@@ -5734,10 +4748,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[1]) != null) {
-                            pg2.drawString(UIBLOCKS.get(items[ic.ids[1]]) + " (" + (int)((double)ic.durs[1]/TOOLDURS.get(ic.ids[1])*100) + "%)", mousePos[1], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[1]]) + " (" + (int)((double)ic.durs[1]/TOOLDURS.get(ic.ids[1])*100) + "%)", mousePos[1], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(items[ic.ids[1]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[1]]), mousePos[0], mousePos[1]);
                         }
                     }
                     if (mousePos[0] >= 6 && mousePos[0] < 46 &&
@@ -5746,10 +4760,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[2]) != null) {
-                            pg2.drawString(UIBLOCKS.get(items[ic.ids[2]]) + " (" + (int)((double)ic.durs[2]/TOOLDURS.get(ic.ids[2])*100) + "%)", mousePos[2], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[2]]) + " (" + (int)((double)ic.durs[2]/TOOLDURS.get(ic.ids[2])*100) + "%)", mousePos[2], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(items[ic.ids[2]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[2]]), mousePos[0], mousePos[1]);
                         }
                     }
                     if (mousePos[0] >= 62 && mousePos[0] < 102 &&
@@ -5758,10 +4772,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[3]) != null) {
-                            pg2.drawString(UIBLOCKS.get(items[ic.ids[3]]) + " (" + (int)((double)ic.durs[3]/TOOLDURS.get(ic.ids[3])*100) + "%)", mousePos[3], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[3]]) + " (" + (int)((double)ic.durs[3]/TOOLDURS.get(ic.ids[3])*100) + "%)", mousePos[3], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(items[ic.ids[3]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[3]]), mousePos[0], mousePos[1]);
                         }
                     }
                 }
@@ -5989,14 +5003,14 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                 }
             }
             int dn = GRASSDIRT.get(type);
-            boolean left = (blocks[lyr][y][x-1] == 0 || !blockcds[blocks[lyr][y][x-1]]);// && (blocks[lyr][y-1][x] != dn && blocks[lyr][y+1][x] != dn) && (blocks[lyr][y-1][x-1] != dn && blocks[lyr][y+1][x-1] != dn);
-            boolean right = (blocks[lyr][y][x+1] == 0 || !blockcds[blocks[lyr][y][x+1]]);// && (blocks[lyr][y-1][x] != dn && blocks[lyr][y+1][x] != dn) && (blocks[lyr][y-1][x+1] != dn && blocks[lyr][y+1][x+1] != dn);
-            boolean up = (blocks[lyr][y-1][x] == 0 || !blockcds[blocks[lyr][y-1][x]]);// && (blocks[lyr][y][x-1] != dn && blocks[lyr][y][x+1] != dn) && (blocks[lyr][y-1][x-1] != dn && blocks[lyr][y-1][x+1] != dn);
-            boolean down = (blocks[lyr][y+1][x] == 0 || !blockcds[blocks[lyr][y+1][x]]);// && (blocks[lyr][y][x-1] != dn && blocks[lyr][y][x+1] != dn) && (blocks[lyr][y+1][x-1] != dn && blocks[lyr][y+1][x+1] != dn);
-            boolean upleft = (blocks[lyr][y-1][x-1] == 0 || !blockcds[blocks[lyr][y-1][x-1]]);// && (blocks[lyr][y-1][x] != dn && blocks[lyr][y][x-1] != dn && blocks[lyr][y-1][x-1] != dn && blocks[lyr][y-2][x] != dn && blocks[lyr][y][x-2] != dn);
-            boolean upright = (blocks[lyr][y-1][x+1] == 0 || !blockcds[blocks[lyr][y-1][x+1]]);// && (blocks[lyr][y-1][x] != dn && blocks[lyr][y][x+1] != dn && blocks[lyr][y-1][x+1] != dn && blocks[lyr][y-2][x] != dn && blocks[lyr][y][x+2] != dn);
-            boolean downleft = (blocks[lyr][y+1][x-1] == 0 || !blockcds[blocks[lyr][y+1][x-1]]);// && (blocks[lyr][y+1][x] != dn && blocks[lyr][y][x-1] != dn && blocks[lyr][y+1][x-1] != dn && blocks[lyr][y+2][x] != dn && blocks[lyr][y][x-2] != dn);
-            boolean downright = (blocks[lyr][y+1][x+1] == 0 || !blockcds[blocks[lyr][y+1][x+1]]);// && (blocks[lyr][y+1][x] != dn && blocks[lyr][y][x+1] != dn && blocks[lyr][y+1][x+1] != dn && blocks[lyr][y+2][x] != dn && blocks[lyr][y][x+2] != dn);
+            boolean left = (blocks[lyr][y][x-1] == 0 || !BLOCK_CDS[blocks[lyr][y][x-1]]);// && (blocks[lyr][y-1][x] != dn && blocks[lyr][y+1][x] != dn) && (blocks[lyr][y-1][x-1] != dn && blocks[lyr][y+1][x-1] != dn);
+            boolean right = (blocks[lyr][y][x+1] == 0 || !BLOCK_CDS[blocks[lyr][y][x+1]]);// && (blocks[lyr][y-1][x] != dn && blocks[lyr][y+1][x] != dn) && (blocks[lyr][y-1][x+1] != dn && blocks[lyr][y+1][x+1] != dn);
+            boolean up = (blocks[lyr][y-1][x] == 0 || !BLOCK_CDS[blocks[lyr][y-1][x]]);// && (blocks[lyr][y][x-1] != dn && blocks[lyr][y][x+1] != dn) && (blocks[lyr][y-1][x-1] != dn && blocks[lyr][y-1][x+1] != dn);
+            boolean down = (blocks[lyr][y+1][x] == 0 || !BLOCK_CDS[blocks[lyr][y+1][x]]);// && (blocks[lyr][y][x-1] != dn && blocks[lyr][y][x+1] != dn) && (blocks[lyr][y+1][x-1] != dn && blocks[lyr][y+1][x+1] != dn);
+            boolean upleft = (blocks[lyr][y-1][x-1] == 0 || !BLOCK_CDS[blocks[lyr][y-1][x-1]]);// && (blocks[lyr][y-1][x] != dn && blocks[lyr][y][x-1] != dn && blocks[lyr][y-1][x-1] != dn && blocks[lyr][y-2][x] != dn && blocks[lyr][y][x-2] != dn);
+            boolean upright = (blocks[lyr][y-1][x+1] == 0 || !BLOCK_CDS[blocks[lyr][y-1][x+1]]);// && (blocks[lyr][y-1][x] != dn && blocks[lyr][y][x+1] != dn && blocks[lyr][y-1][x+1] != dn && blocks[lyr][y-2][x] != dn && blocks[lyr][y][x+2] != dn);
+            boolean downleft = (blocks[lyr][y+1][x-1] == 0 || !BLOCK_CDS[blocks[lyr][y+1][x-1]]);// && (blocks[lyr][y+1][x] != dn && blocks[lyr][y][x-1] != dn && blocks[lyr][y+1][x-1] != dn && blocks[lyr][y+2][x] != dn && blocks[lyr][y][x-2] != dn);
+            boolean downright = (blocks[lyr][y+1][x+1] == 0 || !BLOCK_CDS[blocks[lyr][y+1][x+1]]);// && (blocks[lyr][y+1][x] != dn && blocks[lyr][y][x+1] != dn && blocks[lyr][y+1][x+1] != dn && blocks[lyr][y+2][x] != dn && blocks[lyr][y][x+2] != dn);
             int[][] pixm = new int[IMAGESIZE][IMAGESIZE];
             for (dy=0; dy<8; dy++) {
                 for (dx=0; dx<8; dx++) {
@@ -6397,7 +5411,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
     }
 
     public static boolean[] getBLOCKCDS() {
-        return blockcds;
+        return BLOCK_CDS;
     }
 
     public static Map<Integer,Boolean> getBLOCKCD() {
@@ -6420,8 +5434,8 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
         return itemImgs;
     }
 
-    public static String[] getItems() {
-        return items;
+    public static String[] getitems() {
+        return ITEMS;
     }
 
     public static Map<Short,Integer> getARMOR() {

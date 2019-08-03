@@ -3,6 +3,7 @@ package com.sergio.refacto;
 import java.lang.Math;
 import java.util.Random;
 
+import com.sergio.refacto.tools.Constants;
 import com.sergio.refacto.tools.PerlinNoise;
 
 public class World {
@@ -1106,7 +1107,7 @@ public class World {
             b2 == 75 && b1 == 74 ||
             b1 == 91 && b2 == 93 ||
             b2 == 91 && b1 == 93 ||
-            b2 >= 94 && b2 <= 99 && TerrariaClone.wirec[b1] ||
+            b2 >= 94 && b2 <= 99 && Constants.WIRE_C[b1] ||
             b1 == 103 && b2 == 104 ||
             b2 == 103 && b1 == 104 ||
             b1 == 15 && b2 == 83 ||
