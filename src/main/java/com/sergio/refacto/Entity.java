@@ -7,6 +7,12 @@ import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
 
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Entity implements Serializable {
 
     double x, y, vx, vy, oldx, oldy, n;

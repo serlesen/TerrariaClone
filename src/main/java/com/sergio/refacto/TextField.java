@@ -5,11 +5,17 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class TextField {
 
-    private int width, height;
+    int width, height;
     String text;
-    private Font font;
+    Font font;
     BufferedImage image;
 
     public TextField(int width, String text) {

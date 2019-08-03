@@ -1,5 +1,13 @@
-package com.sergio.refacto;
+package com.sergio.refacto.items;
 
+import com.sergio.refacto.TerrariaClone;
+import com.sergio.refacto.World;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Chunk {
 
     int cx, cy;
