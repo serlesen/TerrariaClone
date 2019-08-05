@@ -8,5 +8,6 @@ Refactorings done:
 * Add privatization on entity fields
 * Externalize initialization to specific classes
 * Remove commented code
+* Created some utility classes
 
 [terraria]: https://terraria.org/

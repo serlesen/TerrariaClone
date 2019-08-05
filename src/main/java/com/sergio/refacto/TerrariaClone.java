@@ -53,8 +53,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.sergio.refacto.init.ArmorInitializer;
+import com.sergio.refacto.init.BackgroundImagesInitializer;
 import com.sergio.refacto.init.BlockCDInitializer;
 import com.sergio.refacto.init.BlockDropsInitializer;
+import com.sergio.refacto.init.BlockImagesInitializer;
 import com.sergio.refacto.init.BlockLightsInitializer;
 import com.sergio.refacto.init.BlockToolsInitializer;
 import com.sergio.refacto.init.DDelayInitializer;
@@ -64,7 +66,10 @@ import com.sergio.refacto.init.FuelsInitializer;
 import com.sergio.refacto.init.GSupportInitializer;
 import com.sergio.refacto.init.GrassDirtInitializer;
 import com.sergio.refacto.init.ItemBlocksInitializer;
+import com.sergio.refacto.init.ItemImagesInitializer;
+import com.sergio.refacto.init.LightLevelsInitializer;
 import com.sergio.refacto.init.MaxStacksInitializer;
+import com.sergio.refacto.init.OutlineImagesInitializer;
 import com.sergio.refacto.init.OutlinesInitializer;
 import com.sergio.refacto.init.SkyColorsInitializer;
 import com.sergio.refacto.init.SkyLightsInitializer;
@@ -78,6 +83,7 @@ import com.sergio.refacto.init.UIBlocksInitializer;
 import com.sergio.refacto.init.UIEntitiesInitializer;
 import com.sergio.refacto.init.WirePInitializer;
 import com.sergio.refacto.items.Chunk;
+import com.sergio.refacto.tools.ResourcesLoader;
 
 import static com.sergio.refacto.tools.Constants.*;
 
@@ -587,8 +593,8 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
     int loadTextPos = 0;
 
     BufferedImage sun, moon, cloud, logo_white, logo_black, title_screen, select_world, new_world, save_exit;
-    BufferedImage[] clouds = {loadImage("environment/cloud1.png")};
-    BufferedImage wcnct_px = loadImage("misc/wcnct.png");
+    BufferedImage[] clouds = { ResourcesLoader.loadImage("environment/cloud1.png")};
+    BufferedImage wcnct_px = ResourcesLoader.loadImage("misc/wcnct.png");
 
     Thread thread;
     javax.swing.Timer createWorldTimer;
@@ -741,60 +747,24 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
             mousePos = new int[2];
             mousePos2 = new int[2];
 
-            logo_white = loadImage("interface/logo_white.png");
-            logo_black = loadImage("interface/logo_black.png");
-            title_screen = loadImage("interface/title_screen.png");
-            select_world = loadImage("interface/select_world.png");
-            new_world = loadImage("interface/new_world.png");
-            save_exit = loadImage("interface/save_exit.png");
+            logo_white = ResourcesLoader.loadImage("interface/logo_white.png");
+            logo_black = ResourcesLoader.loadImage("interface/logo_black.png");
+            title_screen = ResourcesLoader.loadImage("interface/title_screen.png");
+            select_world = ResourcesLoader.loadImage("interface/select_world.png");
+            new_world = ResourcesLoader.loadImage("interface/new_world.png");
+            save_exit = ResourcesLoader.loadImage("interface/save_exit.png");
 
             state = "loading_graphics";
 
             repaint();
 
-            backgroundImgs = new HashMap<>();
+            backgroundImgs = BackgroundImagesInitializer.init();
 
-            String[] bgs = {"solid/empty", "dirt_none/downleft", "dirt_none/downright", "dirt_none/left", "dirt_none/right", "dirt_none/up", "dirt_none/upleft", "dirt_none/upright",
-                "solid/dirt", "stone_dirt/downleft", "stone_dirt/downright", "stone_dirt/left", "stone_dirt/right", "stone_dirt/up", "stone_dirt/upleft", "stone_dirt/upright",
-                "solid/stone", "stone_none/down"};
+            itemImgs = ItemImagesInitializer.init();
 
-            for (i=0; i<bgs.length; i++) {
-                backgroundImgs.put((byte)i, loadImage("backgrounds/" + bgs[i] + ".png"));
-            }
+            blockImgs = BlockImagesInitializer.init();
 
-            itemImgs = new HashMap<>();
-
-            for (i=1; i< ITEMS.length; i++) {
-                itemImgs.put((short) i, loadImage("items/" + ITEMS[i] + ".png"));
-                if (itemImgs.get((short)i) == null) {
-                    System.out.println("[ERROR] Could not load item graphic '" + ITEMS[i] + "'.");
-                }
-            }
-
-            blockImgs = new HashMap<>();
-
-            for (i=1; i< BLOCK_NAMES.length; i++) {
-                for (j=0; j<8; j++) {
-                    blockImgs.put("blocks/" + BLOCK_NAMES[i] + "/texture" + (j+1) + ".png",
-                        loadImage("blocks/" + BLOCK_NAMES[i] + "/texture" + (j+1) + ".png"));
-                    if (blockImgs.get("blocks/" + BLOCK_NAMES[i] + "/texture" + (j+1) + ".png") == null) {
-                        System.out.println("[ERROR] Could not load block graphic '" + BLOCK_NAMES[i] + "'.");
-                    }
-                }
-            }
-
-            outlineImgs = new HashMap<>();
-
-            String[] outlineNameList = {"default", "wood", "none", "tree", "tree_root", "square", "wire"};
-
-            for (i=0; i<outlineNameList.length; i++) {
-                for (j=0; j< DIRS.length; j++) {
-                    for (k=0; k<5; k++) {
-                        outlineImgs.put("outlines/" + outlineNameList[i] + "/" + DIRS[j] + (k+1) + ".png",
-                            loadImage("outlines/" + outlineNameList[i] + "/" + DIRS[j] + (k+1) + ".png"));
-                    }
-                }
-            }
+            outlineImgs = OutlineImagesInitializer.init();
 
             DURABILITY = DurabilityInitializer.init();
 
@@ -822,11 +792,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
 
             SKYLIGHTS = SkyLightsInitializer.init();
 
-            LIGHTLEVELS = new HashMap<>();
-
-            for (i=0; i<17; i++) {
-                LIGHTLEVELS.put(i, loadImage("light/" + i + ".png"));
-            }
+            LIGHTLEVELS = LightLevelsInitializer.init();
 
             BLOCKLIGHTS = BlockLightsInitializer.init();
 
@@ -852,8 +818,8 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
 
             DDELAY = DDelayInitializer.init();
 
-            sun = loadImage("environment/sun.png");
-            moon = loadImage("environment/moon.png");
+            sun = ResourcesLoader.loadImage("environment/sun.png");
+            moon = ResourcesLoader.loadImage("environment/moon.png");
             FRI1 = new ArrayList<>(0);
             FRN1 = new ArrayList<>(0);
             FRI2 = new ArrayList<>(0);
@@ -1778,16 +1744,20 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                     blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = 135;
                     rdrawn[updatey.get(i)][updatex.get(i)] = false;
                 }
-                else if (blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 141 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 144 || blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 149 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 152 ||
-                    blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 157 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 160 || blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 165 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 168) {
+                else if ((blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 141 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 144)
+                        || (blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 149 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 152)
+                        || (blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 157 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 160)
+                        || (blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 165 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 168)) {
                     print("[DEBUG2R]");
                     blockTemp = blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
                     removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i), false);
                     blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] -= 4;
                     rdrawn[updatey.get(i)][updatex.get(i)] = false;
                 }
-                else if (blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 137 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 140 || blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 145 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 148 ||
-                    blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 153 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 156 || blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 161 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 164) {
+                else if ((blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 137 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 140)
+                        || (blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 145 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 148)
+                        || (blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 153 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 156)
+                        || (blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] >= 161 && blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] <= 164)) {
                     print("[DEBUG2A]");
                     blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] += 4;
                     power[updatel.get(i)][updatey.get(i)][updatex.get(i)] = (float)5;
@@ -1881,7 +1851,9 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                     continue;
                                 }
                                 else if (DEBUG_MOBTEST != null) mobSpawn = DEBUG_MOBTEST;
-                                if (mobSpawn.equals("blue_bubble") || mobSpawn.equals("green_bubble") || mobSpawn.equals("red_bubble") || mobSpawn.equals("yellow_bubble") || mobSpawn.equals("black_bubble") || mobSpawn.equals("white_bubble")) {
+                                if (mobSpawn.equals("blue_bubble") || mobSpawn.equals("green_bubble")
+                                        || mobSpawn.equals("red_bubble") || mobSpawn.equals("yellow_bubble")
+                                        || mobSpawn.equals("black_bubble") || mobSpawn.equals("white_bubble")) {
                                     xmax = 2;
                                     ymax = 2;
                                 }
@@ -3222,23 +3194,6 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
         }
     }
 
-    public static boolean hasOpenSpace(int x, int y, Integer[][] blocks) {
-        return (blocks[y-1][x-1] == 0 || !BLOCK_CDS[blocks[y-1][x-1]] ||
-                blocks[y-1][x] == 0 || !BLOCK_CDS[blocks[y-1][x]] ||
-                blocks[y-1][x+1] == 0 || !BLOCK_CDS[blocks[y-1][x+1]] ||
-                blocks[y][x-1] == 0 || !BLOCK_CDS[blocks[y][x-1]] ||
-                blocks[y][x+1] == 0 || !BLOCK_CDS[blocks[y][x+1]] ||
-                blocks[y+1][x-1] == 0 || !BLOCK_CDS[blocks[y+1][x-1]] ||
-                blocks[y+1][x] == 0 || !BLOCK_CDS[blocks[y+1][x]] ||
-                blocks[y+1][x+1] == 0 || !BLOCK_CDS[blocks[y+1][x+1]]);
-    }
-
-    public boolean empty(int x, int y) {
-        return ((blocks[0][y][x] == 0 || BLOCKLIGHTS.get(blocks[0][y][x]) == 0) &&
-                (blocks[1][y][x] == 0 || BLOCKLIGHTS.get(blocks[1][y][x]) == 0) &&
-                (blocks[2][y][x] == 0 || BLOCKLIGHTS.get(blocks[2][y][x]) == 0));
-    }
-
     public String checkBiome(int x, int y) {
         int desert = 0;
         int frost = 0;
@@ -4531,13 +4486,13 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
             }
 
             if (layer == 0) {
-                layerImg = loadImage("interface/layersB.png");
+                layerImg = ResourcesLoader.loadImage("interface/layersB.png");
             }
             if (layer == 1) {
-                layerImg = loadImage("interface/layersN.png");
+                layerImg = ResourcesLoader.loadImage("interface/layersN.png");
             }
             if (layer == 2) {
-                layerImg = loadImage("interface/layersF.png");
+                layerImg = ResourcesLoader.loadImage("interface/layersF.png");
             }
 
             pg2.drawImage(layerImg,
@@ -4944,18 +4899,6 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                   WIDTH, HEIGHT, random, WORLDWIDTH, WORLDHEIGHT,
                                   resunlight,
                                   ic, kworlds, icmatrix, version));
-    }
-
-    public static BufferedImage loadImage(String path) {
-        InputStream url = TerrariaClone.class.getClassLoader().getResourceAsStream(path);
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(url);
-        }
-        catch (Exception e) {
-            //
-        }
-        return image;
     }
 
     public BufferedImage loadBlock(Integer type, Byte dir, Byte dirn, Byte tnum,
