@@ -3,7 +3,7 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sergio.refacto.tools.Constants.*;
+import com.sergio.refacto.dto.Items;
 
 public class MaxStacksInitializer {
 
@@ -12,7 +12,7 @@ public class MaxStacksInitializer {
     public static Map<Short, Short> init() {
         Map<Short, Short> maxStacks = new HashMap<>();
 
-        for (int i = 0; i < ITEMS.length; i++) {
+        for (int i = 0; i < Items.values().length; i++) {
             maxStacks.put((short) i, STACKS[i]);
         }
 

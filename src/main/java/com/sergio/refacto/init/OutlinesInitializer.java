@@ -3,14 +3,14 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sergio.refacto.tools.Constants.*;
+import com.sergio.refacto.dto.BlockNames;
 
 public class OutlinesInitializer {
 
     public static Map<Integer, String> init() {
         Map<Integer, String> outlines = new HashMap<>();
 
-        for (int i = 1; i < BLOCK_NAMES.length; i++) {
+        for (int i = 1; i < BlockNames.values().length; i++) {
             outlines.put(i, "default");
         }
 

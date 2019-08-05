@@ -36,15 +36,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JApplet;
@@ -52,6 +49,9 @@ import javax.swing.JFrame;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.sergio.refacto.dto.BlockNames;
+import com.sergio.refacto.dto.Directions;
+import com.sergio.refacto.dto.Items;
 import com.sergio.refacto.init.ArmorInitializer;
 import com.sergio.refacto.init.BackgroundImagesInitializer;
 import com.sergio.refacto.init.BlockCDInitializer;
@@ -85,427 +85,9 @@ import com.sergio.refacto.init.WirePInitializer;
 import com.sergio.refacto.items.Chunk;
 import com.sergio.refacto.tools.ResourcesLoader;
 
-import static com.sergio.refacto.tools.Constants.*;
+import static com.sergio.refacto.dto.Constants.*;
 
-/*
-
-0    Air
-1    Dirt
-2    Stone
-3    Copper Ore
-4    Iron Ore
-5    Silver Ore
-6    Gold Ore
-7    Wood
-8    Workbench
-9    Wooden Chest
-10    Stone Chest
-11    Copper Chest
-12    Iron Chest
-13    Silver Chest
-14    Gold Chest
-15    Tree
-16    Leaves
-17    Furnace
-18    Coal
-19    Lumenstone
-20    Wooden Torch
-21    Coal Torch
-22    Lumenstone Torch
-23    Furnace (on)
-24    Wooden Torch (left wall)
-25    Wooden Torch (right wall)
-26    Coal Torch (left wall)
-27    Coal Torch (right wall)
-28    Lumenstone Torch (left wall)
-29    Lumenstone Torch (right wall)
-30    Tree (root)
-31    Zinc Ore
-32    Rhymestone Ore
-33    Obdurite Ore
-34    Aluminum Ore
-35    Lead Ore
-36    Uranium Ore
-37    Zythium Ore
-38    Zythium Ore (on)
-39    Silicon Ore
-40    Irradium Ore
-41    Nullstone
-42    Meltstone
-43    Skystone
-44    Magnetite Ore
-45    Sand
-46    Snow
-47    Glass
-48    Sunflower (stage 1)
-49    Sunflower (stage 2)
-50    Sunflower (stage 3)
-51    Moonflower (stage 1)
-52    Moonflower (stage 2)
-53    Moonflower (stage 3)
-54    Dryweed (stage 1)
-55    Dryweed (stage 2)
-56    Dryweed (stage 3)
-57    Greenleaf (stage 1)
-58    Greenleaf (stage 2)
-59    Greenleaf (stage 3)
-60    Frostleaf (stage 1)
-61    Frostleaf (stage 2)
-62    Frostleaf (stage 3)
-63    Caveroot (stage 1)
-64    Caveroot (stage 2)
-65    Caveroot (stage 3)
-66    Skyblossom (stage 1)
-67    Skyblossom (stage 2)
-68    Skyblossom (stage 3)
-69    Void Rot (stage 1)
-70    Void Rot (stage 2)
-71    Void Rot (stage 3)
-72    Grass
-73    Jungle Grass
-74    Swamp Grass
-75    Mud
-76    Sandstone
-77    Marshleaf (stage 1)
-78    Marshleaf (stage 2)
-79    Marshleaf (stage 3)
-80    Zinc Chest
-81    Rhymestone Chest
-82    Obdurite Chest
-83    Tree (no bark)
-84    Cobblestone
-85    Chiseled Stone
-86    Chiseled Cobblestone
-87    Stone Bricks
-88    Clay
-89    Clay Bricks
-90    Varnished Wood
-91    Dirt (transparent)
-92    Magnetite Ore (transparent)
-93    Grass (transparent)
-94    Zythium Wire
-95    Zythium Wire (1 power)
-96    Zythium Wire (2 power)
-97    Zythium Wire (3 power)
-98    Zythium Wire (4 power)
-99    Zythium Wire (5 power)
-100    Zythium Torch
-101    Zythium Torch (left wall)
-102    Zythium Torch (right wall)
-103    Zythium Lamp
-104    Zythium Lamp (on)
-105    Lever
-106    Lever (on)
-107    Lever (left wall)
-108    Lever (left wall, on)
-109    Lever (right wall)
-110    Lever (right wall, on)
-111    Zythium Amplifier (right)
-112    Zythium Amplifier (down)
-113    Zythium Amplifier (left)
-114    Zythium Amplifier (up)
-115    Zythium Amplifier (right, on)
-116    Zythium Amplifier (down, on)
-117    Zythium Amplifier (left, on)
-118    Zythium Amplifier (up, on)
-119    Zythium Inverter (right)
-120    Zythium Inverter (down)
-121    Zythium Inverter (left)
-122    Zythium Inverter (up)
-123    Zythium Inverter (right, on)
-124    Zythium Inverter (down, on)
-125    Zythium Inverter (left, on)
-126    Zythium Inverter (up, on)
-127    Button (left)
-128    Button (left, on)
-129    Button (right)
-130    Button (right, on)
-131    Wooden Pressure Plate
-132    Wooden Pressure Plate (on)
-133    Stone Pressure Plate
-134    Stone Pressure Plate (on)
-135    Zythium Pressure Plate
-136    Zythium Pressure Plate (on)
-137    Zythium Delayer (1 delay, right)
-138    Zythium Delayer (1 delay, down)
-139    Zythium Delayer (1 delay, left)
-140    Zythium Delayer (1 delay, up)
-141    Zythium Delayer (1 delay, right, on)
-142    Zythium Delayer (1 delay, down, on)
-143    Zythium Delayer (1 delay, left, on)
-144    Zythium Delayer (1 delay, up, on)
-145    Zythium Delayer (2 delay, right)
-146    Zythium Delayer (2 delay, down)
-147    Zythium Delayer (2 delay, left)
-148    Zythium Delayer (2 delay, up)
-149    Zythium Delayer (2 delay, right, on)
-150    Zythium Delayer (2 delay, down, on)
-151    Zythium Delayer (2 delay, left, on)
-152    Zythium Delayer (2 delay, up, on)
-153    Zythium Delayer (4 delay, right)
-154    Zythium Delayer (4 delay, down)
-155    Zythium Delayer (4 delay, left)
-156    Zythium Delayer (4 delay, up)
-157    Zythium Delayer (4 delay, right, on)
-158    Zythium Delayer (4 delay, down, on)
-159    Zythium Delayer (4 delay, left, on)
-160    Zythium Delayer (4 delay, up, on)
-161    Zythium Delayer (8 delay, right)
-162    Zythium Delayer (8 delay, down)
-163    Zythium Delayer (8 delay, left)
-164    Zythium Delayer (8 delay, up)
-165    Zythium Delayer (8 delay, right, on)
-166    Zythium Delayer (8 delay, down, on)
-167    Zythium Delayer (8 delay, left, on)
-168    Zythium Delayer (8 delay, up, on)
-
-0    center
-1    tdown_both
-2    tdown_cw
-3    tdown_ccw
-4    tdown
-5    tup_both
-6    tup_cw
-7    tup_ccw
-8    tup
-9    leftright
-10    tright_both
-11    tright_cw
-12    tright_ccw
-13    tright
-14    upleftdiag
-15    upleft
-16    downleftdiag
-17    downleft
-18    left
-19    tleft_both
-20    tleft_cw
-21    tleft_ccw
-22    tleft
-23    uprightdiag
-24    upright
-25    downrightdiag
-26    downright
-27    right
-28    updown
-29    up
-30    down
-31    single
-
-0    None
-1    Dirt/None downleft
-2    Dirt/None downright
-3    Dirt/None left
-4    Dirt/None right
-5    Dirt/None up
-6    Dirt/None upleft
-7    Dirt/None upright
-8    Dirt
-9    Stone/Dirt downleft
-10    Stone/Dirt downright
-11    Stone/Dirt left
-12    Stone/Dirt right
-13    Stone/Dirt up
-14    Stone/Dirt upleft
-15    Stone/Dirt upright
-16    Stone
-17    Stone/None down
-
-0    Empty
-1    Dirt
-2    Stone
-3    Copper Ore
-4    Iron Ore
-5    Silver Ore
-6    Gold Ore
-7    Copper Pick
-8    Iron Pick
-9    Silver Pick
-10    Gold Pick
-11    Copper Axe
-12    Iron Axe
-13    Silver Axe
-14    Gold Axe
-15    Wood
-16    Copper Sword
-17    Iron Sword
-18    Silver Sword
-19    Gold Sword
-20    Workbench
-21    Wooden Chest
-22    Stone Chest
-23    Copper Chest
-24    Iron Chest
-25    Silver Chest
-26    Gold Chest
-27    Furnace
-28    Coal
-29    Copper Ingot
-30    Iron Ingot
-31    Silver Ingot
-32    Gold Ingot
-33    Stone Lighter
-34    Lumenstone
-35    Wooden Torch
-36    Coal Torch
-37    Lumenstone Torch
-38    Zinc Ore
-39    Rhymestone Ore
-40    Obdurite Ore
-41    Aluminum Ore
-42    Lead Ore
-43    Uranium Ore
-44    Zythium Ore
-45    Silicon Ore
-46    Irradium Ore
-47    Nullstone
-48    Meltstone
-49    Skystone
-50    Magnetite Ore
-51    Zinc Pick
-52    Zinc Axe
-53    Zinc Sword
-54    Rhymestone Pick
-55    Rhymestone Axe
-56    Rhymestone Sword
-57    Obdurite Pick
-58    Obdurite Axe
-59    Obdurite Sword
-60    Zinc Ingot
-61    Rhymestone Ingot
-62    Obdurite Ingot
-63    Aluminum Ingot
-64    Lead Ingot
-65    Uranium Bar
-66    Refined Uranium
-67    Zythium Bar
-68    Silicon Bar
-69    Irradium Ingot
-70    Nullstone Bar
-71    Meltstone Bar
-72    Skystone Bar
-73    Magnetite Ingot
-74    Sand
-75    Snow
-76    Glass
-77    Sunflower Seeds
-78    Sunflower
-79    Moonflower Seeds
-80    Moonflower
-81    Dryweed Seeds
-82    Dryweed
-83    Greenleaf Seeds
-84    Greenleaf
-85    Frostleaf Seeds
-86    Frostleaf
-87    Caveroot Seeds
-88    Caveroot
-89    Skyblossom Seeds
-90    Skyblossom
-91    Void Rot Seeds
-92    Void Rot
-93    Mud
-94    Sandstone
-95    Marshleaf Seeds
-96    Marshleaf
-97    Blue Goo
-98    Green Goo
-99    Red Goo
-100    Yellow Goo
-101    Black Goo
-102    White Goo
-103    Astral Shard
-104    Rotten Chunk
-105    Copper Helmet
-106    Copper Chestplate
-107    Copper Leggings
-108    Copper Greaves
-109    Iron Helmet
-110    Iron Chestplate
-111    Iron Leggings
-112    Iron Greaves
-113    Silver Helmet
-114    Silver Chestplate
-115    Silver Leggings
-116    Silver Greaves
-117    Gold Helmet
-118    Gold Chestplate
-119    Gold Leggings
-120    Gold Greaves
-121    Zinc Helmet
-122    Zinc Chestplate
-123    Zinc Leggings
-124    Zinc Greaves
-125    Rhymestone Helmet
-126    Rhymestone Chestplate
-127    Rhymestone Leggings
-128    Rhymestone Greaves
-129    Obdurite Helmet
-130    Obdurite Chestplate
-131    Obdurite Leggings
-132    Obdurite Greaves
-133    Aluminum Helmet
-134    Aluminum Chestplate
-135    Aluminum Leggings
-136    Aluminum Greaves
-137    Lead Helmet
-138    Lead Chestplate
-139    Lead Leggings
-140    Lead Greaves
-141    Zythium Helmet
-142    Zythium Chestplate
-143    Zythium Leggings
-144    Zythium Greaves
-145    Aluminum Pick
-146    Aluminum Axe
-147    Aluminum Sword
-148    Lead Pick
-149    Lead Axe
-150    Lead Sword
-151    Zinc Chest
-152    Rhymestone Chest
-153    Obdurite Chest
-154    Wooden Pick
-155    Wooden Axe
-156    Wooden Sword
-157    Stone Pick
-158    Stone Axe
-159    Stone Sword
-160    Bark
-161    Cobblestone
-162    Chiseled Stone
-163    Chiseled Cobblestone
-164    Stone Bricks
-165    Clay
-166    Clay Bricks
-167    Varnish
-168    Varnished Wood
-169    Magnetite Pick
-170    Magnetite Axe
-171    Magnetite Sword
-172    Irradium Pick
-173    Irradium Axe
-174    Irradium Sword
-175    Zythium Wire
-176    Zythium Torch
-177    Zythium Lamp
-178    Lever
-179    Charcoal
-180    Zythium Amplifier
-181    Zythium Inverter
-182    Button
-183    Wooden Pressure Plate
-184    Stone Pressure Plate
-185    Zythium Pressure Plate
-186    Zythium Delayer (1)
-187    Zythium Delayer (2)
-188    Zythium Delayer (4)
-189    Zythium Delayer (8)
-190    Wrench
-
-*/
-
-public class    TerrariaClone extends JApplet implements ChangeListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
+public class TerrariaClone extends JApplet implements ChangeListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
     static GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     BufferedImage screen;
@@ -990,13 +572,13 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                                                             for (int l=0; l<3; l++) {
                                                                                 if (blocks[l][ty][tx] != 0) {
                                                                                     if (l == 2) {
-                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
                                                                                     }
                                                                                     else {
-                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
@@ -1049,13 +631,13 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                                                             for (int l=0; l<3; l++) {
                                                                                 if (blocks[l][ty][tx] != 0) {
                                                                                     if (l == 2) {
-                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
                                                                                     }
                                                                                     else {
-                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
@@ -1108,13 +690,13 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                                                             for (int l=0; l<3; l++) {
                                                                                 if (blocks[l][ty][tx] != 0) {
                                                                                     if (l == 2) {
-                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        fwg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
                                                                                     }
                                                                                     else {
-                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], BLOCK_NAMES, DIRS, OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
+                                                                                        wg2.drawImage(loadBlock(blocks[l][ty][tx], blockds[l][ty][tx], blockdns[ty][tx], blockts[ty][tx], OUTLINES.get(blocks[l][ty][tx]), tx, ty, l),
                                                                                             tx*BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE - twy*CHUNKSIZE, tx*BLOCKSIZE + BLOCKSIZE - twx*CHUNKSIZE, ty*BLOCKSIZE + BLOCKSIZE - twy*CHUNKSIZE,
                                                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                                                             null);
@@ -4541,10 +4123,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)inventory.ids[uy*10+ux]) != null) {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[inventory.ids[uy*10+ux]]) + " (" + (int)((double)inventory.durs[uy*10+ux]/TOOLDURS.get(inventory.ids[uy*10+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(inventory.ids[uy*10+ux]).getFileName()) + " (" + (int)((double)inventory.durs[uy*10+ux]/TOOLDURS.get(inventory.ids[uy*10+ux])*100) + "%)", mousePos[0], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[inventory.ids[uy*10+ux]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(inventory.ids[uy*10+ux]).getFileName()), mousePos[0], mousePos[1]);
                         }
                     }
                 }
@@ -4568,10 +4150,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                             pg2.setFont(mobFont);
                             pg2.setColor(Color.WHITE);
                             if (TOOLDURS.get((short)cic.ids[uy*2+ux]) != null) {
-                                pg2.drawString(UIBLOCKS.get(ITEMS[cic.ids[uy*2+ux]]) + " (" + (int)((double)cic.durs[uy*2+ux]/TOOLDURS.get(cic.ids[uy*2+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                                pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[uy*2+ux]).getFileName()) + " (" + (int)((double)cic.durs[uy*2+ux]/TOOLDURS.get(cic.ids[uy*2+ux])*100) + "%)", mousePos[0], mousePos[1]);
                             }
                             else {
-                                pg2.drawString(UIBLOCKS.get(ITEMS[cic.ids[uy*2+ux]]), mousePos[0], mousePos[1]);
+                                pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[uy*2+ux]).getFileName()), mousePos[0], mousePos[1]);
                             }
                         }
                     }
@@ -4582,10 +4164,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                     pg2.setFont(mobFont);
                     pg2.setColor(Color.WHITE);
                     if (TOOLDURS.get((short)cic.ids[4]) != null) {
-                        pg2.drawString(UIBLOCKS.get(ITEMS[cic.ids[4]]) + " (" + (int)((double)cic.durs[4]/TOOLDURS.get(cic.ids[4])*100) + "%)", mousePos[0], mousePos[1]);
+                        pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[4]).getFileName()) + " (" + (int)((double)cic.durs[4]/TOOLDURS.get(cic.ids[4])*100) + "%)", mousePos[0], mousePos[1]);
                     }
                     else {
-                        pg2.drawString(UIBLOCKS.get(ITEMS[cic.ids[4]]), mousePos[0], mousePos[1]);
+                        pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[4]).getFileName()), mousePos[0], mousePos[1]);
                     }
                 }
                 for (uy=0; uy<4; uy++) {
@@ -4594,10 +4176,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)armor.ids[uy]) != null) {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[armor.ids[uy]]) + " (" + (int)((double)armor.durs[uy]/TOOLDURS.get(armor.ids[uy])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(armor.ids[uy]).getFileName()) + " (" + (int)((double)armor.durs[uy]/TOOLDURS.get(armor.ids[uy])*100) + "%)", mousePos[0], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[armor.ids[uy]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(armor.ids[uy]).getFileName()), mousePos[0], mousePos[1]);
                         }
                     }
                 }
@@ -4613,10 +4195,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                 pg2.setFont(mobFont);
                                 pg2.setColor(Color.WHITE);
                                 if (TOOLDURS.get((short)ic.ids[uy*3+ux]) != null) {
-                                    pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[uy*3+ux]]) + " (" + (int)((double)ic.durs[uy*3+ux]/TOOLDURS.get(ic.ids[uy*3+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*3+ux]).getFileName()) + " (" + (int)((double)ic.durs[uy*3+ux]/TOOLDURS.get(ic.ids[uy*3+ux])*100) + "%)", mousePos[0], mousePos[1]);
                                 }
                                 else {
-                                    pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[uy*3+ux]]), mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*3+ux]).getFileName()), mousePos[0], mousePos[1]);
                                 }
                             }
                         }
@@ -4628,10 +4210,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[9]) != null) {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[9]]) + " (" + (int)((double)ic.durs[9]/TOOLDURS.get(ic.ids[9])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[9]).getFileName()) + " (" + (int)((double)ic.durs[9]/TOOLDURS.get(ic.ids[9])*100) + "%)", mousePos[0], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[9]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[9]).getFileName()), mousePos[0], mousePos[1]);
                         }
                     }
                 }
@@ -4649,10 +4231,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                 pg2.setFont(mobFont);
                                 pg2.setColor(Color.WHITE);
                                 if (TOOLDURS.get((short)ic.ids[uy*inventory.CX+ux]) != null) {
-                                    pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[uy*inventory.CX+ux]]) + " (" + (int)((double)ic.durs[uy*inventory.CX+ux]/TOOLDURS.get(ic.ids[uy*inventory.CX+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*inventory.CX+ux]).getFileName()) + " (" + (int)((double)ic.durs[uy*inventory.CX+ux]/TOOLDURS.get(ic.ids[uy*inventory.CX+ux])*100) + "%)", mousePos[0], mousePos[1]);
                                 }
                                 else {
-                                    pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[uy*inventory.CX+ux]]), mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*inventory.CX+ux]).getFileName()), mousePos[0], mousePos[1]);
                                 }
                             }
                         }
@@ -4665,10 +4247,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[0]) != null) {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[0]]) + " (" + (int)((double)ic.durs[0]/TOOLDURS.get(ic.ids[0])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[0]).getFileName()) + " (" + (int)((double)ic.durs[0]/TOOLDURS.get(ic.ids[0])*100) + "%)", mousePos[0], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[0]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[0]).getFileName()), mousePos[0], mousePos[1]);
                         }
                     }
                     if (mousePos[0] >= 6 && mousePos[0] < 46 &&
@@ -4677,10 +4259,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[1]) != null) {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[1]]) + " (" + (int)((double)ic.durs[1]/TOOLDURS.get(ic.ids[1])*100) + "%)", mousePos[1], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[1]).getFileName()) + " (" + (int)((double)ic.durs[1]/TOOLDURS.get(ic.ids[1])*100) + "%)", mousePos[1], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[1]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[1]).getFileName()), mousePos[0], mousePos[1]);
                         }
                     }
                     if (mousePos[0] >= 6 && mousePos[0] < 46 &&
@@ -4689,10 +4271,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[2]) != null) {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[2]]) + " (" + (int)((double)ic.durs[2]/TOOLDURS.get(ic.ids[2])*100) + "%)", mousePos[2], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[2]).getFileName()) + " (" + (int)((double)ic.durs[2]/TOOLDURS.get(ic.ids[2])*100) + "%)", mousePos[2], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[2]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[2]).getFileName()), mousePos[0], mousePos[1]);
                         }
                     }
                     if (mousePos[0] >= 62 && mousePos[0] < 102 &&
@@ -4701,10 +4283,10 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[3]) != null) {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[3]]) + " (" + (int)((double)ic.durs[3]/TOOLDURS.get(ic.ids[3])*100) + "%)", mousePos[3], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[3]).getFileName()) + " (" + (int)((double)ic.durs[3]/TOOLDURS.get(ic.ids[3])*100) + "%)", mousePos[3], mousePos[1]);
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(ITEMS[ic.ids[3]]), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[3]).getFileName()), mousePos[0], mousePos[1]);
                         }
                     }
                 }
@@ -4901,18 +4483,17 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                   ic, kworlds, icmatrix, version));
     }
 
-    public BufferedImage loadBlock(Integer type, Byte dir, Byte dirn, Byte tnum,
-        String[] blocknames, String[] dirs, String outlineName, int x, int y, int lyr) {
+    public BufferedImage loadBlock(Integer type, Byte dir, Byte dirn, Byte tnum, String outlineName, int x, int y, int lyr) {
         int fx, fy;
         int dir_is = (int)dir;
-        String dir_s = dirs[dir_is];
+        String dir_s = Directions.findByIndex(dir_is).getFileName();
         int dir_i = (int)dirn;
         BufferedImage outline = outlineImgs.get("outlines/" + outlineName + "/" + dir_s + (dir_i+1) + ".png");
-        String bName = blocknames[type];
+        String bName = BlockNames.findByIndex(type).getFileName();
         BufferedImage texture = blockImgs.get("blocks/" + bName + "/texture" + (tnum+1) + ".png");
         BufferedImage image = config.createCompatibleImage(IMAGESIZE, IMAGESIZE, Transparency.TRANSLUCENT);
         if (GRASSDIRT.get(type) != null) {
-            BufferedImage dirtOriginal = blockImgs.get("blocks/" + blocknames[GRASSDIRT.get(type)] + "/texture" + (tnum+1) + ".png");
+            BufferedImage dirtOriginal = blockImgs.get("blocks/" + BlockNames.findByIndex(GRASSDIRT.get(type)).getFileName() + "/texture" + (tnum+1) + ".png");
             BufferedImage dirt = config.createCompatibleImage(IMAGESIZE, IMAGESIZE, Transparency.TRANSLUCENT);
             for (dy=0; dy<IMAGESIZE; dy++) {
                 for (dx=0; dx<IMAGESIZE; dx++) {
@@ -5349,10 +4930,6 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
 
     public static Map<Short,BufferedImage> getItemImgs() {
         return itemImgs;
-    }
-
-    public static String[] getitems() {
-        return ITEMS;
     }
 
     public static Map<Short,Integer> getARMOR() {

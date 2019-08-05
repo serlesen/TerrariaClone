@@ -3,14 +3,14 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sergio.refacto.tools.Constants.*;
+import com.sergio.refacto.dto.Items;
 
 public class ArmorInitializer {
 
     public static Map<Short, Integer> init() {
         Map<Short, Integer> armor = new HashMap<>();
 
-        for (int i = 0; i < ITEMS.length; i++) {
+        for (int i = 0; i < Items.values().length; i++) {
             armor.put((short) i, 0);
         }
 

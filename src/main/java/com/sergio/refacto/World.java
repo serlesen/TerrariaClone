@@ -1,9 +1,8 @@
 package com.sergio.refacto;
 
-import java.lang.Math;
 import java.util.Random;
 
-import com.sergio.refacto.tools.Constants;
+import com.sergio.refacto.dto.Constants;
 import com.sergio.refacto.tools.PerlinNoise;
 
 public class World {

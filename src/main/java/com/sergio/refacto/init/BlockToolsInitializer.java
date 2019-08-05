@@ -3,7 +3,7 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sergio.refacto.tools.Constants.*;
+import com.sergio.refacto.dto.BlockNames;
 
 public class BlockToolsInitializer {
 
@@ -186,7 +186,7 @@ public class BlockToolsInitializer {
 
         Map<Integer, Short[]> blockTools = new HashMap<>();
 
-        for (int i = 1; i < BLOCK_NAMES.length; i++) {
+        for (int i = 1; i < BlockNames.values().length; i++) {
             blockTools.put(i, BLOCKS[i]);
         }
 

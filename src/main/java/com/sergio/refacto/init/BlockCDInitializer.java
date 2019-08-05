@@ -3,7 +3,7 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sergio.refacto.tools.Constants.*;
+import static com.sergio.refacto.dto.Constants.*;
 
 public class BlockCDInitializer {
 

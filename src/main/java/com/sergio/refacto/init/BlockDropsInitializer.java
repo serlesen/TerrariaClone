@@ -3,7 +3,7 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sergio.refacto.tools.Constants.*;
+import com.sergio.refacto.dto.BlockNames;
 
 public class BlockDropsInitializer {
 
@@ -12,7 +12,7 @@ public class BlockDropsInitializer {
     public static Map<Integer, Short> init() {
         Map<Integer, Short> blockDrops = new HashMap<>();
 
-        for (int i = 1; i < BLOCK_NAMES.length; i++) {
+        for (int i = 1; i < BlockNames.values().length; i++) {
             blockDrops.put(i, DROPS[i]);
         }
 

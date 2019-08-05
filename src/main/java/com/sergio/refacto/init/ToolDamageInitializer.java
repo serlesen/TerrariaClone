@@ -3,14 +3,14 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sergio.refacto.tools.Constants.*;
+import com.sergio.refacto.dto.Items;
 
 public class ToolDamageInitializer {
 
     public static Map<Short, Integer> init() {
         Map<Short, Integer> toolDamage = new HashMap<>();
 
-        for (int i = 0; i < ITEMS.length; i++) {
+        for (int i = 0; i < Items.values().length; i++) {
             toolDamage.put((short) i, 1);
         }
 

@@ -3,14 +3,14 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sergio.refacto.tools.Constants.*;
+import com.sergio.refacto.dto.Items;
 
 public class ToolSpeedInitializer {
 
     public static Map<Short, Double> init() {
         Map<Short, Double> toolSpeed = new HashMap<>();
 
-        for (int i = 1; i < ITEMS.length; i++) {
+        for (int i = 1; i < Items.values().length; i++) {
             toolSpeed.put((short) i, 0.175);
         }
 

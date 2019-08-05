@@ -3,7 +3,7 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sergio.refacto.tools.Constants.*;
+import com.sergio.refacto.dto.Items;
 
 public class ItemBlocksInitializer {
 
@@ -12,7 +12,7 @@ public class ItemBlocksInitializer {
     public static Map<Short, Integer> init() {
         Map<Short, Integer> itemBlocks = new HashMap<>();
 
-        for (int i = 1; i < ITEMS.length; i++) {
+        for (int i = 1; i < Items.values().length; i++) {
             itemBlocks.put((short) i, BLOCKS[i]);
         }
 

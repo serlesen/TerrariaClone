@@ -4,9 +4,8 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sergio.refacto.dto.Directions;
 import com.sergio.refacto.tools.ResourcesLoader;
-
-import static com.sergio.refacto.tools.Constants.*;
 
 public class OutlineImagesInitializer {
 
@@ -16,10 +15,10 @@ public class OutlineImagesInitializer {
         String[] outlineNameList = {"default", "wood", "none", "tree", "tree_root", "square", "wire"};
 
         for (int i = 0; i < outlineNameList.length; i++) {
-            for (int j = 0; j < DIRS.length; j++) {
+            for (int j = 0; j < Directions.values().length; j++) {
                 for (int k = 0; k < 5; k++) {
-                    outlineImgs.put("outlines/" + outlineNameList[i] + "/" + DIRS[j] + (k+1) + ".png",
-                            ResourcesLoader.loadImage("outlines/" + outlineNameList[i] + "/" + DIRS[j] + (k+1) + ".png"));
+                    outlineImgs.put("outlines/" + outlineNameList[i] + "/" + Directions.findByIndex(j).getFileName() + (k+1) + ".png",
+                            ResourcesLoader.loadImage("outlines/" + outlineNameList[i] + "/" + Directions.findByIndex(j).getFileName() + (k+1) + ".png"));
                 }
             }
         }

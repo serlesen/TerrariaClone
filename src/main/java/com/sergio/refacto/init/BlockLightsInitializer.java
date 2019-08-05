@@ -3,14 +3,14 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.sergio.refacto.tools.Constants.*;
+import com.sergio.refacto.dto.BlockNames;
 
 public class BlockLightsInitializer {
 
     public static Map<Integer, Integer> init() {
         Map<Integer, Integer> blockLights = new HashMap<>();
 
-        for (int i = 0; i < BLOCK_NAMES.length; i++) {
+        for (int i = 0; i < BlockNames.values().length; i++) {
             blockLights.put(i, 0);
         }
 

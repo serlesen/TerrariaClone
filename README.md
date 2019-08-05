@@ -9,5 +9,6 @@ Refactorings done:
 * Externalize initialization to specific classes
 * Remove commented code
 * Created some utility classes
+* Use enums instead of array of indexes/strings
 
 [terraria]: https://terraria.org/
