@@ -7,5 +7,6 @@ Original project at https://github.com/raxod502/TerrariaClone.git
 Refactorings done:
 * Add privatization on entity fields
 * Externalize initialization to specific classes
+* Remove commented code
 
 [terraria]: https://terraria.org/

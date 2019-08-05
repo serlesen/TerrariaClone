@@ -1504,17 +1504,6 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
         updatet = new ArrayList<Integer>();
         updatel = new ArrayList<Integer>();
 
-        for (x=0; x<WIDTH; x++) {
-//            addSunLighting(x, 0);
-        }
-
-        for (x=0; x<WIDTH; x++) {
-            for (y=0; y<HEIGHT; y++) {
-//                addBlockLighting(x, y);
-//                addBlockPower(x, y);
-            }
-        }
-
         pmsg("-> Calculating light...");
 
         resolvePowerMatrix();
@@ -1888,10 +1877,7 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
                                         mobSpawn = "snowman";
                                     }
                                 }
-/*                                if (mobSpawn != null && player.y <= HEIGHT*0.08*BLOCKSIZE) {
-                                    mobSpawn = "white_bubble"; // 100% of all spawns in sky
-                                }
-*/                                if (mobSpawn == null) {
+                                if (mobSpawn == null) {
                                     continue;
                                 }
                                 else if (DEBUG_MOBTEST != null) mobSpawn = DEBUG_MOBTEST;
@@ -4396,18 +4382,6 @@ public class    TerrariaClone extends JApplet implements ChangeListener, KeyList
         pg2.setColor(bg);
         pg2.fillRect(0, 0, getWidth(), getHeight());
         if (state.equals("ingame")) {
-/*            if (SKYLIGHTS.get((int)timeOfDay) != null) {
-                sunlightlevel = SKYLIGHTS.get((int)timeOfDay);
-                resunlight = 0;
-            }
-            if (resunlight < WIDTH) {
-                for (ux=resunlight; ux<Math.min(resunlight+SUNLIGHTSPEED,WIDTH); ux++) {
-                    removeSunLighting(ux, 0);
-                    addSunLighting(ux, 0);
-                }
-                resunlight += SUNLIGHTSPEED;
-            }
-*/
             if (player.y / 16 < HEIGHT * 0.5) {
                 pg2.translate(getWidth()/2, getHeight()*0.85);
                 pg2.rotate((timeOfDay - 70200)/86400*Math.PI*2);
