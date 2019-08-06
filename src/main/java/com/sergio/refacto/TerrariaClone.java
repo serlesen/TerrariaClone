@@ -51,6 +51,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.sergio.refacto.dto.BlockNames;
+import com.sergio.refacto.items.Cloud;
+import com.sergio.refacto.items.CloudsAggregate;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.Directions;
 import com.sergio.refacto.dto.Items;
@@ -128,8 +130,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     Inventory inventory;
     static ItemCollection cic, armor;
     List<Entity> entities;
-    List<Double> cloudsx, cloudsy, cloudsv;
-    List<Integer> cloudsn;
+    CloudsAggregate cloudsAggregate;
     List<Integer> machinesx, machinesy;
 
     Chunk[][] temporarySaveFile;
@@ -173,8 +174,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     Font worldFont = new Font("Andale Mono", Font.BOLD, 16);
     Color CYANISH = new Color(75, 163, 243);
 
-    BufferedImage sun, moon, cloud, logo_white, logo_black, title_screen, select_world, new_world, save_exit;
-    BufferedImage[] clouds = { ResourcesLoader.loadImage("environment/cloud1.png")};
+    BufferedImage sun, moon, cloudImage, logo_white, logo_black, title_screen, select_world, new_world, save_exit;
+    BufferedImage[] cloudsImages = { ResourcesLoader.loadImage("environment/cloud1.png")};
     BufferedImage wcnct_px = ResourcesLoader.loadImage("misc/wcnct.png");
 
     javax.swing.Timer createWorldTimer;
@@ -975,10 +976,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
         entities = new ArrayList<Entity>(0);
 
-        cloudsx = new ArrayList<Double>(0);
-        cloudsy = new ArrayList<Double>(0);
-        cloudsv = new ArrayList<Double>(0);
-        cloudsn = new ArrayList<Integer>(0);
+        cloudsAggregate = new CloudsAggregate();
 
         machinesx = new ArrayList<Integer>(0);
         machinesy = new ArrayList<Integer>(0);
@@ -3039,27 +3037,27 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     public void updateEnvironment() {
         timeOfDay += 1.2*DebugContext.ACCEL;
-        for (i=cloudsx.size()-1; i>-1; i--) {
-            cloudsx.set(i, cloudsx.get(i) + cloudsv.get(i));
-            if (cloudsx.get(i) < -250 || cloudsx.get(i) > getWidth() + 250) {
-                cloudsx.remove(i);
-                cloudsy.remove(i);
-                cloudsv.remove(i);
-                cloudsn.remove(i);
+        for (i= cloudsAggregate.getClouds().size()-1; i>-1; i--) {
+            cloudsAggregate.updateXUponSpeed(i);
+            if (cloudsAggregate.isOutsideBounds(i, getWidth())) {
+                cloudsAggregate.removeCloud(i);
             }
         }
         if (random.nextInt((int)(1500/DebugContext.ACCEL)) == 0) {
-            cloudsn.add(random.nextInt(1));
-            cloud = clouds[cloudsn.get(cloudsn.size()-1)];
+
+            Cloud cloud = new Cloud();
+            cloud.setN(random.nextInt(1));
+            cloudImage = cloudsImages[cloud.getN()];
             if (random.nextInt(2) == 0) {
-                cloudsx.add((double)(-cloud.getWidth()*2));
-                cloudsv.add((double)(0.1*DebugContext.ACCEL));
+                cloud.setX(-cloudImage.getWidth() * 2);
+                cloud.setSpeed(0.1 * DebugContext.ACCEL);
             }
             else {
-                cloudsx.add((double)getWidth());
-                cloudsv.add((double)(-0.1*DebugContext.ACCEL));
+                cloud.setX(getWidth());
+                cloud.setSpeed(-0.1 * DebugContext.ACCEL);
             }
-            cloudsy.add(random.nextDouble()*(getHeight()-cloud.getHeight())+cloud.getHeight());
+            cloud.setY(random.nextDouble()*(getHeight()- cloudImage.getHeight())+ cloudImage.getHeight());
+            cloudsAggregate.getClouds().add(cloud);
         }
     }
 
@@ -3858,11 +3856,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 pg2.rotate(-(timeOfDay - 70200)/86400*Math.PI*2-Math.PI);
                 pg2.translate(-getWidth()/2, -getHeight()*0.85);
 
-                for (i=0; i<cloudsx.size(); i++) {
-                    cloud = clouds[cloudsn.get(i)];
-                    pg2.drawImage(clouds[cloudsn.get(i)],
-                        (int)cloudsx.get(i).doubleValue(), (int)cloudsy.get(i).doubleValue(), (int)cloudsx.get(i).doubleValue()+cloud.getWidth()*2, (int)cloudsy.get(i).doubleValue()+cloud.getHeight()*2,
-                        0, 0, cloud.getWidth(), cloud.getHeight(),
+                for (i=0; i< cloudsAggregate.getClouds().size(); i++) {
+                    cloudImage = cloudsImages[cloudsAggregate.getClouds().get(i).getN()];
+                    pg2.drawImage(cloudsImages[cloudsAggregate.getClouds().get(i).getN()],
+                        (int) cloudsAggregate.getClouds().get(i).getX(), (int) cloudsAggregate.getClouds().get(i).getY(), (int) cloudsAggregate.getClouds().get(i).getX() + cloudImage.getWidth()*2, (int) cloudsAggregate.getClouds().get(i).getY() + cloudImage.getHeight()*2,
+                        0, 0, cloudImage.getWidth(), cloudImage.getHeight(),
                         null);
                 }
             }
@@ -4282,10 +4280,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         inventory = wc.inventory;
         cic = wc.cic;
         entities = wc.entities;
-        cloudsx = wc.cloudsx;
-        cloudsy = wc.cloudsy;
-        cloudsv = wc.cloudsv;
-        cloudsn = wc.cloudsn;
+        cloudsAggregate = wc.cloudsAggregate;
         machinesx = wc.machinesx;
         machinesy = wc.machinesy;
         lsources = wc.lsources;
@@ -4375,7 +4370,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         return (new WorldContainer(blocks, blockds, blockdns, blockbgs, blockts,
                                   lights, power, drawn, ldrawn, rdrawn,
                                   player, inventory, cic,
-                                  entities, cloudsx, cloudsy, cloudsv, cloudsn,
+                                  entities, cloudsAggregate,
                                   machinesx, machinesy, lsources, lqx, lqy, lqd,
                                   rgnc1, rgnc2, layer, layerTemp, blockTemp,
                                   mx, my, icx, icy, mining, immune,
@@ -4387,7 +4382,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                   ic, kworlds, icmatrix, version));
     }
 
-    public BufferedImage loadBlock(Integer type, Byte dir, Byte dirn, Byte tnum, String outlineName, int x, int y, int lyr) {
+    <public BufferedImage loadBlock(Integer type, Byte dir, Byte dirn, Byte tnum, String outlineName, int x, int y, int lyr) {
         int fx, fy;
         int dir_is = (int)dir;
         String dir_s = Directions.findByIndex(dir_is).getFileName();

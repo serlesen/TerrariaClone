@@ -1,7 +1,10 @@
 package com.sergio.refacto;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.List;
+import java.util.Random;
+
+import com.sergio.refacto.items.CloudsAggregate;
 
 public class WorldContainer implements Serializable {
 
@@ -20,8 +23,7 @@ public class WorldContainer implements Serializable {
     Inventory inventory;
     ItemCollection cic;
     List<Entity> entities;
-    List<Double> cloudsx, cloudsy, cloudsv;
-    List<Integer> cloudsn;
+    CloudsAggregate cloudsAggregate;
     List<Integer> machinesx, machinesy;
 
     int rgnc1;
@@ -69,7 +71,7 @@ public class WorldContainer implements Serializable {
     public WorldContainer(Integer[][][] blocks, Byte[][][] blockds, Byte[][] blockdns, Byte[][] blockbgs, Byte[][] blockts,
         Float[][] lights, Float[][][] power, Boolean[][] drawn, Boolean[][] ldrawn, Boolean[][] rdrawn,
         Player player, Inventory inventory, ItemCollection cic,
-        List<Entity> entities, List<Double> cloudsx, List<Double> cloudsy, List<Double> cloudsv, List<Integer> cloudsn,
+        List<Entity> entities, CloudsAggregate cloudsAggregate,
         List<Integer> machinesx, List<Integer> machinesy, Boolean[][] lsources, List<Integer> lqx, List<Integer> lqy, Boolean[][] lqd,
         int rgnc1, int rgnc2, int layer, int layerTemp, int blockTemp,
         int mx, int my, int icx, int icy, int mining, int immune,
@@ -94,10 +96,7 @@ public class WorldContainer implements Serializable {
         this.inventory = inventory;
         this.cic = cic;
         this.entities = entities;
-        this.cloudsx = cloudsx;
-        this.cloudsy = cloudsy;
-        this.cloudsv = cloudsv;
-        this.cloudsn = cloudsn;
+        this.cloudsAggregate = cloudsAggregate;
         this.machinesx = machinesx;
         this.machinesy = machinesy;
         this.lsources = lsources;
