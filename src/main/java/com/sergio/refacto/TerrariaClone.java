@@ -957,16 +957,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
         }
 
-        short[] tlist1 = {0, 0, 0, 0, 0};
-        short[] tlist2 = {0, 0, 0, 0, 0};
-        short[] tlist3 = {0, 0, 0, 0, 0};
-        cic = new ItemCollection("cic", tlist1, tlist2, tlist3);
+        cic = new ItemCollection("cic", 5);
         inventory.renderCollection(cic);
 
-        short[] tlist4 = {0, 0, 0, 0};
-        short[] tlist5 = {0, 0, 0, 0};
-        short[] tlist6 = {0, 0, 0, 0};
-        armor = new ItemCollection("armor", tlist4, tlist5, tlist6);
+        armor = new ItemCollection("armor", 4);
         inventory.renderCollection(armor);
 
         toolAngle = 4.7;
@@ -1140,7 +1134,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 if (!ic.type.equals("workbench")) {
                     machinesx.add(icx);
                     machinesy.add(icy);
-                    icmatrix[iclayer][icy][icx] = new ItemCollection(ic.type, ic.ids, ic.nums, ic.durs);
+                    icmatrix[iclayer][icy][icx] = new ItemCollection(ic);
                 }
                 if (ic.type.equals("workbench")) {
                     if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
@@ -2160,7 +2154,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 if (!ic.type.equals("workbench")) {
                                     machinesx.add(icx);
                                     machinesy.add(icy);
-                                    icmatrix[iclayer][icy][icx] = new ItemCollection(ic.type, ic.ids, ic.nums, ic.durs);
+                                    icmatrix[iclayer][icy][icx] = new ItemCollection(ic);
                                 }
                                 if (ic.type.equals("workbench")) {
                                     if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
@@ -2188,14 +2182,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             iclayer = layer;
                             for (int l=0; l<3; l++) {
                                 if (blocks[l][uy][ux] == 8) {
-                                    short[] tlist1 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                                     if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("workbench")) {
                                         ic = new ItemCollection("workbench", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("workbench", tlist1, tlist2, tlist3);
+                                        ic = new ItemCollection("workbench", 10);
                                     }
                                     icx = ux;
                                     icy = uy;
@@ -2203,14 +2194,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     showInv = true;
                                 }
                                 if (blocks[l][uy][ux] == 9) {
-                                    short[] tlist1 = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist2 = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist3 = {0, 0, 0, 0, 0, 0, 0, 0, 0};
                                     if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("wooden_chest")) {
                                         ic = new ItemCollection("wooden_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("wooden_chest", tlist1, tlist2, tlist3);
+                                        ic = new ItemCollection("wooden_chest", 9);
                                     }
                                     icx = ux;
                                     icy = uy;
@@ -2218,14 +2206,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     showInv = true;
                                 }
                                 if (blocks[l][uy][ux] == 10) {
-                                    short[] tlist1 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                                     if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("stone_chest")) {
                                         ic = new ItemCollection("stone_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("stone_chest", tlist1, tlist2, tlist3);
+                                        ic = new ItemCollection("stone_chest", 15);
                                     }
                                     icx = ux;
                                     icy = uy;
@@ -2233,14 +2218,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     showInv = true;
                                 }
                                 if (blocks[l][uy][ux] == 11) {
-                                    short[] tlist1 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                                     if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("copper_chest")) {
                                         ic = new ItemCollection("copper_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("copper_chest", tlist1, tlist2, tlist3);
+                                        ic = new ItemCollection("copper_chest", 20);
                                     }
                                     icx = ux;
                                     icy = uy;
@@ -2248,14 +2230,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     showInv = true;
                                 }
                                 if (blocks[l][uy][ux] == 12) {
-                                    short[] tlist1 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                                     if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("iron_chest")) {
                                         ic = new ItemCollection("iron_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("iron_chest", tlist1, tlist2, tlist3);
+                                        ic = new ItemCollection("iron_chest", 28);
                                     }
                                     icx = ux;
                                     icy = uy;
@@ -2263,14 +2242,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     showInv = true;
                                 }
                                 if (blocks[l][uy][ux] == 13) {
-                                    short[] tlist1 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                                     if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("silver_chest")) {
                                         ic = new ItemCollection("silver_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("silver_chest", tlist1, tlist2, tlist3);
+                                        ic = new ItemCollection("silver_chest", 35);
                                     }
                                     icx = ux;
                                     icy = uy;
@@ -2278,14 +2254,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     showInv = true;
                                 }
                                 if (blocks[l][uy][ux] == 14) {
-                                    short[] tlist1 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                                     if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("gold_chest")) {
                                         ic = new ItemCollection("gold_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("gold_chest", tlist1, tlist2, tlist3);
+                                        ic = new ItemCollection("gold_chest", 42);
                                     }
                                     icx = ux;
                                     icy = uy;
@@ -2293,14 +2266,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     showInv = true;
                                 }
                                 if (blocks[l][uy][ux] == 80) {
-                                    short[] tlist1 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                                     if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("zinc_chest")) {
                                         ic = new ItemCollection("zinc_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("zinc_chest", tlist1, tlist2, tlist3);
+                                        ic = new ItemCollection("zinc_chest", 56);
                                     }
                                     icx = ux;
                                     icy = uy;
@@ -2308,14 +2278,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     showInv = true;
                                 }
                                 if (blocks[l][uy][ux] == 81) {
-                                    short[] tlist1 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                                     if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("rhymestone_chest")) {
                                         ic = new ItemCollection("rhymestone_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("rhymestone_chest", tlist1, tlist2, tlist3);
+                                        ic = new ItemCollection("rhymestone_chest", 72);
                                     }
                                     icx = ux;
                                     icy = uy;
@@ -2323,14 +2290,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     showInv = true;
                                 }
                                 if (blocks[l][uy][ux] == 82) {
-                                    short[] tlist1 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-                                    short[] tlist3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
                                     if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("obdurite_chest")) {
                                         ic = new ItemCollection("obdurite_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("obdurite_chest", tlist1, tlist2, tlist3);
+                                        ic = new ItemCollection("obdurite_chest", 100);
                                     }
                                     icx = ux;
                                     icy = uy;
@@ -4533,7 +4497,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     if (!ic.type.equals("workbench")) {
                         machinesx.add(icx);
                         machinesy.add(icy);
-                        icmatrix[iclayer][icy][icx] = new ItemCollection(ic.type, ic.ids, ic.nums, ic.durs);
+                        icmatrix[iclayer][icy][icx] = new ItemCollection(ic);
                     }
                     if (ic.type.equals("workbench")) {
                         if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {

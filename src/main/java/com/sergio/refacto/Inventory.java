@@ -5,6 +5,7 @@ import java.awt.image.*;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 import javax.imageio.ImageIO;
 
 public class Inventory implements Serializable {
@@ -29,8 +30,6 @@ public class Inventory implements Serializable {
     private int troly = 17;
 
     int CX, CY;
-
-    private boolean valid = false;
 
     private ItemCollection ic;
 
@@ -876,28 +875,6 @@ public class Inventory implements Serializable {
         return quantity;
     }
 
-    public int removeItem(short item, short quantity) {
-        for (i=0; i<40; i++) {
-            if (ids[i] == item) {
-                if (nums[i] <= quantity) {
-                    nums[i] -= quantity;
-                    if (nums[i] == 0) {
-                        ids[i] = 0;
-                    }
-                    update(i);
-                    return 0;
-                }
-                else {
-                    quantity -= nums[i];
-                    nums[i] = 0;
-                    ids[i] = 0;
-                    update(i);
-                }
-            }
-        }
-        return quantity;
-    }
-
     public int addLocation(int i, short item, short quantity, short durability) {
         if (ids[i] == item) {
             if (TerrariaClone.getMAXSTACKS().get(ids[i]) - nums[i] >= quantity) {
@@ -1062,8 +1039,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("armor")) {
+        } else if (ic.type.equals("armor")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/armor.png");
                 CX = 1;
@@ -1072,16 +1048,14 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("workbench")) {
+        } else if (ic.type.equals("workbench")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/workbench.png");
                 for (i=0; i<9; i++) {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("wooden_chest")) {
+        } else if (ic.type.equals("wooden_chest")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/wooden_chest.png");
                 CX = 3;
@@ -1090,8 +1064,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("stone_chest")) {
+        } else if (ic.type.equals("stone_chest")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/stone_chest.png");
                 CX = 5;
@@ -1100,8 +1073,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("copper_chest")) {
+        } else if (ic.type.equals("copper_chest")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/copper_chest.png");
                 CX = 5;
@@ -1110,8 +1082,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("iron_chest")) {
+        } else if (ic.type.equals("iron_chest")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/iron_chest.png");
                 CX = 7;
@@ -1120,8 +1091,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("silver_chest")) {
+        } else if (ic.type.equals("silver_chest")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/silver_chest.png");
                 CX = 7;
@@ -1130,8 +1100,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("gold_chest")) {
+        } else if (ic.type.equals("gold_chest")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/gold_chest.png");
                 CX = 7;
@@ -1140,8 +1109,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("zinc_chest")) {
+        } else if (ic.type.equals("zinc_chest")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/zinc_chest.png");
                 CX = 7;
@@ -1150,8 +1118,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("rhymestone_chest")) {
+        } else if (ic.type.equals("rhymestone_chest")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/rhymestone_chest.png");
                 CX = 8;
@@ -1160,8 +1127,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("obdurite_chest")) {
+        } else if (ic.type.equals("obdurite_chest")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/obdurite_chest.png");
                 CX = 10;
@@ -1170,8 +1136,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        if (ic.type.equals("furnace")) {
+        } else if (ic.type.equals("furnace")) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/furnace.png");
                 for (i=-1; i<4; i++) {
@@ -1201,8 +1166,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        }
-        else {
+        } else {
             if (quantity <= TerrariaClone.getMAXSTACKS().get(ic.ids[i])) {
                 ic.ids[i] = item;
                 ic.nums[i] = quantity;
@@ -1272,14 +1236,7 @@ public class Inventory implements Serializable {
             ic.ids[4] = 0;
             ic.ids[4] = 0;
             for (Short[] r2 : RECIPES.get("cic")) {
-                valid = true;
-                for (i=0; i<4; i++) {
-                    if (ic.ids[i] != r2[i]) {
-                        valid = false;
-                        break;
-                    }
-                }
-                if (valid) {
+                if (ic.areIdsEquals(r2)) {
                     ic.ids[4] = r2[4];
                     ic.nums[4] = r2[5];
                     if (TerrariaClone.getTOOLDURS().get(r2[4]) != null)
@@ -1287,24 +1244,8 @@ public class Inventory implements Serializable {
                     break;
                 }
             }
-            ArrayList<Short> r3 = new ArrayList<Short>(6);
             for (Short[] r2 : RECIPES.get("shapeless_cic")) {
-                valid = true;
-                r3.clear();
-                for (j=0; j<r2.length-2; j++) {
-                    r3.add(r2[j]);
-                }
-                for (j=0; j<4; j++) {
-                    n = r3.indexOf(ic.ids[j]);
-                    if (n == -1) {
-                        valid = false;
-                        break;
-                    }
-                    else {
-                        r3.remove(n);
-                    }
-                }
-                if (valid) {
+                if (ic.areInvalidIds(r2)) {
                     ic.ids[4] = r2[r2.length-2];
                     ic.nums[4] = r2[r2.length-1];
                     if (TerrariaClone.getTOOLDURS().get(r2[r2.length-2]) != null)
@@ -1336,8 +1277,7 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.nums[4] + " ", 3*40+9, 20+34);
                 }
             }
-        }
-        if (ic.type.equals("armor")) {
+        } else if (ic.type.equals("armor")) {
             py = (int)(i/CX);
             px = i-(py*CX);
             for (x=px*46; x<px*46+40; x++) {
@@ -1364,8 +1304,7 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.nums[i] + " ", px*46+9, py*46+34);
                 }
             }
-        }
-        if (ic.type.equals("workbench")) {
+        } else if (ic.type.equals("workbench")) {
             py = (int)(i/3);
             px = i-(py*3);
             for (x=px*40; x<px*40+40; x++) {
@@ -1394,14 +1333,7 @@ public class Inventory implements Serializable {
             ic.ids[9] = 0;
             ic.ids[9] = 0;
             for (Short[] r2 : RECIPES.get("workbench")) {
-                valid = true;
-                for (i=0; i<9; i++) {
-                    if (ic.ids[i] != r2[i]) {
-                        valid = false;
-                        break;
-                    }
-                }
-                if (valid) {
+                if (ic.areIdsEquals(r2)) {
                     ic.ids[9] = r2[9];
                     ic.nums[9] = r2[10];
                     if (TerrariaClone.getTOOLDURS().get(r2[9]) != null)
@@ -1409,24 +1341,8 @@ public class Inventory implements Serializable {
                     break;
                 }
             }
-            ArrayList<Short> r3 = new ArrayList<Short>(11);
             for (Short[] r2 : RECIPES.get("shapeless")) {
-                valid = true;
-                r3.clear();
-                for (j=0; j<r2.length-2; j++) {
-                    r3.add(r2[j]);
-                }
-                for (j=0; j<9; j++) {
-                    n = r3.indexOf(ic.ids[j]);
-                    if (n == -1) {
-                        valid = false;
-                        break;
-                    }
-                    else {
-                        r3.remove(n);
-                    }
-                }
-                if (valid) {
+                if (ic.areInvalidIds(r2)) {
                     ic.ids[9] = r2[r2.length-2];
                     ic.nums[9] = r2[r2.length-1];
                     if (TerrariaClone.getTOOLDURS().get(r2[r2.length-2]) != null)
@@ -1458,8 +1374,7 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.nums[9] + " ", 4*40+9, 1*40+34);
                 }
             }
-        }
-        if (ic.type.equals("wooden_chest") || ic.type.equals("stone_chest") ||
+        } else if (ic.type.equals("wooden_chest") || ic.type.equals("stone_chest") ||
             ic.type.equals("copper_chest") || ic.type.equals("iron_chest") ||
             ic.type.equals("silver_chest") || ic.type.equals("gold_chest") ||
             ic.type.equals("zinc_chest") || ic.type.equals("rhymestone_chest") ||
@@ -1490,8 +1405,7 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.nums[i] + " ", px*46+9, py*46+34);
                 }
             }
-        }
-        if (ic.type.equals("furnace")) {
+        } else if (ic.type.equals("furnace")) {
             if (i == -1) {
                 for (y=0; y<5; y++) {
                     for (x=0; x<ic.FUELP*38; x++) {
@@ -1557,46 +1471,23 @@ public class Inventory implements Serializable {
 
     public void useRecipeWorkbench(ItemCollection ic) {
         for (Short[] r2 : RECIPES.get("workbench")) {
-            valid = true;
-            for (i=0; i<9; i++) {
-                if (ic.ids[i] != r2[i]) {
-                    valid = false;
-                    break;
-                }
-            }
-            if (valid) {
+            if (ic.areIdsEquals(r2)) {
                 for (i=0; i<9; i++) {
-                    removeLocationIC(ic, i, new Short((short)1));
+                    removeLocationIC(ic, i, (short) 1);
                     updateIC(ic, i);
                 }
             }
         }
-        ArrayList<Short> r3 = new ArrayList<Short>(11);
         for (Short[] r2 : RECIPES.get("shapeless")) {
-            valid = true;
-            r3.clear();
-            for (k=0; k<r2.length-2; k++) {
-                r3.add(r2[k]);
-            }
-            for (k=0; k<9; k++) {
-                n = r3.indexOf(ic.ids[k]);
-                if (n == -1) {
-                    valid = false;
-                    break;
-                }
-                else {
-                    r3.remove(n);
-                }
-            }
-            if (valid) {
-                r3.clear();
+            if (ic.areInvalidIds(r2)) {
+                List<Short> r3 = new ArrayList<>(11);
                 for (k=0; k<r2.length-2; k++) {
                     r3.add(r2[k]);
                 }
                 for (k=0; k<9; k++) {
                     n = r3.indexOf(ic.ids[k]);
                     r3.remove(n);
-                    removeLocationIC(ic, k, new Short((short)1));
+                    removeLocationIC(ic, k, (short) 1);
                     updateIC(ic, k);
                 }
                 break;
@@ -1606,46 +1497,23 @@ public class Inventory implements Serializable {
 
     public void useRecipeCIC(ItemCollection ic) {
         for (Short[] r2 : RECIPES.get("cic")) {
-            valid = true;
-            for (i=0; i<4; i++) {
-                if (ic.ids[i] != r2[i]) {
-                    valid = false;
-                    break;
-                }
-            }
-            if (valid) {
+            if (ic.areIdsEquals(r2)) {
                 for (i=0; i<4; i++) {
-                    removeLocationIC(ic, i, new Short((short)1));
+                    removeLocationIC(ic, i, (short) 1);
                     updateIC(ic, i);
                 }
             }
         }
-        ArrayList<Short> r3 = new ArrayList<Short>(6);
         for (Short[] r2 : RECIPES.get("shapeless_cic")) {
-            valid = true;
-            r3.clear();
-            for (k=0; k<r2.length-2; k++) {
-                r3.add(r2[k]);
-            }
-            for (k=0; k<4; k++) {
-                n = r3.indexOf(ic.ids[k]);
-                if (n == -1) {
-                    valid = false;
-                    break;
-                }
-                else {
-                    r3.remove(n);
-                }
-            }
-            if (valid) {
-                r3.clear();
+            if (ic.areInvalidIds(r2)) {
+                List<Short> r3 = new ArrayList<>(6);
                 for (k=0; k<r2.length-2; k++) {
                     r3.add(r2[k]);
                 }
                 for (k=0; k<4; k++) {
                     n = r3.indexOf(ic.ids[k]);
                     r3.remove(n);
-                    removeLocationIC(ic, k, new Short((short)1));
+                    removeLocationIC(ic, k, (short) 1);
                     updateIC(ic, k);
                 }
                 break;

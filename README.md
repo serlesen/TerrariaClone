@@ -12,5 +12,6 @@ Refactorings done:
 * Use enums instead of array of indexes/strings
 * Pack some fields together into contexts
 * Migrate Arrays into classes with a meaning for each field
+* Move some methods to objects/aggregates
 
 [terraria]: https://terraria.org/
