@@ -13,16 +13,16 @@ public class WorldContainer implements Serializable {
     Float[][] lights;
     Float[][][] power;
     Boolean[][] lsources;
-    ArrayList<Integer> lqx, lqy;
+    List<Integer> lqx, lqy;
     Boolean[][] lqd;
     private Boolean[][] drawn, ldrawn, rdrawn;
     Player player;
     Inventory inventory;
     ItemCollection cic;
-    ArrayList<Entity> entities;
-    ArrayList<Double> cloudsx, cloudsy, cloudsv;
-    ArrayList<Integer> cloudsn;
-    ArrayList<Integer> machinesx, machinesy;
+    List<Entity> entities;
+    List<Double> cloudsx, cloudsy, cloudsv;
+    List<Integer> cloudsn;
+    List<Integer> machinesx, machinesy;
 
     int rgnc1;
     int rgnc2;
@@ -69,8 +69,8 @@ public class WorldContainer implements Serializable {
     public WorldContainer(Integer[][][] blocks, Byte[][][] blockds, Byte[][] blockdns, Byte[][] blockbgs, Byte[][] blockts,
         Float[][] lights, Float[][][] power, Boolean[][] drawn, Boolean[][] ldrawn, Boolean[][] rdrawn,
         Player player, Inventory inventory, ItemCollection cic,
-        ArrayList<Entity> entities, ArrayList<Double> cloudsx, ArrayList<Double> cloudsy, ArrayList<Double> cloudsv, ArrayList<Integer> cloudsn,
-        ArrayList<Integer> machinesx, ArrayList<Integer> machinesy, Boolean[][] lsources, ArrayList<Integer> lqx, ArrayList<Integer> lqy, Boolean[][] lqd,
+        List<Entity> entities, List<Double> cloudsx, List<Double> cloudsy, List<Double> cloudsv, List<Integer> cloudsn,
+        List<Integer> machinesx, List<Integer> machinesy, Boolean[][] lsources, List<Integer> lqx, List<Integer> lqy, Boolean[][] lqd,
         int rgnc1, int rgnc2, int layer, int layerTemp, int blockTemp,
         int mx, int my, int icx, int icy, int mining, int immune,
         short moveItem, short moveNum, short moveItemTemp, short moveNumTemp, int msi,

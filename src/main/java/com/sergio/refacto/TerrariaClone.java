@@ -54,6 +54,7 @@ import com.sergio.refacto.dto.BlockNames;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.Directions;
 import com.sergio.refacto.dto.Items;
+import com.sergio.refacto.dto.State;
 import com.sergio.refacto.init.ArmorInitializer;
 import com.sergio.refacto.init.BackgroundImagesInitializer;
 import com.sergio.refacto.init.BlockCDInitializer;
@@ -85,6 +86,7 @@ import com.sergio.refacto.init.UIBlocksInitializer;
 import com.sergio.refacto.init.UIEntitiesInitializer;
 import com.sergio.refacto.init.WirePInitializer;
 import com.sergio.refacto.items.Chunk;
+import com.sergio.refacto.items.Mouse;
 import com.sergio.refacto.tools.ResourcesLoader;
 
 import static com.sergio.refacto.dto.Constants.*;
@@ -102,7 +104,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     javax.swing.Timer timer, menuTimer;
     File folder;
     File[] files;
-    ArrayList<String> worldFiles, worldNames;
+    List<String> worldFiles, worldNames;
     String currentWorld;
     TextField newWorldName;
 
@@ -114,21 +116,21 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     Float[][] lights;
     Float[][][] power;
     Boolean[][] lsources;
-    ArrayList<Integer> lqx, lqy, pqx, pqy, zqx, zqy, pzqx, pzqy;
+    List<Integer> lqx, lqy, pqx, pqy, zqx, zqy, pzqx, pzqy;
     Boolean[][] lqd, zqd, pqd, pzqd;
     Byte[][] zqn;
     Byte[][][] pzqn;
     Boolean[][][] arbprd;
-    ArrayList<Integer> updatex, updatey, updatet, updatel;
+    List<Integer> updatex, updatey, updatet, updatel;
     Boolean[][] wcnct;
     Boolean[][] drawn, ldrawn, rdrawn;
     Player player;
     Inventory inventory;
     static ItemCollection cic, armor;
-    ArrayList<Entity> entities;
-    ArrayList<Double> cloudsx, cloudsy, cloudsv;
-    ArrayList<Integer> cloudsn;
-    ArrayList<Integer> machinesx, machinesy;
+    List<Entity> entities;
+    List<Double> cloudsx, cloudsy, cloudsv;
+    List<Integer> cloudsn;
+    List<Integer> machinesx, machinesy;
 
     Chunk[][] temporarySaveFile;
     Chunk[][] chunkMatrix;
@@ -142,7 +144,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     BufferedImage layerImg;
 
     Entity entity;
-    String state = "loading_graphics";
+    State state = State.LOADING_GRAPHICS;
     String mobSpawn;
 
     int u, v, ou, ov, uNew, vNew;
@@ -163,7 +165,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     Point tp1, tp2, tp3, tp4, tp5;
 
-    int[] mousePos, mousePos2;
+    public Mouse mousePos, mousePos2;
 
     Font font = new Font("Chalkboard", Font.BOLD, 12);
     Font mobFont = new Font("Chalkboard", Font.BOLD, 16);
@@ -182,10 +184,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     boolean showTool = false;
     boolean showInv = false;
     boolean checkBlocks = true;
-    boolean mouseClicked = true;
-    boolean mouseClicked2 = true;
-    boolean mouseNoLongerClicked = false;
-    boolean mouseNoLongerClicked2 = false;
     boolean addSources = false;
     boolean doMobSpawn = false;
     boolean keepLeaf = false;
@@ -212,8 +210,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     private static int WORLDWIDTH = WIDTH / CHUNKBLOCKS + 1;
     private static int WORLDHEIGHT = HEIGHT / CHUNKBLOCKS + 1;
 
-    private static final int SUNLIGHTSPEED = 14;
-
     int resunlight = WIDTH;
     int sunlightlevel = 19;
 
@@ -221,8 +217,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     BufferedImage[][] worlds, fworlds;
     boolean[][] kworlds;
-
-    BufferedImage world;
 
     ItemCollection[][][] icmatrix;
 
@@ -261,7 +255,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     static Map<Short,Double> FSPEED;
     static Map<Integer,Integer> DDELAY;
 
-    ArrayList<Short> FRI1, FRN1, FRI2, FRN2;
+    List<Short> FRI1, FRN1, FRI2, FRN2;
 
     Graphics2D wg2, fwg2, ug2, pg2;
 
@@ -294,8 +288,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
             queue = new boolean[7]; // left[0] right[1] up[2] mouse[3] rightmouse[4] shift[5] down[6]
 
-            mousePos = new int[2];
-            mousePos2 = new int[2];
+            mousePos = new Mouse();
+            mousePos2 = new Mouse();
 
             logo_white = ResourcesLoader.loadImage("interface/logo_white.png");
             logo_black = ResourcesLoader.loadImage("interface/logo_black.png");
@@ -304,7 +298,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             new_world = ResourcesLoader.loadImage("interface/new_world.png");
             save_exit = ResourcesLoader.loadImage("interface/save_exit.png");
 
-            state = "loading_graphics";
+            state = State.LOADING_GRAPHICS;
 
             repaint();
 
@@ -404,7 +398,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
 
             bg = CYANISH;
-            state = "title_screen";
+            state = State.TITLE_SCREEN;
 
             repaint();
 
@@ -739,40 +733,35 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             };
                             timer = new javax.swing.Timer(20, mainThread);
 
-                            if (state.equals("title_screen") && !menuPressed) {
-                                if (mousePos[0] >= 239 && mousePos[0] <= 557) {
-                                    if (mousePos[1] >= 213 && mousePos[1] <= 249) { // singleplayer
-                                        findWorlds();
-                                        state = "select_world";
-                                        repaint();
-                                        menuPressed = true;
-                                    }
+                            if (state == State.TITLE_SCREEN && !menuPressed) {
+                                if (mousePos.isInBetweenInclusive(239, 557, 213, 249)) { // singleplayer
+                                    findWorlds();
+                                    state = State.SELECT_WORLD;
+                                    repaint();
+                                    menuPressed = true;
                                 }
                             }
-                            if (state.equals("select_world") && !menuPressed) {
-                                if (mousePos[0] >= 186 && mousePos[0] <= 615 &&
-                                    mousePos[1] >= 458 && mousePos[1] <= 484) { // create new world
-                                    state = "new_world";
+                            if (state == State.SELECT_WORLD && !menuPressed) {
+                                if (mousePos.isInBetweenInclusive(186, 615, 458, 484)) { // create new world
+                                    state = State.NEW_WORLD;
                                     newWorldName = new TextField(400, "New World");
                                     repaint();
                                     menuPressed = true;
                                 }
-                                if (mousePos[0] >= 334 && mousePos[0] <= 457 &&
-                                    mousePos[1] >= 504 && mousePos[1] <= 530) { // back
-                                    state = "title_screen";
+                                if (mousePos.isInBetweenInclusive(334, 457, 504, 530)) { // back
+                                    state = State.TITLE_SCREEN;
                                     repaint();
                                     menuPressed = true;
                                 }
                                 for (i=0; i<worldFiles.size(); i++) {
-                                    if (mousePos[0] >= 166 && mousePos[0] <= 470 &&
-                                        mousePos[1] >= 117+i*35 && mousePos[1] <= 152+i*35) { // load world
+                                    if (mousePos.isInBetweenInclusive(166, 470, 117+i*35, 152+i*35)) { // load world
                                         currentWorld = worldNames.get(i);
-                                        state = "loading_world";
+                                        state = State.LOADING_WORLD;
                                         bg = Color.BLACK;
                                         if (loadWorld(worldFiles.get(i))) {
                                             menuTimer.stop();
                                             bg = CYANISH;
-                                            state = "ingame";
+                                            state = State.IN_GAME;
                                             ready = true;
                                             timer.start();
                                             break;
@@ -780,9 +769,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     }
                                 }
                             }
-                            if (state.equals("new_world") && !menuPressed) {
-                                if (mousePos[0] >= 186 && mousePos[0] <= 615 &&
-                                    mousePos[1] >= 458 && mousePos[1] <= 484) { // create new world
+                            if (state == State.NEW_WORLD && !menuPressed) {
+                                if (mousePos.isInBetweenInclusive(186, 615, 458, 484)) { // create new world
                                     if (!newWorldName.getText().equals("")) {
                                         findWorlds();
                                         doGenerateWorld = true;
@@ -794,7 +782,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         if (doGenerateWorld) {
                                             menuTimer.stop();
                                             bg = Color.BLACK;
-                                            state = "generating_world";
+                                            state = State.GENERATING_WORLD;
                                             currentWorld = newWorldName.getText();
                                             repaint();
                                             Action createWorldThread = new AbstractAction() {
@@ -802,7 +790,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                                     try {
                                                         createNewWorld();
                                                         bg = CYANISH;
-                                                        state = "ingame";
+                                                        state = State.IN_GAME;
                                                         ready = true;
                                                         timer.start();
                                                         createWorldTimer.stop();
@@ -817,9 +805,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         }
                                     }
                                 }
-                                if (mousePos[0] >= 334 && mousePos[0] <= 457 &&
-                                    mousePos[1] >= 504 && mousePos[1] <= 530) { // back
-                                    state = "select_world";
+                                if (mousePos.isInBetweenInclusive(334, 457, 504, 530)) { // back
+                                    state = State.SELECT_WORLD;
                                     repaint();
                                     menuPressed = true;
                                 }
@@ -1029,8 +1016,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     }
 
     public void updateApp() {
-        mousePos2[0] = mousePos[0] + player.ix - getWidth()/2 + player.width/2;
-        mousePos2[1] = mousePos[1] + player.iy - getHeight()/2 + player.height/2;
+        mousePos2.setX(mousePos.getX() + player.ix - getWidth()/2 + player.width/2);
+        mousePos2.setY(mousePos.getY() + player.iy - getHeight()/2 + player.height/2);
 
         currentSkyLight = SKY_COLORS[0];
         for (i=0; i< SKY_COLORS.length; i++) {
@@ -1478,12 +1465,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         if (queue[3]) {
             checkBlocks = true;
             if (showInv) {
-                if (mousePos[0] >= getWidth()-save_exit.getWidth()-24 && mousePos[0] <= getWidth()-24 &&
-                    mousePos[1] >= getHeight()-save_exit.getHeight()-24 && mousePos[1] <= getHeight()-24) {
-                    if (mouseClicked) {
-                        mouseNoLongerClicked = true;
+                if (mousePos.isInBetweenInclusive(getWidth()-save_exit.getWidth()-24, getWidth()-24, getHeight()-save_exit.getHeight()-24, getHeight()-24)) {
+                    if (mousePos.isClicked()) {
+                        mousePos.setReleased(true);
                         saveWorld();
-                        state = "title_screen";
+                        state = State.TITLE_SCREEN;
                         timer.stop();
                         menuTimer.start();
                         return;
@@ -1491,11 +1477,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 }
                 for (ux=0; ux<10; ux++) {
                     for (uy=0; uy<4; uy++) {
-                        if (mousePos[0] >= ux*46+6 && mousePos[0] < ux*46+46 &&
-                            mousePos[1] >= uy*46+6 && mousePos[1] < uy*46+46) {
+                        if (mousePos.isInBetween(ux*46+6, ux*46+46, uy*46+6, uy*46+46)) {
                             checkBlocks = false;
-                            if (mouseClicked) {
-                                mouseNoLongerClicked = true;
+                            if (mousePos.isClicked()) {
+                                mousePos.setReleased(true);
                                 if (uy != 0 || inventory.selection != ux || !showTool) {
                                     moveItemTemp = inventory.ids[uy*10+ux];
                                     moveNumTemp = inventory.nums[uy*10+ux];
@@ -1523,12 +1508,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 }
                 for (ux=0; ux<2; ux++) {
                     for (uy=0; uy<2; uy++) {
-                        if (mousePos[0] >= inventory.image.getWidth()+ux*40+75 &&
-                            mousePos[0] < inventory.image.getWidth()+ux*40+115 &&
-                            mousePos[1] >= uy*40+52 && mousePos[1] < uy*40+92) {
+                        if (mousePos.isInBetween(inventory.image.getWidth()+ux*40+75, inventory.image.getWidth()+ux*40+115, uy*40+52, uy*40+92)) {
                             checkBlocks = false;
-                            if (mouseClicked) {
-                                mouseNoLongerClicked = true;
+                            if (mousePos.isClicked()) {
+                                mousePos.setReleased(true);
                                 moveItemTemp = cic.ids[uy*2+ux];
                                 moveNumTemp = cic.nums[uy*2+ux];
                                 moveDurTemp = cic.durs[uy*2+ux];
@@ -1552,11 +1535,9 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         }
                     }
                 }
-                if (mousePos[0] >= inventory.image.getWidth()+3*40+81 &&
-                    mousePos[0] < inventory.image.getWidth()+3*40+121 &&
-                    mousePos[1] >= 20+52 && mousePos[1] < 20+92) {
+                if (mousePos.isInBetween(inventory.image.getWidth()+3*40+81, inventory.image.getWidth()+3*40+121, 20+52, 20+92)) {
                     checkBlocks = false;
-                    if (mouseClicked) {
+                    if (mousePos.isClicked()) {
                         if (moveItem == cic.ids[4] && moveNum + cic.nums[4] <= MAXSTACKS.get(cic.ids[4])) {
                             moveNum += cic.nums[4];
                             inventory.useRecipeCIC(cic);
@@ -1575,12 +1556,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     if (ic.type.equals("workbench")) {
                         for (ux=0; ux<3; ux++) {
                             for (uy=0; uy<3; uy++) {
-                                if (mousePos[0] >= ux*40+6 && mousePos[0] < ux*40+46 &&
-                                    mousePos[1] >= uy*40+inventory.image.getHeight()+46 &&
-                                    mousePos[1] < uy*40+inventory.image.getHeight()+86) {
+                                if (mousePos.isInBetween(ux*40+6, ux*40+46, uy*40+inventory.image.getHeight()+46, uy*40+inventory.image.getHeight()+86)) {
                                     checkBlocks = false;
-                                    if (mouseClicked) {
-                                        mouseNoLongerClicked = true;
+                                    if (mousePos.isClicked()) {
+                                        mousePos.setReleased(true);
                                         moveItemTemp = ic.ids[uy*3+ux];
                                         moveNumTemp = ic.nums[uy*3+ux];
                                         if (moveItem == ic.ids[uy*3+ux]) {
@@ -1601,11 +1580,9 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                         }
-                        if (mousePos[0] >= 4*40+6 && mousePos[0] < 4*40+46 &&
-                            mousePos[1] >= 1*40+inventory.image.getHeight()+46 &&
-                            mousePos[1] < 1*40+inventory.image.getHeight()+86) {
+                        if (mousePos.isInBetween(4*40+6, 4*40+46, 1*40+inventory.image.getHeight()+46, 1*40+inventory.image.getHeight()+86)) {
                             checkBlocks = false;
-                            if (mouseClicked) {
+                            if (mousePos.isClicked()) {
                                 if (moveItem == ic.ids[9] && moveNum + ic.nums[9] <= MAXSTACKS.get(ic.ids[9])) {
                                     moveNum += ic.nums[9];
                                     inventory.useRecipeWorkbench(ic);
@@ -1628,12 +1605,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         ic.type.equals("obdurite_chest")) {
                         for (ux=0; ux<inventory.CX; ux++) {
                             for (uy=0; uy<inventory.CY; uy++) {
-                                if (mousePos[0] >= ux*46+6 && mousePos[0] < ux*46+46 &&
-                                    mousePos[1] >= uy*46+inventory.image.getHeight()+46 &&
-                                    mousePos[1] < uy*46+inventory.image.getHeight()+86) {
+                                if (mousePos.isInBetween(ux*46+6, ux*46+46, uy*46+inventory.image.getHeight()+46, uy*46+inventory.image.getHeight()+86)) {
                                     checkBlocks = false;
-                                    if (mouseClicked) {
-                                        mouseNoLongerClicked = true;
+                                    if (mousePos.isClicked()) {
+                                        mousePos.setReleased(true);
                                         moveItemTemp = ic.ids[uy*inventory.CX+ux];
                                         moveNumTemp = ic.nums[uy*inventory.CX+ux];
                                         if (moveItem == ic.ids[uy*inventory.CX+ux]) {
@@ -1656,12 +1631,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         }
                     }
                     if (ic.type.equals("furnace")) {
-                        if (mousePos[0] >= 6 && mousePos[0] < 46 &&
-                            mousePos[1] >= inventory.image.getHeight()+46 &&
-                            mousePos[1] < inventory.image.getHeight()+86) {
+                        if (mousePos.isInBetween(6, 46, inventory.image.getHeight()+46, inventory.image.getHeight()+86)) {
                             checkBlocks = false;
-                            if (mouseClicked) {
-                                mouseNoLongerClicked = true;
+                            if (mousePos.isClicked()) {
+                                mousePos.setReleased(true);
                                 moveItemTemp = ic.ids[0];
                                 moveNumTemp = ic.nums[0];
                                 if (moveItem == ic.ids[0]) {
@@ -1681,12 +1654,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                         }
-                        if (mousePos[0] >= 6 && mousePos[0] < 46 &&
-                            mousePos[1] >= inventory.image.getHeight()+142 &&
-                            mousePos[1] < inventory.image.getHeight()+182) {
+                        if (mousePos.isInBetween(6, 46, inventory.image.getHeight()+142, inventory.image.getHeight()+182)) {
                             checkBlocks = false;
-                            if (mouseClicked) {
-                                mouseNoLongerClicked = true;
+                            if (mousePos.isClicked()) {
+                                mousePos.setReleased(true);
                                 moveItemTemp = ic.ids[2];
                                 moveNumTemp = ic.nums[2];
                                 if (moveItem == ic.ids[2]) {
@@ -1705,12 +1676,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                         }
-                        if (mousePos[0] >= 62 && mousePos[0] < 102 &&
-                            mousePos[1] >= inventory.image.getHeight()+46 &&
-                            mousePos[1] < inventory.image.getHeight()+86) {
+                        if (mousePos.isInBetween(62, 102, inventory.image.getHeight()+46, inventory.image.getHeight()+86)) {
                             checkBlocks = false;
-                            if (mouseClicked) {
-                                mouseNoLongerClicked = true;
+                            if (mousePos.isClicked()) {
+                                mousePos.setReleased(true);
                                 if (moveItem == 0) {
                                     moveItem = ic.ids[3];
                                     moveNum = ic.nums[3];
@@ -1729,11 +1698,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     }
                 }
                 for (uy=0; uy<4; uy++) {
-                    if (mousePos[0] >= inventory.image.getWidth() + 6 && mousePos[0] < inventory.image.getWidth() + 6 + armor.image.getWidth() &&
-                        mousePos[1] >= 6 + uy*46 && mousePos[1] < 6 + uy*46+40) {
+                    if (mousePos.isInBetween(inventory.image.getWidth() + 6, inventory.image.getWidth() + 6 + armor.image.getWidth(), 6 + uy*46, 6 + uy*46+40)) {
                         checkBlocks = false;
-                        if (mouseClicked) {
-                            mouseNoLongerClicked = true;
+                        if (mousePos.isClicked()) {
+                            mousePos.setReleased(true);
                             i = uy;
                             if (uy == 0 && (moveItem == (short)105 || moveItem == (short)109 || moveItem == (short)113 || moveItem == (short)117 ||
                                             moveItem == (short)121 || moveItem == (short)125 || moveItem == (short)129 || moveItem == (short)133 ||
@@ -1773,18 +1741,17 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             else {
                 for (ux=0; ux<10; ux++) {
                     uy = 0;
-                    if (mousePos[0] >= ux*46+6 && mousePos[0] < ux*46+46 &&
-                        mousePos[1] >= uy*46+6 && mousePos[1] < uy*46+46) {
+                    if (mousePos.isInBetween(ux*46+6,ux*46+46, uy*46+6, uy*46+46)) {
                         checkBlocks = false;
-                        if (mouseClicked) {
-                            mouseNoLongerClicked = true;
+                        if (mousePos.isClicked()) {
+                            mousePos.setReleased(true);
                             inventory.select2(ux);
                         }
                     }
                 }
             }
-            if (mouseNoLongerClicked) {
-                mouseClicked = false;
+            if (mousePos.isReleased()) {
+                mousePos.setClicked(false);
             }
             if (checkBlocks) {
                 if (inventory.tool() != 0 && !showTool) {
@@ -1798,10 +1765,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     }
                     showTool = true;
                     toolAngle = 4.7;
-                    ux = (int)(mousePos2[0]/BLOCKSIZE);
-                    uy = (int)(mousePos2[1]/BLOCKSIZE);
-                    ux2 = (int)(mousePos2[0]/BLOCKSIZE);
-                    uy2 = (int)(mousePos2[1]/BLOCKSIZE);
+                    ux = (int)(mousePos2.getX()/BLOCKSIZE);
+                    uy = (int)(mousePos2.getY()/BLOCKSIZE);
+                    ux2 = (int)(mousePos2.getX()/BLOCKSIZE);
+                    uy2 = (int)(mousePos2.getY()/BLOCKSIZE);
                     if (Math.sqrt(Math.pow(player.x+player.image.getWidth()-ux2*BLOCKSIZE+BLOCKSIZE/2, 2) + Math.pow(player.y+player.image.getHeight()-uy2*BLOCKSIZE+BLOCKSIZE/2, 2)) <= 160 ||
                         Math.sqrt(Math.pow(player.x+player.image.getWidth()-ux2*BLOCKSIZE+BLOCKSIZE/2+WIDTH*BLOCKSIZE, 2) + Math.pow(player.y+player.image.getHeight()-uy2*BLOCKSIZE+BLOCKSIZE/2, 2)) <= 160 || DebugContext.REACH) {
                         ucx = ux - CHUNKBLOCKS * ((int)(ux/CHUNKBLOCKS));
@@ -1957,18 +1924,17 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
         }
         else {
-            mouseClicked = true;
+            mousePos.setClicked(true);
         }
         if (queue[4]) {
             checkBlocks = true;
             if (showInv) {
                 for (ux=0; ux<10; ux++) {
                     for (uy=0; uy<4; uy++) {
-                        if (mousePos[0] >= ux*46+6 && mousePos[0] < ux*46+46 &&
-                            mousePos[1] >= uy*46+6 && mousePos[1] < uy*46+46) {
+                        if (mousePos.isInBetween(ux*46+6, ux*46+46, uy*46+6, uy*46+46)) {
                             checkBlocks = false;
-                            if (mouseClicked2) {
-                                mouseNoLongerClicked2 = true;
+                            if (mousePos2.isClicked()) {
+                                mousePos2.setReleased(true);
                                 moveItemTemp = inventory.ids[uy*10+ux];
                                 moveNumTemp = (short)(inventory.nums[uy*10+ux]/2);
                                 moveDurTemp = inventory.durs[uy*10+ux];
@@ -2000,12 +1966,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 }
                 for (ux=0; ux<2; ux++) {
                     for (uy=0; uy<2; uy++) {
-                        if (mousePos[0] >= inventory.image.getWidth()+ux*40+75 &&
-                            mousePos[0] < inventory.image.getWidth()+ux*40+121 &&
-                            mousePos[1] >= uy*40+52 && mousePos[1] < uy*40+92) {
+                        if (mousePos.isInBetween(inventory.image.getWidth()+ux*40+75, inventory.image.getWidth()+ux*40+121, uy*40+52, uy*40+92)) {
                             checkBlocks = false;
-                            if (mouseClicked2) {
-                                mouseNoLongerClicked2 = true;
+                            if (mousePos2.isClicked()) {
+                                mousePos2.setReleased(true);
                                 moveItemTemp = cic.ids[uy*2+ux];
                                 moveNumTemp = (short)(cic.nums[uy*2+ux]/2);
                                 if (cic.ids[uy*2+ux] == 0) {
@@ -2035,12 +1999,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     if (ic.type.equals("workbench")) {
                         for (ux=0; ux<3; ux++) {
                             for (uy=0; uy<3; uy++) {
-                                if (mousePos[0] >= ux*40+6 && mousePos[0] < ux*40+46 &&
-                                    mousePos[1] >= uy*40+inventory.image.getHeight()+46 &&
-                                    mousePos[1] < uy*40+inventory.image.getHeight()+86) {
+                                if (mousePos.isInBetween(ux*40+6, ux*40+46, uy*40+inventory.image.getHeight()+46, uy*40+inventory.image.getHeight()+86)) {
                                     checkBlocks = false;
-                                    if (mouseClicked2) {
-                                        mouseNoLongerClicked2 = true;
+                                    if (mousePos2.isClicked()) {
+                                        mousePos2.setReleased(true);
                                         moveItemTemp = ic.ids[uy*3+ux];
                                         moveNumTemp = (short)(ic.nums[uy*3+ux]/2);
                                         if (ic.ids[uy*3+ux] == 0) {
@@ -2071,11 +2033,9 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                         }
-                        if (mousePos[0] >= 4*40+6 && mousePos[0] < 4*40+46 &&
-                            mousePos[1] >= 1*40+inventory.image.getHeight()+46 &&
-                            mousePos[1] < 1*40+inventory.image.getHeight()+86) {
+                        if (mousePos.isInBetween(4*40+6, 4*40+46, 1*40+inventory.image.getHeight()+46, 1*40+inventory.image.getHeight()+86)) {
                             checkBlocks = false;
-                            if (mouseClicked2) {
+                            if (mousePos2.isClicked()) {
                                 //
                             }
                         }
@@ -2087,12 +2047,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         ic.type.equals("obdurite_chest")) {
                         for (ux=0; ux<inventory.CX; ux++) {
                             for (uy=0; uy<inventory.CY; uy++) {
-                                if (mousePos[0] >= ux*46+6 && mousePos[0] < ux*46+46 &&
-                                    mousePos[1] >= uy*46+inventory.image.getHeight()+46 &&
-                                    mousePos[1] < uy*46+inventory.image.getHeight()+86) {
+                                if (mousePos.isInBetween(ux*46+6, ux*46+46, uy*46+inventory.image.getHeight()+46, uy*46+inventory.image.getHeight()+86)) {
                                     checkBlocks = false;
-                                    if (mouseClicked2) {
-                                        mouseNoLongerClicked2 = true;
+                                    if (mousePos2.isClicked()) {
+                                        mousePos2.setReleased(true);
                                         moveItemTemp = ic.ids[uy*inventory.CX+ux];
                                         moveNumTemp = (short)(ic.nums[uy*inventory.CX+ux]/2);
                                         if (ic.ids[uy*inventory.CX+ux] == 0) {
@@ -2120,12 +2078,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         }
                     }
                     if (ic.type.equals("furnace")) {
-                        if (mousePos[0] >= 6 && mousePos[0] < 46 &&
-                            mousePos[1] >= inventory.image.getHeight()+46 &&
-                            mousePos[1] < inventory.image.getHeight()+86) {
+                        if (mousePos.isInBetween(6, 46, inventory.image.getHeight()+46, inventory.image.getHeight()+86)) {
                             checkBlocks = false;
-                            if (mouseClicked2) {
-                                mouseNoLongerClicked2 = true;
+                            if (mousePos2.isClicked()) {
+                                mousePos2.setReleased(true);
                                 moveItemTemp = ic.ids[0];
                                 moveNumTemp = (short)(ic.nums[0]/2);
                                 if (ic.ids[0] == 0) {
@@ -2149,12 +2105,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                         }
-                        if (mousePos[0] >= 6 && mousePos[0] < 46 &&
-                            mousePos[1] >= inventory.image.getHeight()+142 &&
-                            mousePos[1] < inventory.image.getHeight()+182) {
+                        if (mousePos.isInBetween(6, 46, inventory.image.getHeight()+142, inventory.image.getHeight()+182)) {
                             checkBlocks = false;
-                            if (mouseClicked2) {
-                                mouseNoLongerClicked2 = true;
+                            if (mousePos2.isClicked()) {
+                                mousePos2.setReleased(true);
                                 moveItemTemp = ic.ids[2];
                                 moveNumTemp = (short)(ic.nums[2]/2);
                                 if (ic.ids[2] == 0) {
@@ -2178,12 +2132,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                         }
-                        if (mousePos[0] >= 62 && mousePos[0] < 102 &&
-                            mousePos[1] >= inventory.image.getHeight()+46 &&
-                            mousePos[1] < inventory.image.getHeight()+86) {
+                        if (mousePos.isInBetween(62, 102, inventory.image.getHeight()+46, inventory.image.getHeight()+86)) {
                             checkBlocks = false;
-                            if (mouseClicked2) {
-                                mouseNoLongerClicked2 = true;
+                            if (mousePos2.isClicked()) {
+                                mousePos2.setReleased(true);
                                 moveItemTemp = ic.ids[3];
                                 moveNumTemp = (short)(ic.nums[3]/2);
                                 if (moveItem == 0 && ic.nums[3] != 1) {
@@ -2197,10 +2149,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 }
             }
             if (checkBlocks) {
-                if (!(mousePos2[0] < 0 || mousePos2[0] >= WIDTH*BLOCKSIZE ||
-                      mousePos2[1] < 0 || mousePos2[1] >= HEIGHT*BLOCKSIZE)) {
-                    ux = (int)(mousePos2[0]/BLOCKSIZE);
-                    uy = (int)(mousePos2[1]/BLOCKSIZE);
+                if (!(mousePos2.getX() < 0 || mousePos2.getX() >= WIDTH*BLOCKSIZE ||
+                      mousePos2.getY() < 0 || mousePos2.getY() >= HEIGHT*BLOCKSIZE)) {
+                    ux = (int)(mousePos2.getX()/BLOCKSIZE);
+                    uy = (int)(mousePos2.getY()/BLOCKSIZE);
                     if (DebugContext.REACH || Math.sqrt(Math.pow(player.x+player.image.getWidth()-ux*BLOCKSIZE+BLOCKSIZE/2, 2) + Math.pow(player.y+player.image.getHeight()-uy*BLOCKSIZE+BLOCKSIZE/2, 2)) <= 160) {
                         ucx = ux - CHUNKBLOCKS * ((int)(ux/CHUNKBLOCKS));
                         ucy = uy - CHUNKBLOCKS * ((int)(uy/CHUNKBLOCKS));
@@ -2421,8 +2373,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             }
                             blocks[layer][uy][ux] = 83;
                         }
-                        if (mouseClicked2) {
-                            mouseNoLongerClicked2 = true;
+                        if (mousePos2.isClicked()) {
+                            mousePos2.setReleased(true);
                             blockTemp = blocks[layer][uy][ux];
                             if (blocks[layer][uy][ux] == 105 || blocks[layer][uy][ux] == 107 || blocks[layer][uy][ux] == 109) {
                                 blocks[layer][uy][ux] += 1;
@@ -2498,12 +2450,12 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     }
                 }
             }
-            if (mouseNoLongerClicked2) {
-                mouseClicked2 = false;
+            if (mousePos2.isReleased()) {
+                mousePos2.setClicked(false);
             }
         }
         else {
-            mouseClicked2 = true;
+            mousePos2.setClicked(true);
         }
         if (showTool) {
             toolAngle += toolSpeed;
@@ -3886,7 +3838,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         pg2 = screen.createGraphics();
         pg2.setColor(bg);
         pg2.fillRect(0, 0, getWidth(), getHeight());
-        if (state.equals("ingame")) {
+        if (state == State.IN_GAME) {
             if (player.y / 16 < HEIGHT * 0.5) {
                 pg2.translate(getWidth()/2, getHeight()*0.85);
                 pg2.rotate((timeOfDay - 70200)/86400*Math.PI*2);
@@ -4061,20 +4013,20 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 width = itemImgs.get(moveItem).getWidth();
                 height = itemImgs.get(moveItem).getHeight();
                 pg2.drawImage(itemImgs.get(moveItem),
-                    mousePos[0]+12+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), mousePos[1]+12+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), mousePos[0]+36-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), mousePos[1]+36-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
+                    mousePos.getX()+12+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), mousePos.getY()+12+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), mousePos.getX()+36-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), mousePos.getY()+36-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
                 if (moveNum > 1) {
                     pg2.setFont(font);
                     pg2.setColor(Color.WHITE);
-                    pg2.drawString(moveNum + " ", mousePos[0]+13, mousePos[1]+38);
+                    pg2.drawString(moveNum + " ", mousePos.getX()+13, mousePos.getY()+38);
                 }
             }
             for (i=0; i<entities.size(); i++) {
-                if (UIENTITIES.get(entities.get(i).getName()) != null && entities.get(i).getRect() != null && entities.get(i).getRect().contains(new Point(mousePos2[0], mousePos2[1]))) {
+                if (UIENTITIES.get(entities.get(i).getName()) != null && entities.get(i).getRect() != null && entities.get(i).getRect().contains(new Point(mousePos2.getX(), mousePos2.getY()))) {
                     pg2.setFont(mobFont);
                     pg2.setColor(Color.WHITE);
-                    pg2.drawString(UIENTITIES.get(entities.get(i).getName()) + " (" + entities.get(i).getHp() + "/" + entities.get(i).getThp() + ")", mousePos[0], mousePos[1]);
+                    pg2.drawString(UIENTITIES.get(entities.get(i).getName()) + " (" + entities.get(i).getHp() + "/" + entities.get(i).getThp() + ")", mousePos.getX(), mousePos.getY());
                     break;
                 }
             }
@@ -4086,15 +4038,14 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
             for (ux=0; ux<10; ux++) {
                 for (uy=0; uy<ymax; uy++) {
-                    if (mousePos[0] >= ux*46+6 && mousePos[0] <= ux*46+46 &&
-                        mousePos[1] >= uy*46+6 && mousePos[1] <= uy*46+46 && inventory.ids[uy*10+ux] != 0) {
+                    if (mousePos.isInBetweenInclusive(ux*46+6, ux*46+46, uy*46+6, uy*46+46) && inventory.ids[uy*10+ux] != 0) {
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)inventory.ids[uy*10+ux]) != null) {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(inventory.ids[uy*10+ux]).getFileName()) + " (" + (int)((double)inventory.durs[uy*10+ux]/TOOLDURS.get(inventory.ids[uy*10+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(inventory.ids[uy*10+ux]).getFileName()) + " (" + (int)((double)inventory.durs[uy*10+ux]/TOOLDURS.get(inventory.ids[uy*10+ux])*100) + "%)", mousePos.getX(), mousePos.getY());
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(inventory.ids[uy*10+ux]).getFileName()), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(inventory.ids[uy*10+ux]).getFileName()), mousePos.getX(), mousePos.getY());
                         }
                     }
                 }
@@ -4112,42 +4063,37 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             if (showInv) {
                 for (ux=0; ux<2; ux++) {
                     for (uy=0; uy<2; uy++) {
-                        if (mousePos[0] >= inventory.image.getWidth()+ux*40+75 &&
-                            mousePos[0] < inventory.image.getWidth()+ux*40+115 &&
-                            mousePos[1] >= uy*40+52 && mousePos[1] < uy*40+92 && cic.ids[uy*2+ux] != 0) {
+                        if (mousePos.isInBetween(inventory.image.getWidth()+ux*40+75, inventory.image.getWidth()+ux*40+115, uy*40+52, uy*40+92) && cic.ids[uy*2+ux] != 0) {
                             pg2.setFont(mobFont);
                             pg2.setColor(Color.WHITE);
                             if (TOOLDURS.get((short)cic.ids[uy*2+ux]) != null) {
-                                pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[uy*2+ux]).getFileName()) + " (" + (int)((double)cic.durs[uy*2+ux]/TOOLDURS.get(cic.ids[uy*2+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                                pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[uy*2+ux]).getFileName()) + " (" + (int)((double)cic.durs[uy*2+ux]/TOOLDURS.get(cic.ids[uy*2+ux])*100) + "%)", mousePos.getX(), mousePos.getY());
                             }
                             else {
-                                pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[uy*2+ux]).getFileName()), mousePos[0], mousePos[1]);
+                                pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[uy*2+ux]).getFileName()), mousePos.getX(), mousePos.getY());
                             }
                         }
                     }
                 }
-                if (mousePos[0] >= inventory.image.getWidth()+3*40+75 &&
-                    mousePos[0] < inventory.image.getWidth()+3*40+115 &&
-                    mousePos[1] >= 20+52 && mousePos[1] < 20+92 && cic.ids[4] != 0) {
+                if (mousePos.isInBetween(inventory.image.getWidth()+3*40+75, inventory.image.getWidth()+3*40+115, 20+52, 20+92) && cic.ids[4] != 0) {
                     pg2.setFont(mobFont);
                     pg2.setColor(Color.WHITE);
                     if (TOOLDURS.get((short)cic.ids[4]) != null) {
-                        pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[4]).getFileName()) + " (" + (int)((double)cic.durs[4]/TOOLDURS.get(cic.ids[4])*100) + "%)", mousePos[0], mousePos[1]);
+                        pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[4]).getFileName()) + " (" + (int)((double)cic.durs[4]/TOOLDURS.get(cic.ids[4])*100) + "%)", mousePos.getX(), mousePos.getY());
                     }
                     else {
-                        pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[4]).getFileName()), mousePos[0], mousePos[1]);
+                        pg2.drawString(UIBLOCKS.get(Items.findByIndex(cic.ids[4]).getFileName()), mousePos.getX(), mousePos.getY());
                     }
                 }
                 for (uy=0; uy<4; uy++) {
-                    if (mousePos[0] >= inventory.image.getWidth() + 6 && mousePos[0] < inventory.image.getWidth() + 6 + armor.image.getWidth() &&
-                        mousePos[1] >= 6 + uy*46 && mousePos[1] < 6 + uy*46+46 && armor.ids[uy] != 0) {
+                    if (mousePos.isInBetween(inventory.image.getWidth() + 6, inventory.image.getWidth() + 6 + armor.image.getWidth(), 6 + uy*46, 6 + uy*46+46) && armor.ids[uy] != 0) {
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)armor.ids[uy]) != null) {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(armor.ids[uy]).getFileName()) + " (" + (int)((double)armor.durs[uy]/TOOLDURS.get(armor.ids[uy])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(armor.ids[uy]).getFileName()) + " (" + (int)((double)armor.durs[uy]/TOOLDURS.get(armor.ids[uy])*100) + "%)", mousePos.getX(), mousePos.getY());
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(armor.ids[uy]).getFileName()), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(armor.ids[uy]).getFileName()), mousePos.getX(), mousePos.getY());
                         }
                     }
                 }
@@ -4156,32 +4102,28 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 if (ic.type.equals("workbench")) {
                     for (ux=0; ux<3; ux++) {
                         for (uy=0; uy<3; uy++) {
-                            if (mousePos[0] >= ux*40+6 && mousePos[0] < ux*40+46 &&
-                                mousePos[1] >= uy*40+inventory.image.getHeight()+46 &&
-                                mousePos[1] < uy*40+inventory.image.getHeight()+86 &&
+                            if (mousePos.isInBetween(ux*40+6, ux*40+46, uy*40+inventory.image.getHeight()+46, uy*40+inventory.image.getHeight()+86) &&
                                 ic.ids[uy*3+ux] != 0) {
                                 pg2.setFont(mobFont);
                                 pg2.setColor(Color.WHITE);
                                 if (TOOLDURS.get((short)ic.ids[uy*3+ux]) != null) {
-                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*3+ux]).getFileName()) + " (" + (int)((double)ic.durs[uy*3+ux]/TOOLDURS.get(ic.ids[uy*3+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*3+ux]).getFileName()) + " (" + (int)((double)ic.durs[uy*3+ux]/TOOLDURS.get(ic.ids[uy*3+ux])*100) + "%)", mousePos.getX(), mousePos.getY());
                                 }
                                 else {
-                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*3+ux]).getFileName()), mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*3+ux]).getFileName()), mousePos.getX(), mousePos.getY());
                                 }
                             }
                         }
                     }
-                    if (mousePos[0] >= 4*40+6 && mousePos[0] < 4*40+46 &&
-                        mousePos[1] >= 1*40+inventory.image.getHeight()+46 &&
-                        mousePos[1] < 1*40+inventory.image.getHeight()+86 &&
+                    if (mousePos.isInBetween(4*40+6, 4*40+46, 1*40+inventory.image.getHeight()+46, 1*40+inventory.image.getHeight()+86) &&
                         ic.ids[9] != 0) {
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[9]) != null) {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[9]).getFileName()) + " (" + (int)((double)ic.durs[9]/TOOLDURS.get(ic.ids[9])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[9]).getFileName()) + " (" + (int)((double)ic.durs[9]/TOOLDURS.get(ic.ids[9])*100) + "%)", mousePos.getX(), mousePos.getY());
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[9]).getFileName()), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[9]).getFileName()), mousePos.getX(), mousePos.getY());
                         }
                     }
                 }
@@ -4192,86 +4134,80 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     ic.type.equals("obdurite_chest")) {
                     for (ux=0; ux<inventory.CX; ux++) {
                         for (uy=0; uy<inventory.CY; uy++) {
-                            if (mousePos[0] >= ux*46+6 && mousePos[0] < ux*46+46 &&
-                                mousePos[1] >= uy*46+inventory.image.getHeight()+46 &&
-                                mousePos[1] < uy*46+inventory.image.getHeight()+86 &&
+                            if (mousePos.isInBetween(ux*46+6, ux*46+46, uy*46+inventory.image.getHeight()+46, uy*46+inventory.image.getHeight()+86) &&
                                 ic.ids[uy*inventory.CX+ux] != 0) {
                                 pg2.setFont(mobFont);
                                 pg2.setColor(Color.WHITE);
                                 if (TOOLDURS.get((short)ic.ids[uy*inventory.CX+ux]) != null) {
-                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*inventory.CX+ux]).getFileName()) + " (" + (int)((double)ic.durs[uy*inventory.CX+ux]/TOOLDURS.get(ic.ids[uy*inventory.CX+ux])*100) + "%)", mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*inventory.CX+ux]).getFileName()) + " (" + (int)((double)ic.durs[uy*inventory.CX+ux]/TOOLDURS.get(ic.ids[uy*inventory.CX+ux])*100) + "%)", mousePos.getX(), mousePos.getY());
                                 }
                                 else {
-                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*inventory.CX+ux]).getFileName()), mousePos[0], mousePos[1]);
+                                    pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[uy*inventory.CX+ux]).getFileName()), mousePos.getX(), mousePos.getY());
                                 }
                             }
                         }
                     }
                 }
                 if (ic.type.equals("furnace")) {
-                    if (mousePos[0] >= 6 && mousePos[0] < 46 &&
-                        mousePos[1] >= inventory.image.getHeight()+46 && mousePos[1] < inventory.image.getHeight()+86 &&
+                    if (mousePos.isInBetween(6, 46, inventory.image.getHeight()+46,inventory.image.getHeight()+86) &&
                         ic.ids[0] != 0) {
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[0]) != null) {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[0]).getFileName()) + " (" + (int)((double)ic.durs[0]/TOOLDURS.get(ic.ids[0])*100) + "%)", mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[0]).getFileName()) + " (" + (int)((double)ic.durs[0]/TOOLDURS.get(ic.ids[0])*100) + "%)", mousePos.getX(), mousePos.getY());
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[0]).getFileName()), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[0]).getFileName()), mousePos.getX(), mousePos.getY());
                         }
                     }
-                    if (mousePos[0] >= 6 && mousePos[0] < 46 &&
-                        mousePos[1] >= inventory.image.getHeight()+102 && mousePos[1] < inventory.image.getHeight()+142 &&
+                    if (mousePos.isInBetween(6, 46, inventory.image.getHeight()+102, inventory.image.getHeight()+142) &&
                         ic.ids[1] != 0) {
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[1]) != null) {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[1]).getFileName()) + " (" + (int)((double)ic.durs[1]/TOOLDURS.get(ic.ids[1])*100) + "%)", mousePos[1], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[1]).getFileName()) + " (" + (int)((double)ic.durs[1]/TOOLDURS.get(ic.ids[1])*100) + "%)", mousePos.getX(), mousePos.getY());
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[1]).getFileName()), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[1]).getFileName()), mousePos.getX(), mousePos.getY());
                         }
                     }
-                    if (mousePos[0] >= 6 && mousePos[0] < 46 &&
-                        mousePos[1] >= inventory.image.getHeight()+142 && mousePos[1] < inventory.image.getHeight()+182 &&
+                    if (mousePos.isInBetween(6, 46, inventory.image.getHeight()+142, inventory.image.getHeight()+182) &&
                         ic.ids[2] != 0) {
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[2]) != null) {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[2]).getFileName()) + " (" + (int)((double)ic.durs[2]/TOOLDURS.get(ic.ids[2])*100) + "%)", mousePos[2], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[2]).getFileName()) + " (" + (int)((double)ic.durs[2]/TOOLDURS.get(ic.ids[2])*100) + "%)", mousePos.getX(), mousePos.getY());
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[2]).getFileName()), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[2]).getFileName()), mousePos.getX(), mousePos.getY());
                         }
                     }
-                    if (mousePos[0] >= 62 && mousePos[0] < 102 &&
-                        mousePos[1] >= inventory.image.getHeight()+46 && mousePos[1] < inventory.image.getHeight()+86 &&
+                    if (mousePos.isInBetween(62, 102, inventory.image.getHeight()+46, inventory.image.getHeight()+86) &&
                         ic.ids[3] != 0) {
                         pg2.setFont(mobFont);
                         pg2.setColor(Color.WHITE);
                         if (TOOLDURS.get((short)ic.ids[3]) != null) {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[3]).getFileName()) + " (" + (int)((double)ic.durs[3]/TOOLDURS.get(ic.ids[3])*100) + "%)", mousePos[3], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[3]).getFileName()) + " (" + (int)((double)ic.durs[3]/TOOLDURS.get(ic.ids[3])*100) + "%)", mousePos.getX(), mousePos.getY());
                         }
                         else {
-                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[3]).getFileName()), mousePos[0], mousePos[1]);
+                            pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[3]).getFileName()), mousePos.getX(), mousePos.getY());
                         }
                     }
                 }
             }
         }
-        if (state.equals("loading_graphics")) {
+        if (state == State.LOADING_GRAPHICS) {
             pg2.setFont(loadFont);
             pg2.setColor(Color.GREEN);
             pg2.drawString("Loading graphics... Please wait.", getWidth()/2-200, getHeight()/2-5);
         }
-        if (state.equals("title_screen")) {
+        if (state == State.TITLE_SCREEN) {
             pg2.drawImage(title_screen,
                 0, 0, getWidth(), getHeight(),
                 0, 0, getWidth(), getHeight(),
                 null);
         }
-        if (state.equals("select_world")) {
+        if (state == State.SELECT_WORLD) {
             pg2.drawImage(select_world,
                 0, 0, getWidth(), getHeight(),
                 0, 0, getWidth(), getHeight(),
@@ -4283,7 +4219,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 pg2.fillRect(166, 150+i*35, 470, 3);
             }
         }
-        if (state.equals("new_world")) {
+        if (state == State.NEW_WORLD) {
             pg2.drawImage(new_world,
                 0, 0, getWidth(), getHeight(),
                 0, 0, getWidth(), getHeight(),
@@ -4293,7 +4229,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 0, 0, 400, 30,
                 null);
         }
-        if (state.equals("generating_world")) {
+        if (state == State.GENERATING_WORLD) {
             pg2.setFont(loadFont);
             pg2.setColor(Color.GREEN);
             pg2.drawString("Generating new world... Please wait.", getWidth()/2-200, getHeight()/2-5);
@@ -4595,7 +4531,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         if (key.getKeyCode() == key.VK_SHIFT) {
             queue[5] = true;
         }
-        if (state.equals("ingame")) {
+        if (state == State.IN_GAME) {
             if (key.getKeyCode() == key.VK_ESCAPE) {
                 if (ic != null) {
                     if (!ic.type.equals("workbench")) {
@@ -4787,7 +4723,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             if (c == '/') c = '?';
         }
 
-        if (state.equals("new_world") && !newWorldFocus) {
+        if (state == State.NEW_WORLD && !newWorldFocus) {
             if (c != 0) {
                 newWorldName.typeKey(c);
                 repaint();
@@ -4846,14 +4782,14 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     public void mouseMoved(MouseEvent e) {
         if (mousePos != null) {
-            mousePos[0] = e.getX();
-            mousePos[1] = e.getY();
+            mousePos.setX(e.getX());
+            mousePos.setY(e.getY());
         }
     }
 
     public void mouseDragged(MouseEvent e) {
-        mousePos[0] = e.getX();
-        mousePos[1] = e.getY();
+        mousePos.setX(e.getX());
+        mousePos.setY(e.getY());
     }
 
     public Dimension getPreferredSize() {
