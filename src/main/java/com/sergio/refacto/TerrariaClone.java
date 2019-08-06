@@ -51,6 +51,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.sergio.refacto.dto.BlockNames;
+import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.items.Cloud;
 import com.sergio.refacto.items.CloudsAggregate;
 import com.sergio.refacto.dto.DebugContext;
@@ -1142,14 +1143,14 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     icmatrix[iclayer][icy][icx] = new ItemCollection(ic.type, ic.ids, ic.nums, ic.durs);
                 }
                 if (ic.type.equals("workbench")) {
-                    if (player.imgState.equals("still right") || player.imgState.equals("walk right 1") || player.imgState.equals("walk right 2")) {
+                    if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                         for (i=0; i<9; i++) {
                             if (ic.ids[i] != 0) {
                                 entities.add(new Entity(icx*BLOCKSIZE, icy*BLOCKSIZE, 2, -2, ic.ids[i], ic.nums[i], ic.durs[i], 75));
                             }
                         }
                     }
-                    if (player.imgState.equals("still left") || player.imgState.equals("walk left 1") || player.imgState.equals("walk left 2")) {
+                    if (player.imgState == ImageState.STILL_LEFT || player.imgState.isWalkLeft()) {
                         for (i=0; i<9; i++) {
                             if (ic.ids[i] != 0) {
                                 entities.add(new Entity(icx*BLOCKSIZE, icy*BLOCKSIZE, -2, -2, ic.ids[i], ic.nums[i], ic.durs[i], 75));
@@ -2162,14 +2163,14 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     icmatrix[iclayer][icy][icx] = new ItemCollection(ic.type, ic.ids, ic.nums, ic.durs);
                                 }
                                 if (ic.type.equals("workbench")) {
-                                    if (player.imgState.equals("still right") || player.imgState.equals("walk right 1") || player.imgState.equals("walk right 2")) {
+                                    if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                                         for (i=0; i<9; i++) {
                                             if (ic.ids[i] != 0) {
                                                 entities.add(new Entity(icx*BLOCKSIZE, icy*BLOCKSIZE, 2, -2, ic.ids[i], ic.nums[i], ic.durs[i], 75));
                                             }
                                         }
                                     }
-                                    if (player.imgState.equals("still left") || player.imgState.equals("walk left 1") || player.imgState.equals("walk left 2")) {
+                                    if (player.imgState == ImageState.STILL_LEFT || player.imgState.isWalkLeft()) {
                                         for (i=0; i<9; i++) {
                                             if (ic.ids[i] != 0) {
                                                 entities.add(new Entity(icx*BLOCKSIZE, icy*BLOCKSIZE, -2, -2, ic.ids[i], ic.nums[i], ic.durs[i], 75));
@@ -2519,14 +2520,14 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     icmatrix[iclayer][icy][icx] = new ItemCollection(ic.type, ic.ids, ic.nums, ic.durs);
                 }
                 if (ic.type.equals("workbench")) {
-                    if (player.imgState.equals("still right") || player.imgState.equals("walk right 1") || player.imgState.equals("walk right 2")) {
+                    if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                         for (i=0; i<9; i++) {
                             if (ic.ids[i] != 0) {
                                 entities.add(new Entity(icx*BLOCKSIZE, icy*BLOCKSIZE, 2, -2, ic.ids[i], ic.nums[i], ic.durs[i], 75));
                             }
                         }
                     }
-                    if (player.imgState.equals("still left") || player.imgState.equals("walk left 1") || player.imgState.equals("walk left 2")) {
+                    if (player.imgState == ImageState.STILL_LEFT || player.imgState.isWalkLeft()) {
                         for (i=0; i<9; i++) {
                             if (ic.ids[i] != 0) {
                                 entities.add(new Entity(icx*BLOCKSIZE, icy*BLOCKSIZE, -2, -2, ic.ids[i], ic.nums[i], ic.durs[i], 75));
@@ -2545,10 +2546,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 if (showInv) {
                     for (i=0; i<4; i++) {
                         if (cic.ids[i] != 0) {
-                            if (player.imgState.equals("still right") || player.imgState.equals("walk right 1") || player.imgState.equals("walk right 2")) {
+                            if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                                 entities.add(new Entity(player.x, player.y, 2, -2, cic.ids[i], cic.nums[i], cic.durs[i], 75));
                             }
-                            if (player.imgState.equals("still left") || player.imgState.equals("walk left 1") || player.imgState.equals("walk left 2")) {
+                            if (player.imgState == ImageState.STILL_LEFT || player.imgState.isWalkLeft()) {
                                 entities.add(new Entity(player.x, player.y, -2, -2, cic.ids[i], cic.nums[i], cic.durs[i], 75));
                             }
                             inventory.removeLocationIC(cic, i, cic.nums[i]);
@@ -2558,10 +2559,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 showInv = !showInv;
             }
             if (moveItem != 0) {
-                if (player.imgState.equals("still right") || player.imgState.equals("walk right 1") || player.imgState.equals("walk right 2")) {
+                if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                     entities.add(new Entity(player.x, player.y, 2, -2, moveItem, moveNum, moveDur, 75));
                 }
-                if (player.imgState.equals("still left") || player.imgState.equals("walk left 1") || player.imgState.equals("walk left 2")) {
+                if (player.imgState == ImageState.STILL_LEFT || player.imgState.isWalkLeft()) {
                     entities.add(new Entity(player.x, player.y, -2, -2, moveItem, moveNum, moveDur, 75));
                 }
                 moveItem = 0;
@@ -2569,10 +2570,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
             for (i=0; i<4; i++) {
                 if (armor.ids[i] != 0) {
-                    if (player.imgState.equals("still right") || player.imgState.equals("walk right 1") || player.imgState.equals("walk right 2")) {
+                    if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                         entities.add(new Entity(player.x, player.y, 2, -2, armor.ids[i], armor.nums[i], armor.durs[i], 75));
                     }
-                    if (player.imgState.equals("still left") || player.imgState.equals("walk left 1") || player.imgState.equals("walk left 2")) {
+                    if (player.imgState == ImageState.STILL_LEFT || player.imgState.isWalkLeft()) {
                         entities.add(new Entity(player.x, player.y, -2, -2, armor.ids[i], armor.nums[i], armor.durs[i], 75));
                     }
                     inventory.removeLocationIC(armor, i, armor.nums[i]);
@@ -2587,7 +2588,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             showTool = false;
         }
         if (showTool) {
-            if (player.imgState.equals("still right") || player.imgState.equals("walk right 1") || player.imgState.equals("walk right 2")) {
+            if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                 tp1 = new Point((int)(player.x + player.width/2 + 6), (int)(player.y + player.height/2));
                 tp2 = new Point((int)(player.x + player.width/2 + 6 + tool.getWidth()*2*Math.cos(toolAngle) + tool.getHeight()*2*Math.sin(toolAngle)),
                                 (int)(player.y + player.height/2 + tool.getWidth()*2*Math.sin(toolAngle) - tool.getHeight()*2*Math.cos(toolAngle)));
@@ -2598,7 +2599,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 tp5 = new Point((int)(player.x + player.width/2 + 6 + tool.getWidth()*1.5*Math.cos(toolAngle) + tool.getHeight()*1.5*Math.sin(toolAngle)),
                                 (int)(player.y + player.height/2 + tool.getWidth()*1.5*Math.sin(toolAngle) - tool.getHeight()*1.5*Math.cos(toolAngle)));
             }
-            if (player.imgState.equals("still left") || player.imgState.equals("walk left 1") || player.imgState.equals("walk left 2")) {
+            if (player.imgState == ImageState.STILL_LEFT || player.imgState.isWalkLeft()) {
                 tp1 = new Point((int)(player.x + player.width/2 - 6), (int)(player.y + player.height/2));
                 tp2 = new Point((int)(player.x + player.width/2 - 6 + tool.getWidth()*2*Math.cos((Math.PI * 1.5) - toolAngle) + tool.getHeight()*2*Math.sin((Math.PI * 1.5) - toolAngle)),
                                 (int)(player.y + player.height/2 + tool.getWidth()*2*Math.sin((Math.PI * 1.5) - toolAngle) - tool.getHeight()*2*Math.cos((Math.PI * 1.5) - toolAngle)));
@@ -3909,7 +3910,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
 
             if (showTool && tool != null) {
-                if (player.imgState.equals("still right") || player.imgState.equals("walk right 1") || player.imgState.equals("walk right 2")) {
+                if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                     pg2.translate(getWidth()/2+6, getHeight()/2);
                     pg2.rotate(toolAngle);
 
@@ -3921,7 +3922,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     pg2.rotate(-toolAngle);
                     pg2.translate(-getWidth()/2-6, -getHeight()/2);
                 }
-                if (player.imgState.equals("still left") || player.imgState.equals("walk left 1") || player.imgState.equals("walk left 2")) {
+                if (player.imgState == ImageState.STILL_LEFT || player.imgState.isWalkLeft()) {
                     pg2.translate(getWidth()/2-6, getHeight()/2);
                     pg2.rotate((Math.PI * 1.5) - toolAngle);
 
@@ -4382,7 +4383,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                   ic, kworlds, icmatrix, version));
     }
 
-    <public BufferedImage loadBlock(Integer type, Byte dir, Byte dirn, Byte tnum, String outlineName, int x, int y, int lyr) {
+    public BufferedImage loadBlock(Integer type, Byte dir, Byte dirn, Byte tnum, String outlineName, int x, int y, int lyr) {
         int fx, fy;
         int dir_is = (int)dir;
         String dir_s = Directions.findByIndex(dir_is).getFileName();
@@ -4535,14 +4536,14 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         icmatrix[iclayer][icy][icx] = new ItemCollection(ic.type, ic.ids, ic.nums, ic.durs);
                     }
                     if (ic.type.equals("workbench")) {
-                        if (player.imgState.equals("still right") || player.imgState.equals("walk right 1") || player.imgState.equals("walk right 2")) {
+                        if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                             for (i=0; i<9; i++) {
                                 if (ic.ids[i] != 0) {
                                     entities.add(new Entity(icx*BLOCKSIZE, icy*BLOCKSIZE, 2, -2, ic.ids[i], ic.nums[i], ic.durs[i], 75));
                                 }
                             }
                         }
-                        if (player.imgState.equals("still left") || player.imgState.equals("walk left 1") || player.imgState.equals("walk left 2")) {
+                        if (player.imgState == ImageState.STILL_LEFT || player.imgState.isWalkLeft()) {
                             for (i=0; i<9; i++) {
                                 if (ic.ids[i] != 0) {
                                     entities.add(new Entity(icx*BLOCKSIZE, icy*BLOCKSIZE, -2, -2, ic.ids[i], ic.nums[i], ic.durs[i], 75));
@@ -4561,10 +4562,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     if (showInv) {
                         for (i=0; i<4; i++) {
                             if (cic.ids[i] != 0) {
-                                if (player.imgState.equals("still right") || player.imgState.equals("walk right 1") || player.imgState.equals("walk right 2")) {
+                                if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                                     entities.add(new Entity(player.x, player.y, 2, -2, cic.ids[i], cic.nums[i], cic.durs[i], 75));
                                 }
-                                if (player.imgState.equals("still left") || player.imgState.equals("walk left 1") || player.imgState.equals("walk left 2")) {
+                                if (player.imgState == ImageState.STILL_LEFT || player.imgState.isWalkLeft()) {
                                     entities.add(new Entity(player.x, player.y, -2, -2, cic.ids[i], cic.nums[i], cic.durs[i], 75));
                                 }
                                 inventory.removeLocationIC(cic, i, cic.nums[i]);
@@ -4574,10 +4575,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     showInv = !showInv;
                 }
                 if (moveItem != 0) {
-                    if (player.imgState.equals("still right") || player.imgState.equals("walk right 1") || player.imgState.equals("walk right 2")) {
+                    if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                         entities.add(new Entity(player.x, player.y, 2, -2, moveItem, moveNum, moveDur, 75));
                     }
-                    if (player.imgState.equals("still left") || player.imgState.equals("walk left 1") || player.imgState.equals("walk left 2")) {
+                    if (player.imgState == ImageState.STILL_LEFT || player.imgState.isWalkLeft()) {
                         entities.add(new Entity(player.x, player.y, -2, -2, moveItem, moveNum, moveDur, 75));
                     }
                     moveItem = 0;

@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
 
+import com.sergio.refacto.dto.ImageState;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -29,7 +30,9 @@ public class Entity implements Serializable {
 
     int dframes, imgDelay;
 
-    String name, AI, imgState;
+    String name, AI;
+
+    ImageState imgState;
 
     Rectangle rect;
 
@@ -87,11 +90,11 @@ public class Entity implements Serializable {
         imgDelay = 0;
         bcount = 0;
         if (AI == "bat") {
-            imgState = "normal right";
+            imgState = ImageState.NORMAL_RIGHT;
             this.vx = 3;
         }
         else {
-            imgState = "still right";
+            imgState = ImageState.STILL_RIGHT;
         }
 
         hp = thp;
@@ -166,22 +169,21 @@ public class Entity implements Serializable {
             }
             if (x > player.x) {
                 vx = Math.max(vx - 0.1, -1.2);
-                if (imgState == "still left" || imgState == "still right" ||
-                    imgState == "walk right 1" || imgState == "walk right 2") {
+                if (imgState.isStill() || (imgState.isWalk() && imgState.isRight())) {
                     imgDelay = 10;
-                    imgState = "walk left 2";
+                    imgState = ImageState.WALK_LEFT_2;
                     image = loadImage("sprites/monsters/" + name + "/left_walk.png");
                 }
                 if (imgDelay <= 0) {
-                    if (imgState == "walk left 1") {
+                    if (imgState == ImageState.WALK_LEFT_1) {
                         imgDelay = 10;
-                        imgState = "walk left 2";
+                        imgState = ImageState.WALK_LEFT_2;
                         image = loadImage("sprites/monsters/" + name + "/left_walk.png");
                     }
                     else {
-                        if (imgState == "walk left 2") {
+                        if (imgState == ImageState.WALK_LEFT_2) {
                             imgDelay = 10;
-                            imgState = "walk left 1";
+                            imgState = ImageState.WALK_LEFT_1;
                             image = loadImage("sprites/monsters/" + name + "/left_still.png");
                         }
                     }
@@ -192,22 +194,21 @@ public class Entity implements Serializable {
             }
             else {
                 vx = Math.min(vx + 0.1, 1.2);
-                if (imgState == "still left" || imgState == "still right" ||
-                    imgState == "walk left 1" || imgState == "walk left 2") {
+                if (imgState.isStill() || (imgState.isWalk() && imgState.isLeft())) {
                     imgDelay = 10;
-                    imgState = "walk right 2";
+                    imgState = ImageState.WALK_RIGHT_2;
                     image = loadImage("sprites/monsters/" + name + "/right_walk.png");
                 }
                 if (imgDelay <= 0) {
-                    if (imgState == "walk right 1") {
+                    if (imgState == ImageState.WALK_RIGHT_1) {
                         imgDelay = 10;
-                        imgState = "walk right 2";
+                        imgState = ImageState.WALK_RIGHT_2;
                         image = loadImage("sprites/monsters/" + name + "/right_walk.png");
                     }
                     else {
-                        if (imgState == "walk right 2") {
+                        if (imgState == ImageState.WALK_RIGHT_2) {
                             imgDelay = 10;
-                            imgState = "walk right 1";
+                            imgState = ImageState.WALK_RIGHT_1;
                             image = loadImage("sprites/monsters/" + name + "/right_still.png");
                         }
                     }
@@ -217,12 +218,10 @@ public class Entity implements Serializable {
                 }
             }
             if (!grounded) {
-                if (imgState == "still left" || imgState == "walk left 1" ||
-                    imgState == "walk left 2") {
+                if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
                     image = loadImage("sprites/monsters/" + name + "/left_jump.png");
                 }
-                if (imgState == "still right" || imgState == "walk right 1" ||
-                    imgState == "walk right 2") {
+                if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
                     image = loadImage("sprites/monsters/" + name + "/right_jump.png");
                 }
             }
@@ -331,33 +330,33 @@ public class Entity implements Serializable {
                 vy = Math.min(vy + 0.05, 2.0);
             }
             imgDelay -= 1;
-            if (vx > 0 && imgState != "normal right") {
-                imgState = "normal right";
+            if (vx > 0 && imgState != ImageState.NORMAL_RIGHT) {
+                imgState = ImageState.NORMAL_RIGHT;
                 image = loadImage("sprites/monsters/" + name + "/normal_right.png");
                 imgDelay = 10;
             }
-            if (vx < 0 && imgState != "normal left") {
-                imgState = "normal left";
+            if (vx < 0 && imgState != ImageState.NORMAL_LEFT) {
+                imgState = ImageState.NORMAL_LEFT;
                 image = loadImage("sprites/monsters/" + name + "/normal_left.png");
                 imgDelay = 10;
             }
-            if (imgState == "normal left" && imgDelay <= 0) {
-                imgState = "flap left";
+            if (imgState == ImageState.NORMAL_LEFT && imgDelay <= 0) {
+                imgState = ImageState.FLAP_LEFT;
                 image = loadImage("sprites/monsters/" + name + "/flap_left.png");
                 imgDelay = 10;
             }
-            if (imgState == "normal right" && imgDelay <= 0) {
-                imgState = "flap right";
+            if (imgState == ImageState.NORMAL_RIGHT && imgDelay <= 0) {
+                imgState = ImageState.FLAP_RIGHT;
                 image = loadImage("sprites/monsters/" + name + "/flap_right.png");
                 imgDelay = 10;
             }
-            if (imgState == "flap left" && imgDelay <= 0) {
-                imgState = "normal left";
+            if (imgState == ImageState.FLAP_LEFT && imgDelay <= 0) {
+                imgState = ImageState.NORMAL_LEFT;
                 image = loadImage("sprites/monsters/" + name + "/normal_left.png");
                 imgDelay = 10;
             }
-            if (imgState == "flap right" && imgDelay <= 0) {
-                imgState = "normal right";
+            if (imgState == ImageState.FLAP_RIGHT && imgDelay <= 0) {
+                imgState = ImageState.NORMAL_RIGHT;
                 image = loadImage("sprites/monsters/" + name + "/normal_right.png");
                 imgDelay = 10;
             }

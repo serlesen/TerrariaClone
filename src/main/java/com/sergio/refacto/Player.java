@@ -7,6 +7,7 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 import com.sergio.refacto.dto.DebugContext;
+import com.sergio.refacto.dto.ImageState;
 
 public class Player implements Serializable {
     transient BufferedImage image;
@@ -20,7 +21,7 @@ public class Player implements Serializable {
     private int i, j, n;
 
     private int imgDelay;
-    String imgState;
+    ImageState imgState;
 
     private int BLOCKSIZE = TerrariaClone.getBLOCKSIZE();
 
@@ -46,7 +47,7 @@ public class Player implements Serializable {
         rect = new Rectangle(ix, iy, width, height);
 
         imgDelay = 0;
-        imgState = "still right";
+        imgState = ImageState.STILL_RIGHT;
 
         thp = 50;
 
@@ -59,22 +60,21 @@ public class Player implements Serializable {
             if (vx > -4 || DebugContext.SPEED) {
                 vx = vx - 0.5;
             }
-            if (imgState.equals("still left") || imgState.equals("still right") ||
-                imgState.equals("walk right 1") || imgState.equals("walk right 2")) {
+            if (imgState.isStill() || imgState.isWalkRight()) {
                 imgDelay = 5;
-                imgState = "walk left 2";
+                imgState = ImageState.WALK_LEFT_2;
                 image = loadImage("sprites/player/left_walk.png");
             }
             if (imgDelay <= 0) {
-                if (imgState.equals("walk left 1")) {
+                if (imgState == ImageState.WALK_LEFT_1) {
                     imgDelay = 5;
-                    imgState = "walk left 2";
+                    imgState = ImageState.WALK_LEFT_2;
                     image = loadImage("sprites/player/left_walk.png");
                 }
                 else {
-                    if (imgState.equals("walk left 2")) {
+                    if (imgState == ImageState.WALK_LEFT_2) {
                         imgDelay = 5;
-                        imgState = "walk left 1";
+                        imgState = ImageState.WALK_LEFT_1;
                         image = loadImage("sprites/player/left_still.png");
                     }
                 }
@@ -87,22 +87,21 @@ public class Player implements Serializable {
             if (vx < 4 || DebugContext.SPEED) {
                 vx = vx + 0.5;
             }
-            if (imgState.equals("still left") || imgState.equals("still right") ||
-                imgState.equals("walk left 1") || imgState.equals("walk left 2")) {
+            if (imgState.isStill() || imgState.isWalkLeft()) {
                 imgDelay = 5;
-                imgState = "walk right 2";
+                imgState = ImageState.WALK_RIGHT_2;
                 image = loadImage("sprites/player/right_walk.png");
             }
             if (imgDelay <= 0) {
-                if (imgState.equals("walk right 1")) {
+                if (imgState == ImageState.WALK_RIGHT_1) {
                     imgDelay = 5;
-                    imgState = "walk right 2";
+                    imgState = ImageState.WALK_RIGHT_2;
                     image = loadImage("sprites/player/right_walk.png");
                 }
                 else {
-                    if (imgState.equals("walk right 2")) {
+                    if (imgState == ImageState.WALK_RIGHT_2) {
                         imgDelay = 5;
-                        imgState = "walk right 1";
+                        imgState = ImageState.WALK_RIGHT_1;
                         image = loadImage("sprites/player/right_still.png");
                     }
                 }
@@ -147,26 +146,22 @@ public class Player implements Serializable {
                 vx = vx + 0.3;
             }
             if (grounded) {
-                if (imgState.equals("still left") || imgState.equals("walk left 1") ||
-                    imgState.equals("walk left 2")) {
-                    imgState = "still left";
+                if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
+                    imgState = ImageState.STILL_LEFT;
                     image = loadImage("sprites/player/left_still.png");
                 }
-                if (imgState.equals("still right") || imgState.equals("walk right 1") ||
-                    imgState.equals("walk right 2")) {
-                    imgState = "still right";
+                if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
+                    imgState = ImageState.STILL_RIGHT;
                     image = loadImage("sprites/player/right_still.png");
                 }
             }
         }
 
         if (!grounded) {
-            if (imgState.equals("still left") || imgState.equals("walk left 1") ||
-                imgState.equals("walk left 2")) {
+            if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
                 image = loadImage("sprites/player/left_jump.png");
             }
-            if (imgState.equals("still right") || imgState.equals("walk right 1") ||
-                imgState.equals("walk right 2")) {
+            if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
                 image = loadImage("sprites/player/right_jump.png");
             }
         }
@@ -259,26 +254,24 @@ public class Player implements Serializable {
 
     public void reloadImage() {
         if (grounded) {
-            if (imgState.equals("still left") || imgState.equals("walk left 1")) {
+            if (imgState == ImageState.STILL_LEFT || imgState == ImageState.WALK_LEFT_1) {
                 image = loadImage("sprites/player/left_still.png");
             }
-            if (imgState.equals("walk left 2")) {
+            if (imgState == ImageState.WALK_LEFT_2) {
                 image = loadImage("sprites/player/left_walk.png");
             }
-            if (imgState.equals("still right") || imgState.equals("walk right 1")) {
+            if (imgState == ImageState.STILL_RIGHT || imgState == ImageState.WALK_RIGHT_1) {
                 image = loadImage("sprites/player/right_still.png");
             }
-            if (imgState.equals("walk right 2")) {
+            if (imgState == ImageState.WALK_RIGHT_2) {
                 image = loadImage("sprites/player/right_walk.png");
             }
         }
         else {
-            if (imgState.equals("still left") || imgState.equals("walk left 1") ||
-                imgState.equals("walk left 2")) {
+            if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
                 image = loadImage("sprites/player/left_jump.png");
             }
-            if (imgState.equals("still right") || imgState.equals("walk right 1") ||
-                imgState.equals("walk right 2")) {
+            if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
                 image = loadImage("sprites/player/right_jump.png");
             }
         }
