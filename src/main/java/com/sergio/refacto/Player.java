@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.net.URL;
 import javax.imageio.ImageIO;
 
+import com.sergio.refacto.dto.DebugContext;
+
 public class Player implements Serializable {
     transient BufferedImage image;
     int ix, iy, ivx, ivy, width, height, bx1, by1, bx2, by2, thp, hp;
@@ -54,7 +56,7 @@ public class Player implements Serializable {
     public void update(Integer[][] blocks, boolean[] queue, int u, int v) {
         grounded = (onGround || onGroundDelay);
         if (queue[0] == true) {
-            if (vx > -4 || TerrariaClone.DEBUG_SPEED) {
+            if (vx > -4 || DebugContext.SPEED) {
                 vx = vx - 0.5;
             }
             if (imgState.equals("still left") || imgState.equals("still right") ||
@@ -82,7 +84,7 @@ public class Player implements Serializable {
             }
         }
         if (queue[1] == true) {
-            if (vx < 4 || TerrariaClone.DEBUG_SPEED) {
+            if (vx < 4 || DebugContext.SPEED) {
                 vx = vx + 0.5;
             }
             if (imgState.equals("still left") || imgState.equals("still right") ||
@@ -110,7 +112,7 @@ public class Player implements Serializable {
             }
         }
         if (queue[2] == true) {
-            if (TerrariaClone.DEBUG_FLIGHT) {
+            if (DebugContext.FLIGHT) {
                 vy -= 1;
                 pvy -= 1;
             }
@@ -122,7 +124,7 @@ public class Player implements Serializable {
             }
         }
         if (queue[6] == true) {
-            if (TerrariaClone.DEBUG_FLIGHT) {
+            if (DebugContext.FLIGHT) {
                 vy += 1;
                 pvy += 1;
             }
@@ -130,7 +132,7 @@ public class Player implements Serializable {
         if (!onGround) {
             vy = vy + 0.3;
             pvy = pvy + 0.3;
-            if (vy > 7 && !TerrariaClone.DEBUG_FLIGHT) {
+            if (vy > 7 && !DebugContext.FLIGHT) {
                 vy = 7;
             }
         }
@@ -175,7 +177,7 @@ public class Player implements Serializable {
 
         x = x + vx;
 
-        if (!TerrariaClone.DEBUG_NOCLIP) {
+        if (!DebugContext.NOCLIP) {
             for (i=0; i<2; i++) {
                 ix = (int)x;
                 iy = (int)y;
@@ -208,7 +210,7 @@ public class Player implements Serializable {
 
         y = y + vy;
         onGround = false;
-        if (!TerrariaClone.DEBUG_NOCLIP) {
+        if (!DebugContext.NOCLIP) {
             for (i=0; i<2; i++) {
                 ix = (int)x;
                 iy = (int)y;
@@ -229,7 +231,7 @@ public class Player implements Serializable {
                             if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                                 if (oldy <= j*16 - height && vy > 0) {
                                     y = j*16 - height;
-                                    if (pvy >= 10 && !TerrariaClone.DEBUG_INVINCIBLE) {
+                                    if (pvy >= 10 && !DebugContext.INVINCIBLE) {
                                         hp -= (int)((pvy - 12.5))*2;
                                     }
                                     onGround = true;
