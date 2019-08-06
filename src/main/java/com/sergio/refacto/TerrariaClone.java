@@ -52,6 +52,7 @@ import javax.swing.event.ChangeListener;
 
 import com.sergio.refacto.dto.BlockNames;
 import com.sergio.refacto.dto.ImageState;
+import com.sergio.refacto.dto.ItemType;
 import com.sergio.refacto.items.Cloud;
 import com.sergio.refacto.items.CloudsAggregate;
 import com.sergio.refacto.dto.DebugContext;
@@ -957,10 +958,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
         }
 
-        cic = new ItemCollection("cic", 5);
+        cic = new ItemCollection(ItemType.CIC, 5);
         inventory.renderCollection(cic);
 
-        armor = new ItemCollection("armor", 4);
+        armor = new ItemCollection(ItemType.ARMOR, 4);
         inventory.renderCollection(armor);
 
         toolAngle = 4.7;
@@ -1043,7 +1044,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         for (j=0; j<machinesx.size(); j++) {
             x = machinesx.get(j); y = machinesy.get(j);
             for (int l=0; l<3; l++) {
-                if (icmatrix[l][y][x] != null && icmatrix[l][y][x].type.equals("furnace")) {
+                if (icmatrix[l][y][x] != null && icmatrix[l][y][x].type == ItemType.FURNACE) {
                     if (icmatrix[l][y][x].F_ON) {
                         if (icmatrix[l][y][x].ids[1] == 0) {
                             if (FUELS.get(icmatrix[l][y][x].ids[2]) != null) {
@@ -1087,7 +1088,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
         }
 
-        if (ic != null && ic.type.equals("furnace")) {
+        if (ic != null && ic.type == ItemType.FURNACE) {
             if (ic.F_ON) {
                 if (ic.ids[1] == 0) {
                     if (FUELS.get(ic.ids[2]) != null) {
@@ -1131,12 +1132,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         }
         if (Math.sqrt(Math.pow(player.x+player.image.getWidth()-icx*BLOCKSIZE+BLOCKSIZE/2, 2) + Math.pow(player.y+player.image.getHeight()-icy*BLOCKSIZE+BLOCKSIZE/2, 2)) > 160) {
             if (ic != null) {
-                if (!ic.type.equals("workbench")) {
+                if (ic.type != ItemType.WORKBENCH) {
                     machinesx.add(icx);
                     machinesy.add(icy);
                     icmatrix[iclayer][icy][icx] = new ItemCollection(ic);
-                }
-                if (ic.type.equals("workbench")) {
+                } else if (ic.type == ItemType.WORKBENCH) {
                     if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                         for (i=0; i<9; i++) {
                             if (ic.ids[i] != 0) {
@@ -1151,8 +1151,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             }
                         }
                     }
-                }
-                if (ic.type.equals("furnace")) {
+                } else if (ic.type == ItemType.FURNACE) {
                     icmatrix[iclayer][icy][icx].FUELP = ic.FUELP;
                     icmatrix[iclayer][icy][icx].SMELTP = ic.SMELTP;
                     icmatrix[iclayer][icy][icx].F_ON = ic.F_ON;
@@ -1546,7 +1545,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     }
                 }
                 if (ic != null) {
-                    if (ic.type.equals("workbench")) {
+                    if (ic.type == ItemType.WORKBENCH) {
                         for (ux=0; ux<3; ux++) {
                             for (uy=0; uy<3; uy++) {
                                 if (mousePos.isInBetween(ux*40+6, ux*40+46, uy*40+inventory.image.getHeight()+46, uy*40+inventory.image.getHeight()+86)) {
@@ -1590,12 +1589,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                         }
-                    }
-                    if (ic.type.equals("wooden_chest") || ic.type.equals("stone_chest") ||
-                        ic.type.equals("copper_chest") || ic.type.equals("iron_chest") ||
-                        ic.type.equals("silver_chest") || ic.type.equals("gold_chest") ||
-                        ic.type.equals("zinc_chest") || ic.type.equals("rhymestone_chest") ||
-                        ic.type.equals("obdurite_chest")) {
+                    } else if (ic.type == ItemType.WOODEN_CHEST || ic.type == ItemType.STONE_CHEST ||
+                        ic.type == ItemType.COPPER_CHEST || ic.type == ItemType.IRON_CHEST ||
+                        ic.type == ItemType.SILVER_CHEST || ic.type == ItemType.GOLD_CHEST ||
+                        ic.type == ItemType.ZINC_CHEST || ic.type == ItemType.RHYMESTONE_CHEST ||
+                        ic.type == ItemType.OBDURITE_CHEST) {
                         for (ux=0; ux<inventory.CX; ux++) {
                             for (uy=0; uy<inventory.CY; uy++) {
                                 if (mousePos.isInBetween(ux*46+6, ux*46+46, uy*46+inventory.image.getHeight()+46, uy*46+inventory.image.getHeight()+86)) {
@@ -1622,8 +1620,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                         }
-                    }
-                    if (ic.type.equals("furnace")) {
+                    } else if (ic.type == ItemType.FURNACE) {
                         if (mousePos.isInBetween(6, 46, inventory.image.getHeight()+46, inventory.image.getHeight()+86)) {
                             checkBlocks = false;
                             if (mousePos.isClicked()) {
@@ -1794,7 +1791,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         }
                         else if (inventory.tool() == 33) {
                             if (blocks[layer][uy][ux] == 17 || blocks[layer][uy][ux] == 23) {
-                                if (icmatrix[layer][uy][ux] != null && icmatrix[layer][uy][ux].type.equals("furnace")) {
+                                if (icmatrix[layer][uy][ux] != null && icmatrix[layer][uy][ux].type == ItemType.FURNACE) {
                                     inventory.durs[inventory.selection] -= 1;
                                     icmatrix[layer][uy][ux].F_ON = true;
                                     blocks[layer][uy][ux] = 23;
@@ -1805,7 +1802,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     rdrawn[uy][ux] = false;
                                 }
                                 else {
-                                    if (ic != null && ic.type.equals("furnace")) {
+                                    if (ic != null && ic.type == ItemType.FURNACE) {
                                         inventory.durs[inventory.selection] -= 1;
                                         ic.F_ON = true;
                                         blocks[layer][icy][icx] = 23;
@@ -1989,7 +1986,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     }
                 }
                 if (ic != null) {
-                    if (ic.type.equals("workbench")) {
+                    if (ic.type == ItemType.WORKBENCH) {
                         for (ux=0; ux<3; ux++) {
                             for (uy=0; uy<3; uy++) {
                                 if (mousePos.isInBetween(ux*40+6, ux*40+46, uy*40+inventory.image.getHeight()+46, uy*40+inventory.image.getHeight()+86)) {
@@ -2032,12 +2029,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 //
                             }
                         }
-                    }
-                    if (ic.type.equals("wooden_chest") || ic.type.equals("stone_chest") ||
-                        ic.type.equals("copper_chest") || ic.type.equals("iron_chest") ||
-                        ic.type.equals("silver_chest") || ic.type.equals("gold_chest") ||
-                        ic.type.equals("zinc_chest") || ic.type.equals("rhymestone_chest") ||
-                        ic.type.equals("obdurite_chest")) {
+                    } else if (ic.type == ItemType.WOODEN_CHEST || ic.type == ItemType.STONE_CHEST ||
+                        ic.type == ItemType.COPPER_CHEST || ic.type == ItemType.IRON_CHEST ||
+                        ic.type == ItemType.SILVER_CHEST || ic.type == ItemType.GOLD_CHEST ||
+                        ic.type == ItemType.ZINC_CHEST || ic.type == ItemType.RHYMESTONE_CHEST ||
+                        ic.type == ItemType.OBDURITE_CHEST) {
                         for (ux=0; ux<inventory.CX; ux++) {
                             for (uy=0; uy<inventory.CY; uy++) {
                                 if (mousePos.isInBetween(ux*46+6, ux*46+46, uy*46+inventory.image.getHeight()+46, uy*46+inventory.image.getHeight()+86)) {
@@ -2069,8 +2065,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                         }
-                    }
-                    if (ic.type.equals("furnace")) {
+                    } else if (ic.type == ItemType.FURNACE) {
                         if (mousePos.isInBetween(6, 46, inventory.image.getHeight()+46, inventory.image.getHeight()+86)) {
                             checkBlocks = false;
                             if (mousePos2.isClicked()) {
@@ -2151,12 +2146,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         ucy = uy - CHUNKBLOCKS * ((int)(uy/CHUNKBLOCKS));
                         if (blocks[layer][uy][ux] >= 8 && blocks[layer][uy][ux] <= 14 || blocks[layer][uy][ux] == 17 || blocks[layer][uy][ux] == 23 || blocks[layer][uy][ux] >= 80 && blocks[layer][uy][ux] <= 82) {
                             if (ic != null) {
-                                if (!ic.type.equals("workbench")) {
+                                if (ic.type != ItemType.WORKBENCH) {
                                     machinesx.add(icx);
                                     machinesy.add(icy);
                                     icmatrix[iclayer][icy][icx] = new ItemCollection(ic);
-                                }
-                                if (ic.type.equals("workbench")) {
+                                } else if (ic.type == ItemType.WORKBENCH) {
                                     if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                                         for (i=0; i<9; i++) {
                                             if (ic.ids[i] != 0) {
@@ -2172,7 +2166,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         }
                                     }
                                 }
-                                if (ic.type.equals("furnace")) {
+                                if (ic.type == ItemType.FURNACE) {
                                     icmatrix[iclayer][icy][icx].FUELP = ic.FUELP;
                                     icmatrix[iclayer][icy][icx].SMELTP = ic.SMELTP;
                                     icmatrix[iclayer][icy][icx].F_ON = ic.F_ON;
@@ -2182,138 +2176,125 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             iclayer = layer;
                             for (int l=0; l<3; l++) {
                                 if (blocks[l][uy][ux] == 8) {
-                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("workbench")) {
-                                        ic = new ItemCollection("workbench", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
+                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type == ItemType.WORKBENCH) {
+                                        ic = new ItemCollection(ItemType.WORKBENCH, icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("workbench", 10);
+                                        ic = new ItemCollection(ItemType.WORKBENCH, 10);
                                     }
                                     icx = ux;
                                     icy = uy;
                                     inventory.renderCollection(ic);
                                     showInv = true;
-                                }
-                                if (blocks[l][uy][ux] == 9) {
-                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("wooden_chest")) {
-                                        ic = new ItemCollection("wooden_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
+                                } else if (blocks[l][uy][ux] == 9) {
+                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type == ItemType.WOODEN_CHEST) {
+                                        ic = new ItemCollection(ItemType.WOODEN_CHEST, icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("wooden_chest", 9);
+                                        ic = new ItemCollection(ItemType.WOODEN_CHEST, 9);
                                     }
                                     icx = ux;
                                     icy = uy;
                                     inventory.renderCollection(ic);
                                     showInv = true;
-                                }
-                                if (blocks[l][uy][ux] == 10) {
-                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("stone_chest")) {
-                                        ic = new ItemCollection("stone_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
+                                } else if (blocks[l][uy][ux] == 10) {
+                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type == ItemType.STONE_CHEST) {
+                                        ic = new ItemCollection(ItemType.STONE_CHEST, icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("stone_chest", 15);
+                                        ic = new ItemCollection(ItemType.STONE_CHEST, 15);
                                     }
                                     icx = ux;
                                     icy = uy;
                                     inventory.renderCollection(ic);
                                     showInv = true;
-                                }
-                                if (blocks[l][uy][ux] == 11) {
-                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("copper_chest")) {
-                                        ic = new ItemCollection("copper_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
+                                } else if (blocks[l][uy][ux] == 11) {
+                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type == ItemType.COPPER_CHEST) {
+                                        ic = new ItemCollection(ItemType.COPPER_CHEST, icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("copper_chest", 20);
+                                        ic = new ItemCollection(ItemType.COPPER_CHEST, 20);
                                     }
                                     icx = ux;
                                     icy = uy;
                                     inventory.renderCollection(ic);
                                     showInv = true;
-                                }
-                                if (blocks[l][uy][ux] == 12) {
-                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("iron_chest")) {
-                                        ic = new ItemCollection("iron_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
+                                } else if (blocks[l][uy][ux] == 12) {
+                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type == ItemType.IRON_CHEST) {
+                                        ic = new ItemCollection(ItemType.IRON_CHEST, icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("iron_chest", 28);
+                                        ic = new ItemCollection(ItemType.IRON_CHEST, 28);
                                     }
                                     icx = ux;
                                     icy = uy;
                                     inventory.renderCollection(ic);
                                     showInv = true;
-                                }
-                                if (blocks[l][uy][ux] == 13) {
-                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("silver_chest")) {
-                                        ic = new ItemCollection("silver_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
+                                } else if (blocks[l][uy][ux] == 13) {
+                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type == ItemType.SILVER_CHEST) {
+                                        ic = new ItemCollection(ItemType.SILVER_CHEST, icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("silver_chest", 35);
+                                        ic = new ItemCollection(ItemType.SILVER_CHEST, 35);
                                     }
                                     icx = ux;
                                     icy = uy;
                                     inventory.renderCollection(ic);
                                     showInv = true;
-                                }
-                                if (blocks[l][uy][ux] == 14) {
-                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("gold_chest")) {
-                                        ic = new ItemCollection("gold_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
+                                } else if (blocks[l][uy][ux] == 14) {
+                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type == ItemType.GOLD_CHEST) {
+                                        ic = new ItemCollection(ItemType.GOLD_CHEST, icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("gold_chest", 42);
+                                        ic = new ItemCollection(ItemType.GOLD_CHEST, 42);
                                     }
                                     icx = ux;
                                     icy = uy;
                                     inventory.renderCollection(ic);
                                     showInv = true;
-                                }
-                                if (blocks[l][uy][ux] == 80) {
-                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("zinc_chest")) {
-                                        ic = new ItemCollection("zinc_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
+                                } else if (blocks[l][uy][ux] == 80) {
+                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type == ItemType.ZINC_CHEST) {
+                                        ic = new ItemCollection(ItemType.ZINC_CHEST, icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("zinc_chest", 56);
+                                        ic = new ItemCollection(ItemType.ZINC_CHEST, 56);
                                     }
                                     icx = ux;
                                     icy = uy;
                                     inventory.renderCollection(ic);
                                     showInv = true;
-                                }
-                                if (blocks[l][uy][ux] == 81) {
-                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("rhymestone_chest")) {
-                                        ic = new ItemCollection("rhymestone_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
+                                } else if (blocks[l][uy][ux] == 81) {
+                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type == ItemType.RHYMESTONE_CHEST) {
+                                        ic = new ItemCollection(ItemType.RHYMESTONE_CHEST, icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("rhymestone_chest", 72);
+                                        ic = new ItemCollection(ItemType.RHYMESTONE_CHEST, 72);
                                     }
                                     icx = ux;
                                     icy = uy;
                                     inventory.renderCollection(ic);
                                     showInv = true;
-                                }
-                                if (blocks[l][uy][ux] == 82) {
-                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("obdurite_chest")) {
-                                        ic = new ItemCollection("obdurite_chest", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
+                                } else if (blocks[l][uy][ux] == 82) {
+                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type == ItemType.OBDURITE_CHEST) {
+                                        ic = new ItemCollection(ItemType.OBDURITE_CHEST, icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                     }
                                     else {
-                                        ic = new ItemCollection("obdurite_chest", 100);
+                                        ic = new ItemCollection(ItemType.OBDURITE_CHEST, 100);
                                     }
                                     icx = ux;
                                     icy = uy;
                                     inventory.renderCollection(ic);
                                     showInv = true;
-                                }
-                                if (blocks[l][uy][ux] == 17 || blocks[l][uy][ux] == 23) {
-                                    short[] tlist1 = {0, 0, 0, 0};
-                                    short[] tlist2 = {0, 0, 0, 0};
-                                    short[] tlist3 = {0, 0, 0, 0};
-                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type.equals("furnace")) {
-                                        ic = new ItemCollection("furnace", icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
+                                } else if (blocks[l][uy][ux] == 17 || blocks[l][uy][ux] == 23) {
+                                    if (icmatrix[l][uy][ux] != null && icmatrix[l][uy][ux].type == ItemType.FURNACE) {
+                                        ic = new ItemCollection(ItemType.FURNACE, icmatrix[l][uy][ux].ids, icmatrix[l][uy][ux].nums, icmatrix[l][uy][ux].durs);
                                         ic.FUELP = icmatrix[l][uy][ux].FUELP;
                                         ic.SMELTP = icmatrix[l][uy][ux].SMELTP;
                                         ic.F_ON = icmatrix[l][uy][ux].F_ON;
                                         icmatrix[l][uy][ux] = null;
                                     }
                                     else {
-                                        ic = new ItemCollection("furnace", tlist1, tlist2, tlist3);
+                                        ic = new ItemCollection(ItemType.FURNACE, 4);
                                     }
                                     icx = ux;
                                     icy = uy;
@@ -2478,12 +2459,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 }
             }
             if (ic != null) {
-                if (!ic.type.equals("workbench")) {
+                if (ic.type != ItemType.WORKBENCH) {
                     machinesx.add(icx);
                     machinesy.add(icy);
                     icmatrix[iclayer][icy][icx] = new ItemCollection(ic.type, ic.ids, ic.nums, ic.durs);
-                }
-                if (ic.type.equals("workbench")) {
+                } else if (ic.type == ItemType.WORKBENCH) {
                     if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                         for (i=0; i<9; i++) {
                             if (ic.ids[i] != 0) {
@@ -2499,7 +2479,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         }
                     }
                 }
-                if (ic.type.equals("furnace")) {
+                if (ic.type == ItemType.FURNACE) {
                     icmatrix[iclayer][icy][icx].FUELP = ic.FUELP;
                     icmatrix[iclayer][icy][icx].SMELTP = ic.SMELTP;
                     icmatrix[iclayer][icy][icx].F_ON = ic.F_ON;
@@ -2753,14 +2733,14 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             if (blocks[layer][uy][ux] >= 8 && blocks[layer][uy][ux] <= 14 || blocks[layer][uy][ux] == 17 || blocks[layer][uy][ux] == 23 || blocks[layer][uy][ux] >= 80 && blocks[layer][uy][ux] <= 82) {
                 if (ic != null) {
                     for (i=0; i<ic.ids.length; i++) {
-                        if (ic.ids[i] != 0 && !(ic.type.equals("furnace") && i == 1)) {
+                        if (ic.ids[i] != 0 && !(ic.type == ItemType.FURNACE && i == 1)) {
                             entities.add(new Entity(ux*BLOCKSIZE, uy*BLOCKSIZE, random.nextDouble()*4-2, -2, ic.ids[i], ic.nums[i], ic.durs[i]));
                         }
                     }
                 }
                 if (icmatrix[layer][uy][ux] != null) {
                     for (i=0; i<icmatrix[layer][uy][ux].ids.length; i++) {
-                        if (icmatrix[layer][uy][ux].ids[i] != 0 && !(icmatrix[layer][uy][ux].type.equals("furnace") && i == 1)) {
+                        if (icmatrix[layer][uy][ux].ids[i] != 0 && !(icmatrix[layer][uy][ux].type == ItemType.FURNACE && i == 1)) {
                             entities.add(new Entity(ux*BLOCKSIZE, uy*BLOCKSIZE, random.nextDouble()*4-2, -2, icmatrix[layer][uy][ux].ids[i], icmatrix[layer][uy][ux].nums[i], icmatrix[layer][uy][ux].durs[i]));
                         }
                     }
@@ -4062,7 +4042,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 }
             }
             if (ic != null) {
-                if (ic.type.equals("workbench")) {
+                if (ic.type == ItemType.WORKBENCH) {
                     for (ux=0; ux<3; ux++) {
                         for (uy=0; uy<3; uy++) {
                             if (mousePos.isInBetween(ux*40+6, ux*40+46, uy*40+inventory.image.getHeight()+46, uy*40+inventory.image.getHeight()+86) &&
@@ -4089,12 +4069,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             pg2.drawString(UIBLOCKS.get(Items.findByIndex(ic.ids[9]).getFileName()), mousePos.getX(), mousePos.getY());
                         }
                     }
-                }
-                if (ic.type.equals("wooden_chest") || ic.type.equals("stone_chest") ||
-                    ic.type.equals("copper_chest") || ic.type.equals("iron_chest") ||
-                    ic.type.equals("silver_chest") || ic.type.equals("gold_chest") ||
-                    ic.type.equals("zinc_chest") || ic.type.equals("rhymestone_chest") ||
-                    ic.type.equals("obdurite_chest")) {
+                } else if (ic.type == ItemType.WOODEN_CHEST || ic.type == ItemType.STONE_CHEST ||
+                    ic.type == ItemType.COPPER_CHEST || ic.type == ItemType.IRON_CHEST ||
+                    ic.type == ItemType.SILVER_CHEST || ic.type == ItemType.GOLD_CHEST ||
+                    ic.type == ItemType.ZINC_CHEST || ic.type == ItemType.RHYMESTONE_CHEST ||
+                    ic.type == ItemType.OBDURITE_CHEST) {
                     for (ux=0; ux<inventory.CX; ux++) {
                         for (uy=0; uy<inventory.CY; uy++) {
                             if (mousePos.isInBetween(ux*46+6, ux*46+46, uy*46+inventory.image.getHeight()+46, uy*46+inventory.image.getHeight()+86) &&
@@ -4110,8 +4089,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             }
                         }
                     }
-                }
-                if (ic.type.equals("furnace")) {
+                } else if (ic.type == ItemType.FURNACE) {
                     if (mousePos.isInBetween(6, 46, inventory.image.getHeight()+46,inventory.image.getHeight()+86) &&
                         ic.ids[0] != 0) {
                         pg2.setFont(mobFont);
@@ -4294,10 +4272,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             inventory.renderCollection(cic);
         }
         else {
-            short[] tlist1 = {0, 0, 0, 0, 0};
-            short[] tlist2 = {0, 0, 0, 0, 0};
-            short[] tlist3 = {0, 0, 0, 0, 0};
-            cic = new ItemCollection("cic", tlist1, tlist2, tlist3);
+            cic = new ItemCollection(ItemType.CIC, 5);
             inventory.renderCollection(cic);
         }
         if (ic != null) {
@@ -4494,12 +4469,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         if (state == State.IN_GAME) {
             if (key.getKeyCode() == key.VK_ESCAPE) {
                 if (ic != null) {
-                    if (!ic.type.equals("workbench")) {
+                    if (ic.type != ItemType.WORKBENCH) {
                         machinesx.add(icx);
                         machinesy.add(icy);
                         icmatrix[iclayer][icy][icx] = new ItemCollection(ic);
-                    }
-                    if (ic.type.equals("workbench")) {
+                    } else if (ic.type == ItemType.WORKBENCH) {
                         if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                             for (i=0; i<9; i++) {
                                 if (ic.ids[i] != 0) {
@@ -4515,7 +4489,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             }
                         }
                     }
-                    if (ic.type.equals("furnace")) {
+                    if (ic.type == ItemType.FURNACE) {
                         icmatrix[iclayer][icy][icx].FUELP = ic.FUELP;
                         icmatrix[iclayer][icy][icx].SMELTP = ic.SMELTP;
                         icmatrix[iclayer][icy][icx].F_ON = ic.F_ON;

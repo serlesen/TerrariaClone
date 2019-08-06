@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.List;
 import javax.imageio.ImageIO;
 
+import com.sergio.refacto.dto.ItemType;
+
 public class Inventory implements Serializable {
 
     int i, j, k, x, y, n, px, py, selection, width, height;
@@ -1032,14 +1034,14 @@ public class Inventory implements Serializable {
     }
 
     public void renderCollection(ItemCollection ic) {
-        if (ic.type.equals("cic")) {
+        if (ic.type == ItemType.CIC) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/cic.png");
                 for (i=0; i<4; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("armor")) {
+        } else if (ic.type == ItemType.ARMOR) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/armor.png");
                 CX = 1;
@@ -1048,14 +1050,14 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("workbench")) {
+        } else if (ic.type == ItemType.WORKBENCH) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/workbench.png");
                 for (i=0; i<9; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("wooden_chest")) {
+        } else if (ic.type == ItemType.WOODEN_CHEST) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/wooden_chest.png");
                 CX = 3;
@@ -1064,7 +1066,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("stone_chest")) {
+        } else if (ic.type == ItemType.STONE_CHEST) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/stone_chest.png");
                 CX = 5;
@@ -1073,7 +1075,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("copper_chest")) {
+        } else if (ic.type == ItemType.COPPER_CHEST) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/copper_chest.png");
                 CX = 5;
@@ -1082,7 +1084,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("iron_chest")) {
+        } else if (ic.type == ItemType.IRON_CHEST) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/iron_chest.png");
                 CX = 7;
@@ -1091,7 +1093,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("silver_chest")) {
+        } else if (ic.type == ItemType.SILVER_CHEST) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/silver_chest.png");
                 CX = 7;
@@ -1100,7 +1102,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("gold_chest")) {
+        } else if (ic.type == ItemType.GOLD_CHEST) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/gold_chest.png");
                 CX = 7;
@@ -1109,7 +1111,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("zinc_chest")) {
+        } else if (ic.type == ItemType.ZINC_CHEST) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/zinc_chest.png");
                 CX = 7;
@@ -1118,7 +1120,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("rhymestone_chest")) {
+        } else if (ic.type == ItemType.RHYMESTONE_CHEST) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/rhymestone_chest.png");
                 CX = 8;
@@ -1127,7 +1129,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("obdurite_chest")) {
+        } else if (ic.type == ItemType.OBDURITE_CHEST) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/obdurite_chest.png");
                 CX = 10;
@@ -1136,7 +1138,7 @@ public class Inventory implements Serializable {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type.equals("furnace")) {
+        } else if (ic.type == ItemType.FURNACE) {
             if (ic.image == null) {
                 ic.image = loadImage("interface/furnace.png");
                 for (i=-1; i<4; i++) {
@@ -1207,7 +1209,7 @@ public class Inventory implements Serializable {
     }
 
     public void updateIC(ItemCollection ic, int i) {
-        if (ic.type.equals("cic")) {
+        if (ic.type == ItemType.CIC) {
             py = (int)(i/2);
             px = i-(py*2);
             for (x=px*40; x<px*40+40; x++) {
@@ -1277,7 +1279,7 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.nums[4] + " ", 3*40+9, 20+34);
                 }
             }
-        } else if (ic.type.equals("armor")) {
+        } else if (ic.type == ItemType.ARMOR) {
             py = (int)(i/CX);
             px = i-(py*CX);
             for (x=px*46; x<px*46+40; x++) {
@@ -1304,7 +1306,7 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.nums[i] + " ", px*46+9, py*46+34);
                 }
             }
-        } else if (ic.type.equals("workbench")) {
+        } else if (ic.type == ItemType.WORKBENCH) {
             py = (int)(i/3);
             px = i-(py*3);
             for (x=px*40; x<px*40+40; x++) {
@@ -1374,11 +1376,11 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.nums[9] + " ", 4*40+9, 1*40+34);
                 }
             }
-        } else if (ic.type.equals("wooden_chest") || ic.type.equals("stone_chest") ||
-            ic.type.equals("copper_chest") || ic.type.equals("iron_chest") ||
-            ic.type.equals("silver_chest") || ic.type.equals("gold_chest") ||
-            ic.type.equals("zinc_chest") || ic.type.equals("rhymestone_chest") ||
-            ic.type.equals("obdurite_chest")) {
+        } else if (ic.type == ItemType.WOODEN_CHEST || ic.type == ItemType.STONE_CHEST ||
+            ic.type == ItemType.COPPER_CHEST || ic.type == ItemType.IRON_CHEST ||
+            ic.type == ItemType.SILVER_CHEST || ic.type == ItemType.GOLD_CHEST ||
+            ic.type == ItemType.ZINC_CHEST || ic.type == ItemType.RHYMESTONE_CHEST ||
+            ic.type == ItemType.OBDURITE_CHEST) {
             py = (int)(i/CX);
             px = i-(py*CX);
             for (x=px*46; x<px*46+40; x++) {
@@ -1405,7 +1407,7 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.nums[i] + " ", px*46+9, py*46+34);
                 }
             }
-        } else if (ic.type.equals("furnace")) {
+        } else if (ic.type == ItemType.FURNACE) {
             if (i == -1) {
                 for (y=0; y<5; y++) {
                     for (x=0; x<ic.FUELP*38; x++) {

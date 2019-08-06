@@ -1,28 +1,29 @@
 package com.sergio.refacto;
 
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sergio.refacto.dto.ItemType;
+
 public class ItemCollection implements Serializable {
 
-    String type;
+    ItemType type;
     short[] ids, nums, durs;
     transient BufferedImage image;
     double FUELP = 0;
     double SMELTP = 0;
     boolean F_ON = false;
-    short recipeNum;
 
-    public ItemCollection(String type, short[] ids, short[] nums, short[] durs) {
+    public ItemCollection(ItemType type, short[] ids, short[] nums, short[] durs) {
         this.type = type;
         this.ids = ids;
         this.nums = nums;
         this.durs = durs;
     }
 
-    public ItemCollection(String type, int size) {
+    public ItemCollection(ItemType type, int size) {
         short[] list1 = new short[size];
         short[] list2 = new short[size];
         short[] list3 = new short[size];
