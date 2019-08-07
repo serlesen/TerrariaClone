@@ -8,15 +8,14 @@ import javax.imageio.ImageIO;
 
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ImageState;
+import com.sergio.refacto.dto.KeyPressed;
 
 public class Player implements Serializable {
     transient BufferedImage image;
     int ix, iy, ivx, ivy, width, height, bx1, by1, bx2, by2, thp, hp;
     double x, y, vx, vy, pvy, oldx, oldy;
     private boolean onGround, onGroundDelay, grounded;
-    private boolean ghost = true;
     Rectangle rect;
-    private short[] blocklist;
 
     private int i, j, n;
 
@@ -41,8 +40,6 @@ public class Player implements Serializable {
 
         ix = (int)x;
         iy = (int)y;
-        ivx = (int)ivx;
-        ivy = (int)ivy;
 
         rect = new Rectangle(ix, iy, width, height);
 
@@ -54,9 +51,9 @@ public class Player implements Serializable {
         hp = thp;
     }
 
-    public void update(Integer[][] blocks, boolean[] queue, int u, int v) {
+    public void update(Integer[][] blocks, KeyPressed keyPressed, int u, int v) {
         grounded = (onGround || onGroundDelay);
-        if (queue[0] == true) {
+        if (keyPressed == KeyPressed.LEFT) {
             if (vx > -4 || DebugContext.SPEED) {
                 vx = vx - 0.5;
             }
@@ -70,8 +67,7 @@ public class Player implements Serializable {
                     imgDelay = 5;
                     imgState = ImageState.WALK_LEFT_2;
                     image = loadImage("sprites/player/left_walk.png");
-                }
-                else {
+                } else {
                     if (imgState == ImageState.WALK_LEFT_2) {
                         imgDelay = 5;
                         imgState = ImageState.WALK_LEFT_1;
@@ -82,8 +78,7 @@ public class Player implements Serializable {
             else {
                 imgDelay = imgDelay - 1;
             }
-        }
-        if (queue[1] == true) {
+        } else if (keyPressed == KeyPressed.RIGHT) {
             if (vx < 4 || DebugContext.SPEED) {
                 vx = vx + 0.5;
             }
@@ -97,8 +92,7 @@ public class Player implements Serializable {
                     imgDelay = 5;
                     imgState = ImageState.WALK_RIGHT_2;
                     image = loadImage("sprites/player/right_walk.png");
-                }
-                else {
+                } else {
                     if (imgState == ImageState.WALK_RIGHT_2) {
                         imgDelay = 5;
                         imgState = ImageState.WALK_RIGHT_1;
@@ -109,8 +103,7 @@ public class Player implements Serializable {
             else {
                 imgDelay = imgDelay - 1;
             }
-        }
-        if (queue[2] == true) {
+        } else if (keyPressed == KeyPressed.UP) {
             if (DebugContext.FLIGHT) {
                 vy -= 1;
                 pvy -= 1;
@@ -121,8 +114,7 @@ public class Player implements Serializable {
                     pvy = -7;
                 }
             }
-        }
-        if (queue[6] == true) {
+        } else if (keyPressed == KeyPressed.DOWN) {
             if (DebugContext.FLIGHT) {
                 vy += 1;
                 pvy += 1;
@@ -135,7 +127,7 @@ public class Player implements Serializable {
                 vy = 7;
             }
         }
-        if (!queue[0] && !queue[1]) {
+        if (keyPressed != KeyPressed.LEFT && keyPressed != KeyPressed.RIGHT) {
             if (Math.abs(vx) < 0.3) {
                 vx = 0;
             }
@@ -149,8 +141,7 @@ public class Player implements Serializable {
                 if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
                     imgState = ImageState.STILL_LEFT;
                     image = loadImage("sprites/player/left_still.png");
-                }
-                if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
+                } else if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
                     imgState = ImageState.STILL_RIGHT;
                     image = loadImage("sprites/player/right_still.png");
                 }
@@ -160,8 +151,7 @@ public class Player implements Serializable {
         if (!grounded) {
             if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
                 image = loadImage("sprites/player/left_jump.png");
-            }
-            if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
+            } else if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
                 image = loadImage("sprites/player/right_jump.png");
             }
         }
@@ -256,22 +246,17 @@ public class Player implements Serializable {
         if (grounded) {
             if (imgState == ImageState.STILL_LEFT || imgState == ImageState.WALK_LEFT_1) {
                 image = loadImage("sprites/player/left_still.png");
-            }
-            if (imgState == ImageState.WALK_LEFT_2) {
+            } else if (imgState == ImageState.WALK_LEFT_2) {
                 image = loadImage("sprites/player/left_walk.png");
-            }
-            if (imgState == ImageState.STILL_RIGHT || imgState == ImageState.WALK_RIGHT_1) {
+            } else if (imgState == ImageState.STILL_RIGHT || imgState == ImageState.WALK_RIGHT_1) {
                 image = loadImage("sprites/player/right_still.png");
-            }
-            if (imgState == ImageState.WALK_RIGHT_2) {
+            } else if (imgState == ImageState.WALK_RIGHT_2) {
                 image = loadImage("sprites/player/right_walk.png");
             }
-        }
-        else {
+        } else {
             if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
                 image = loadImage("sprites/player/left_jump.png");
-            }
-            if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
+            } else if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
                 image = loadImage("sprites/player/right_jump.png");
             }
         }

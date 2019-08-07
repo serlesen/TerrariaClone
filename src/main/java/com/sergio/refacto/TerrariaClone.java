@@ -53,6 +53,8 @@ import javax.swing.event.ChangeListener;
 import com.sergio.refacto.dto.BlockNames;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.ItemType;
+import com.sergio.refacto.dto.KeyPressed;
+import com.sergio.refacto.dto.MousePressed;
 import com.sergio.refacto.items.Cloud;
 import com.sergio.refacto.items.CloudsAggregate;
 import com.sergio.refacto.dto.DebugContext;
@@ -182,7 +184,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     BufferedImage wcnct_px = ResourcesLoader.loadImage("misc/wcnct.png");
 
     javax.swing.Timer createWorldTimer;
-    boolean[] queue;
+    KeyPressed keyPressed;
+    MousePressed mousePressed;
 
     boolean ready = true;
     boolean showTool = false;
@@ -289,8 +292,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             addMouseWheelListener(this);
 
             screen = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-            queue = new boolean[7]; // left[0] right[1] up[2] mouse[3] rightmouse[4] shift[5] down[6]
 
             mousePos = new Mouse();
             mousePos2 = new Mouse();
@@ -411,7 +412,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             menuTimer.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     try {
-                        if (queue[3]) {
+                        if (mousePressed == MousePressed.LEFT_MOUSE) {
                             Action mainThread = new AbstractAction() {
                                 public void actionPerformed(ActionEvent ae) {
                                     try {
@@ -721,7 +722,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                             }
                                             updateApp();
                                             updateEnvironment();
-                                            player.update(blocks[1], queue, u, v);
+                                            player.update(blocks[1], keyPressed, u, v);
                                             if (timeOfDay >= 86400) {
                                                 timeOfDay = 0;
                                                 day += 1;
@@ -1455,7 +1456,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
         }
 
-        if (queue[3]) {
+        if (mousePressed == MousePressed.LEFT_MOUSE) {
             checkBlocks = true;
             if (showInv) {
                 if (mousePos.isInBetweenInclusive(getWidth()-save_exit.getWidth()-24, getWidth()-24, getHeight()-save_exit.getHeight()-24, getHeight()-24)) {
@@ -1917,7 +1918,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         else {
             mousePos.setClicked(true);
         }
-        if (queue[4]) {
+        if (mousePressed == MousePressed.RIGHT_MOUSE) {
             checkBlocks = true;
             if (showInv) {
                 for (ux=0; ux<10; ux++) {
@@ -4453,20 +4454,17 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     public void keyPressed(KeyEvent key) {
         if (key.getKeyCode() == key.VK_LEFT || key.getKeyCode() == key.VK_A) {
-            queue[0] = true;
+            keyPressed = KeyPressed.LEFT;
+        } else if (key.getKeyCode() == key.VK_RIGHT || key.getKeyCode() == key.VK_D) {
+            keyPressed = KeyPressed.RIGHT;
+        } else if (key.getKeyCode() == key.VK_UP || key.getKeyCode() == key.VK_W) {
+            keyPressed = KeyPressed.UP;
+        } else if (key.getKeyCode() == key.VK_DOWN || key.getKeyCode() == key.VK_S) {
+            keyPressed = KeyPressed.DOWN;
+        } else if (key.getKeyCode() == key.VK_SHIFT) {
+            keyPressed = KeyPressed.SHIFT;
         }
-        if (key.getKeyCode() == key.VK_RIGHT || key.getKeyCode() == key.VK_D) {
-            queue[1] = true;
-        }
-        if (key.getKeyCode() == key.VK_UP || key.getKeyCode() == key.VK_W) {
-            queue[2] = true;
-        }
-        if (key.getKeyCode() == key.VK_DOWN || key.getKeyCode() == key.VK_S) {
-            queue[6] = true;
-        }
-        if (key.getKeyCode() == key.VK_SHIFT) {
-            queue[5] = true;
-        }
+        
         if (state == State.IN_GAME) {
             if (key.getKeyCode() == key.VK_ESCAPE) {
                 if (ic != null) {
@@ -4607,7 +4605,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         if (key.getKeyCode() == key.VK_PERIOD) c = '.';
         if (key.getKeyCode() == key.VK_SLASH) c = '/';
 
-        if (queue[5]) {
+        if (keyPressed == KeyPressed.SHIFT) {
             if (c == 'q') c = 'Q';
             if (c == 'w') c = 'W';
             if (c == 'e') c = 'E';
@@ -4679,35 +4677,26 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     }
 
     public void keyReleased(KeyEvent key) {
-        if (key.getKeyCode() == key.VK_LEFT || key.getKeyCode() == key.VK_A) {
-            queue[0] = false;
-        }
-        if (key.getKeyCode() == key.VK_RIGHT || key.getKeyCode() == key.VK_D) {
-            queue[1] = false;
-        }
-        if (key.getKeyCode() == key.VK_UP || key.getKeyCode() == key.VK_W) {
-            queue[2] = false;
-        }
-        if (key.getKeyCode() == key.VK_SHIFT) {
-            queue[5] = false;
-        }
-        if (key.getKeyCode() == key.VK_DOWN || key.getKeyCode() == key.VK_S) {
-            queue[6] = false;
+        if (key.getKeyCode() == key.VK_LEFT || key.getKeyCode() == key.VK_A
+                || key.getKeyCode() == key.VK_RIGHT || key.getKeyCode() == key.VK_D
+                || key.getKeyCode() == key.VK_UP || key.getKeyCode() == key.VK_W
+                || key.getKeyCode() == key.VK_SHIFT
+                || key.getKeyCode() == key.VK_DOWN || key.getKeyCode() == key.VK_S) {
+            keyPressed = KeyPressed.NONE;
         }
     }
 
     public void mousePressed(MouseEvent e) {
-        if (!queue[3]) {
-            queue[3] = e.getButton() == MouseEvent.BUTTON1;
+        if (mousePressed != MousePressed.LEFT_MOUSE && e.getButton() == MouseEvent.BUTTON1) {
+            mousePressed = MousePressed.LEFT_MOUSE;
         }
-        if (!queue[4]) {
-            queue[4] = e.getButton() == MouseEvent.BUTTON3;
+        if (mousePressed != MousePressed.RIGHT_MOUSE && e.getButton() == MouseEvent.BUTTON3) {
+            mousePressed = MousePressed.RIGHT_MOUSE;
         }
     }
 
     public void mouseReleased(MouseEvent e) {
-        queue[3] = false;
-        queue[4] = false;
+        mousePressed = MousePressed.NONE;
         menuPressed = false;
     }
 
