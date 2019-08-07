@@ -12,12 +12,10 @@ import com.sergio.refacto.dto.KeyPressed;
 
 public class Player implements Serializable {
     transient BufferedImage image;
-    int ix, iy, ivx, ivy, width, height, bx1, by1, bx2, by2, thp, hp;
+    int ix, iy, width, height, thp, hp;
     double x, y, vx, vy, pvy, oldx, oldy;
     private boolean onGround, onGroundDelay, grounded;
     Rectangle rect;
-
-    private int i, j, n;
 
     private int imgDelay;
     ImageState imgState;
@@ -53,100 +51,18 @@ public class Player implements Serializable {
 
     public void update(Integer[][] blocks, KeyPressed keyPressed, int u, int v) {
         grounded = (onGround || onGroundDelay);
-        if (keyPressed == KeyPressed.LEFT) {
-            if (vx > -4 || DebugContext.SPEED) {
-                vx = vx - 0.5;
-            }
-            if (imgState.isStill() || imgState.isWalkRight()) {
-                imgDelay = 5;
-                imgState = ImageState.WALK_LEFT_2;
-                image = loadImage("sprites/player/left_walk.png");
-            }
-            if (imgDelay <= 0) {
-                if (imgState == ImageState.WALK_LEFT_1) {
-                    imgDelay = 5;
-                    imgState = ImageState.WALK_LEFT_2;
-                    image = loadImage("sprites/player/left_walk.png");
-                } else {
-                    if (imgState == ImageState.WALK_LEFT_2) {
-                        imgDelay = 5;
-                        imgState = ImageState.WALK_LEFT_1;
-                        image = loadImage("sprites/player/left_still.png");
-                    }
-                }
-            }
-            else {
-                imgDelay = imgDelay - 1;
-            }
-        } else if (keyPressed == KeyPressed.RIGHT) {
-            if (vx < 4 || DebugContext.SPEED) {
-                vx = vx + 0.5;
-            }
-            if (imgState.isStill() || imgState.isWalkLeft()) {
-                imgDelay = 5;
-                imgState = ImageState.WALK_RIGHT_2;
-                image = loadImage("sprites/player/right_walk.png");
-            }
-            if (imgDelay <= 0) {
-                if (imgState == ImageState.WALK_RIGHT_1) {
-                    imgDelay = 5;
-                    imgState = ImageState.WALK_RIGHT_2;
-                    image = loadImage("sprites/player/right_walk.png");
-                } else {
-                    if (imgState == ImageState.WALK_RIGHT_2) {
-                        imgDelay = 5;
-                        imgState = ImageState.WALK_RIGHT_1;
-                        image = loadImage("sprites/player/right_still.png");
-                    }
-                }
-            }
-            else {
-                imgDelay = imgDelay - 1;
-            }
-        } else if (keyPressed == KeyPressed.UP) {
-            if (DebugContext.FLIGHT) {
-                vy -= 1;
-                pvy -= 1;
-            }
-            else {
-                if (onGround == true) {
-                    vy = -7;
-                    pvy = -7;
-                }
-            }
-        } else if (keyPressed == KeyPressed.DOWN) {
-            if (DebugContext.FLIGHT) {
-                vy += 1;
-                pvy += 1;
-            }
-        }
+
+        handleMovement(keyPressed);
+
         if (!onGround) {
-            vy = vy + 0.3;
-            pvy = pvy + 0.3;
+            vy += 0.3;
+            pvy += 0.3;
             if (vy > 7 && !DebugContext.FLIGHT) {
                 vy = 7;
             }
         }
-        if (keyPressed != KeyPressed.LEFT && keyPressed != KeyPressed.RIGHT) {
-            if (Math.abs(vx) < 0.3) {
-                vx = 0;
-            }
-            if (vx >= 0.3) {
-                vx = vx - 0.3;
-            }
-            if (vx <= -0.3) {
-                vx = vx + 0.3;
-            }
-            if (grounded) {
-                if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
-                    imgState = ImageState.STILL_LEFT;
-                    image = loadImage("sprites/player/left_still.png");
-                } else if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
-                    imgState = ImageState.STILL_RIGHT;
-                    image = loadImage("sprites/player/right_still.png");
-                }
-            }
-        }
+
+        handleStopping(keyPressed);
 
         if (!grounded) {
             if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
@@ -163,19 +79,20 @@ public class Player implements Serializable {
         x = x + vx;
 
         if (!DebugContext.NOCLIP) {
-            for (i=0; i<2; i++) {
-                ix = (int)x;
-                iy = (int)y;
-                ivx = (int)vx;
-                ivy = (int)vy;
+            for (int k = 0; k < 2; k++) {
+
+                ix = (int) x;
+                iy = (int) y;
 
                 rect = new Rectangle(ix-1, iy, width+2, height);
 
-                bx1 = (int)x/BLOCKSIZE; by1 = (int)y/BLOCKSIZE;
-                bx2 = (int)(x+width)/BLOCKSIZE; by2 = (int)(y+height)/BLOCKSIZE;
+                int bx1 = (int)x/BLOCKSIZE;
+                int by1 = (int)y/BLOCKSIZE;
+                int bx2 = (int)(x+width)/BLOCKSIZE;
+                int by2 = (int)(y+height)/BLOCKSIZE;
 
-                for (i=bx1; i<=bx2; i++) {
-                    for (j=by1; j<=by2; j++) {
+                for (int i = bx1; i <= bx2; i++) {
+                    for (int j = by1; j <= by2; j++) {
                         if (blocks[j+v][i+u] != 0 && TerrariaClone.getBLOCKCD().get(blocks[j+v][i+u])) {
                             if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                                 if (oldx <= i*16 - width && vx > 0) {
@@ -196,22 +113,23 @@ public class Player implements Serializable {
         y = y + vy;
         onGround = false;
         if (!DebugContext.NOCLIP) {
-            for (i=0; i<2; i++) {
-                ix = (int)x;
-                iy = (int)y;
-                ivx = (int)vx;
-                ivy = (int)vy;
+            for (int k = 0; k < 2; k++) {
 
-                rect = new Rectangle(ix, iy-1, width, height+2);
+                ix = (int) x;
+                iy = (int) y;
 
-                bx1 = (int)x/BLOCKSIZE; by1 = (int)y/BLOCKSIZE;
-                bx2 = (int)(x+width)/BLOCKSIZE; by2 = (int)(y+height)/BLOCKSIZE;
+                rect = new Rectangle(ix, iy - 1, width, height+2);
+
+                int bx1 = (int)x/BLOCKSIZE;
+                int by1 = (int)y/BLOCKSIZE;
+                int bx2 = (int)(x+width)/BLOCKSIZE;
+                int by2 = (int)(y+height)/BLOCKSIZE;
 
                 by1 = Math.max(0, by1);
                 by2 = Math.min(blocks.length - 1, by2);
 
-                for (i=bx1; i<=bx2; i++) {
-                    for (j=by1; j<=by2; j++) {
+                for (int i = bx1; i <= bx2; i++) {
+                    for (int j = by1; j <= by2; j++) {
                         if (blocks[j+v][i+u] != 0 && TerrariaClone.getBLOCKCD().get(blocks[j+v][i+u])) {
                             if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                                 if (oldy <= j*16 - height && vy > 0) {
@@ -234,12 +152,92 @@ public class Player implements Serializable {
             }
         }
 
-        ix = (int)x;
-        iy = (int)y;
-        ivx = (int)vx;
-        ivy = (int)vy;
+        ix = (int) x;
+        iy = (int) y;
 
-        rect = new Rectangle(ix-1, iy-1, width+2, height+2);
+        rect = new Rectangle(ix - 1, iy - 1, width+2, height+2);
+    }
+
+    private void handleStopping(KeyPressed keyPressed) {
+        if (keyPressed != KeyPressed.LEFT && keyPressed != KeyPressed.RIGHT) {
+            if (Math.abs(vx) < 0.3) {
+                vx = 0;
+            }
+            if (vx >= 0.3) {
+                vx -= 0.3;
+            }
+            if (vx <= -0.3) {
+                vx += 0.3;
+            }
+            if (grounded) {
+                if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
+                    imgState = ImageState.STILL_LEFT;
+                    image = loadImage("sprites/player/left_still.png");
+                } else if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
+                    imgState = ImageState.STILL_RIGHT;
+                    image = loadImage("sprites/player/right_still.png");
+                }
+            }
+        }
+    }
+
+    private void handleMovement(KeyPressed keyPressed) {
+        if (keyPressed == KeyPressed.LEFT) {
+            if (vx > -4 || DebugContext.SPEED) {
+                vx -= 0.5;
+            }
+            if (imgState.isStill() || imgState.isWalkRight()) {
+                setMovementImageTo(ImageState.WALK_LEFT_2, "sprites/player/left_walk.png");
+            }
+            if (imgDelay <= 0) {
+                if (imgState == ImageState.WALK_LEFT_1) {
+                    setMovementImageTo(ImageState.WALK_LEFT_2, "sprites/player/left_walk.png");
+                } else {
+                    if (imgState == ImageState.WALK_LEFT_2) {
+                        setMovementImageTo(ImageState.WALK_LEFT_1, "sprites/player/left_still.png");
+                    }
+                }
+            } else {
+                imgDelay = imgDelay - 1;
+            }
+        } else if (keyPressed == KeyPressed.RIGHT) {
+            if (vx < 4 || DebugContext.SPEED) {
+                vx += 0.5;
+            }
+            if (imgState.isStill() || imgState.isWalkLeft()) {
+                setMovementImageTo(ImageState.WALK_RIGHT_2, "sprites/player/right_walk.png");
+            }
+            if (imgDelay <= 0) {
+                if (imgState == ImageState.WALK_RIGHT_1) {
+                    setMovementImageTo(ImageState.WALK_RIGHT_2, "sprites/player/right_walk.png");
+                } else {
+                    if (imgState == ImageState.WALK_RIGHT_2) {
+                        setMovementImageTo(ImageState.WALK_RIGHT_1, "sprites/player/right_still.png");
+                    }
+                }
+            } else {
+                imgDelay = imgDelay - 1;
+            }
+        } else if (keyPressed == KeyPressed.UP) {
+            if (DebugContext.FLIGHT) {
+                vy -= 1;
+                pvy -= 1;
+            } else if (onGround) {
+                    vy = -7;
+                    pvy = -7;
+            }
+        } else if (keyPressed == KeyPressed.DOWN) {
+            if (DebugContext.FLIGHT) {
+                vy += 1;
+                pvy += 1;
+            }
+        }
+    }
+
+    private void setMovementImageTo(ImageState walkLeft2, String path) {
+        imgDelay = 5;
+        imgState = walkLeft2;
+        image = loadImage(path);
     }
 
     public void reloadImage() {
@@ -266,7 +264,7 @@ public class Player implements Serializable {
         int fd = damage;
         if (useArmor) {
             fd -= sumArmor();
-            for (i=0; i<4; i++) {
+            for (int i = 0; i < 4; i++) {
                 TerrariaClone.armor.getDurs()[i] -= 1;
                 if (TerrariaClone.armor.getDurs()[i] <= 0) {
                     inventory.removeLocationIC(TerrariaClone.armor, i, TerrariaClone.armor.getNums()[i]);
@@ -296,33 +294,5 @@ public class Player implements Serializable {
             System.out.println("[ERROR] could not load image '" + path + "'.");
         }
         return image;
-    }
-
-    public static int mod(int a, int q) {
-        return TerrariaClone.mod(a, q);
-    }
-
-    public static void print(String text) {
-        System.out.println(text);
-    }
-
-    public static void print(int text) {
-        System.out.println(text);
-    }
-
-    public static void print(double text) {
-        System.out.println(text);
-    }
-
-    public static void print(short text) {
-        System.out.println(text);
-    }
-
-    public static void print(boolean text) {
-        System.out.println(text);
-    }
-
-    public static void print(Object text) {
-        System.out.println(text);
     }
 }
