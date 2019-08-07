@@ -282,9 +282,9 @@ public class Player implements Serializable {
         if (useArmor) {
             fd -= sumArmor();
             for (i=0; i<4; i++) {
-                TerrariaClone.armor.durs[i] -= 1;
-                if (TerrariaClone.armor.durs[i] <= 0) {
-                    inventory.removeLocationIC(TerrariaClone.armor, i, TerrariaClone.armor.nums[i]);
+                TerrariaClone.armor.getDurs()[i] -= 1;
+                if (TerrariaClone.armor.getDurs()[i] <= 0) {
+                    inventory.removeLocationIC(TerrariaClone.armor, i, TerrariaClone.armor.getNums()[i]);
                 }
             }
         }
@@ -295,10 +295,10 @@ public class Player implements Serializable {
     }
 
     public int sumArmor() {
-        return (TerrariaClone.getARMOR().get(TerrariaClone.armor.ids[0]) +
-                TerrariaClone.getARMOR().get(TerrariaClone.armor.ids[1]) +
-                TerrariaClone.getARMOR().get(TerrariaClone.armor.ids[2]) +
-                TerrariaClone.getARMOR().get(TerrariaClone.armor.ids[3]));
+        return (TerrariaClone.getARMOR().get(TerrariaClone.armor.getIds()[0]) +
+                TerrariaClone.getARMOR().get(TerrariaClone.armor.getIds()[1]) +
+                TerrariaClone.getARMOR().get(TerrariaClone.armor.getIds()[2]) +
+                TerrariaClone.getARMOR().get(TerrariaClone.armor.getIds()[3]));
     }
 
     private static BufferedImage loadImage(String path) {

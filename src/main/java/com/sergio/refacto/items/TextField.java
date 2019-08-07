@@ -1,4 +1,4 @@
-package com.sergio.refacto;
+package com.sergio.refacto.items;
 
 import java.awt.Color;
 import java.awt.Font;

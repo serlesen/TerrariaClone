@@ -6,7 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.sergio.refacto.dto.ItemType;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemCollection implements Serializable {
 
     ItemType type;

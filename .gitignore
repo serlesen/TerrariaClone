@@ -6,3 +6,4 @@ target/
 /worlds/
 *~
 *.class
+.DS_Store

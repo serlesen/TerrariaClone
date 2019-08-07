@@ -1,11 +1,15 @@
 package com.sergio.refacto;
 
-import java.awt.*;
-import java.awt.image.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.imageio.ImageIO;
 
 import com.sergio.refacto.dto.ItemType;
@@ -1034,113 +1038,113 @@ public class Inventory implements Serializable {
     }
 
     public void renderCollection(ItemCollection ic) {
-        if (ic.type == ItemType.CIC) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/cic.png");
+        if (ic.getType() == ItemType.CIC) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/cic.png"));
                 for (i=0; i<4; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.ARMOR) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/armor.png");
+        } else if (ic.getType() == ItemType.ARMOR) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/armor.png"));
                 CX = 1;
                 CY = 4;
                 for (i=0; i<4; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.WORKBENCH) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/workbench.png");
+        } else if (ic.getType() == ItemType.WORKBENCH) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/workbench.png"));
                 for (i=0; i<9; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.WOODEN_CHEST) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/wooden_chest.png");
+        } else if (ic.getType() == ItemType.WOODEN_CHEST) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/wooden_chest.png"));
                 CX = 3;
                 CY = 3;
                 for (i=0; i<9; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.STONE_CHEST) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/stone_chest.png");
+        } else if (ic.getType() == ItemType.STONE_CHEST) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/stone_chest.png"));
                 CX = 5;
                 CY = 3;
                 for (i=0; i<15; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.COPPER_CHEST) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/copper_chest.png");
+        } else if (ic.getType() == ItemType.COPPER_CHEST) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/copper_chest.png"));
                 CX = 5;
                 CY = 4;
                 for (i=0; i<20; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.IRON_CHEST) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/iron_chest.png");
+        } else if (ic.getType() == ItemType.IRON_CHEST) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/iron_chest.png"));
                 CX = 7;
                 CY = 4;
                 for (i=0; i<28; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.SILVER_CHEST) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/silver_chest.png");
+        } else if (ic.getType() == ItemType.SILVER_CHEST) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/silver_chest.png"));
                 CX = 7;
                 CY = 5;
                 for (i=0; i<35; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.GOLD_CHEST) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/gold_chest.png");
+        } else if (ic.getType() == ItemType.GOLD_CHEST) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/gold_chest.png"));
                 CX = 7;
                 CY = 6;
                 for (i=0; i<42; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.ZINC_CHEST) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/zinc_chest.png");
+        } else if (ic.getType() == ItemType.ZINC_CHEST) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/zinc_chest.png"));
                 CX = 7;
                 CY = 8;
                 for (i=0; i<56; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.RHYMESTONE_CHEST) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/rhymestone_chest.png");
+        } else if (ic.getType() == ItemType.RHYMESTONE_CHEST) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/rhymestone_chest.png"));
                 CX = 8;
                 CY = 9;
                 for (i=0; i<72; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.OBDURITE_CHEST) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/obdurite_chest.png");
+        } else if (ic.getType() == ItemType.OBDURITE_CHEST) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/obdurite_chest.png"));
                 CX = 10;
                 CY = 10;
                 for (i=0; i<100; i++) {
                     updateIC(ic, i);
                 }
             }
-        } else if (ic.type == ItemType.FURNACE) {
-            if (ic.image == null) {
-                ic.image = loadImage("interface/furnace.png");
+        } else if (ic.getType() == ItemType.FURNACE) {
+            if (ic.getImage() == null) {
+                ic.setImage(loadImage("interface/furnace.png"));
                 for (i=-1; i<4; i++) {
                     updateIC(ic, i);
                 }
@@ -1153,33 +1157,33 @@ public class Inventory implements Serializable {
     }
 
     public int addLocationIC(ItemCollection ic, int i, short item, short quantity, short durability) {
-        if (ic.ids[i] == item) {
-            if (TerrariaClone.getMAXSTACKS().get(ic.ids[i]) - ic.nums[i] >= quantity) {
-                ic.nums[i] += quantity;
-                if (ic.image != null) {
+        if (ic.getIds()[i] == item) {
+            if (TerrariaClone.getMAXSTACKS().get(ic.getIds()[i]) - ic.getNums()[i] >= quantity) {
+                ic.getNums()[i] += quantity;
+                if (ic.getImage() != null) {
                     updateIC(ic, i);
                 }
                 return 0;
             }
             else {
-                quantity -= TerrariaClone.getMAXSTACKS().get(ic.ids[i]) - ic.nums[i];
-                ic.nums[i] = TerrariaClone.getMAXSTACKS().get(ic.ids[i]);
-                if (ic.image != null) {
+                quantity -= TerrariaClone.getMAXSTACKS().get(ic.getIds()[i]) - ic.getNums()[i];
+                ic.getNums()[i] = TerrariaClone.getMAXSTACKS().get(ic.getIds()[i]);
+                if (ic.getImage() != null) {
                     updateIC(ic, i);
                 }
             }
         } else {
-            if (quantity <= TerrariaClone.getMAXSTACKS().get(ic.ids[i])) {
-                ic.ids[i] = item;
-                ic.nums[i] = quantity;
-                ic.durs[i] = durability;
-                if (ic.image != null) {
+            if (quantity <= TerrariaClone.getMAXSTACKS().get(ic.getIds()[i])) {
+                ic.getIds()[i] = item;
+                ic.getNums()[i] = quantity;
+                ic.getNums()[i] = durability;
+                if (ic.getImage() != null) {
                     updateIC(ic, i);
                 }
                 return 0;
             }
             else {
-                quantity -= TerrariaClone.getMAXSTACKS().get(ic.ids[i]);
+                quantity -= TerrariaClone.getMAXSTACKS().get(ic.getIds()[i]);
                 return quantity;
             }
         }
@@ -1187,21 +1191,21 @@ public class Inventory implements Serializable {
     }
 
     public int removeLocationIC(ItemCollection ic, int i, short quantity) {
-        if (ic.nums[i] >= quantity) {
-            ic.nums[i] -= quantity;
-            if (ic.nums[i] == 0) {
-                ic.ids[i] = 0;
+        if (ic.getNums()[i] >= quantity) {
+            ic.getNums()[i] -= quantity;
+            if (ic.getNums()[i] == 0) {
+                ic.getIds()[i] = 0;
             }
-            if (ic.image != null) {
+            if (ic.getImage() != null) {
                 updateIC(ic, i);
             }
             return 0;
         }
         else {
-            quantity -= ic.nums[i];
-            ic.nums[i] = 0;
-            ic.ids[i] = 0;
-            if (ic.image != null) {
+            quantity -= ic.getNums()[i];
+            ic.getNums()[i] = 0;
+            ic.getIds()[i] = 0;
+            if (ic.getImage() != null) {
                 updateIC(ic, i);
             }
         }
@@ -1209,220 +1213,219 @@ public class Inventory implements Serializable {
     }
 
     public void updateIC(ItemCollection ic, int i) {
-        if (ic.type == ItemType.CIC) {
+        if (ic.getType() == ItemType.CIC) {
             py = (int)(i/2);
             px = i-(py*2);
             for (x=px*40; x<px*40+40; x++) {
                 for (y=py*40; y<py*40+40; y++) {
-                    ic.image.setRGB(x, y, 9539985);
+                    ic.getImage().setRGB(x, y, 9539985);
                 }
             }
-            g2 = ic.image.createGraphics();
+            g2 = ic.getImage().createGraphics();
             g2.drawImage(box,
                 px*40, py*40, px*40+40, py*40+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.ids[i] != 0) {
-                width = TerrariaClone.getItemImgs().get(ic.ids[i]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.ids[i]).getHeight();
-                g2.drawImage(TerrariaClone.getItemImgs().get(ic.ids[i]),
+            if (ic.getIds()[i] != 0) {
+                width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
+                height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
+                g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
                     px*40+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*40+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), px*40+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*40+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
-                if (ic.nums[i] > 1) {
+                if (ic.getNums()[i] > 1) {
                     g2.setFont(font);
                     g2.setColor(Color.WHITE);
-                    g2.drawString(ic.nums[i] + " ", px*40+9, py*40+34);
+                    g2.drawString(ic.getNums()[i] + " ", px*40+9, py*40+34);
                 }
             }
-            ic.ids[4] = 0;
-            ic.ids[4] = 0;
+            ic.getIds()[4] = 0;
+            ic.getIds()[4] = 0;
             for (Short[] r2 : RECIPES.get("cic")) {
                 if (ic.areIdsEquals(r2)) {
-                    ic.ids[4] = r2[4];
-                    ic.nums[4] = r2[5];
+                    ic.getIds()[4] = r2[4];
+                    ic.getNums()[4] = r2[5];
                     if (TerrariaClone.getTOOLDURS().get(r2[4]) != null)
-                        ic.durs[4] = TerrariaClone.getTOOLDURS().get(r2[4]);
+                        ic.getDurs()[4] = TerrariaClone.getTOOLDURS().get(r2[4]);
                     break;
                 }
             }
             for (Short[] r2 : RECIPES.get("shapeless_cic")) {
                 if (ic.areInvalidIds(r2)) {
-                    ic.ids[4] = r2[r2.length-2];
-                    ic.nums[4] = r2[r2.length-1];
+                    ic.getIds()[4] = r2[r2.length-2];
+                    ic.getNums()[4] = r2[r2.length-1];
                     if (TerrariaClone.getTOOLDURS().get(r2[r2.length-2]) != null)
-                        ic.durs[4] = TerrariaClone.getTOOLDURS().get(r2[r2.length-2]);
+                        ic.getDurs()[4] = TerrariaClone.getTOOLDURS().get(r2[r2.length-2]);
                     break;
                 }
             }
             for (x=3*40; x<3*40+40; x++) {
                 for (y=20; y<20+40; y++) {
-                    ic.image.setRGB(x, y, 9539985);
+                    ic.getImage().setRGB(x, y, 9539985);
                 }
             }
-            g2 = ic.image.createGraphics();
+            g2 = ic.getImage().createGraphics();
             g2.drawImage(box,
                 3*40, 20, 3*40+40, 20+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.ids[4] != 0) {
-                width = TerrariaClone.getItemImgs().get(ic.ids[4]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.ids[4]).getHeight();
-                g2.drawImage(TerrariaClone.getItemImgs().get(ic.ids[4]),
+            if (ic.getIds()[4] != 0) {
+                width = TerrariaClone.getItemImgs().get(ic.getIds()[4]).getWidth();
+                height = TerrariaClone.getItemImgs().get(ic.getIds()[4]).getHeight();
+                g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[4]),
                     3*40+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), 20+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), 3*40+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), 20+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
 
-                if (ic.nums[4] > 1) {
+                if (ic.getNums()[4] > 1) {
                     g2.setFont(font);
                     g2.setColor(Color.WHITE);
-                    g2.drawString(ic.nums[4] + " ", 3*40+9, 20+34);
+                    g2.drawString(ic.getNums()[4] + " ", 3*40+9, 20+34);
                 }
             }
-        } else if (ic.type == ItemType.ARMOR) {
+        } else if (ic.getType() == ItemType.ARMOR) {
             py = (int)(i/CX);
             px = i-(py*CX);
             for (x=px*46; x<px*46+40; x++) {
                 for (y=py*46; y<py*46+40; y++) {
-                    ic.image.setRGB(x, y, 9539985);
+                    ic.getImage().setRGB(x, y, 9539985);
                 }
             }
-            g2 = ic.image.createGraphics();
+            g2 = ic.getImage().createGraphics();
             g2.drawImage(box,
                 px*46, py*46, px*46+40, py*46+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.ids[i] != 0) {
-                width = TerrariaClone.getItemImgs().get(ic.ids[i]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.ids[i]).getHeight();
-                g2.drawImage(TerrariaClone.getItemImgs().get(ic.ids[i]),
+            if (ic.getIds()[i] != 0) {
+                width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
+                height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
+                g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
                     px*46+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), px*46+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
 
-                if (ic.nums[i] > 1) {
+                if (ic.getNums()[i] > 1) {
                     g2.setFont(font);
                     g2.setColor(Color.WHITE);
-                    g2.drawString(ic.nums[i] + " ", px*46+9, py*46+34);
+                    g2.drawString(ic.getNums()[i] + " ", px*46+9, py*46+34);
                 }
             }
-        } else if (ic.type == ItemType.WORKBENCH) {
+        } else if (ic.getType() == ItemType.WORKBENCH) {
             py = (int)(i/3);
             px = i-(py*3);
             for (x=px*40; x<px*40+40; x++) {
                 for (y=py*40; y<py*40+40; y++) {
-                    ic.image.setRGB(x, y, 9539985);
+                    ic.getImage().setRGB(x, y, 9539985);
                 }
             }
-            g2 = ic.image.createGraphics();
+            g2 = ic.getImage().createGraphics();
             g2.drawImage(box,
                 px*40, py*40, px*40+40, py*40+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.ids[i] != 0) {
-                width = TerrariaClone.getItemImgs().get(ic.ids[i]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.ids[i]).getHeight();
-                g2.drawImage(TerrariaClone.getItemImgs().get(ic.ids[i]),
+            if (ic.getIds()[i] != 0) {
+                width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
+                height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
+                g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
                     px*40+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*40+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), px*40+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*40+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
-                if (ic.nums[i] > 1) {
+                if (ic.getNums()[i] > 1) {
                     g2.setFont(font);
                     g2.setColor(Color.WHITE);
-                    g2.drawString(ic.nums[i] + " ", px*40+9, py*40+34);
+                    g2.drawString(ic.getNums()[i] + " ", px*40+9, py*40+34);
                 }
             }
-            ic.ids[9] = 0;
-            ic.ids[9] = 0;
+            ic.getIds()[9] = 0;
             for (Short[] r2 : RECIPES.get("workbench")) {
                 if (ic.areIdsEquals(r2)) {
-                    ic.ids[9] = r2[9];
-                    ic.nums[9] = r2[10];
+                    ic.getIds()[9] = r2[9];
+                    ic.getNums()[9] = r2[10];
                     if (TerrariaClone.getTOOLDURS().get(r2[9]) != null)
-                        ic.durs[9] = TerrariaClone.getTOOLDURS().get(r2[9]);
+                        ic.getDurs()[9] = TerrariaClone.getTOOLDURS().get(r2[9]);
                     break;
                 }
             }
             for (Short[] r2 : RECIPES.get("shapeless")) {
                 if (ic.areInvalidIds(r2)) {
-                    ic.ids[9] = r2[r2.length-2];
-                    ic.nums[9] = r2[r2.length-1];
+                    ic.getIds()[9] = r2[r2.length-2];
+                    ic.getNums()[9] = r2[r2.length-1];
                     if (TerrariaClone.getTOOLDURS().get(r2[r2.length-2]) != null)
-                        ic.durs[9] = TerrariaClone.getTOOLDURS().get(r2.length-2);
+                        ic.getDurs()[9] = TerrariaClone.getTOOLDURS().get(r2.length-2);
                     break;
                 }
             }
             for (x=4*40; x<4*40+40; x++) {
                 for (y=1*40; y<1*40+40; y++) {
-                    ic.image.setRGB(x, y, 9539985);
+                    ic.getImage().setRGB(x, y, 9539985);
                 }
             }
-            g2 = ic.image.createGraphics();
+            g2 = ic.getImage().createGraphics();
             g2.drawImage(box,
                 4*40, 1*40, 4*40+40, 1*40+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.ids[9] != 0) {
-                width = TerrariaClone.getItemImgs().get(ic.ids[9]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.ids[9]).getHeight();
-                    g2.drawImage(TerrariaClone.getItemImgs().get(ic.ids[9]),
+            if (ic.getIds()[9] != 0) {
+                width = TerrariaClone.getItemImgs().get(ic.getIds()[9]).getWidth();
+                height = TerrariaClone.getItemImgs().get(ic.getIds()[9]).getHeight();
+                    g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[9]),
                         4*40+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), 1*40+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), 4*40+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), 1*40+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                         0, 0, width, height,
                         null);
 
-                if (ic.nums[9] > 1) {
+                if (ic.getNums()[9] > 1) {
                     g2.setFont(font);
                     g2.setColor(Color.WHITE);
-                    g2.drawString(ic.nums[9] + " ", 4*40+9, 1*40+34);
+                    g2.drawString(ic.getNums()[9] + " ", 4*40+9, 1*40+34);
                 }
             }
-        } else if (ic.type == ItemType.WOODEN_CHEST || ic.type == ItemType.STONE_CHEST ||
-            ic.type == ItemType.COPPER_CHEST || ic.type == ItemType.IRON_CHEST ||
-            ic.type == ItemType.SILVER_CHEST || ic.type == ItemType.GOLD_CHEST ||
-            ic.type == ItemType.ZINC_CHEST || ic.type == ItemType.RHYMESTONE_CHEST ||
-            ic.type == ItemType.OBDURITE_CHEST) {
+        } else if (ic.getType() == ItemType.WOODEN_CHEST || ic.getType() == ItemType.STONE_CHEST ||
+            ic.getType() == ItemType.COPPER_CHEST || ic.getType() == ItemType.IRON_CHEST ||
+            ic.getType() == ItemType.SILVER_CHEST || ic.getType() == ItemType.GOLD_CHEST ||
+            ic.getType() == ItemType.ZINC_CHEST || ic.getType() == ItemType.RHYMESTONE_CHEST ||
+            ic.getType() == ItemType.OBDURITE_CHEST) {
             py = (int)(i/CX);
             px = i-(py*CX);
             for (x=px*46; x<px*46+40; x++) {
                 for (y=py*46; y<py*46+40; y++) {
-                    ic.image.setRGB(x, y, 9539985);
+                    ic.getImage().setRGB(x, y, 9539985);
                 }
             }
-            g2 = ic.image.createGraphics();
+            g2 = ic.getImage().createGraphics();
             g2.drawImage(box,
                 px*46, py*46, px*46+40, py*46+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.ids[i] != 0) {
-                width = TerrariaClone.getItemImgs().get(ic.ids[i]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.ids[i]).getHeight();
-                g2.drawImage(TerrariaClone.getItemImgs().get(ic.ids[i]),
+            if (ic.getIds()[i] != 0) {
+                width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
+                height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
+                g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
                     px*46+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), px*46+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
 
-                if (ic.nums[i] > 1) {
+                if (ic.getNums()[i] > 1) {
                     g2.setFont(font);
                     g2.setColor(Color.WHITE);
-                    g2.drawString(ic.nums[i] + " ", px*46+9, py*46+34);
+                    g2.drawString(ic.getNums()[i] + " ", px*46+9, py*46+34);
                 }
             }
-        } else if (ic.type == ItemType.FURNACE) {
+        } else if (ic.getType() == ItemType.FURNACE) {
             if (i == -1) {
                 for (y=0; y<5; y++) {
-                    for (x=0; x<ic.FUELP*38; x++) {
-                        ic.image.setRGB(x+1, y+51, new Color(255, 0, 0).getRGB());
+                    for (x=0; x<ic.getFUELP()*38; x++) {
+                        ic.getImage().setRGB(x+1, y+51, new Color(255, 0, 0).getRGB());
                     }
-                    for (x=(int)(ic.FUELP*38); x<38; x++) {
-                        ic.image.setRGB(x+1, y+51, new Color(145, 145, 145).getRGB());
+                    for (x=(int)(ic.getFUELP()*38); x<38; x++) {
+                        ic.getImage().setRGB(x+1, y+51, new Color(145, 145, 145).getRGB());
                     }
                 }
                 for (x=0; x<5; x++) {
-                    for (y=0; y<ic.SMELTP*38; y++) {
-                        ic.image.setRGB(x+40, y+1, new Color(255, 0, 0).getRGB());
+                    for (y=0; y<ic.getSMELTP()*38; y++) {
+                        ic.getImage().setRGB(x+40, y+1, new Color(255, 0, 0).getRGB());
                     }
-                    for (y=(int)(ic.SMELTP*38); y<38; y++) {
-                        ic.image.setRGB(x+40, y+1, new Color(145, 145, 145).getRGB());
+                    for (y=(int)(ic.getSMELTP()*38); y<38; y++) {
+                        ic.getImage().setRGB(x+40, y+1, new Color(145, 145, 145).getRGB());
                     }
                 }
             }
@@ -1445,26 +1448,26 @@ public class Inventory implements Serializable {
                 }
                 for (x=(int)(fpx*40); x<fpx*40+40; x++) {
                     for (y=(int)(fpy*40); y<fpy*40+40; y++) {
-                        ic.image.setRGB(x, y, 9539985);
+                        ic.getImage().setRGB(x, y, 9539985);
                     }
                 }
-                g2 = ic.image.createGraphics();
+                g2 = ic.getImage().createGraphics();
                 g2.drawImage(box,
                     (int)(fpx*40), (int)(fpy*40), (int)(fpx*40+40), (int)(fpy*40+40),
                     0, 0, 40, 40,
                     null);
-                if (ic.ids[i] != 0) {
-                    width = TerrariaClone.getItemImgs().get(ic.ids[i]).getWidth();
-                    height = TerrariaClone.getItemImgs().get(ic.ids[i]).getHeight();
-                    g2.drawImage(TerrariaClone.getItemImgs().get(ic.ids[i]),
+                if (ic.getIds()[i] != 0) {
+                    width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
+                    height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
+                    g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
                         (int)(fpx*40+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2)), (int)(fpy*40+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2)), (int)(fpx*40+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2)), (int)(fpy*40+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2)),
                         0, 0, width, height,
                         null);
 
-                    if (ic.nums[i] > 1) {
+                    if (ic.getNums()[i] > 1) {
                         g2.setFont(font);
                         g2.setColor(Color.WHITE);
-                        g2.drawString(ic.nums[i] + " ", (int)(fpx*40+9), (int)(fpy*40+34));
+                        g2.drawString(ic.getNums()[i] + " ", (int)(fpx*40+9), (int)(fpy*40+34));
                     }
                 }
             }
@@ -1487,7 +1490,7 @@ public class Inventory implements Serializable {
                     r3.add(r2[k]);
                 }
                 for (k=0; k<9; k++) {
-                    n = r3.indexOf(ic.ids[k]);
+                    n = r3.indexOf(ic.getIds()[k]);
                     r3.remove(n);
                     removeLocationIC(ic, k, (short) 1);
                     updateIC(ic, k);
@@ -1513,7 +1516,7 @@ public class Inventory implements Serializable {
                     r3.add(r2[k]);
                 }
                 for (k=0; k<4; k++) {
-                    n = r3.indexOf(ic.ids[k]);
+                    n = r3.indexOf(ic.getIds()[k]);
                     r3.remove(n);
                     removeLocationIC(ic, k, (short) 1);
                     updateIC(ic, k);
