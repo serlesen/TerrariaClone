@@ -48,6 +48,7 @@ import javax.swing.event.ChangeListener;
 import com.sergio.refacto.dto.BlockNames;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.Directions;
+import com.sergio.refacto.dto.EntityType;
 import com.sergio.refacto.dto.FileInfo;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.ItemPositionInScreen;
@@ -134,7 +135,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     Entity entity;
     State state = State.LOADING_GRAPHICS;
-    String mobSpawn;
+    EntityType mobSpawn;
 
     int u, v, ou, ov, uNew, vNew;
     int x, y, i, j, t, tx, ty, twx, twy, tlx, tly, ux, uy, ux2, uy2, ulx, uly, ulx2, uly2, ucx, ucy, pwx, pwy, n, dx, dy, dx2, dy2, ax, ay, axl, ayl, vc, xpos, ypos, xpos2, ypos2, x2, y2, rnum, width, height, xmax, ymax;
@@ -192,7 +193,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     static Map<Short, Integer> ITEMBLOCKS;
     static Map<Integer, String> OUTLINES;
     static Map<String, String> UIBLOCKS;
-    static Map<String, String> UIENTITIES;
+    static Map<EntityType, String> UIENTITIES;
     static Map<Integer, Boolean> BLOCKCD;
     static Map<Short, Short> MAXSTACKS;
     static Map<Integer, Integer> SKYLIGHTS;
@@ -1251,13 +1252,13 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         if (RandomTool.nextInt(350) == 0) {
                                             rnum = RandomTool.nextInt(100);
                                             if (rnum >= 0 && rnum < 45) {
-                                                mobSpawn = "blue_bubble"; // 45%
+                                                mobSpawn = EntityType.BLUE_BUBBLE; // 45%
                                             }
                                             if (rnum >= 45 && rnum < 85) {
-                                                mobSpawn = "green_bubble"; // 40%
+                                                mobSpawn = EntityType.GREEN_BUBBLE; // 40%
                                             }
                                             if (rnum >= 85 && rnum < 100) {
-                                                mobSpawn = "red_bubble"; // 15%
+                                                mobSpawn = EntityType.RED_BUBBLE; // 15%
                                             }
                                         }
                                     }
@@ -1265,13 +1266,13 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         if (RandomTool.nextInt(200) == 0) {
                                             rnum = RandomTool.nextInt(100);
                                             if (rnum >= 0 && rnum < 80) {
-                                                mobSpawn = "zombie"; // 80%
+                                                mobSpawn = EntityType.ZOMBIE; // 80%
                                             }
                                             if (rnum >= 80 && rnum < 90) {
-                                                mobSpawn = "armored_zombie"; // 10%
+                                                mobSpawn = EntityType.ARMORED_ZOMBIE; // 10%
                                             }
                                             if (rnum >= 90 && rnum < 100) {
-                                                mobSpawn = "shooting_star"; // 10%
+                                                mobSpawn = EntityType.SHOOTING_STAR; // 10%
                                             }
                                         }
                                     }
@@ -1279,33 +1280,33 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     if (RandomTool.nextInt(100) == 0) {
                                         rnum = RandomTool.nextInt(100);
                                         if (rnum >= 0 && rnum < 25) {
-                                            mobSpawn = "yellow_bubble"; // 25%
+                                            mobSpawn = EntityType.YELLOW_BUBBLE; // 25%
                                         }
                                         if (rnum >= 25 && rnum < 45) {
-                                            mobSpawn = "zombie"; // 20%
+                                            mobSpawn = EntityType.ZOMBIE; // 20%
                                         }
                                         if (rnum >= 45 && rnum < 60) {
-                                            mobSpawn = "armored_zombie"; // 15%
+                                            mobSpawn = EntityType.ARMORED_ZOMBIE; // 15%
                                         }
                                         if (rnum >= 60 && rnum < 70) {
-                                            mobSpawn = "black_bubble"; // 10%
+                                            mobSpawn = EntityType.BLACK_BUBBLE; // 10%
                                         }
                                         if (rnum >= 70 && rnum < 85) {
-                                            mobSpawn = "bat"; // 15%
+                                            mobSpawn = EntityType.BAT; // 15%
                                         }
                                         if (rnum >= 85 && rnum < 100) {
-                                            mobSpawn = "skeleton"; // 15%
+                                            mobSpawn = EntityType.SKELETON; // 15%
                                         }
                                     }
                                 }
                                 if (mobSpawn != null && checkBiome(xpos, ypos).equals("desert")) {
                                     if (RandomTool.nextInt(3) == 0) { // 33% of all spawns in desert
-                                        mobSpawn = "sandbot";
+                                        mobSpawn = EntityType.SANDBOT;
                                     }
                                 }
                                 if (mobSpawn != null && checkBiome(xpos, ypos).equals("frost")) {
                                     if (RandomTool.nextInt(3) == 0) { // 33% of all spawns in desert
-                                        mobSpawn = "snowman";
+                                        mobSpawn = EntityType.SNOWMAN;
                                     }
                                 }
                                 if (mobSpawn == null) {
@@ -1313,41 +1314,33 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 } else if (DebugContext.MOBTEST != null) {
                                     mobSpawn = DebugContext.MOBTEST;
                                 }
-                                if (mobSpawn.equals("blue_bubble") || mobSpawn.equals("green_bubble")
-                                        || mobSpawn.equals("red_bubble") || mobSpawn.equals("yellow_bubble")
-                                        || mobSpawn.equals("black_bubble") || mobSpawn.equals("white_bubble")) {
+                                if (mobSpawn == EntityType.BLUE_BUBBLE || mobSpawn == EntityType.GREEN_BUBBLE
+                                        || mobSpawn == EntityType.RED_BUBBLE || mobSpawn == EntityType.YELLOW_BUBBLE
+                                        || mobSpawn == EntityType.BLACK_BUBBLE || mobSpawn == EntityType.WHITE_BUBBLE) {
                                     xmax = 2;
                                     ymax = 2;
-                                }
-                                if (mobSpawn.equals("zombie")) {
+                                } else if (mobSpawn == EntityType.ZOMBIE) {
                                     xmax = 2;
                                     ymax = 3;
-                                }
-                                if (mobSpawn.equals("armored_zombie")) {
+                                } else if (mobSpawn == EntityType.ARMORED_ZOMBIE) {
                                     xmax = 2;
                                     ymax = 3;
-                                }
-                                if (mobSpawn.equals("shooting_star")) {
+                                } else if (mobSpawn == EntityType.SHOOTING_STAR) {
                                     xmax = 2;
                                     ymax = 2;
-                                }
-                                if (mobSpawn.equals("sandbot")) {
+                                } else if (mobSpawn == EntityType.SANDBOT) {
                                     xmax = 2;
                                     ymax = 2;
-                                }
-                                if (mobSpawn.equals("snowman")) {
+                                } else if (mobSpawn == EntityType.SNOWMAN) {
                                     xmax = 2;
                                     ymax = 3;
-                                }
-                                if (mobSpawn.equals("bat")) {
+                                } else if (mobSpawn == EntityType.BAT) {
                                     xmax = 1;
                                     ymax = 1;
-                                }
-                                if (mobSpawn.equals("bee")) {
+                                } else if (mobSpawn == EntityType.BEE) {
                                     xmax = 1;
                                     ymax = 1;
-                                }
-                                if (mobSpawn.equals("skeleton")) {
+                                } else if (mobSpawn == EntityType.SKELETON) {
                                     xmax = 1;
                                     ymax = 3;
                                 }
@@ -1375,7 +1368,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         worldContainer.mobCount = 0;
 
         for (i = worldContainer.entities.size() - 1; i > -1; i--) {
-            if (worldContainer.entities.get(i).getName() != null) {
+            if (worldContainer.entities.get(i).getEntityType() != null) {
                 worldContainer.mobCount += 1;
                 if (worldContainer.entities.get(i).getIx() < worldContainer.player.ix - 2000 || worldContainer.entities.get(i).getIx() > worldContainer.player.ix + 2000 ||
                         worldContainer.entities.get(i).getIy() < worldContainer.player.iy - 2000 || worldContainer.entities.get(i).getIy() > worldContainer.player.iy + 2000) {
@@ -1784,7 +1777,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     }
                                     if (worldContainer.layer == 1 && !DebugContext.GPLACE && BLOCK_CDS[worldContainer.blockTemp]) {
                                         for (i = 0; i < worldContainer.entities.size(); i++) {
-                                            if (worldContainer.entities.get(i).getName() != null && worldContainer.entities.get(i).getRect().intersects(new Rectangle(ux * BLOCKSIZE, uy * BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
+                                            if (worldContainer.entities.get(i).getEntityType() != null && worldContainer.entities.get(i).getRect().intersects(new Rectangle(ux * BLOCKSIZE, uy * BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                                                 worldContainer.blockTemp = 0;
                                             }
                                         }
@@ -2308,10 +2301,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             if (worldContainer.entities.get(i).update(worldContainer.blocks[1], worldContainer.player, u, v)) {
                 worldContainer.entities.remove(i);
             } else if (worldContainer.player.rect.intersects(worldContainer.entities.get(i).getRect())) {
-                if (worldContainer.entities.get(i).getName() != null) {
+                if (worldContainer.entities.get(i).getEntityType() != null) {
                     if (worldContainer.immune <= 0) {
                         if (!DebugContext.INVINCIBLE) {
-                            worldContainer.player.damage(worldContainer.entities.get(i).getAtk(), true, worldContainer.inventory);
+                            worldContainer.player.damage(worldContainer.entities.get(i).getAttackPoints(), true, worldContainer.inventory);
                         }
                         worldContainer.rgnc1 = 750;
                         worldContainer.immune = 40;
@@ -2434,7 +2427,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         (int) (worldContainer.player.y + worldContainer.player.height / 2 + tool.getWidth() * 1.5 * Math.sin((Math.PI * 1.5) - worldContainer.toolAngle) - tool.getHeight() * 1.5 * Math.cos((Math.PI * 1.5) - worldContainer.toolAngle)));
             }
             for (i = worldContainer.entities.size() - 1; i >= 0; i--) {
-                if (worldContainer.entities.get(i).getName() != null && !worldContainer.entities.get(i).isNohit() && worldContainer.showTool && (worldContainer.entities.get(i).getRect().contains(tp1) || worldContainer.entities.get(i).getRect().contains(tp2) || worldContainer.entities.get(i).getRect().contains(tp3) || worldContainer.entities.get(i).getRect().contains(tp4) || worldContainer.entities.get(i).getRect().contains(tp5)) && (!worldContainer.entities.get(i).getName().equals("bee") || RandomTool.nextInt(4) == 0)) {
+                if (worldContainer.entities.get(i).getEntityType() != null && !worldContainer.entities.get(i).isNohit() && worldContainer.showTool && (worldContainer.entities.get(i).getRect().contains(tp1) || worldContainer.entities.get(i).getRect().contains(tp2) || worldContainer.entities.get(i).getRect().contains(tp3) || worldContainer.entities.get(i).getRect().contains(tp4) || worldContainer.entities.get(i).getRect().contains(tp5)) && (!worldContainer.entities.get(i).getEntityType().equals("bee") || RandomTool.nextInt(4) == 0)) {
                     if (worldContainer.entities.get(i).hit(TOOLDAMAGE.get(worldContainer.inventory.tool()), worldContainer.player)) {
                         ArrayList<Short> dropList = worldContainer.entities.get(i).drops();
                         for (j = 0; j < dropList.size(); j++) {
@@ -2483,7 +2476,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
             for (x = bx1; x <= bx2; x++) {
                 for (y = by1; y <= by2; y++) {
-                    if (worldContainer.blocks[worldContainer.layer][y][x] >= 131 && worldContainer.blocks[worldContainer.layer][y][x] <= 136 && (i == -1 || worldContainer.blocks[worldContainer.layer][y][x] <= 134 && (x != -1 && worldContainer.entities.get(i).getName() != null || worldContainer.blocks[worldContainer.layer][y][x] <= 132))) {
+                    if (worldContainer.blocks[worldContainer.layer][y][x] >= 131 && worldContainer.blocks[worldContainer.layer][y][x] <= 136 && (i == -1 || worldContainer.blocks[worldContainer.layer][y][x] <= 134 && (x != -1 && worldContainer.entities.get(i).getEntityType() != null || worldContainer.blocks[worldContainer.layer][y][x] <= 132))) {
                         if (worldContainer.blocks[worldContainer.layer][y][x] == 131 || worldContainer.blocks[worldContainer.layer][y][x] == 133 || worldContainer.blocks[worldContainer.layer][y][x] == 135) {
                             worldContainer.blocks[worldContainer.layer][y][x] += 1;
                             worldContainer.rdrawn[y][x] = false;
@@ -4012,10 +4005,10 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 }
             }
             for (i = 0; i < worldContainer.entities.size(); i++) {
-                if (UIENTITIES.get(worldContainer.entities.get(i).getName()) != null && worldContainer.entities.get(i).getRect() != null && worldContainer.entities.get(i).getRect().contains(new Point(mousePos2.getX(), mousePos2.getY()))) {
+                if (UIENTITIES.get(worldContainer.entities.get(i).getEntityType().getName()) != null && worldContainer.entities.get(i).getRect() != null && worldContainer.entities.get(i).getRect().contains(new Point(mousePos2.getX(), mousePos2.getY()))) {
                     pg2.setFont(mobFont);
                     pg2.setColor(Color.WHITE);
-                    pg2.drawString(UIENTITIES.get(worldContainer.entities.get(i).getName()) + " (" + worldContainer.entities.get(i).getHp() + "/" + worldContainer.entities.get(i).getThp() + ")", mousePos.getX(), mousePos.getY());
+                    pg2.drawString(UIENTITIES.get(worldContainer.entities.get(i).getEntityType()) + " (" + worldContainer.entities.get(i).getHealthPoints() + "/" + worldContainer.entities.get(i).getTotalHealthPoints() + ")", mousePos.getX(), mousePos.getY());
                     break;
                 }
             }

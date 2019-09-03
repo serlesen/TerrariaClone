@@ -14,7 +14,7 @@ public class DebugContext {
     public static final boolean INVINCIBLE = true;
     public static final int HERBGROW = 1;
     public static final int GRASSGROW = 1;
-    public static final String MOBTEST = null;
+    public static final EntityType MOBTEST = null;
     public static final boolean STATS = true;
     public static final String ITEMS = "testing";
     public static final boolean GPLACE = true;

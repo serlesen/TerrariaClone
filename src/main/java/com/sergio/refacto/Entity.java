@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
 
+import com.sergio.refacto.dto.EntityType;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
@@ -23,7 +24,7 @@ public class Entity implements Serializable {
     int BLOCKSIZE = TerrariaClone.getBLOCKSIZE();
     double mdelay = 0;
 
-    int thp, hp, ap, atk;
+    int totalHealthPoints, healthPoints, armorPoints, attackPoints;
 
     short id, num, dur;
 
@@ -31,7 +32,7 @@ public class Entity implements Serializable {
 
     int dframes, imgDelay;
 
-    String name, AI;
+    EntityType entityType, AI;
 
     ImageState imgState;
 
@@ -41,45 +42,69 @@ public class Entity implements Serializable {
 
     transient BufferedImage image;
 
-    public Entity(double x, double y, double vx, double vy, String name) {
+    public Entity(double x, double y, double vx, double vy, EntityType entityType) {
         this.x = x;
         this.y = y;
         this.vx = vx;
         this.vy = vy;
-        this.name = name;
+        this.entityType = entityType;
         oldx = x;
         oldy = y;
         ix = (int)x;
         iy = (int)y;
         nohit = false;
 
-        if (name.equals("blue_bubble")) { thp = 18; ap = 0; atk = 2; AI = "bubble"; }
-        if (name.equals("green_bubble")) { thp = 25; ap = 0; atk = 4; AI = "bubble"; }
-        if (name.equals("red_bubble")) { thp = 40; ap = 0; atk = 6; AI = "bubble"; }
-        if (name.equals("yellow_bubble")) { thp = 65; ap = 1; atk = 9; AI = "bubble"; }
-        if (name.equals("black_bubble")) { thp = 100; ap = 3; atk = 14; AI = "bubble"; }
-        if (name.equals("white_bubble")) { thp = 70; ap = 2; atk = 11; AI = "fast_bubble"; }
-        if (name.equals("zombie")) { thp = 35; ap = 0; atk = 5; AI = "zombie"; }
-        if (name.equals("armored_zombie")) { thp = 45; ap = 2; atk = 7; AI = "zombie"; }
-        if (name.equals("shooting_star")) { thp = 25; ap = 0; atk = 5; AI = "shooting_star"; }
-        if (name.equals("sandbot")) { thp = 50; ap = 2; atk = 3; AI = "sandbot"; }
-        if (name.equals("sandbot_bullet")) { thp = 1; ap = 0; atk = 7; AI = "bullet"; nohit = false; }
-        if (name.equals("snowman")) { thp = 40; ap = 0; atk = 6; AI = "zombie"; }
-        if (name.equals("bat")) { thp = 15; ap = 0; atk = 5; AI = "bat"; };
-        if (name.equals("bee")) { thp = 1; ap = 0; atk = 5; AI = "bee"; };
-        if (name.equals("skeleton")) { thp = 50; ap = 1; atk = 7; AI = "zombie"; };
+        switch (entityType) {
+            case BLUE_BUBBLE:
+            case GREEN_BUBBLE:
+            case RED_BUBBLE:
+            case YELLOW_BUBBLE:
+            case BLACK_BUBBLE:
+                AI = EntityType.BUBBLE;
+                break;
+            case WHITE_BUBBLE:
+                AI = EntityType.FAST_BUBBLE;
+                break;
+            case ZOMBIE:
+            case ARMORED_ZOMBIE:
+            case SNOWMAN:
+            case SKELETON:
+                AI = EntityType.ZOMBIE;
+                break;
+            case SHOOTING_STAR:
+                AI = EntityType.SHOOTING_STAR;
+                break;
+            case SANDBOT:
+                AI = EntityType.SANDBOT;
+                break;
+            case SANDBOT_BULLET:
+                AI = EntityType.BULLET;
+                break;
+            case BAT:
+                AI = EntityType.BAT;
+                break;
+            case BEE:
+                AI = EntityType.BEE;
+                break;
+        }
 
-        if (AI == "bubble" || AI == "fast_bubble" || AI == "shooting_star" || AI == "sandbot" || AI == "bullet" || AI == "bee") {
-            image = loadImage("sprites/monsters/" + name + "/normal.png");
+        totalHealthPoints = entityType.getHealthPoints();
+        healthPoints = entityType.getHealthPoints();
+        armorPoints = entityType.getArmorPoints();
+        attackPoints = entityType.getAttackPoints();
+
+        if (AI == EntityType.BUBBLE || AI == EntityType.FAST_BUBBLE || AI == EntityType.SHOOTING_STAR || AI == EntityType.SANDBOT || AI == EntityType.BULLET || AI == EntityType.BEE) {
+            image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal.png");
         }
-        if (AI == "zombie") {
-            image = loadImage("sprites/monsters/" + name + "/right_still.png");
+        if (AI == EntityType.ZOMBIE) {
+            image = loadImage("sprites/monsters/" + entityType.getFileName() + "/right_still.png");
         }
-        if (AI == "bat") {
-            image = loadImage("sprites/monsters/" + name + "/normal_right.png");
+        if (AI == EntityType.BAT) {
+            image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal_right.png");
         }
 
-        width = image.getWidth()*2; height = image.getHeight()*2;
+        width = image.getWidth()*2;
+        height = image.getHeight()*2;
 
         ix = (int)x;
         iy = (int)y;
@@ -90,15 +115,12 @@ public class Entity implements Serializable {
 
         imgDelay = 0;
         bcount = 0;
-        if (AI == "bat") {
+        if (AI == EntityType.BAT) {
             imgState = ImageState.NORMAL_RIGHT;
             this.vx = 3;
-        }
-        else {
+        } else {
             imgState = ImageState.STILL_RIGHT;
         }
-
-        hp = thp;
     }
 
     public Entity(double x, double y, double vx, double vy, short id, short num) {
@@ -118,7 +140,6 @@ public class Entity implements Serializable {
         this.y = y;
         this.vx = vx;
         this.vy = vy;
-        this.name = name;
         this.id = id;
         this.num = num;
         this.dur = dur;
@@ -137,7 +158,7 @@ public class Entity implements Serializable {
 
     public boolean update(Integer[][] blocks, Player player, int u, int v) {
         newMob = null;
-        if (name == null) {
+        if (entityType == null) {
             if (!onGround) {
                 vy = vy + 0.3;
                 if (vy > 7) {
@@ -156,12 +177,11 @@ public class Entity implements Serializable {
             collide(blocks, player, u, v);
             mdelay -= 1;
         }
-        if (AI == "bullet") {
+        if (AI == EntityType.BULLET) {
             if (collide(blocks, player, u, v)) {
                 return true;
             }
-        }
-        if (AI == "zombie") {
+        } else if (AI == EntityType.ZOMBIE) {
             if (!onGround) {
                 vy = vy + 0.3;
                 if (vy > 7) {
@@ -173,19 +193,19 @@ public class Entity implements Serializable {
                 if (imgState.isStill() || (imgState.isWalk() && imgState.isRight())) {
                     imgDelay = 10;
                     imgState = ImageState.WALK_LEFT_2;
-                    image = loadImage("sprites/monsters/" + name + "/left_walk.png");
+                    image = loadImage("sprites/monsters/" + entityType.getFileName() + "/left_walk.png");
                 }
                 if (imgDelay <= 0) {
                     if (imgState == ImageState.WALK_LEFT_1) {
                         imgDelay = 10;
                         imgState = ImageState.WALK_LEFT_2;
-                        image = loadImage("sprites/monsters/" + name + "/left_walk.png");
+                        image = loadImage("sprites/monsters/" + entityType.getFileName() + "/left_walk.png");
                     }
                     else {
                         if (imgState == ImageState.WALK_LEFT_2) {
                             imgDelay = 10;
                             imgState = ImageState.WALK_LEFT_1;
-                            image = loadImage("sprites/monsters/" + name + "/left_still.png");
+                            image = loadImage("sprites/monsters/" + entityType.getFileName() + "/left_still.png");
                         }
                     }
                 }
@@ -198,19 +218,19 @@ public class Entity implements Serializable {
                 if (imgState.isStill() || (imgState.isWalk() && imgState.isLeft())) {
                     imgDelay = 10;
                     imgState = ImageState.WALK_RIGHT_2;
-                    image = loadImage("sprites/monsters/" + name + "/right_walk.png");
+                    image = loadImage("sprites/monsters/" + entityType.getFileName() + "/right_walk.png");
                 }
                 if (imgDelay <= 0) {
                     if (imgState == ImageState.WALK_RIGHT_1) {
                         imgDelay = 10;
                         imgState = ImageState.WALK_RIGHT_2;
-                        image = loadImage("sprites/monsters/" + name + "/right_walk.png");
+                        image = loadImage("sprites/monsters/" + entityType.getFileName() + "/right_walk.png");
                     }
                     else {
                         if (imgState == ImageState.WALK_RIGHT_2) {
                             imgDelay = 10;
                             imgState = ImageState.WALK_RIGHT_1;
-                            image = loadImage("sprites/monsters/" + name + "/right_still.png");
+                            image = loadImage("sprites/monsters/" + entityType.getFileName() + "/right_still.png");
                         }
                     }
                 }
@@ -220,15 +240,14 @@ public class Entity implements Serializable {
             }
             if (!grounded) {
                 if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
-                    image = loadImage("sprites/monsters/" + name + "/left_jump.png");
+                    image = loadImage("sprites/monsters/" + entityType.getFileName() + "/left_jump.png");
                 }
                 if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
-                    image = loadImage("sprites/monsters/" + name + "/right_jump.png");
+                    image = loadImage("sprites/monsters/" + entityType.getFileName() + "/right_jump.png");
                 }
             }
             collide(blocks, player, u, v);
-        }
-        if (AI == "bubble") {
+        } else if (AI == EntityType.BUBBLE) {
             if (x > player.x) {
                 vx = Math.max(vx - 0.1, -1.2);
             }
@@ -242,8 +261,7 @@ public class Entity implements Serializable {
                 vy = Math.min(vy + 0.1, 1.2);
             }
             collide(blocks, player, u, v);
-        }
-        if (AI == "fast_bubble") {
+        } else if (AI == EntityType.FAST_BUBBLE) {
             if (x > player.x) {
                 vx = Math.max(vx - 0.2, -2.4);
             }
@@ -257,8 +275,7 @@ public class Entity implements Serializable {
                 vy = Math.min(vy + 0.2, 2.4);
             }
             collide(blocks, player, u, v);
-        }
-        if (AI == "shooting_star") {
+        } else if (AI == EntityType.SHOOTING_STAR) {
             n = Math.atan2(player.y - y, player.x - x);
             vx += Math.cos(n)/10;
             vy += Math.sin(n)/10;
@@ -267,8 +284,7 @@ public class Entity implements Serializable {
             if (vy < -5) vy = -5;
             if (vy > 5) vy = 5;
             collide(blocks, player, u, v);
-        }
-        if (AI == "sandbot") {
+        } else if (AI == EntityType.SANDBOT) {
             if (Math.sqrt(Math.pow(player.x - x, 2) + Math.pow(player.y - y, 2)) > 160) {
                 if (x > player.x) {
                     vx = Math.max(vx - 0.1, -1.2);
@@ -299,25 +315,24 @@ public class Entity implements Serializable {
             }
             bcount += 1;
             if (bcount == 110) {
-                image = loadImage("sprites/monsters/" + name + "/ready1.png");
+                image = loadImage("sprites/monsters/" + entityType.getFileName() + "/ready1.png");
             }
             if (bcount == 130) {
-                image = loadImage("sprites/monsters/" + name + "/ready2.png");
+                image = loadImage("sprites/monsters/" + entityType.getFileName() + "/ready2.png");
             }
             if (bcount == 150) {
                 double theta = Math.atan2(player.y - y, player.x - x);
-                newMob = new Entity(x, y, Math.cos(theta)*3.5, Math.sin(theta)*3.5, name + "_bullet");
+                newMob = new Entity(x, y, Math.cos(theta)*3.5, Math.sin(theta)*3.5, EntityType.SANDBOT_BULLET);
             }
             if (bcount == 170) {
-                image = loadImage("sprites/monsters/" + name + "/ready1.png");
+                image = loadImage("sprites/monsters/" + entityType.getFileName() + "/ready1.png");
             }
             if (bcount == 190) {
-                image = loadImage("sprites/monsters/" + name + "/normal.png");
+                image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal.png");
                 bcount = 0;
             }
             collide(blocks, player, u, v);
-        }
-        if (AI == "bat") {
+        } else if (AI == EntityType.BAT) {
             if (vx > 3) {
                 vx = 3;
             }
@@ -333,37 +348,36 @@ public class Entity implements Serializable {
             imgDelay -= 1;
             if (vx > 0 && imgState != ImageState.NORMAL_RIGHT) {
                 imgState = ImageState.NORMAL_RIGHT;
-                image = loadImage("sprites/monsters/" + name + "/normal_right.png");
+                image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal_right.png");
                 imgDelay = 10;
             }
             if (vx < 0 && imgState != ImageState.NORMAL_LEFT) {
                 imgState = ImageState.NORMAL_LEFT;
-                image = loadImage("sprites/monsters/" + name + "/normal_left.png");
+                image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal_left.png");
                 imgDelay = 10;
             }
             if (imgState == ImageState.NORMAL_LEFT && imgDelay <= 0) {
                 imgState = ImageState.FLAP_LEFT;
-                image = loadImage("sprites/monsters/" + name + "/flap_left.png");
+                image = loadImage("sprites/monsters/" + entityType.getFileName() + "/flap_left.png");
                 imgDelay = 10;
             }
             if (imgState == ImageState.NORMAL_RIGHT && imgDelay <= 0) {
                 imgState = ImageState.FLAP_RIGHT;
-                image = loadImage("sprites/monsters/" + name + "/flap_right.png");
+                image = loadImage("sprites/monsters/" + entityType.getFileName() + "/flap_right.png");
                 imgDelay = 10;
             }
             if (imgState == ImageState.FLAP_LEFT && imgDelay <= 0) {
                 imgState = ImageState.NORMAL_LEFT;
-                image = loadImage("sprites/monsters/" + name + "/normal_left.png");
+                image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal_left.png");
                 imgDelay = 10;
             }
             if (imgState == ImageState.FLAP_RIGHT && imgDelay <= 0) {
                 imgState = ImageState.NORMAL_RIGHT;
-                image = loadImage("sprites/monsters/" + name + "/normal_right.png");
+                image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal_right.png");
                 imgDelay = 10;
             }
             collide(blocks, player, u, v);
-        }
-        if (AI == "bee") {
+        } else if (AI == EntityType.BEE) {
             double theta = Math.atan2(player.y - y, player.x - x);
             vx = Math.cos(theta)*2.5;
             vy = Math.sin(theta)*2.5;
@@ -401,18 +415,18 @@ public class Entity implements Serializable {
                 for (j=by1; j<=by2; j++) {
                     if (blocks[j][i] != 0 && TerrariaClone.getBLOCKCD().get(blocks[j+v][i+u])) {
                         if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
-                            if (oldx <= i*16 - width && (vx > 0 || AI == "shooting_star")) {
+                            if (oldx <= i*16 - width && (vx > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 x = i*16 - width;
-                                if (AI == "bubble") {
+                                if (AI == EntityType.BUBBLE) {
                                     vx = -vx;
                                 }
-                                else if (AI == "zombie") {
+                                else if (AI == EntityType.ZOMBIE) {
                                     vx = 0;
                                     if (onGround && player.x > x) {
                                         vy = -7;
                                     }
                                 }
-                                else if (AI == "bat") {
+                                else if (AI == EntityType.BAT) {
                                     vx = -vx;
                                 }
                                 else {
@@ -420,18 +434,18 @@ public class Entity implements Serializable {
                                 }
                                 rv = true;
                             }
-                            if (oldx >= i*16 + BLOCKSIZE && (vx < 0 || AI == "shooting_star")) {
+                            if (oldx >= i*16 + BLOCKSIZE && (vx < 0 || AI == EntityType.SHOOTING_STAR)) {
                                 x = i*16 + BLOCKSIZE;
-                                if (AI == "bubble") {
+                                if (AI == EntityType.BUBBLE) {
                                     vx = -vx;
                                 }
-                                else if (AI == "zombie") {
+                                else if (AI == EntityType.ZOMBIE) {
                                     vx = 0;
                                     if (onGround && player.x < x) {
                                         vy = -7;
                                     }
                                 }
-                                else if (AI == "bat") {
+                                else if (AI == EntityType.BAT) {
                                     vx = -vx;
                                 }
                                 else {
@@ -466,10 +480,10 @@ public class Entity implements Serializable {
                 for (j=by1; j<=by2; j++) {
                     if (blocks[j][i] != 0 && TerrariaClone.getBLOCKCD().get(blocks[j+v][i+u])) {
                         if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
-                            if (oldy <= j*16 - height && (vy > 0 || AI == "shooting_star")) {
+                            if (oldy <= j*16 - height && (vy > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 y = j*16 - height;
                                 onGround = true;
-                                if (AI == "bubble") {
+                                if (AI == EntityType.BUBBLE) {
                                     vy = -vy;
                                 }
                                 else {
@@ -477,9 +491,9 @@ public class Entity implements Serializable {
                                 }
                                 rv = true;
                             }
-                            if (oldy >= j*16 + BLOCKSIZE && (vy < 0 || AI == "shooting_star")) {
+                            if (oldy >= j*16 + BLOCKSIZE && (vy < 0 || AI == EntityType.SHOOTING_STAR)) {
                                 y = j*16 + BLOCKSIZE;
-                                if (AI == "bubble") {
+                                if (AI == EntityType.BUBBLE) {
                                     vy = -vy;
                                 }
                                 else {
@@ -505,9 +519,9 @@ public class Entity implements Serializable {
 
     public boolean hit(int damage, Player player) {
         if (!immune && !nohit) {
-            hp -= Math.max(1, damage - ap);
+            healthPoints -= Math.max(1, damage - armorPoints);
             immune = true;
-            if (AI == "shooting_star") {
+            if (AI == EntityType.SHOOTING_STAR) {
                 if (player.x + player.width/2 < x + width/2) {
                     vx = 4;
                 }
@@ -525,52 +539,44 @@ public class Entity implements Serializable {
                 vy -= 1.2;
             }
         }
-        return hp <= 0;
+        return healthPoints <= 0;
     }
 
     public ArrayList<Short> drops() {
         ArrayList<Short> dropList = new ArrayList<Short>();
-        if (name == "blue_bubble") {
+        if (entityType == EntityType.BLUE_BUBBLE) {
             for (i=0; i< RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)97));
             }
-        }
-        if (name == "green_bubble") {
+        } else if (entityType == EntityType.GREEN_BUBBLE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)98));
             }
-        }
-        if (name == "red_bubble") {
+        } else if (entityType == EntityType.RED_BUBBLE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)99));
             }
-        }
-        if (name == "yellow_bubble") {
+        } else if (entityType == EntityType.YELLOW_BUBBLE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)100));
             }
-        }
-        if (name == "black_bubble") {
+        } else if (entityType == EntityType.BLACK_BUBBLE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)101));
             }
-        }
-        if (name == "white_bubble") {
+        } else if (entityType == EntityType.WHITE_BUBBLE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)102));
             }
-        }
-        if (name == "shooting_star") {
+        } else if (entityType == EntityType.SHOOTING_STAR) {
             for (i=0; i<RandomTool.nextInt(2); i++) {
                 dropList.add(new Short((short)103));
             }
-        }
-        if (name == "zombie") {
+        } else if (entityType == EntityType.ZOMBIE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)104));
             }
-        }
-        if (name == "armored_zombie") {
+        } else if (entityType == EntityType.ARMORED_ZOMBIE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)104));
             }
@@ -586,8 +592,7 @@ public class Entity implements Serializable {
             if (RandomTool.nextInt(15) == 0) {
                 dropList.add(new Short((short)112));
             }
-        }
-        if (name == "sandbot") {
+        } else if (entityType == EntityType.SANDBOT) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)74));
             }
@@ -597,8 +602,7 @@ public class Entity implements Serializable {
             if (RandomTool.nextInt(6) == 0) {
                 dropList.add(new Short((short)45));
             }
-        }
-        if (name == "snowman") {
+        } else if (entityType == EntityType.SNOWMAN) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)75));
             }
@@ -607,11 +611,11 @@ public class Entity implements Serializable {
     }
 
     public void reloadImage() {
-        if (AI.equals("bubble") || AI.equals("shooting_star")) {
-            image = loadImage("sprites/monsters/" + name + "/normal.png");
+        if (AI == EntityType.BUBBLE || AI == EntityType.SHOOTING_STAR) {
+            image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal.png");
         }
-        if (AI.equals("zombie")) {
-            image = loadImage("sprites/monsters/" + name + "/right_still.png");
+        if (AI == EntityType.ZOMBIE) {
+            image = loadImage("sprites/monsters/" + entityType.getFileName() + "/right_still.png");
         }
     }
 
