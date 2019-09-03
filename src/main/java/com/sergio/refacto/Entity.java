@@ -8,6 +8,7 @@ import java.util.*;
 import javax.imageio.ImageIO;
 
 import com.sergio.refacto.dto.ImageState;
+import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -529,77 +530,76 @@ public class Entity implements Serializable {
 
     public ArrayList<Short> drops() {
         ArrayList<Short> dropList = new ArrayList<Short>();
-        Random random = TerrariaClone.getRandom();
         if (name == "blue_bubble") {
-            for (i=0; i<random.nextInt(3); i++) {
+            for (i=0; i< RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)97));
             }
         }
         if (name == "green_bubble") {
-            for (i=0; i<random.nextInt(3); i++) {
+            for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)98));
             }
         }
         if (name == "red_bubble") {
-            for (i=0; i<random.nextInt(3); i++) {
+            for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)99));
             }
         }
         if (name == "yellow_bubble") {
-            for (i=0; i<random.nextInt(3); i++) {
+            for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)100));
             }
         }
         if (name == "black_bubble") {
-            for (i=0; i<random.nextInt(3); i++) {
+            for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)101));
             }
         }
         if (name == "white_bubble") {
-            for (i=0; i<random.nextInt(3); i++) {
+            for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)102));
             }
         }
         if (name == "shooting_star") {
-            for (i=0; i<random.nextInt(2); i++) {
+            for (i=0; i<RandomTool.nextInt(2); i++) {
                 dropList.add(new Short((short)103));
             }
         }
         if (name == "zombie") {
-            for (i=0; i<random.nextInt(3); i++) {
+            for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)104));
             }
         }
         if (name == "armored_zombie") {
-            for (i=0; i<random.nextInt(3); i++) {
+            for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)104));
             }
-            if (random.nextInt(15) == 0) {
+            if (RandomTool.nextInt(15) == 0) {
                 dropList.add(new Short((short)109));
             }
-            if (random.nextInt(15) == 0) {
+            if (RandomTool.nextInt(15) == 0) {
                 dropList.add(new Short((short)110));
             }
-            if (random.nextInt(15) == 0) {
+            if (RandomTool.nextInt(15) == 0) {
                 dropList.add(new Short((short)111));
             }
-            if (random.nextInt(15) == 0) {
+            if (RandomTool.nextInt(15) == 0) {
                 dropList.add(new Short((short)112));
             }
         }
         if (name == "sandbot") {
-            for (i=0; i<random.nextInt(3); i++) {
+            for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)74));
             }
-            if (random.nextInt(2) == 0) {
+            if (RandomTool.nextInt(2) == 0) {
                 dropList.add(new Short((short)44));
             }
-            if (random.nextInt(6) == 0) {
+            if (RandomTool.nextInt(6) == 0) {
                 dropList.add(new Short((short)45));
             }
         }
         if (name == "snowman") {
-            for (i=0; i<random.nextInt(3); i++) {
+            for (i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(new Short((short)75));
             }
         }

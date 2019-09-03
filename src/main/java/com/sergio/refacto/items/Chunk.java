@@ -2,6 +2,7 @@ package com.sergio.refacto.items;
 
 import com.sergio.refacto.TerrariaClone;
 import com.sergio.refacto.World;
+import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -30,7 +31,7 @@ public class Chunk {
         this.cx = cx;
         this.cy = cy;
 
-        Object[] rv = World.generateChunk(cx, cy, TerrariaClone.getRandom());
+        Object[] rv = World.generateChunk(cx, cy);
         blocks = (Integer[][][])rv[0];
         blockds = (Byte[][][])rv[1];
         blockdns = (Byte[][])rv[2];

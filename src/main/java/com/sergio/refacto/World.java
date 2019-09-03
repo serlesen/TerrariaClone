@@ -1,9 +1,8 @@
 package com.sergio.refacto;
 
-import java.util.Random;
-
 import com.sergio.refacto.dto.Constants;
 import com.sergio.refacto.tools.PerlinNoise;
+import com.sergio.refacto.tools.RandomTool;
 
 public class World {
 
@@ -12,12 +11,10 @@ public class World {
     private static double f;
     private static short type;
 
-    private static Random random;
-
     private static boolean[][] coordlist;
     private static boolean[][] coordlist2;
 
-    public static Object[] generateChunk(int cx, int cy, Random random) {
+    public static Object[] generateChunk(int cx, int cy) {
         int size = TerrariaClone.CHUNKBLOCKS;
         Integer[][][] blocks = new Integer[3][size][size];
         Byte[][][] blockds = new Byte[3][size][size];
@@ -46,9 +43,9 @@ public class World {
                     arbprd[l][y][x] = false;
                     power[l][y][x] = (float)0;
                 }
-                blockdns[y][x] = (byte)random.nextInt(5);
+                blockdns[y][x] = (byte) RandomTool.nextInt(5);
                 blockbgs[y][x] = 0;
-                blockts[y][x] = (byte)random.nextInt(8);
+                blockts[y][x] = (byte) RandomTool.nextInt(8);
                 lights[y][x] = (float)19;
                 lsources[y][x] = false;
                 wcnct[y][x] = false;
