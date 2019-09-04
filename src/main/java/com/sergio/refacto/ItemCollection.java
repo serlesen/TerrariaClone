@@ -50,11 +50,11 @@ public class ItemCollection implements Serializable {
         this.durs = ic.durs;
     }
 
-    public boolean areIdsEquals(Short[] inputIds) {
+    public boolean areIdsEquals(short[] inputValues) {
         boolean valid = true;
 
-        for (int i = 0; i < 4; i++) {
-            if (ids[i] != inputIds[i]) {
+        for (int i = 0; i < inputValues.length; i++) {
+            if (ids[i] != inputValues[i]) {
                 valid = false;
                 break;
             }
@@ -63,14 +63,14 @@ public class ItemCollection implements Serializable {
         return valid;
     }
 
-    public boolean areInvalidIds(Short[] inputIds) {
+    public boolean areInvalidIds(short[] inputValues) {
         boolean valid = true;
 
         List<Short> r3 = new ArrayList<>(6);
-        for (int j=0; j<inputIds.length-2; j++) {
-            r3.add(inputIds[j]);
+        for (int j = 0; j < inputValues.length - 2; j++) {
+            r3.add(inputValues[j]);
         }
-        for (int j=0; j<4; j++) {
+        for (int j = 0; j < inputValues.length; j++) {
             int n = r3.indexOf(ids[j]);
             if (n == -1) {
                 valid = false;

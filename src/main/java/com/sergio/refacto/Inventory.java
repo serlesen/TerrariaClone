@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import com.sergio.refacto.dto.ItemType;
+import com.sergio.refacto.dto.RecipeItem;
 
 public class Inventory implements Serializable {
 
@@ -28,9 +29,6 @@ public class Inventory implements Serializable {
     short[] ids;
     short[] nums;
     short[] durs;
-    private Short[][] list_thing;
-    private short[][] r1;
-    private short[] r2;
 
     private int trolx = 37;
     private int troly = 17;
@@ -39,7 +37,7 @@ public class Inventory implements Serializable {
 
     private ItemCollection ic;
 
-    private Map<String,Short[][]> RECIPES;
+    private Map<String, RecipeItem[]> RECIPES;
 
     public Inventory() {
         ids = new short[40];
@@ -82,757 +80,276 @@ public class Inventory implements Serializable {
             }
         }
 
-        RECIPES = new HashMap<String,Short[][]>();
+        RECIPES = new HashMap<>();
 
-        Short[][] list_thing1 = {
-            {15, 15, 15,
-                0, 15, 0,
-            0, 15, 0, 154, 1}, // Wooden Pick
-            {2, 2, 2,
-                0, 15, 0,
-            0, 15, 0, 157, 1}, // Stone Pick
-            {29, 29, 29,
-                0, 15, 0,
-            0, 15, 0, 7, 1}, // Copper Pick
-            {30, 30, 30,
-                0, 15, 0,
-            0, 15, 0, 8, 1}, // Iron Pick
-            {31, 31, 31,
-                0, 15, 0,
-            0, 15, 0, 9, 1}, // Silver Pick
-            {32, 32, 32,
-                0, 15, 0,
-            0, 15, 0, 10, 1}, // Gold Pick
-            {60, 60, 60,
-                0, 15, 0,
-            0, 15, 0, 51, 1}, // Zinc Pick
-            {61, 61, 61,
-                0, 15, 0,
-            0, 15, 0, 54, 1}, // Rhymestone Pick
-            {62, 62, 62,
-                0, 15, 0,
-            0, 15, 0, 57, 1}, // Obdurite Pick
-            {73, 73, 73,
-                0, 15, 0,
-            0, 15, 0, 169, 1}, // Magnetite Pick
-            {69, 69, 69,
-                0, 15, 0,
-            0, 15, 0, 172, 1}, // Irradium Pick
-            {15, 15, 0,
-                15, 15, 0,
-            0, 15, 0, 155, 1}, // Wooden Axe
-            {0, 15, 15,
-                0, 15, 15,
-            0, 15, 0, 155, 1},
-            {15, 15, 0,
-                15, 15, 0,
-            15, 0, 0, 155, 1},
-            {0, 15, 15,
-                0, 15, 15,
-            0, 0, 15, 155, 1},
-            {2, 2, 0,
-                2, 15, 0,
-            0, 15, 0, 158, 1}, // Stone Axe
-            {0, 2, 2,
-                0, 15, 2,
-            0, 15, 0, 158, 1},
-            {2, 2, 0,
-                15, 2, 0,
-            15, 0, 0, 158, 1},
-            {0, 2, 2,
-                0, 2, 15,
-            0, 0, 15, 158, 1},
-            {29, 29, 0,
-                29, 15, 0,
-            0, 15, 0, 11, 1}, // Copper Axe
-            {0, 29, 29,
-                0, 15, 29,
-            0, 15, 0, 11, 1},
-            {29, 29, 0,
-                15, 29, 0,
-            15, 0, 0, 11, 1},
-            {0, 29, 29,
-                0, 29, 15,
-            0, 0, 15, 11, 1},
-            {30, 30, 0,
-                30, 15, 0,
-            0, 15, 0, 11, 1}, // Iron Axe
-            {0, 30, 30,
-                0, 15, 30,
-            0, 15, 0, 11, 1},
-            {30, 30, 0,
-                15, 30, 0,
-            15, 0, 0, 11, 1},
-            {0, 30, 30,
-                0, 30, 15,
-            0, 0, 15, 11, 1},
-            {31, 31, 0,
-                31, 15, 0,
-            0, 15, 0, 11, 1}, // Silver Axe
-            {0, 31, 31,
-                0, 15, 31,
-            0, 15, 0, 11, 1},
-            {31, 31, 0,
-                15, 31, 0,
-            15, 0, 0, 11, 1},
-            {0, 31, 31,
-                0, 31, 15,
-            0, 0, 15, 11, 1},
-            {32, 32, 0,
-                32, 15, 0,
-            0, 15, 0, 11, 1}, // Gold Axe
-            {0, 32, 32,
-                0, 15, 32,
-            0, 15, 0, 11, 1},
-            {32, 32, 0,
-                15, 32, 0,
-            15, 0, 0, 11, 1},
-            {0, 32, 32,
-                0, 32, 15,
-            0, 0, 15, 11, 1},
-            {60, 60, 0,
-                60, 15, 0,
-            0, 15, 0, 52, 1}, // Zinc Axe
-            {0, 60, 60,
-                0, 15, 60,
-            0, 15, 0, 52, 1},
-            {60, 60, 0,
-                15, 60, 0,
-            15, 0, 0, 52, 1},
-            {0, 60, 60,
-                0, 60, 15,
-            0, 0, 15, 52, 1},
-            {61, 61, 0,
-                61, 15, 0,
-            0, 15, 0, 55, 1}, // Rhymestone Axe
-            {0, 61, 61,
-                0, 15, 61,
-            0, 15, 0, 55, 1},
-            {61, 61, 0,
-                15, 61, 0,
-            15, 0, 0, 55, 1},
-            {0, 61, 61,
-                0, 61, 15,
-            0, 0, 15, 55, 1},
-            {62, 62, 0,
-                62, 15, 0,
-            0, 15, 0, 58, 1}, // Obdurite Axe
-            {0, 62, 62,
-                0, 15, 62,
-            0, 15, 0, 58, 1},
-            {62, 62, 0,
-                15, 62, 0,
-            15, 0, 0, 58, 1},
-            {0, 62, 62,
-                0, 62, 15,
-            0, 0, 15, 58, 1},
-            {73, 73, 0,
-                73, 15, 0,
-            0, 15, 0, 170, 1}, // Magnetite Axe
-            {0, 73, 73,
-                0, 15, 73,
-            0, 15, 0, 170, 1},
-            {73, 73, 0,
-                15, 73, 0,
-            15, 0, 0, 170, 1},
-            {0, 73, 73,
-                0, 73, 15,
-            0, 0, 15, 170, 1},
-            {69, 69, 0,
-                69, 15, 0,
-            0, 15, 0, 169, 1}, // Irradium Axe
-            {0, 69, 69,
-                0, 15, 69,
-            0, 15, 0, 169, 1},
-            {69, 69, 0,
-                15, 69, 0,
-            15, 0, 0, 169, 1},
-            {0, 69, 69,
-                0, 69, 15,
-            0, 0, 15, 169, 1},
-            {15, 0, 0,
-                15, 0, 0,
-            15, 0, 0, 156, 1}, // Wooden Sword
-            {0, 15, 0,
-                0, 15, 0,
-            0, 15, 0, 156, 1},
-            {0, 0, 15,
-                0, 0, 15,
-            0, 0, 15, 156, 1},
-            {2, 0, 0,
-                2, 0, 0,
-            15, 0, 0, 159, 1}, // Stone Sword
-            {0, 2, 0,
-                0, 2, 0,
-            0, 15, 0, 159, 1},
-            {0, 0, 2,
-                0, 0, 2,
-            0, 0, 15, 159, 1},
-            {29, 0, 0,
-                29, 0, 0,
-            15, 0, 0, 16, 1}, // Copper Sword
-            {0, 29, 0,
-                0, 29, 0,
-            0, 15, 0, 16, 1},
-            {0, 0, 29,
-                0, 0, 29,
-            0, 0, 15, 16, 1},
-            {30, 0, 0,
-                30, 0, 0,
-            15, 0, 0, 17, 1}, // Iron Sword
-            {0, 30, 0,
-                0, 30, 0,
-            0, 15, 0, 17, 1},
-            {0, 0, 30,
-                0, 0, 30,
-            0, 0, 15, 17, 1},
-            {31, 0, 0,
-                31, 0, 0,
-            15, 0, 0, 18, 1}, // Silver Sword
-            {0, 31, 0,
-                0, 31, 0,
-            0, 15, 0, 18, 1},
-            {0, 0, 31,
-                0, 0, 31,
-            0, 0, 15, 18, 1},
-            {32, 0, 0,
-                32, 0, 0,
-            15, 0, 0, 19, 1}, // Gold Sword
-            {0, 32, 0,
-                0, 32, 0,
-            0, 15, 0, 19, 1},
-            {0, 0, 32,
-                0, 0, 32,
-            0, 0, 15, 19, 1},
-            {38, 0, 0,
-                38, 0, 0,
-            15, 0, 0, 19, 1}, // Zinc Sword
-            {0, 38, 0,
-                0, 38, 0,
-            0, 15, 0, 19, 1},
-            {0, 0, 38,
-                0, 0, 38,
-            0, 0, 15, 19, 1},
-            {39, 0, 0,
-                39, 0, 0,
-            15, 0, 0, 19, 1}, // Rhymestone Sword
-            {0, 39, 0,
-                0, 39, 0,
-            0, 15, 0, 19, 1},
-            {0, 0, 39,
-                0, 0, 39,
-            0, 0, 15, 19, 1},
-            {40, 0, 0,
-                40, 0, 0,
-            15, 0, 0, 19, 1}, // Obdurite Sword
-            {0, 40, 0,
-                0, 40, 0,
-            0, 15, 0, 19, 1},
-            {0, 0, 40,
-                0, 0, 40,
-            0, 0, 15, 19, 1},
-            {73, 0, 0,
-                73, 0, 0,
-            15, 0, 0, 171, 1}, // Magnetite Sword
-            {0, 73, 0,
-                0, 73, 0,
-            0, 15, 0, 171, 1},
-            {0, 0, 73,
-                0, 0, 73,
-            0, 0, 15, 171, 1},
-            {69, 0, 0,
-                69, 0, 0,
-            15, 0, 0, 174, 1}, // Irradium Sword
-            {0, 69, 0,
-                0, 69, 0,
-            0, 15, 0, 174, 1},
-            {0, 0, 69,
-                0, 0, 69,
-            0, 0, 15, 174, 1},
-            {63, 0, 63,
-                0, 63, 0,
-            0, 63, 0, 190, 1}, // Wrench
-            {15, 0, 0,
-                2, 0, 0,
-            175, 0, 0, 178, 1}, // Lever
-            {0, 15, 0,
-                0, 2, 0,
-            0, 175, 0, 178, 1},
-            {0, 0, 15,
-                0, 0, 2,
-            0, 0, 175, 178, 1},
-            {29, 29, 29,
-                29, 0, 29,
-            0, 0, 0, 105, 1}, // Copper Helmet
-            {0, 0, 0,
-                29, 29, 29,
-            29, 0, 29, 105, 1},
-            {29, 0, 29,
-                29, 29, 29,
-            29, 29, 29, 106, 1}, // Copper Chestplate
-            {29, 29, 29,
-                29, 0, 29,
-            29, 0, 29, 107, 1}, // Copper Leggings
-            {29, 0, 29,
-                29, 0, 29,
-            0, 0, 0, 108, 1}, // Copper Greaves
-            {0, 0, 0,
-                29, 0, 29,
-            29, 0, 29, 108, 1},
-            {30, 30, 30,
-                30, 0, 30,
-            0, 0, 0, 109, 1}, // Iron Helmet
-            {0, 0, 0,
-                30, 30, 30,
-            30, 0, 30, 109, 1},
-            {30, 0, 30,
-                30, 30, 30,
-            30, 30, 30, 110, 1}, // Iron Chestplate
-            {30, 30, 30,
-                30, 0, 30,
-            30, 0, 30, 111, 1}, // Iron Leggings
-            {30, 0, 30,
-                30, 0, 30,
-            0, 0, 0, 112, 1}, // Iron Greaves
-            {0, 0, 0,
-                30, 0, 30,
-            30, 0, 30, 112, 1},
-            {31, 31, 31,
-                31, 0, 31,
-            0, 0, 0, 113, 1}, // Silver Helmet
-            {0, 0, 0,
-                31, 31, 31,
-            31, 0, 31, 113, 1},
-            {31, 0, 31,
-                31, 31, 31,
-            31, 31, 31, 114, 1}, // Silver Chestplate
-            {31, 31, 31,
-                31, 0, 31,
-            31, 0, 31, 115, 1}, // Silver Leggings
-            {31, 0, 31,
-                31, 0, 31,
-            0, 0, 0, 116, 1}, // Silver Greaves
-            {0, 0, 0,
-                31, 0, 31,
-            31, 0, 31, 116, 1},
-            {32, 32, 32,
-                32, 0, 32,
-            0, 0, 0, 117, 1}, // Gold Helmet
-            {0, 0, 0,
-                32, 32, 32,
-            32, 0, 32, 117, 1},
-            {32, 0, 32,
-                32, 32, 32,
-            32, 32, 32, 118, 1}, // Gold Chestplate
-            {32, 32, 32,
-                32, 0, 32,
-            32, 0, 32, 119, 1}, // Gold Leggings
-            {32, 0, 32,
-                32, 0, 32,
-            0, 0, 0, 120, 1}, // Gold Greaves
-            {0, 0, 0,
-                32, 0, 32,
-            32, 0, 32, 120, 1},
-            {60, 60, 60,
-                60, 0, 60,
-            0, 0, 0, 121, 1}, // Zinc Helmet
-            {0, 0, 0,
-                60, 60, 60,
-            60, 0, 60, 121, 1},
-            {60, 0, 60,
-                60, 60, 60,
-            60, 60, 60, 122, 1}, // Zinc Chestplate
-            {60, 60, 60,
-                60, 0, 60,
-            60, 0, 60, 123, 1}, // Zinc Leggings
-            {60, 0, 60,
-                60, 0, 60,
-            0, 0, 0, 124, 1}, // Zinc Greaves
-            {0, 0, 0,
-                60, 0, 60,
-            60, 0, 60, 124, 1},
-            {61, 61, 61,
-                61, 0, 61,
-            0, 0, 0, 125, 1}, // Rhymestone Helmet
-            {0, 0, 0,
-                61, 61, 61,
-            61, 0, 61, 125, 1},
-            {61, 0, 61,
-                61, 61, 61,
-            61, 61, 61, 126, 1}, // Rhymestone Chestplate
-            {61, 61, 61,
-                61, 0, 61,
-            61, 0, 61, 127, 1}, // Rhymestone Leggings
-            {61, 0, 61,
-                61, 0, 61,
-            0, 0, 0, 128, 1}, // Rhymestone Greaves
-            {0, 0, 0,
-                61, 0, 61,
-            61, 0, 61, 128, 1},
-            {62, 62, 62,
-                62, 0, 62,
-            0, 0, 0, 129, 1}, // Obdurite Helmet
-            {0, 0, 0,
-                62, 62, 62,
-            62, 0, 62, 129, 1},
-            {62, 0, 62,
-                62, 62, 62,
-            62, 62, 62, 130, 1}, // Obdurite Chestplate
-            {62, 62, 62,
-                62, 0, 62,
-            62, 0, 62, 131, 1}, // Obdurite Leggings
-            {62, 0, 62,
-                62, 0, 62,
-            0, 0, 0, 132, 1}, // Obdurite Greaves
-            {0, 0, 0,
-                62, 0, 62,
-            62, 0, 62, 132, 1},
-            {63, 63, 63,
-                63, 0, 63,
-            0, 0, 0, 133, 1}, // Aluminum Helmet
-            {0, 0, 0,
-                63, 63, 63,
-            63, 0, 63, 133, 1},
-            {63, 0, 63,
-                63, 63, 63,
-            63, 63, 63, 134, 1}, // Aluminum Chestplate
-            {63, 63, 63,
-                63, 0, 63,
-            63, 0, 63, 135, 1}, // Aluminum Leggings
-            {63, 0, 63,
-                63, 0, 63,
-            0, 0, 0, 136, 1}, // Aluminum Greaves
-            {0, 0, 0,
-                63, 0, 63,
-            63, 0, 63, 136, 1},
-            {64, 64, 64,
-                64, 0, 64,
-            0, 0, 0, 137, 1}, // Lead Helmet
-            {0, 0, 0,
-                64, 64, 64,
-            64, 0, 64, 137, 1},
-            {64, 0, 64,
-                64, 64, 64,
-            64, 64, 64, 138, 1}, // Lead Chestplate
-            {64, 64, 64,
-                64, 0, 64,
-            64, 0, 64, 139, 1}, // Lead Leggings
-            {64, 0, 64,
-                64, 0, 64,
-            0, 0, 0, 140, 1}, // Lead Greaves
-            {0, 0, 0,
-                64, 0, 64,
-            64, 0, 64, 140, 1},
-            {15, 15, 15,
-                15, 0, 15,
-            15, 15, 15, 21, 1}, // Wooden Chest
-            {2, 2, 2,
-                2, 21, 2,
-            2, 2, 2, 22, 1}, // Stone Chest
-            {29, 29, 29,
-                29, 22, 29,
-            29, 29, 29, 23, 1}, // Copper Chest
-            {30, 30, 30,
-                30, 22, 30,
-            30, 30, 30, 24, 1}, // Iron Chest
-            {31, 31, 31,
-                31, 22, 31,
-            31, 31, 31, 25, 1}, // Silver Chest
-            {32, 32, 32,
-                32, 22, 32,
-            32, 32, 32, 26, 1}, // Gold Chest
-            {60, 60, 60,
-                60, 22, 60,
-            60, 60, 60, 151, 1}, // Zinc Chest
-            {61, 61, 61,
-                61, 22, 61,
-            61, 61, 61, 152, 1}, // Rhymestone Chest
-            {62, 62, 62,
-                62, 22, 62,
-            62, 62, 62, 153, 1}, // Obdurite Chest
-            {76, 76, 76,
-                76, 34, 76,
-            76, 175, 76, 177, 1}, // Zythium Lamp
-            {76, 76, 76,
-                175, 44, 175,
-            76, 76, 76, 180, 1}, // Zythium Amplifier
-            {76, 76, 76,
-                44, 175, 44,
-            76, 76, 76, 181, 1}, // Zythium Inverter
-            {76, 175, 76,
-                175, 175, 175,
-            76, 175, 76, 186, 1}, // Zythium Delayer
-            {15, 15, 0,
-                15, 15, 0,
-            0, 0, 0, 20, 1}, // Workbench
-            {0, 15, 15,
-                0, 15, 15,
-            0, 0, 0, 20, 1},
-            {0, 0, 0,
-                15, 15, 0,
-            15, 15, 0, 20, 1},
-            {0, 0, 0,
-                0, 15, 15,
-            0, 15, 15, 20, 1},
-            {160, 160, 0,
-                160, 160, 0,
-            0, 0, 0, 15, 1}, // Bark -> Wood
-            {0, 160, 160,
-                0, 160, 160,
-            0, 0, 0, 15, 1},
-            {0, 0, 0,
-                160, 160, 0,
-            160, 160, 0, 15, 1},
-            {0, 0, 0,
-                0, 160, 160,
-            0, 160, 160, 15, 1},
-            {2, 2, 0,
-                2, 2, 0,
-            0, 0, 0, 161, 4}, // Cobblestone
-            {0, 2, 2,
-                0, 2, 2,
-            0, 0, 0, 161, 4},
-            {0, 0, 0,
-                2, 2, 0,
-            2, 2, 0, 161, 4},
-            {0, 0, 0,
-                0, 2, 2,
-            0, 2, 2, 161, 4},
-            {162, 162, 0,
-                162, 162, 0,
-            0, 0, 0, 163, 4}, // Chiseled Cobblestone
-            {0, 162, 162,
-                0, 162, 162,
-            0, 0, 0, 163, 4},
-            {0, 0, 0,
-                162, 162, 0,
-            162, 162, 0, 163, 4},
-            {0, 0, 0,
-                0, 162, 162,
-            0, 162, 162, 163, 4},
-            {163, 163, 0,
-                163, 163, 0,
-            0, 0, 0, 164, 4}, // Stone Bricks
-            {0, 163, 163,
-                0, 163, 163,
-            0, 0, 0, 164, 4},
-            {0, 0, 0,
-                163, 163, 0,
-            163, 163, 0, 164, 4},
-            {0, 0, 0,
-                0, 163, 163,
-            0, 163, 163, 164, 4},
-            {2, 2, 2,
-                2, 0, 2,
-            2, 2, 2, 27, 1}, // Furnace
-            {67, 67, 67,
-                0, 0, 0,
-            0, 0, 0, 175, 10}, // Zythium Wire
-            {0, 0, 0,
-                67, 67, 67,
-            0, 0, 0, 175, 20},
-            {0, 0, 0,
-                0, 0, 0,
-            67, 67, 67, 175, 20},
-            {2, 0, 0,
-                0, 2, 0,
-            0, 0, 0, 33, 1}, // Stone Lighter
-            {0, 2, 0,
-                0, 0, 2,
-            0, 0, 0, 33, 1},
-            {0, 0, 0,
-                2, 0, 0,
-            0, 2, 0, 33, 1},
-            {0, 0, 0,
-                0, 2, 0,
-            0, 0, 2, 33, 1},
-            {0, 2, 0,
-                2, 0, 0,
-            0, 0, 0, 33, 1},
-            {0, 0, 2,
-                0, 2, 0,
-            0, 0, 0, 33, 1},
-            {0, 0, 0,
-                0, 2, 0,
-            2, 0, 0, 33, 1},
-            {0, 0, 0,
-                0, 0, 2,
-            0, 2, 0, 33, 1},
-            {15, 0, 0,
-                15, 0, 0,
-            0, 0, 0, 35, 4},  // Wooden Torch
-            {0, 15, 0,
-                0, 15, 0,
-            0, 0, 0, 35, 4},
-            {0, 0, 15,
-                0, 0, 15,
-            0, 0, 0, 35, 4},
-            {0, 0, 0,
-                15, 0, 0,
-            15, 0, 0, 35, 4},
-            {0, 0, 0,
-                0, 15, 0,
-            0, 15, 0, 35, 4},
-            {0, 0, 0,
-                0, 0, 15,
-            0, 0, 15, 35, 4},
-            {28, 0, 0,
-                15, 0, 0,
-            0, 0, 0, 36, 4}, // Coal Torch
-            {0, 28, 0,
-                0, 15, 0,
-            0, 0, 0, 36, 4},
-            {0, 0, 28,
-                0, 0, 15,
-            0, 0, 0, 36, 4},
-            {0, 0, 0,
-                28, 0, 0,
-            15, 0, 0, 36, 4},
-            {0, 0, 0,
-                0, 28, 0,
-            0, 15, 0, 36, 4},
-            {0, 0, 0,
-                0, 0, 28,
-            0, 0, 15, 36, 4},
-            {34, 0, 0,
-                15, 0, 0,
-            0, 0, 0, 37, 4}, // Lumenstone Torch
-            {0, 34, 0,
-                0, 15, 0,
-            0, 0, 0, 37, 4},
-            {0, 0, 34,
-                0, 0, 15,
-            0, 0, 0, 37, 4},
-            {0, 0, 0,
-                34, 0, 0,
-            15, 0, 0, 37, 4},
-            {0, 0, 0,
-                0, 34, 0,
-            0, 15, 0, 37, 4},
-            {0, 0, 0,
-                0, 0, 34,
-            0, 0, 15, 37, 4},
-            {44, 0, 0,
-                15, 0, 0,
-            0, 0, 0, 176, 4}, // Zythium Torch
-            {0, 44, 0,
-                0, 15, 0,
-            0, 0, 0, 176, 4},
-            {0, 0, 44,
-                0, 0, 15,
-            0, 0, 0, 176, 4},
-            {0, 0, 0,
-                44, 0, 0,
-            15, 0, 0, 176, 4},
-            {0, 0, 0,
-                0, 44, 0,
-            0, 15, 0, 176, 4},
-            {0, 0, 0,
-                0, 0, 44,
-            0, 0, 15, 176, 4},
-            {15, 15, 0,
-                0, 0, 0,
-            0, 0, 0, 183, 1}, // Wooden Pressure Plate
-            {0, 15, 15,
-                0, 0, 0,
-            0, 0, 0, 183, 1},
-            {0, 0, 0,
-                15, 15, 0,
-            0, 0, 0, 183, 1},
-            {0, 0, 0,
-                0, 15, 15,
-            0, 0, 0, 183, 1},
-            {0, 0, 0,
-                0, 0, 0,
-            15, 15, 0, 183, 1},
-            {0, 0, 0,
-                0, 0, 0,
-            0, 15, 15, 183, 1},
-            {2, 2, 0,
-                0, 0, 0,
-            0, 0, 0, 184, 1}, // Stone Pressure Plate
-            {0, 2, 2,
-                0, 0, 0,
-            0, 0, 0, 184, 1},
-            {0, 0, 0,
-                2, 2, 0,
-            0, 0, 0, 184, 1},
-            {0, 0, 0,
-                0, 2, 2,
-            0, 0, 0, 184, 1},
-            {0, 0, 0,
-                0, 0, 0,
-            2, 2, 0, 184, 1},
-            {0, 0, 0,
-                0, 0, 0,
-            0, 2, 2, 184, 1},
-            {162, 44, 162,
-                0, 175, 0,
-            0, 0, 0, 185, 1}, // Zythium Pressure Plate
-            {0, 0, 0,
-                162, 44, 162,
-            0, 175, 0, 185, 1}
+        RecipeItem[] list_thing1 = {
+            new RecipeItem(new short[]{15, 15, 15, 0, 15, 0, 0, 15, 0}, (short) 154, (short) 1), // Wooden Pick
+            new RecipeItem(new short[]{2, 2, 2, 0, 15, 0, 0, 15, 0}, (short) 157, (short) 1), // Stone Pick
+            new RecipeItem(new short[]{29, 29, 29, 0, 15, 0, 0, 15, 0}, (short) 7, (short) 1), // Copper Pick
+            new RecipeItem(new short[]{30, 30, 30, 0, 15, 0, 0, 15, 0}, (short) 8, (short) 1), // Iron Pick
+            new RecipeItem(new short[]{31, 31, 31, 0, 15, 0, 0, 15, 0}, (short) 9, (short) 1), // Silver Pick
+            new RecipeItem(new short[]{32, 32, 32, 0, 15, 0, 0, 15, 0}, (short) 10, (short) 1), // Gold Pick
+            new RecipeItem(new short[]{60, 60, 60, 0, 15, 0, 0, 15, 0}, (short) 51, (short) 1), // Zinc Pick
+            new RecipeItem(new short[]{61, 61, 61, 0, 15, 0, 0, 15, 0}, (short) 54, (short) 1), // Rhymestone Pick
+            new RecipeItem(new short[]{62, 62, 62, 0, 15, 0, 0, 15, 0}, (short) 57, (short) 1), // Obdurite Pick
+            new RecipeItem(new short[]{73, 73, 73, 0, 15, 0, 0, 15, 0}, (short) 169, (short) 1), // Magnetite Pick
+            new RecipeItem(new short[]{69, 69, 69, 0, 15, 0, 0, 15, 0}, (short) 172, (short) 1), // Irradium Pick
+            new RecipeItem(new short[]{15, 15, 0, 15, 15, 0, 0, 15, 0}, (short) 155, (short) 1), // Wooden Axe
+            new RecipeItem(new short[]{0, 15, 15, 0, 15, 15, 0, 15, 0}, (short) 155, (short) 1),
+            new RecipeItem(new short[]{15, 15, 0, 15, 15, 0, 15, 0, 0}, (short) 155, (short) 1),
+            new RecipeItem(new short[]{0, 15, 15, 0, 15, 15, 0, 0, 15}, (short) 155, (short) 1),
+            new RecipeItem(new short[]{2, 2, 0, 2, 15, 0, 0, 15, 0}, (short) 158, (short) 1), // Stone Axe
+            new RecipeItem(new short[]{0, 2, 2, 0, 15, 2, 0, 15, 0}, (short) 158, (short) 1),
+            new RecipeItem(new short[]{2, 2, 0, 15, 2, 0, 15, 0, 0}, (short) 158, (short) 1),
+            new RecipeItem(new short[]{0, 2, 2, 0, 2, 15, 0, 0, 15}, (short) 158, (short) 1),
+            new RecipeItem(new short[]{29, 29, 0, 29, 15, 0, 0, 15, 0}, (short) 11, (short) 1), // Copper Axe
+            new RecipeItem(new short[]{0, 29, 29, 0, 15, 29, 0, 15, 0}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{29, 29, 0, 15, 29, 0, 15, 0, 0}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{0, 29, 29, 0, 29, 15, 0, 0, 15}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{30, 30, 0, 30, 15, 0, 0, 15, 0}, (short) 11, (short) 1), // Iron Axe
+            new RecipeItem(new short[]{0, 30, 30, 0, 15, 30, 0, 15, 0}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{30, 30, 0, 15, 30, 0, 15, 0, 0}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{0, 30, 30, 0, 30, 15, 0, 0, 15}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{31, 31, 0, 31, 15, 0, 0, 15, 0}, (short) 11, (short) 1), // Silver Axe
+            new RecipeItem(new short[]{0, 31, 31, 0, 15, 31, 0, 15, 0}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{31, 31, 0, 15, 31, 0, 15, 0, 0}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{0, 31, 31, 0, 31, 15, 0, 0, 15}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{32, 32, 0, 32, 15, 0, 0, 15, 0}, (short) 11, (short) 1), // Gold Axe
+            new RecipeItem(new short[]{0, 32, 32, 0, 15, 32, 0, 15, 0}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{32, 32, 0, 15, 32, 0, 15, 0, 0}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{0, 32, 32, 0, 32, 15, 0, 0, 15}, (short) 11, (short) 1),
+            new RecipeItem(new short[]{60, 60, 0, 60, 15, 0, 0, 15, 0}, (short) 52, (short) 1), // Zinc Axe
+            new RecipeItem(new short[]{0, 60, 60, 0, 15, 60, 0, 15, 0}, (short) 52, (short) 1),
+            new RecipeItem(new short[]{60, 60, 0, 15, 60, 0, 15, 0, 0}, (short) 52, (short) 1),
+            new RecipeItem(new short[]{0, 60, 60, 0, 60, 15, 0, 0, 15}, (short) 52, (short) 1),
+            new RecipeItem(new short[]{61, 61, 0, 61, 15, 0, 0, 15, 0}, (short) 55, (short) 1), // Rhymestone Axe
+            new RecipeItem(new short[]{0, 61, 61, 0, 15, 61, 0, 15, 0}, (short) 55, (short) 1),
+            new RecipeItem(new short[]{61, 61, 0, 15, 61, 0, 15, 0, 0}, (short) 55, (short) 1),
+            new RecipeItem(new short[]{0, 61, 61, 0, 61, 15, 0, 0, 15}, (short) 55, (short) 1),
+            new RecipeItem(new short[]{62, 62, 0, 62, 15, 0, 0, 15, 0}, (short) 58, (short) 1), // Obdurite Axe
+            new RecipeItem(new short[]{0, 62, 62, 0, 15, 62, 0, 15, 0}, (short) 58, (short) 1),
+            new RecipeItem(new short[]{62, 62, 0, 15, 62, 0, 15, 0, 0}, (short) 58, (short) 1),
+            new RecipeItem(new short[]{0, 62, 62, 0, 62, 15, 0, 0, 15}, (short) 58, (short) 1),
+            new RecipeItem(new short[]{73, 73, 0, 73, 15, 0, 0, 15, 0}, (short) 170, (short) 1), // Magnetite Axe
+            new RecipeItem(new short[]{0, 73, 73, 0, 15, 73, 0, 15, 0}, (short) 170, (short) 1),
+            new RecipeItem(new short[]{73, 73, 0, 15, 73, 0, 15, 0, 0}, (short) 170, (short) 1),
+            new RecipeItem(new short[]{0, 73, 73, 0, 73, 15, 0, 0, 15}, (short) 170, (short) 1),
+            new RecipeItem(new short[]{69, 69, 0, 69, 15, 0, 0, 15, 0}, (short) 169, (short) 1), // Irradium Axe
+            new RecipeItem(new short[]{0, 69, 69, 0, 15, 69, 0, 15, 0}, (short) 169, (short) 1),
+            new RecipeItem(new short[]{69, 69, 0, 15, 69, 0, 15, 0, 0}, (short) 169, (short) 1),
+            new RecipeItem(new short[]{0, 69, 69, 0, 69, 15, 0, 0, 15}, (short) 169, (short) 1),
+            new RecipeItem(new short[]{15, 0, 0, 15, 0, 0, 15, 0, 0}, (short) 156, (short) 1), // Wooden Sword
+            new RecipeItem(new short[]{0, 15, 0, 0, 15, 0, 0, 15, 0}, (short) 156, (short) 1),
+            new RecipeItem(new short[]{0, 0, 15, 0, 0, 15, 0, 0, 15}, (short) 156, (short) 1),
+            new RecipeItem(new short[]{2, 0, 0, 2, 0, 0, 15, 0, 0}, (short) 159, (short) 1), // Stone Sword
+            new RecipeItem(new short[]{0, 2, 0, 0, 2, 0, 0, 15, 0}, (short) 159, (short) 1),
+            new RecipeItem(new short[]{0, 0, 2, 0, 0, 2, 0, 0, 15}, (short) 159, (short) 1),
+            new RecipeItem(new short[]{29, 0, 0, 29, 0, 0, 15, 0, 0}, (short) 16, (short) 1), // Copper Sword
+            new RecipeItem(new short[]{0, 29, 0, 0, 29, 0, 0, 15, 0}, (short) 16, (short) 1),
+            new RecipeItem(new short[]{0, 0, 29, 0, 0, 29, 0, 0, 15}, (short) 16, (short) 1),
+            new RecipeItem(new short[]{30, 0, 0, 30, 0, 0, 15, 0, 0}, (short) 17, (short) 1), // Iron Sword
+            new RecipeItem(new short[]{0, 30, 0, 0, 30, 0, 0, 15, 0}, (short) 17, (short) 1),
+            new RecipeItem(new short[]{0, 0, 30, 0, 0, 30, 0, 0, 15}, (short) 17, (short) 1),
+            new RecipeItem(new short[]{31, 0, 0, 31, 0, 0, 15, 0, 0}, (short) 18, (short) 1), // Silver Sword
+            new RecipeItem(new short[]{0, 31, 0, 0, 31, 0, 0, 15, 0}, (short) 18, (short) 1),
+            new RecipeItem(new short[]{0, 0, 31, 0, 0, 31, 0, 0, 15}, (short) 18, (short) 1),
+            new RecipeItem(new short[]{32, 0, 0, 32, 0, 0, 15, 0, 0}, (short) 19, (short) 1), // Gold Sword
+            new RecipeItem(new short[]{0, 32, 0, 0, 32, 0, 0, 15, 0}, (short) 19, (short) 1),
+            new RecipeItem(new short[]{0, 0, 32, 0, 0, 32, 0, 0, 15}, (short) 19, (short) 1),
+            new RecipeItem(new short[]{38, 0, 0, 38, 0, 0, 15, 0, 0}, (short) 19, (short) 1), // Zinc Sword
+            new RecipeItem(new short[]{0, 38, 0, 0, 38, 0, 0, 15, 0}, (short) 19, (short) 1),
+            new RecipeItem(new short[]{0, 0, 38, 0, 0, 38, 0, 0, 15}, (short) 19, (short) 1),
+            new RecipeItem(new short[]{39, 0, 0, 39, 0, 0, 15, 0, 0}, (short) 19, (short) 1), // Rhymestone Sword
+            new RecipeItem(new short[]{0, 39, 0, 0, 39, 0, 0, 15, 0}, (short) 19, (short) 1),
+            new RecipeItem(new short[]{0, 0, 39, 0, 0, 39, 0, 0, 15}, (short) 19, (short) 1),
+            new RecipeItem(new short[]{40, 0, 0, 40, 0, 0, 15, 0, 0}, (short) 19, (short) 1), // Obdurite Sword
+            new RecipeItem(new short[]{0, 40, 0, 0, 40, 0, 0, 15, 0}, (short) 19, (short) 1),
+            new RecipeItem(new short[]{0, 0, 40, 0, 0, 40, 0, 0, 15}, (short) 19, (short) 1),
+            new RecipeItem(new short[]{73, 0, 0, 73, 0, 0, 15, 0, 0}, (short) 171, (short) 1), // Magnetite Sword
+            new RecipeItem(new short[]{0, 73, 0, 0, 73, 0, 0, 15, 0}, (short) 171, (short) 1),
+            new RecipeItem(new short[]{0, 0, 73, 0, 0, 73, 0, 0, 15}, (short) 171, (short) 1),
+            new RecipeItem(new short[]{69, 0, 0, 69, 0, 0, 15, 0, 0}, (short) 174, (short) 1), // Irradium Sword
+            new RecipeItem(new short[]{0, 69, 0, 0, 69, 0, 0, 15, 0}, (short) 174, (short) 1),
+            new RecipeItem(new short[]{0, 0, 69, 0, 0, 69, 0, 0, 15}, (short) 174, (short) 1),
+            new RecipeItem(new short[]{63, 0, 63, 0, 63, 0, 0, 63, 0}, (short) 190, (short) 1), // Wrench
+            new RecipeItem(new short[]{15, 0, 0, 2, 0, 0, 175, 0, 0}, (short) 178, (short) 1), // Lever
+            new RecipeItem(new short[]{0, 15, 0, 0, 2, 0, 0, 175, 0}, (short) 178, (short) 1),
+            new RecipeItem(new short[]{0, 0, 15, 0, 0, 2, 0, 0, 175}, (short) 178, (short) 1),
+            new RecipeItem(new short[]{29, 29, 29, 29, 0, 29, 0, 0, 0}, (short) 105, (short) 1), // Copper Helmet
+            new RecipeItem(new short[]{0, 0, 0, 29, 29, 29, 29, 0, 29}, (short) 105, (short) 1),
+            new RecipeItem(new short[]{29, 0, 29, 29, 29, 29, 29, 29, 29}, (short) 106, (short) 1), // Copper Chestplate
+            new RecipeItem(new short[]{29, 29, 29, 29, 0, 29, 29, 0, 29}, (short) 107, (short) 1), // Copper Leggings
+            new RecipeItem(new short[]{29, 0, 29, 29, 0, 29, 0, 0, 0}, (short) 108, (short) 1), // Copper Greaves
+            new RecipeItem(new short[]{0, 0, 0, 29, 0, 29, 29, 0, 29}, (short) 108, (short) 1),
+            new RecipeItem(new short[]{30, 30, 30, 30, 0, 30, 0, 0, 0}, (short) 109, (short) 1), // Iron Helmet
+            new RecipeItem(new short[]{0, 0, 0, 30, 30, 30, 30, 0, 30}, (short) 109, (short) 1),
+            new RecipeItem(new short[]{30, 0, 30, 30, 30, 30, 30, 30, 30}, (short) 110, (short) 1), // Iron Chestplate
+            new RecipeItem(new short[]{30, 30, 30, 30, 0, 30, 30, 0, 30}, (short) 111, (short) 1), // Iron Leggings
+            new RecipeItem(new short[]{30, 0, 30, 30, 0, 30, 0, 0, 0}, (short) 112, (short) 1), // Iron Greaves
+            new RecipeItem(new short[]{0, 0, 0, 30, 0, 30, 30, 0, 30}, (short) 112, (short) 1),
+            new RecipeItem(new short[]{31, 31, 31, 31, 0, 31, 0, 0, 0}, (short) 113, (short) 1), // Silver Helmet
+            new RecipeItem(new short[]{0, 0, 0, 31, 31, 31, 31, 0, 31}, (short) 113, (short) 1),
+            new RecipeItem(new short[]{31, 0, 31, 31, 31, 31, 31, 31, 31}, (short) 114, (short) 1), // Silver Chestplate
+            new RecipeItem(new short[]{31, 31, 31, 31, 0, 31, 31, 0, 31}, (short) 115, (short) 1), // Silver Leggings
+            new RecipeItem(new short[]{31, 0, 31, 31, 0, 31, 0, 0, 0}, (short) 116, (short) 1), // Silver Greaves
+            new RecipeItem(new short[]{0, 0, 0, 31, 0, 31, 31, 0, 31}, (short) 116, (short) 1),
+            new RecipeItem(new short[]{32, 32, 32, 32, 0, 32, 0, 0, 0}, (short) 117, (short) 1), // Gold Helmet
+            new RecipeItem(new short[]{0, 0, 0, 32, 32, 32, 32, 0, 32}, (short) 117, (short) 1),
+            new RecipeItem(new short[]{32, 0, 32, 32, 32, 32, 32, 32, 32}, (short) 118, (short) 1), // Gold Chestplate
+            new RecipeItem(new short[]{32, 32, 32, 32, 0, 32, 32, 0, 32}, (short) 119, (short) 1), // Gold Leggings
+            new RecipeItem(new short[]{32, 0, 32, 32, 0, 32, 0, 0, 0}, (short) 120, (short) 1), // Gold Greaves
+            new RecipeItem(new short[]{0, 0, 0, 32, 0, 32, 32, 0, 32}, (short) 120, (short) 1),
+            new RecipeItem(new short[]{60, 60, 60, 60, 0, 60, 0, 0, 0}, (short) 121, (short) 1), // Zinc Helmet
+            new RecipeItem(new short[]{0, 0, 0, 60, 60, 60, 60, 0, 60}, (short) 121, (short) 1),
+            new RecipeItem(new short[]{60, 0, 60, 60, 60, 60, 60, 60, 60}, (short) 122, (short) 1), // Zinc Chestplate
+            new RecipeItem(new short[]{60, 60, 60, 60, 0, 60, 60, 0, 60}, (short) 123, (short) 1), // Zinc Leggings
+            new RecipeItem(new short[]{60, 0, 60, 60, 0, 60, 0, 0, 0}, (short) 124, (short) 1), // Zinc Greaves
+            new RecipeItem(new short[]{0, 0, 0, 60, 0, 60, 60, 0, 60}, (short) 124, (short) 1),
+            new RecipeItem(new short[]{61, 61, 61, 61, 0, 61, 0, 0, 0}, (short) 125, (short) 1), // Rhymestone Helmet
+            new RecipeItem(new short[]{0, 0, 0, 61, 61, 61, 61, 0, 61}, (short) 125, (short) 1),
+            new RecipeItem(new short[]{61, 0, 61, 61, 61, 61, 61, 61, 61}, (short) 126, (short) 1), // Rhymestone Chestplate
+            new RecipeItem(new short[]{61, 61, 61, 61, 0, 61, 61, 0, 61}, (short) 127, (short) 1), // Rhymestone Leggings
+            new RecipeItem(new short[]{61, 0, 61, 61, 0, 61, 0, 0, 0}, (short) 128, (short) 1), // Rhymestone Greaves
+            new RecipeItem(new short[]{0, 0, 0, 61, 0, 61, 61, 0, 61}, (short) 128, (short) 1),
+            new RecipeItem(new short[]{62, 62, 62, 62, 0, 62, 0, 0, 0}, (short) 129, (short) 1), // Obdurite Helmet
+            new RecipeItem(new short[]{0, 0, 0, 62, 62, 62, 62, 0, 62}, (short) 129, (short) 1),
+            new RecipeItem(new short[]{62, 0, 62, 62, 62, 62, 62, 62, 62}, (short) 130, (short) 1), // Obdurite Chestplate
+            new RecipeItem(new short[]{62, 62, 62, 62, 0, 62, 62, 0, 62}, (short) 131, (short) 1), // Obdurite Leggings
+            new RecipeItem(new short[]{62, 0, 62, 62, 0, 62, 0, 0, 0}, (short) 132, (short) 1), // Obdurite Greaves
+            new RecipeItem(new short[]{0, 0, 0, 62, 0, 62, 62, 0, 62}, (short) 132, (short) 1),
+            new RecipeItem(new short[]{63, 63, 63, 63, 0, 63, 0, 0, 0}, (short) 133, (short) 1), // Aluminum Helmet
+            new RecipeItem(new short[]{0, 0, 0, 63, 63, 63, 63, 0, 63}, (short) 133, (short) 1),
+            new RecipeItem(new short[]{63, 0, 63, 63, 63, 63, 63, 63, 63}, (short) 134, (short) 1), // Aluminum Chestplate
+            new RecipeItem(new short[]{63, 63, 63, 63, 0, 63, 63, 0, 63}, (short) 135, (short) 1), // Aluminum Leggings
+            new RecipeItem(new short[]{63, 0, 63, 63, 0, 63, 0, 0, 0}, (short) 136, (short) 1), // Aluminum Greaves
+            new RecipeItem(new short[]{0, 0, 0, 63, 0, 63, 63, 0, 63}, (short) 136, (short) 1),
+            new RecipeItem(new short[]{64, 64, 64, 64, 0, 64, 0, 0, 0}, (short) 137, (short) 1), // Lead Helmet
+            new RecipeItem(new short[]{0, 0, 0, 64, 64, 64, 64, 0, 64}, (short) 137, (short) 1),
+            new RecipeItem(new short[]{64, 0, 64, 64, 64, 64, 64, 64, 64}, (short) 138, (short) 1), // Lead Chestplate
+            new RecipeItem(new short[]{64, 64, 64, 64, 0, 64, 64, 0, 64}, (short) 139, (short) 1), // Lead Leggings
+            new RecipeItem(new short[]{64, 0, 64, 64, 0, 64, 0, 0, 0}, (short) 140, (short) 1), // Lead Greaves
+            new RecipeItem(new short[]{0, 0, 0, 64, 0, 64, 64, 0, 64}, (short) 140, (short) 1),
+            new RecipeItem(new short[]{15, 15, 15, 15, 0, 15, 15, 15, 15}, (short) 21, (short) 1), // Wooden Chest
+            new RecipeItem(new short[]{2, 2, 2, 2, 21, 2, 2, 2, 2}, (short) 22, (short) 1), // Stone Chest
+            new RecipeItem(new short[]{29, 29, 29, 29, 22, 29, 29, 29, 29}, (short) 23, (short) 1), // Copper Chest
+            new RecipeItem(new short[]{30, 30, 30, 30, 22, 30, 30, 30, 30}, (short) 24, (short) 1), // Iron Chest
+            new RecipeItem(new short[]{31, 31, 31, 31, 22, 31, 31, 31, 31}, (short) 25, (short) 1), // Silver Chest
+            new RecipeItem(new short[]{32, 32, 32, 32, 22, 32, 32, 32, 32}, (short) 26, (short) 1), // Gold Chest
+            new RecipeItem(new short[]{60, 60, 60, 60, 22, 60, 60, 60, 60}, (short) 151, (short) 1), // Zinc Chest
+            new RecipeItem(new short[]{61, 61, 61, 61, 22, 61, 61, 61, 61}, (short) 152, (short) 1), // Rhymestone Chest
+            new RecipeItem(new short[]{62, 62, 62, 62, 22, 62, 62, 62, 62}, (short) 153, (short) 1), // Obdurite Chest
+            new RecipeItem(new short[]{76, 76, 76, 76, 34, 76, 76, 175, 76}, (short) 177, (short) 1), // Zythium Lamp
+            new RecipeItem(new short[]{76, 76, 76, 175, 44, 175, 76, 76, 76}, (short) 180, (short) 1), // Zythium Amplifier
+            new RecipeItem(new short[]{76, 76, 76, 44, 175, 44, 76, 76, 76}, (short) 181, (short) 1), // Zythium Inverter
+            new RecipeItem(new short[]{76, 175, 76, 175, 175, 175, 76, 175, 76}, (short) 186, (short) 1), // Zythium Delayer
+            new RecipeItem(new short[]{15, 15, 0, 15, 15, 0, 0, 0, 0}, (short) 20, (short) 1), // Workbench
+            new RecipeItem(new short[]{0, 15, 15, 0, 15, 15, 0, 0, 0}, (short) 20, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 15, 15, 0, 15, 15, 0}, (short) 20, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 0, 15, 15, 0, 15, 15}, (short) 20, (short) 1),
+            new RecipeItem(new short[]{160, 160, 0, 160, 160, 0, 0, 0, 0}, (short) 15, (short) 1), // Bark -> Wood
+            new RecipeItem(new short[]{0, 160, 160, 0, 160, 160, 0, 0, 0}, (short) 15, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 160, 160, 0, 160, 160, 0}, (short) 15, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 0, 160, 160, 0, 160, 160}, (short) 15, (short) 1),
+            new RecipeItem(new short[]{2, 2, 0, 2, 2, 0, 0, 0, 0}, (short) 161, (short) 4), // Cobblestone
+            new RecipeItem(new short[]{0, 2, 2, 0, 2, 2, 0, 0, 0}, (short) 161, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 2, 2, 0, 2, 2, 0}, (short) 161, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 0, 2, 2, 0, 2, 2}, (short) 161, (short) 4),
+            new RecipeItem(new short[]{162, 162, 0, 162, 162, 0, 0, 0, 0}, (short) 163, (short) 4), // Chiseled Cobblestone
+            new RecipeItem(new short[]{0, 162, 162, 0, 162, 162, 0, 0, 0}, (short) 163, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 162, 162, 0, 162, 162, 0}, (short) 163, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 0, 162, 162, 0, 162, 162}, (short) 163, (short) 4),
+            new RecipeItem(new short[]{163, 163, 0, 163, 163, 0, 0, 0, 0}, (short) 164, (short) 4), // Stone Bricks
+            new RecipeItem(new short[]{0, 163, 163, 0, 163, 163, 0, 0, 0}, (short) 164, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 163, 163, 0, 163, 163, 0}, (short) 164, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 0, 163, 163, 0, 163, 163}, (short) 164, (short) 4),
+            new RecipeItem(new short[]{2, 2, 2, 2, 0, 2, 2, 2, 2}, (short) 27, (short) 1), // Furnace
+            new RecipeItem(new short[]{67, 67, 67, 0, 0, 0, 0, 0, 0}, (short) 175, (short) 10), // Zythium Wire
+            new RecipeItem(new short[]{0, 0, 0, 67, 67, 67, 0, 0, 0}, (short) 175, (short) 20),
+            new RecipeItem(new short[]{0, 0, 0, 0, 0, 0, 67, 67, 67}, (short) 175, (short) 20),
+            new RecipeItem(new short[]{2, 0, 0, 0, 2, 0, 0, 0, 0}, (short) 33, (short) 1), // Stone Lighter
+            new RecipeItem(new short[]{0, 2, 0, 0, 0, 2, 0, 0, 0}, (short) 33, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 2, 0, 0, 0, 2, 0}, (short) 33, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 0, 2, 0, 0, 0, 2}, (short) 33, (short) 1),
+            new RecipeItem(new short[]{0, 2, 0, 2, 0, 0, 0, 0, 0}, (short) 33, (short) 1),
+            new RecipeItem(new short[]{0, 0, 2, 0, 2, 0, 0, 0, 0}, (short) 33, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 0, 2, 0, 2, 0, 0}, (short) 33, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 0, 0, 2, 0, 2, 0}, (short) 33, (short) 1),
+            new RecipeItem(new short[]{15, 0, 0, 15, 0, 0, 0, 0, 0}, (short) 35, (short) 4),  // Wooden Torch
+            new RecipeItem(new short[]{0, 15, 0, 0, 15, 0, 0, 0, 0}, (short) 35, (short) 4),
+            new RecipeItem(new short[]{0, 0, 15, 0, 0, 15, 0, 0, 0}, (short) 35, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 15, 0, 0, 15, 0, 0}, (short) 35, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 0, 15, 0, 0, 15, 0}, (short) 35, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 0, 0, 15, 0, 0, 15}, (short) 35, (short) 4),
+            new RecipeItem(new short[]{28, 0, 0, 15, 0, 0, 0, 0, 0}, (short) 36, (short) 4), // Coal Torch
+            new RecipeItem(new short[]{0, 28, 0, 0, 15, 0, 0, 0, 0}, (short) 36, (short) 4),
+            new RecipeItem(new short[]{0, 0, 28, 0, 0, 15, 0, 0, 0}, (short) 36, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 28, 0, 0, 15, 0, 0}, (short) 36, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 0, 28, 0, 0, 15, 0}, (short) 36, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 0, 0, 28, 0, 0, 15}, (short) 36, (short) 4),
+            new RecipeItem(new short[]{34, 0, 0, 15, 0, 0, 0, 0, 0}, (short) 37, (short) 4), // Lumenstone Torch
+            new RecipeItem(new short[]{0, 34, 0, 0, 15, 0, 0, 0, 0}, (short) 37, (short) 4),
+            new RecipeItem(new short[]{0, 0, 34, 0, 0, 15, 0, 0, 0}, (short) 37, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 34, 0, 0, 15, 0, 0}, (short) 37, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 0, 34, 0, 0, 15, 0}, (short) 37, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 0, 0, 34, 0, 0, 15}, (short) 37, (short) 4),
+            new RecipeItem(new short[]{44, 0, 0, 15, 0, 0, 0, 0, 0}, (short) 176, (short) 4), // Zythium Torch
+            new RecipeItem(new short[]{0, 44, 0, 0, 15, 0, 0, 0, 0}, (short) 176, (short) 4),
+            new RecipeItem(new short[]{0, 0, 44, 0, 0, 15, 0, 0, 0}, (short) 176, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 44, 0, 0, 15, 0, 0}, (short) 176, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 0, 44, 0, 0, 15, 0}, (short) 176, (short) 4),
+            new RecipeItem(new short[]{0, 0, 0, 0, 0, 44, 0, 0, 15}, (short) 176, (short) 4),
+            new RecipeItem(new short[]{15, 15, 0, 0, 0, 0, 0, 0, 0}, (short) 183, (short) 1), // Wooden Pressure Plate
+            new RecipeItem(new short[]{0, 15, 15, 0, 0, 0, 0, 0, 0}, (short) 183, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 15, 15, 0, 0, 0, 0}, (short) 183, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 0, 15, 15, 0, 0, 0}, (short) 183, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 0, 0, 0, 15, 15, 0}, (short) 183, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 0, 0, 0, 0, 15, 15}, (short) 183, (short) 1),
+            new RecipeItem(new short[]{2, 2, 0, 0, 0, 0, 0, 0, 0}, (short) 184, (short) 1), // Stone Pressure Plate
+            new RecipeItem(new short[]{0, 2, 2, 0, 0, 0, 0, 0, 0}, (short) 184, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 2, 2, 0, 0, 0, 0}, (short) 184, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 0, 2, 2, 0, 0, 0}, (short) 184, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 0, 0, 0, 2, 2, 0}, (short) 184, (short) 1),
+            new RecipeItem(new short[]{0, 0, 0, 0, 0, 0, 0, 2, 2}, (short) 184, (short) 1),
+            new RecipeItem(new short[]{162, 44, 162, 0, 175, 0, 0, 0, 0}, (short) 185, (short) 1), // Zythium Pressure Plate
+            new RecipeItem(new short[]{0, 0, 0, 162, 44, 162, 0, 175, 0}, (short) 185, (short) 1)
         };
 
         RECIPES.put("workbench", list_thing1);
 
-        Short[][] list_thing2 = {
-            {15, 15,
-                15, 15, 20, 1}, // Workbench
-            {160, 160,
-                160, 160, 15, 1}, // Bark -> Wood
-            {2, 2,
-                2, 2, 161, 4}, // Cobblestone
-            {162, 162,
-                162, 162, 163, 4}, // Chiseled Cobblestone
-            {163, 163,
-                163, 163, 164, 4}, // Stone Bricks
-            {2, 0,
-                0, 2, 33, 1}, // Stone Lighter
-            {0, 2,
-                2, 0, 33, 1},
-            {15, 0,
-                15, 0, 35, 4},  // Wooden Torch
-            {0, 15,
-                0, 15, 35, 4},
-            {28, 0,
-                15, 0, 36, 4}, // Coal Torch
-            {0, 28,
-                0, 15, 36, 4},
-            {34, 0,
-                15, 0, 37, 4}, // Lumenstone Torch
-            {0, 34,
-                0, 15, 37, 4},
-            {44, 0,
-                15, 0, 176, 4}, // Zythium Torch
-            {0, 44,
-                0, 15, 176, 4},
-            {15, 15,
-                0, 0, 183, 1}, // Wooden Pressure Plate
-            {0, 0,
-                15, 15, 183, 1},
-            {2, 2,
-                0, 0, 184, 1}, // Stone Pressure Plate
-            {0, 0,
-                2, 2, 184, 1}
+        RecipeItem[] list_thing2 = {
+            new RecipeItem(new short[]{15, 15, 15, 15}, (short) 20, (short) 1), // Workbench
+            new RecipeItem(new short[]{160, 160, 160, 160}, (short) 15, (short) 1), // Bark -> Wood
+            new RecipeItem(new short[]{2, 2, 2, 2}, (short) 161, (short) 4), // Cobblestone
+            new RecipeItem(new short[]{162, 162, 162, 162}, (short) 163, (short) 4), // Chiseled Cobblestone
+            new RecipeItem(new short[]{163, 163, 163, 163}, (short) 164, (short) 4), // Stone Bricks
+            new RecipeItem(new short[]{2, 0, 0, 2}, (short) 33, (short) 1), // Stone Lighter
+            new RecipeItem(new short[]{0, 2, 2, 0}, (short) 33, (short) 1),
+            new RecipeItem(new short[]{15, 0, 15, 0}, (short) 35, (short) 4),  // Wooden Torch
+            new RecipeItem(new short[]{0, 15, 0, 15}, (short) 35, (short) 4),
+            new RecipeItem(new short[]{28, 0, 15, 0}, (short) 36, (short) 4), // Coal Torch
+            new RecipeItem(new short[]{0, 28, 0, 15}, (short) 36, (short) 4),
+            new RecipeItem(new short[]{34, 0, 15, 0}, (short) 37, (short) 4), // Lumenstone Torch
+            new RecipeItem(new short[]{0, 34, 0, 15}, (short) 37, (short) 4),
+            new RecipeItem(new short[]{44, 0, 15, 0}, (short) 176, (short) 4), // Zythium Torch
+            new RecipeItem(new short[]{0, 44, 0, 15}, (short) 176, (short) 4),
+            new RecipeItem(new short[]{15, 15, 0, 0}, (short) 183, (short) 1), // Wooden Pressure Plate
+            new RecipeItem(new short[]{0, 0, 15, 15}, (short) 183, (short) 1),
+            new RecipeItem(new short[]{2, 2, 0, 0}, (short) 184, (short) 1), // Stone Pressure Plate
+            new RecipeItem(new short[]{0, 0, 2, 2}, (short) 184, (short) 1)
         };
 
         RECIPES.put("cic", list_thing2);
 
-        Short[][] list_thing3 = {
-            {15, 167, 0, 0, 0, 0, 0, 0, 0,
-        168, 1},
-            {162, 0, 0, 0, 0, 0, 0, 0, 0,
-        182, 1}
+        RecipeItem[] list_thing3 = {
+            new RecipeItem(new short[]{15, 167, 0, 0, 0, 0, 0, 0, 0}, (short) 168, (short) 1),
+            new RecipeItem(new short[]{162, 0, 0, 0, 0, 0, 0, 0, 0}, (short) 182, (short) 1)
         };
 
         RECIPES.put("shapeless", list_thing3);
 
-        Short[][] list_thing4 = {
-            {15, 167, 0, 0,
-        168, 1},
-            {162, 0, 0, 0,
-        182, 1}
+        RecipeItem[] list_thing4 = {
+            new RecipeItem(new short[]{15, 167, 0, 0}, (short) 168, (short) 1),
+            new RecipeItem(new short[]{162, 0, 0, 0}, (short) 182, (short) 1)
         };
 
         RECIPES.put("shapeless_cic", list_thing4);
@@ -1241,21 +758,21 @@ public class Inventory implements Serializable {
             }
             ic.getIds()[4] = 0;
             ic.getIds()[4] = 0;
-            for (Short[] r2 : RECIPES.get("cic")) {
-                if (ic.areIdsEquals(r2)) {
-                    ic.getIds()[4] = r2[4];
-                    ic.getNums()[4] = r2[5];
-                    if (TerrariaClone.getTOOLDURS().get(r2[4]) != null)
-                        ic.getDurs()[4] = TerrariaClone.getTOOLDURS().get(r2[4]);
+            for (RecipeItem r2 : RECIPES.get("cic")) {
+                if (ic.areIdsEquals(r2.getValues())) {
+                    ic.getIds()[4] = r2.getId();
+                    ic.getNums()[4] = r2.getNum();
+                    if (TerrariaClone.getTOOLDURS().get(r2.getId()) != null)
+                        ic.getDurs()[4] = TerrariaClone.getTOOLDURS().get(r2.getId());
                     break;
                 }
             }
-            for (Short[] r2 : RECIPES.get("shapeless_cic")) {
-                if (ic.areInvalidIds(r2)) {
-                    ic.getIds()[4] = r2[r2.length-2];
-                    ic.getNums()[4] = r2[r2.length-1];
-                    if (TerrariaClone.getTOOLDURS().get(r2[r2.length-2]) != null)
-                        ic.getDurs()[4] = TerrariaClone.getTOOLDURS().get(r2[r2.length-2]);
+            for (RecipeItem r2 : RECIPES.get("shapeless_cic")) {
+                if (ic.areInvalidIds(r2.getValues())) {
+                    ic.getIds()[4] = r2.getId();
+                    ic.getNums()[4] = r2.getNum();
+                    if (TerrariaClone.getTOOLDURS().get(r2.getId()) != null)
+                        ic.getDurs()[4] = TerrariaClone.getTOOLDURS().get(r2.getId());
                     break;
                 }
             }
@@ -1337,21 +854,21 @@ public class Inventory implements Serializable {
                 }
             }
             ic.getIds()[9] = 0;
-            for (Short[] r2 : RECIPES.get("workbench")) {
-                if (ic.areIdsEquals(r2)) {
-                    ic.getIds()[9] = r2[9];
-                    ic.getNums()[9] = r2[10];
-                    if (TerrariaClone.getTOOLDURS().get(r2[9]) != null)
-                        ic.getDurs()[9] = TerrariaClone.getTOOLDURS().get(r2[9]);
+            for (RecipeItem r2 : RECIPES.get("workbench")) {
+                if (ic.areIdsEquals(r2.getValues())) {
+                    ic.getIds()[9] = r2.getId();
+                    ic.getNums()[9] = r2.getNum();
+                    if (TerrariaClone.getTOOLDURS().get(r2.getId()) != null)
+                        ic.getDurs()[9] = TerrariaClone.getTOOLDURS().get(r2.getId());
                     break;
                 }
             }
-            for (Short[] r2 : RECIPES.get("shapeless")) {
-                if (ic.areInvalidIds(r2)) {
-                    ic.getIds()[9] = r2[r2.length-2];
-                    ic.getNums()[9] = r2[r2.length-1];
-                    if (TerrariaClone.getTOOLDURS().get(r2[r2.length-2]) != null)
-                        ic.getDurs()[9] = TerrariaClone.getTOOLDURS().get(r2.length-2);
+            for (RecipeItem r2 : RECIPES.get("shapeless")) {
+                if (ic.areInvalidIds(r2.getValues())) {
+                    ic.getIds()[9] = r2.getId();
+                    ic.getNums()[9] = r2.getNum();
+                    if (TerrariaClone.getTOOLDURS().get(r2.getId()) != null)
+                        ic.getDurs()[9] = TerrariaClone.getTOOLDURS().get(r2.getId());
                     break;
                 }
             }
@@ -1475,19 +992,19 @@ public class Inventory implements Serializable {
     }
 
     public void useRecipeWorkbench(ItemCollection ic) {
-        for (Short[] r2 : RECIPES.get("workbench")) {
-            if (ic.areIdsEquals(r2)) {
+        for (RecipeItem r2 : RECIPES.get("workbench")) {
+            if (ic.areIdsEquals(r2.getValues())) {
                 for (i=0; i<9; i++) {
                     removeLocationIC(ic, i, (short) 1);
                     updateIC(ic, i);
                 }
             }
         }
-        for (Short[] r2 : RECIPES.get("shapeless")) {
-            if (ic.areInvalidIds(r2)) {
+        for (RecipeItem r2 : RECIPES.get("shapeless")) {
+            if (ic.areInvalidIds(r2.getValues())) {
                 List<Short> r3 = new ArrayList<>(11);
-                for (k=0; k<r2.length-2; k++) {
-                    r3.add(r2[k]);
+                for (k=0; k<r2.getValues().length; k++) {
+                    r3.add(r2.getValues()[k]);
                 }
                 for (k=0; k<9; k++) {
                     n = r3.indexOf(ic.getIds()[k]);
@@ -1501,19 +1018,19 @@ public class Inventory implements Serializable {
     }
 
     public void useRecipeCIC(ItemCollection ic) {
-        for (Short[] r2 : RECIPES.get("cic")) {
-            if (ic.areIdsEquals(r2)) {
+        for (RecipeItem r2 : RECIPES.get("cic")) {
+            if (ic.areIdsEquals(r2.getValues())) {
                 for (i=0; i<4; i++) {
                     removeLocationIC(ic, i, (short) 1);
                     updateIC(ic, i);
                 }
             }
         }
-        for (Short[] r2 : RECIPES.get("shapeless_cic")) {
-            if (ic.areInvalidIds(r2)) {
+        for (RecipeItem r2 : RECIPES.get("shapeless_cic")) {
+            if (ic.areInvalidIds(r2.getValues())) {
                 List<Short> r3 = new ArrayList<>(6);
-                for (k=0; k<r2.length-2; k++) {
-                    r3.add(r2[k]);
+                for (k=0; k<r2.getValues().length-2; k++) {
+                    r3.add(r2.getValues()[k]);
                 }
                 for (k=0; k<4; k++) {
                     n = r3.indexOf(ic.getIds()[k]);
