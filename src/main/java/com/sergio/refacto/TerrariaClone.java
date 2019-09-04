@@ -51,6 +51,7 @@ import com.sergio.refacto.dto.Directions;
 import com.sergio.refacto.dto.EntityType;
 import com.sergio.refacto.dto.FileInfo;
 import com.sergio.refacto.dto.ImageState;
+import com.sergio.refacto.dto.ItemCollection;
 import com.sergio.refacto.dto.ItemPositionInScreen;
 import com.sergio.refacto.dto.ItemType;
 import com.sergio.refacto.dto.Items;
@@ -91,7 +92,10 @@ import com.sergio.refacto.items.Chunk;
 import com.sergio.refacto.items.Cloud;
 import com.sergio.refacto.items.Mouse;
 import com.sergio.refacto.items.TextField;
+import com.sergio.refacto.items.World;
+import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.services.WorldService;
+import com.sergio.refacto.tools.MathTool;
 import com.sergio.refacto.tools.RandomTool;
 import com.sergio.refacto.tools.ResourcesLoader;
 
@@ -125,7 +129,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     Boolean[][][] arbprd;
     List<Integer> updatex, updatey, updatet, updatel;
     Boolean[][] wcnct;
-    static ItemCollection armor;
+    public static ItemCollection armor;
 
     Chunk[][] temporarySaveFile;
     Chunk[][] chunkMatrix;
@@ -1801,7 +1805,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     }
                                     if (worldContainer.blockTemp != 0) {
                                         worldContainer.inventory.removeLocation(worldContainer.inventory.selection, (short) 1);
-                                        worldContainer.blockds[worldContainer.layer] = World.generate2b(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
+                                        worldContainer.blockds[worldContainer.layer] = World.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
                                         for (uly = uy - 1; uly < uy + 2; uly++) {
                                             for (ulx = ux - 1; ulx < ux + 2; ulx++) {
                                                 worldContainer.blockdns[uly][ulx] = (byte) RandomTool.nextInt(5);
@@ -2230,7 +2234,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 } else {
                                     worldContainer.blocks[worldContainer.layer][uy][ux] -= 3;
                                 }
-                                worldContainer.blockds[worldContainer.layer] = World.generate2b(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
+                                worldContainer.blockds[worldContainer.layer] = World.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
                                 worldContainer.rdrawn[uy][ux] = false;
                                 addAdjacentTilesToPQueueConditionally(ux, uy);
                             }
@@ -2241,7 +2245,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 } else {
                                     worldContainer.blocks[worldContainer.layer][uy][ux] -= 3;
                                 }
-                                worldContainer.blockds[worldContainer.layer] = World.generate2b(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
+                                worldContainer.blockds[worldContainer.layer] = World.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
                                 worldContainer.rdrawn[uy][ux] = false;
                                 addAdjacentTilesToPQueueConditionally(ux, uy);
                             }
@@ -2264,7 +2268,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 } else {
                                     worldContainer.blocks[worldContainer.layer][uy][ux] -= 3;
                                 }
-                                worldContainer.blockds[worldContainer.layer] = World.generate2b(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
+                                worldContainer.blockds[worldContainer.layer] = World.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
                                 worldContainer.rdrawn[uy][ux] = false;
                                 redoBlockPower(ux, uy, worldContainer.layer);
                             }
@@ -2758,7 +2762,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 redoBlockLighting(ux, uy);
             }
             addSunLighting(ux, uy);
-            worldContainer.blockds[worldContainer.layer] = World.generate2b(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
+            worldContainer.blockds[worldContainer.layer] = World.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
             for (uly = uy - 1; uly < uy + 2; uly++) {
                 for (ulx = ux - 1; ulx < ux + 2; ulx++) {
                     worldContainer.blockdns[uly][ulx] = (byte) RandomTool.nextInt(5);
@@ -2787,7 +2791,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             }
                             if (!keepLeaf) {
                                 worldContainer.blocks[l][uly][ulx] = 0;
-                                worldContainer.blockds[l] = World.generate2b(worldContainer.blocks[l], worldContainer.blockds[l], ulx, uly);
+                                worldContainer.blockds[l] = World.generateOutlines(worldContainer.blocks[l], worldContainer.blockds[l], ulx, uly);
                                 for (uly2 = uly - 1; uly2 < uly + 2; uly2++) {
                                     for (ulx2 = ulx - 1; ulx2 < ulx + 2; ulx2++) {
                                         worldContainer.drawn[uly2][ulx2] = false;
@@ -2971,7 +2975,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     redoBlockLighting(ux, uy);
                 }
                 addSunLighting(ux, uy);
-                worldContainer.blockds[worldContainer.layer] = World.generate2b(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
+                worldContainer.blockds[worldContainer.layer] = World.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
                 for (uly = uy - 1; uly < uy + 2; uly++) {
                     for (ulx = ux - 1; ulx < ux + 2; ulx++) {
                         worldContainer.blockdns[uly][ulx] = (byte) RandomTool.nextInt(5);
@@ -3000,7 +3004,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                                 if (!keepLeaf) {
                                     worldContainer.blocks[l][uly][ulx] = 0;
-                                    worldContainer.blockds[l] = World.generate2b(worldContainer.blocks[l], worldContainer.blockds[l], ulx, uly);
+                                    worldContainer.blockds[l] = World.generateOutlines(worldContainer.blocks[l], worldContainer.blockds[l], ulx, uly);
                                     for (uly2 = uly - 1; uly2 < uly + 2; uly2++) {
                                         for (ulx2 = ulx - 1; ulx2 < ulx + 2; ulx2++) {
                                             worldContainer.drawn[uly2][ulx2] = false;
@@ -3631,7 +3635,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 if (worldContainer.lsources[y][x]) {
                     n = findBlockLightSource(x, y);
                     if (isReachedBySunlight(x, y)) {
-                        worldContainer.lights[y][x] = this.max(worldContainer.lights[y][x], n, sunlightlevel);
+                        worldContainer.lights[y][x] = MathTool.max(worldContainer.lights[y][x], n, sunlightlevel);
                     } else {
                         worldContainer.lights[y][x] = Math.max(worldContainer.lights[y][x], n);
                     }
@@ -3995,7 +3999,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 width = itemImgs.get(worldContainer.moveItem).getWidth();
                 height = itemImgs.get(worldContainer.moveItem).getHeight();
                 pg2.drawImage(itemImgs.get(worldContainer.moveItem),
-                        mousePos.getX() + 12 + ((int) (24 - (double) 12 / this.max(width, height, 12) * width * 2) / 2), mousePos.getY() + 12 + ((int) (24 - (double) 12 / this.max(width, height, 12) * height * 2) / 2), mousePos.getX() + 36 - ((int) (24 - (double) 12 / this.max(width, height, 12) * width * 2) / 2), mousePos.getY() + 36 - ((int) (24 - (double) 12 / this.max(width, height, 12) * height * 2) / 2),
+                        mousePos.getX() + 12 + ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * width * 2) / 2), mousePos.getY() + 12 + ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * height * 2) / 2), mousePos.getX() + 36 - ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * width * 2) / 2), mousePos.getY() + 36 - ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * height * 2) / 2),
                         0, 0, width, height,
                         null);
                 if (worldContainer.moveNum > 1) {
@@ -4881,34 +4885,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         } finally {
             System.out.println(sb.toString());
         }
-    }
-
-    public static int max(int a, int b, int c) {
-        return Math.max(Math.max(a, b), c);
-    }
-
-    public static float max(float a, float b, float c) {
-        return Math.max(Math.max(a, b), c);
-    }
-
-    public static double max(double a, double b, double c) {
-        return Math.max(Math.max(a, b), c);
-    }
-
-    public static int max(int a, int b, int c, int d) {
-        return Math.max(Math.max(a, b), Math.max(c, d));
-    }
-
-    public static float max(float a, float b, float c, float d) {
-        return Math.max(Math.max(a, b), Math.max(c, d));
-    }
-
-    public static double max(double a, double b, double c, double d) {
-        return Math.max(Math.max(a, b), Math.max(c, d));
-    }
-
-    public static int mod(int a, int q) {
-        return ((a % q) + q) % q;
     }
 
     public static void print(String text) {

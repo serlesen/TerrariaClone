@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 
+import com.sergio.refacto.dto.ItemCollection;
 import com.sergio.refacto.dto.ItemType;
 import com.sergio.refacto.dto.RecipeItem;
 

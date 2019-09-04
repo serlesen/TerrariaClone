@@ -1,4 +1,4 @@
-package com.sergio.refacto;
+package com.sergio.refacto.items;
 
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
@@ -9,12 +9,18 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
+import com.sergio.refacto.Entity;
+import com.sergio.refacto.Inventory;
+import com.sergio.refacto.dto.ItemCollection;
+import com.sergio.refacto.Player;
+import com.sergio.refacto.TerrariaClone;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ItemType;
-import com.sergio.refacto.items.CloudsAggregate;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
+@FieldDefaults(level = AccessLevel.PUBLIC)
 public class WorldContainer implements Serializable {
 
     Integer[][][] blocks;
@@ -77,9 +83,7 @@ public class WorldContainer implements Serializable {
 
     String version;
 
-    private static final int seed = new Random().nextInt();
-
-    public static final int CHUNKBLOCKS = 96;
+    static final int CHUNKBLOCKS = 96;
 
     public WorldContainer() {
         currentSkyLight = 28800;

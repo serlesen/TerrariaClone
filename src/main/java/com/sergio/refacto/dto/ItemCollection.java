@@ -1,11 +1,10 @@
-package com.sergio.refacto;
+package com.sergio.refacto.dto;
 
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sergio.refacto.dto.ItemType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;

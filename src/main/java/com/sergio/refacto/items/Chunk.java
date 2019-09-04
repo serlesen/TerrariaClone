@@ -1,7 +1,7 @@
 package com.sergio.refacto.items;
 
 import com.sergio.refacto.TerrariaClone;
-import com.sergio.refacto.World;
+import com.sergio.refacto.tools.PerlinNoise;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -31,21 +31,47 @@ public class Chunk {
         this.cx = cx;
         this.cy = cy;
 
-        Object[] rv = World.generateChunk(cx, cy);
-        blocks = (Integer[][][])rv[0];
-        blockds = (Byte[][][])rv[1];
-        blockdns = (Byte[][])rv[2];
-        blockbgs = (Byte[][])rv[3];
-        blockts = (Byte[][])rv[4];
-        lights = (Float[][])rv[5];
-        power = (Float[][][])rv[6];
-        lsources = (Boolean[][])rv[7];
-        zqn = (Byte[][])rv[8];
-        pzqn = (Byte[][][])rv[9];
-        arbprd = (Boolean[][][])rv[10];
-        wcnct = (Boolean[][])rv[11];
-        drawn = (Boolean[][])rv[12];
-        rdrawn = (Boolean[][])rv[13];
-        ldrawn = (Boolean[][])rv[14];
+        int size = TerrariaClone.CHUNKBLOCKS;
+        blocks = new Integer[3][size][size];
+        blockds = new Byte[3][size][size];
+        blockdns = new Byte[size][size];
+        blockbgs = new Byte[size][size];
+        blockts = new Byte[size][size];
+        lights = new Float[size][size];
+        power = new Float[3][size][size];
+        lsources = new Boolean[size][size];
+        zqn = new Byte[size][size];
+        pzqn = new Byte[3][size][size];
+        arbprd = new Boolean[3][size][size];
+        wcnct = new Boolean[size][size];
+        drawn = new Boolean[size][size];
+        rdrawn = new Boolean[size][size];
+        ldrawn = new Boolean[size][size];
+        for (int y=0; y<size; y++) {
+            for (int x=0; x<size; x++) {
+                for (int l=0; l<3; l++) {
+                    if (l == 1 && cy*size+y >= PerlinNoise.perlinNoise((cx*size+x) / 10.0, 0.5, 0) * 30 + 50) {
+                        blocks[l][y][x] = 1; // dirt
+                    }
+                    else {
+                        blocks[l][y][x] = 0;
+                    }
+                    arbprd[l][y][x] = false;
+                    power[l][y][x] = (float)0;
+                }
+                blockdns[y][x] = (byte) RandomTool.nextInt(5);
+                blockbgs[y][x] = 0;
+                blockts[y][x] = (byte) RandomTool.nextInt(8);
+                lights[y][x] = (float)19;
+                lsources[y][x] = false;
+                wcnct[y][x] = false;
+                drawn[y][x] = false;
+                rdrawn[y][x] = false;
+                ldrawn[y][x] = false;
+                blockds[0][y][x] = (byte)0;
+                blockds[2][y][x] = (byte)0;
+            }
+        }
+        blockds[1] = World.generateOutlines(blocks[1]);
     }
 }
