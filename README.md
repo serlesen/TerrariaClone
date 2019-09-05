@@ -10,6 +10,7 @@ Refactorings done:
 * Remove commented code
 * Created some utility classes
 * Use enums instead of array of indexes/strings
+* Enrich enums with functional properties
 * Avoid strings and literal numbers, replaced by enums
 * Pack some fields together into contexts
 * Migrate Arrays into classes with a meaning for each field
