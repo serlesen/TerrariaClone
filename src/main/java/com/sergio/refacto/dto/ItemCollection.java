@@ -14,13 +14,14 @@ import lombok.experimental.FieldDefaults;
 public class ItemCollection implements Serializable {
 
     ItemType type;
-    short[] ids, nums, durs;
+    short[] nums, durs;
+    Items[] ids;
     transient BufferedImage image;
     double FUELP = 0;
     double SMELTP = 0;
     boolean F_ON = false;
 
-    public ItemCollection(ItemType type, short[] ids, short[] nums, short[] durs) {
+    public ItemCollection(ItemType type, Items[] ids, short[] nums, short[] durs) {
         this.type = type;
         this.ids = ids;
         this.nums = nums;
@@ -28,11 +29,11 @@ public class ItemCollection implements Serializable {
     }
 
     public ItemCollection(ItemType type, int size) {
-        short[] list1 = new short[size];
+        Items[] list1 = new Items[size];
         short[] list2 = new short[size];
         short[] list3 = new short[size];
         for (int i = 0; i < size; i++) {
-            list1[i] = 0;
+            list1[i] = Items.EMPTY;
             list2[i] = 0;
             list3[i] = 0;
         }
@@ -49,7 +50,7 @@ public class ItemCollection implements Serializable {
         this.durs = ic.durs;
     }
 
-    public boolean areIdsEquals(short[] inputValues) {
+    public boolean areIdsEquals(Items[] inputValues) {
         boolean valid = true;
 
         for (int i = 0; i < inputValues.length; i++) {
@@ -62,21 +63,20 @@ public class ItemCollection implements Serializable {
         return valid;
     }
 
-    public boolean areInvalidIds(short[] inputValues) {
+    public boolean areInvalidIds(Items[] inputValues) {
         boolean valid = true;
 
-        List<Short> r3 = new ArrayList<>(6);
+        List<Items> r3 = new ArrayList<>(6);
         for (int j = 0; j < inputValues.length - 2; j++) {
             r3.add(inputValues[j]);
         }
         for (int j = 0; j < inputValues.length; j++) {
-            int n = r3.indexOf(ids[j]);
-            if (n == -1) {
+            if (!r3.contains(ids[j])) {
                 valid = false;
                 break;
             }
             else {
-                r3.remove(n);
+                r3.remove(ids[j]);
             }
         }
 

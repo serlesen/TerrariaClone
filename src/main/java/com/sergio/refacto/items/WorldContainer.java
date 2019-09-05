@@ -17,6 +17,7 @@ import com.sergio.refacto.Player;
 import com.sergio.refacto.TerrariaClone;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ItemType;
+import com.sergio.refacto.dto.Items;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
@@ -49,7 +50,8 @@ public class WorldContainer implements Serializable {
 
     int mx, my, icx, icy, mining, immune;
 
-    short moveItem, moveNum, moveItemTemp, moveNumTemp;
+    short moveNum, moveNumTemp;
+    Items moveItem, moveItemTemp;
     int msi;
 
     double toolAngle, toolSpeed;
@@ -103,7 +105,7 @@ public class WorldContainer implements Serializable {
         List<Integer> machinesx, List<Integer> machinesy, Boolean[][] lsources, List<Integer> lqx, List<Integer> lqy, Boolean[][] lqd,
         int rgnc1, int rgnc2, int layer, int layerTemp, int blockTemp,
         int mx, int my, int icx, int icy, int mining, int immune,
-        short moveItem, short moveNum, short moveItemTemp, short moveNumTemp, int msi,
+        Items moveItem, short moveNum, Items moveItemTemp, short moveNumTemp, int msi,
         double toolAngle, double toolSpeed, double timeOfDay, int currentSkyLight, int day, int mobCount,
         boolean ready, boolean showTool, boolean showInv, boolean doMobSpawn,
         int WIDTH, int HEIGHT, int WORLDWIDTH, int WORLDHEIGHT,
@@ -308,91 +310,89 @@ public class WorldContainer implements Serializable {
 
         if (DebugContext.ITEMS != null) {
             if (DebugContext.ITEMS.equals("normal")) {
-                inventory.addItem((short) 172, (short) 1);
-                inventory.addItem((short) 173, (short) 1);
-                inventory.addItem((short) 174, (short) 1);
-                inventory.addItem((short) 164, (short) 100);
-                inventory.addItem((short) 35, (short) 100);
-                inventory.addItem((short) 36, (short) 100);
-                inventory.addItem((short) 37, (short) 100);
-                inventory.addItem((short) 20, (short) 5);
-                inventory.addItem((short) 27, (short) 5);
-                inventory.addItem((short) 33, (short) 1);
-                inventory.addItem((short) 28, (short) 100);
-                inventory.addItem((short) 50, (short) 100);
-                inventory.addItem((short) 1, (short) 100);
-                inventory.addItem((short) 2, (short) 100);
-                inventory.addItem((short) 15, (short) 100);
-            }
-            if (DebugContext.ITEMS.equals("tools")) {
-                inventory.addItem((short) 154, (short) 1);
-                inventory.addItem((short) 155, (short) 1);
-                inventory.addItem((short) 156, (short) 1);
-                inventory.addItem((short) 157, (short) 1);
-                inventory.addItem((short) 158, (short) 1);
-                inventory.addItem((short) 159, (short) 1);
-                inventory.addItem((short) 7, (short) 1);
-                inventory.addItem((short) 11, (short) 1);
-                inventory.addItem((short) 12, (short) 1);
-                inventory.addItem((short) 8, (short) 1);
-                inventory.addItem((short) 13, (short) 1);
-                inventory.addItem((short) 14, (short) 1);
-                inventory.addItem((short) 9, (short) 1);
-                inventory.addItem((short) 16, (short) 1);
-                inventory.addItem((short) 17, (short) 1);
-                inventory.addItem((short) 10, (short) 1);
-                inventory.addItem((short) 18, (short) 1);
-                inventory.addItem((short) 33, (short) 1);
-                inventory.addItem((short) 51, (short) 1);
-                inventory.addItem((short) 52, (short) 1);
-                inventory.addItem((short) 53, (short) 1);
-                inventory.addItem((short) 54, (short) 1);
-                inventory.addItem((short) 55, (short) 1);
-                inventory.addItem((short) 56, (short) 1);
-                inventory.addItem((short) 57, (short) 1);
-                inventory.addItem((short) 58, (short) 1);
-                inventory.addItem((short) 59, (short) 1);
-                inventory.addItem((short) 145, (short) 1);
-                inventory.addItem((short) 146, (short) 1);
-                inventory.addItem((short) 147, (short) 1);
-                inventory.addItem((short) 148, (short) 1);
-                inventory.addItem((short) 149, (short) 1);
-                inventory.addItem((short) 150, (short) 1);
-                inventory.addItem((short) 169, (short) 1);
-                inventory.addItem((short) 170, (short) 1);
-                inventory.addItem((short) 171, (short) 1);
-                inventory.addItem((short) 172, (short) 1);
-                inventory.addItem((short) 173, (short) 1);
-                inventory.addItem((short) 174, (short) 1);
+                inventory.addItem(Items.IRRADIUM_PICK, (short) 1);
+                inventory.addItem(Items.IRRADIUM_AXE, (short) 1);
+                inventory.addItem(Items.IRRADIUM_SWORD, (short) 1);
+                inventory.addItem(Items.STONE_BRICKS, (short) 100);
+                inventory.addItem(Items.WOODEN_TORCH, (short) 100);
+                inventory.addItem(Items.COAL_TORCH, (short) 100);
+                inventory.addItem(Items.LUMENSTONE_TORCH, (short) 100);
+                inventory.addItem(Items.WORKBENCH, (short) 5);
+                inventory.addItem(Items.FURNACE, (short) 5);
+                inventory.addItem(Items.STONE_LIGHTER, (short) 1);
+                inventory.addItem(Items.COAL, (short) 100);
+                inventory.addItem(Items.MAGNETITE_ORE, (short) 100);
+                inventory.addItem(Items.DIRT, (short) 100);
+                inventory.addItem(Items.STONE, (short) 100);
+                inventory.addItem(Items.WOOD, (short) 100);
+            } else if (DebugContext.ITEMS.equals("tools")) {
+                inventory.addItem(Items.WOODEN_PICK, (short) 1);
+                inventory.addItem(Items.WOODEN_AXE, (short) 1);
+                inventory.addItem(Items.WOODEN_SWORD, (short) 1);
+                inventory.addItem(Items.STONE_PICK, (short) 1);
+                inventory.addItem(Items.STONE_AXE, (short) 1);
+                inventory.addItem(Items.STONE_SWORD, (short) 1);
+                inventory.addItem(Items.COPPER_PICK, (short) 1);
+                inventory.addItem(Items.COPPER_AXE, (short) 1);
+                inventory.addItem(Items.IRON_AXE, (short) 1);
+                inventory.addItem(Items.IRON_PICK, (short) 1);
+                inventory.addItem(Items.SILVER_AXE, (short) 1);
+                inventory.addItem(Items.GOLD_AXE, (short) 1);
+                inventory.addItem(Items.SILVER_PICK, (short) 1);
+                inventory.addItem(Items.COPPER_SWORD, (short) 1);
+                inventory.addItem(Items.IRON_SWORD, (short) 1);
+                inventory.addItem(Items.GOLD_PICK, (short) 1);
+                inventory.addItem(Items.SILVER_SWORD, (short) 1);
+                inventory.addItem(Items.STONE_LIGHTER, (short) 1);
+                inventory.addItem(Items.ZINC_PICK, (short) 1);
+                inventory.addItem(Items.ZINC_AXE, (short) 1);
+                inventory.addItem(Items.ZINC_SWORD, (short) 1);
+                inventory.addItem(Items.RHYMESTONE_PICK, (short) 1);
+                inventory.addItem(Items.RHYMESTONE_AXE, (short) 1);
+                inventory.addItem(Items.RHYMESTONE_SWORD, (short) 1);
+                inventory.addItem(Items.OBDURITE_PICK, (short) 1);
+                inventory.addItem(Items.OBDURITE_AXE, (short) 1);
+                inventory.addItem(Items.OBDURITE_SWORD, (short) 1);
+                inventory.addItem(Items.ALUMINUM_PICK, (short) 1);
+                inventory.addItem(Items.ALUMINUM_AXE, (short) 1);
+                inventory.addItem(Items.ALUMINUM_SWORD, (short) 1);
+                inventory.addItem(Items.LEAD_PICK, (short) 1);
+                inventory.addItem(Items.LEAD_AXE, (short) 1);
+                inventory.addItem(Items.LEAD_SWORD, (short) 1);
+                inventory.addItem(Items.MAGNETITE_PICK, (short) 1);
+                inventory.addItem(Items.MAGNETITE_AXE, (short) 1);
+                inventory.addItem(Items.MAGNETITE_SWORD, (short) 1);
+                inventory.addItem(Items.IRRADIUM_PICK, (short) 1);
+                inventory.addItem(Items.IRRADIUM_AXE, (short) 1);
+                inventory.addItem(Items.IRRADIUM_SWORD, (short) 1);
 
-                inventory.addItem((short) 19, (short) 1);
-            }
-            if (DebugContext.ITEMS.equals("testing")) {
-                inventory.addItem((short) 172, (short) 1);
-                inventory.addItem((short) 173, (short) 1);
-                inventory.addItem((short) 175, (short) 100);
-                inventory.addItem((short) 15, (short) 100);
-                inventory.addItem((short) 35, (short) 100);
-                inventory.addItem((short) 36, (short) 100);
-                inventory.addItem((short) 37, (short) 100);
-                inventory.addItem((short) 176, (short) 100);
-                inventory.addItem((short) 177, (short) 100);
-                inventory.addItem((short) 178, (short) 100);
-                inventory.addItem((short) 27, (short) 100);
-                inventory.addItem((short) 33, (short) 1);
-                inventory.addItem((short) 86, (short) 100);
-                inventory.addItem((short) 49, (short) 100);
-                inventory.addItem((short) 180, (short) 100);
-                inventory.addItem((short) 181, (short) 100);
-                inventory.addItem((short) 182, (short) 100);
-                inventory.addItem((short) 183, (short) 100);
-                inventory.addItem((short) 184, (short) 100);
-                inventory.addItem((short) 185, (short) 100);
-                inventory.addItem((short) 186, (short) 100);
-                inventory.addItem((short) 187, (short) 100);
-                inventory.addItem((short) 188, (short) 100);
-                inventory.addItem((short) 189, (short) 100);
-                inventory.addItem((short) 190, (short) 1);
+                inventory.addItem(Items.GOLD_SWORD, (short) 1);
+            } else if (DebugContext.ITEMS.equals("testing")) {
+                inventory.addItem(Items.IRRADIUM_PICK, (short) 1);
+                inventory.addItem(Items.IRRADIUM_AXE, (short) 1);
+                inventory.addItem(Items.ZYTHIUM_WIRE, (short) 100);
+                inventory.addItem(Items.WOOD, (short) 100);
+                inventory.addItem(Items.WOODEN_TORCH, (short) 100);
+                inventory.addItem(Items.COAL_TORCH, (short) 100);
+                inventory.addItem(Items.LUMENSTONE_TORCH, (short) 100);
+                inventory.addItem(Items.ZYTHIUM_TORCH, (short) 100);
+                inventory.addItem(Items.ZYTHIUM_LAMP, (short) 100);
+                inventory.addItem(Items.LEVER, (short) 100);
+                inventory.addItem(Items.FURNACE, (short) 100);
+                inventory.addItem(Items.STONE_LIGHTER, (short) 1);
+                inventory.addItem(Items.FROSTLEAF, (short) 100);
+                inventory.addItem(Items.SKYSTONE, (short) 100);
+                inventory.addItem(Items.ZYTHIUM_AMPLIFIER, (short) 100);
+                inventory.addItem(Items.ZYTHIUM_INVERTER, (short) 100);
+                inventory.addItem(Items.BUTTON, (short) 100);
+                inventory.addItem(Items.WOODEN_PRESSURE_PLATE, (short) 100);
+                inventory.addItem(Items.STONE_PRESSURE_PLATE, (short) 100);
+                inventory.addItem(Items.ZYTHIUM_PRESSURE_PLATE, (short) 100);
+                inventory.addItem(Items.ZYTHIUM_DELAYER_1, (short) 100);
+                inventory.addItem(Items.ZYTHIUM_DELAYER_2, (short) 100);
+                inventory.addItem(Items.ZYTHIUM_DELAYER_4, (short) 100);
+                inventory.addItem(Items.ZYTHIUM_DELAYER_8, (short) 100);
+                inventory.addItem(Items.WRENCH, (short) 1);
             }
         }
 
@@ -405,7 +405,8 @@ public class WorldContainer implements Serializable {
         mining = 0;
 
         mx = 0; my = 0;
-        moveItem = 0; moveNum = 0;
+        moveItem = Items.EMPTY;
+        moveNum = 0;
 
         entities = new ArrayList<>(0);
 

@@ -279,10 +279,10 @@ public class Player implements Serializable {
     }
 
     public int sumArmor() {
-        return (Items.findByIndex(TerrariaClone.armor.getIds()[0]).getArmor() +
-                Items.findByIndex(TerrariaClone.armor.getIds()[1]).getArmor() +
-                Items.findByIndex(TerrariaClone.armor.getIds()[2]).getArmor() +
-                Items.findByIndex(TerrariaClone.armor.getIds()[3]).getArmor());
+        return (TerrariaClone.armor.getIds()[0].getArmor() +
+                TerrariaClone.armor.getIds()[1].getArmor() +
+                TerrariaClone.armor.getIds()[2].getArmor() +
+                TerrariaClone.armor.getIds()[3].getArmor());
     }
 
     private static BufferedImage loadImage(String path) {

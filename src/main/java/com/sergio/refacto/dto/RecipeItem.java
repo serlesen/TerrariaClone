@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RecipeItem {
 
-    short[] values;
-    short id;
+    Items[] ingredients;
+    Items resultingItem;
     short num;
 }

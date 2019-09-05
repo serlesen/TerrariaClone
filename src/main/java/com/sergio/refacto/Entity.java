@@ -5,10 +5,12 @@ import java.awt.image.*;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 import javax.imageio.ImageIO;
 
 import com.sergio.refacto.dto.EntityType;
 import com.sergio.refacto.dto.ImageState;
+import com.sergio.refacto.dto.Items;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -26,7 +28,8 @@ public class Entity implements Serializable {
 
     int totalHealthPoints, healthPoints, armorPoints, attackPoints;
 
-    short id, num, dur;
+    Items item;
+    short num, dur;
 
     boolean onGround, immune, grounded, onGroundDelay, nohit;
 
@@ -123,24 +126,24 @@ public class Entity implements Serializable {
         }
     }
 
-    public Entity(double x, double y, double vx, double vy, short id, short num) {
-        this(x, y, vx, vy, id, num, (short)0, 0);
+    public Entity(double x, double y, double vx, double vy, Items item, short num) {
+        this(x, y, vx, vy, item, num, (short)0, 0);
     }
 
-    public Entity(double x, double y, double vx, double vy, short id, short num, int mdelay) {
-        this(x, y, vx, vy, id, num, (short)0, mdelay);
+    public Entity(double x, double y, double vx, double vy, Items item, short num, int mdelay) {
+        this(x, y, vx, vy, item, num, (short)0, mdelay);
     }
 
-    public Entity(double x, double y, double vx, double vy, short id, short num, short dur) {
-        this(x, y, vx, vy, id, num, dur, 0);
+    public Entity(double x, double y, double vx, double vy, Items item, short num, short dur) {
+        this(x, y, vx, vy, item, num, dur, 0);
     }
 
-    public Entity(double x, double y, double vx, double vy, short id, short num, short dur, int mdelay) {
+    public Entity(double x, double y, double vx, double vy, Items item, short num, short dur, int mdelay) {
         this.x = x;
         this.y = y;
         this.vx = vx;
         this.vy = vy;
-        this.id = id;
+        this.item = item;
         this.num = num;
         this.dur = dur;
         this.mdelay = mdelay;
@@ -151,7 +154,7 @@ public class Entity implements Serializable {
 
         dframes = 0;
 
-        image = TerrariaClone.getItemImgs().get(id);
+        image = TerrariaClone.getItemImgs().get(item.getIndex());
 
         width = image.getWidth()*2; height = image.getHeight()*2;
     }
@@ -542,69 +545,69 @@ public class Entity implements Serializable {
         return healthPoints <= 0;
     }
 
-    public ArrayList<Short> drops() {
-        ArrayList<Short> dropList = new ArrayList<Short>();
+    public List<Items> drops() {
+        List<Items> dropList = new ArrayList<>();
         if (entityType == EntityType.BLUE_BUBBLE) {
             for (i=0; i< RandomTool.nextInt(3); i++) {
-                dropList.add(new Short((short)97));
+                dropList.add(Items.BLUE_GOO);
             }
         } else if (entityType == EntityType.GREEN_BUBBLE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
-                dropList.add(new Short((short)98));
+                dropList.add(Items.GREEN_GOO);
             }
         } else if (entityType == EntityType.RED_BUBBLE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
-                dropList.add(new Short((short)99));
+                dropList.add(Items.RED_GOO);
             }
         } else if (entityType == EntityType.YELLOW_BUBBLE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
-                dropList.add(new Short((short)100));
+                dropList.add(Items.YELLOW_GOO);
             }
         } else if (entityType == EntityType.BLACK_BUBBLE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
-                dropList.add(new Short((short)101));
+                dropList.add(Items.BLACK_GOO);
             }
         } else if (entityType == EntityType.WHITE_BUBBLE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
-                dropList.add(new Short((short)102));
+                dropList.add(Items.WHITE_GOO);
             }
         } else if (entityType == EntityType.SHOOTING_STAR) {
             for (i=0; i<RandomTool.nextInt(2); i++) {
-                dropList.add(new Short((short)103));
+                dropList.add(Items.ASTRAL_SHARD);
             }
         } else if (entityType == EntityType.ZOMBIE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
-                dropList.add(new Short((short)104));
+                dropList.add(Items.ROTTEN_CHUNK);
             }
         } else if (entityType == EntityType.ARMORED_ZOMBIE) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
-                dropList.add(new Short((short)104));
+                dropList.add(Items.ROTTEN_CHUNK);
             }
             if (RandomTool.nextInt(15) == 0) {
-                dropList.add(new Short((short)109));
+                dropList.add(Items.IRON_HELMET);
             }
             if (RandomTool.nextInt(15) == 0) {
-                dropList.add(new Short((short)110));
+                dropList.add(Items.IRON_CHESTPLATE);
             }
             if (RandomTool.nextInt(15) == 0) {
-                dropList.add(new Short((short)111));
+                dropList.add(Items.IRON_LEGGINGS);
             }
             if (RandomTool.nextInt(15) == 0) {
-                dropList.add(new Short((short)112));
+                dropList.add(Items.IRON_GREAVES);
             }
         } else if (entityType == EntityType.SANDBOT) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
-                dropList.add(new Short((short)74));
+                dropList.add(Items.SAND);
             }
             if (RandomTool.nextInt(2) == 0) {
-                dropList.add(new Short((short)44));
+                dropList.add(Items.ZYTHIUM_ORE);
             }
             if (RandomTool.nextInt(6) == 0) {
-                dropList.add(new Short((short)45));
+                dropList.add(Items.SILICON_ORE);
             }
         } else if (entityType == EntityType.SNOWMAN) {
             for (i=0; i<RandomTool.nextInt(3); i++) {
-                dropList.add(new Short((short)75));
+                dropList.add(Items.SNOW);
             }
         }
         return dropList;

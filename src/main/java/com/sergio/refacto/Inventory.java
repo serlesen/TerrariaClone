@@ -28,7 +28,7 @@ public class Inventory implements Serializable {
 
     private transient Graphics2D g2;
 
-    short[] ids;
+    Items[] items;
     short[] nums;
     short[] durs;
 
@@ -42,11 +42,11 @@ public class Inventory implements Serializable {
     private static final int MAXIMUM_ITEMS = 40;
 
     public Inventory() {
-        ids = new short[MAXIMUM_ITEMS];
+        items = new Items[MAXIMUM_ITEMS];
         nums = new short[MAXIMUM_ITEMS];
         durs = new short[MAXIMUM_ITEMS];
         for (i=0; i<MAXIMUM_ITEMS; i++) {
-            ids[i] = 0;
+            items[i] = Items.EMPTY;
             nums[i] = 0;
             durs[i] = 0;
         }
@@ -85,313 +85,565 @@ public class Inventory implements Serializable {
         RECIPES = new HashMap<>();
 
         RecipeItem[] list_thing1 = {
-            new RecipeItem(new short[]{15, 15, 15, 0, 15, 0, 0, 15, 0}, (short) 154, (short) 1), // Wooden Pick
-            new RecipeItem(new short[]{2, 2, 2, 0, 15, 0, 0, 15, 0}, (short) 157, (short) 1), // Stone Pick
-            new RecipeItem(new short[]{29, 29, 29, 0, 15, 0, 0, 15, 0}, (short) 7, (short) 1), // Copper Pick
-            new RecipeItem(new short[]{30, 30, 30, 0, 15, 0, 0, 15, 0}, (short) 8, (short) 1), // Iron Pick
-            new RecipeItem(new short[]{31, 31, 31, 0, 15, 0, 0, 15, 0}, (short) 9, (short) 1), // Silver Pick
-            new RecipeItem(new short[]{32, 32, 32, 0, 15, 0, 0, 15, 0}, (short) 10, (short) 1), // Gold Pick
-            new RecipeItem(new short[]{60, 60, 60, 0, 15, 0, 0, 15, 0}, (short) 51, (short) 1), // Zinc Pick
-            new RecipeItem(new short[]{61, 61, 61, 0, 15, 0, 0, 15, 0}, (short) 54, (short) 1), // Rhymestone Pick
-            new RecipeItem(new short[]{62, 62, 62, 0, 15, 0, 0, 15, 0}, (short) 57, (short) 1), // Obdurite Pick
-            new RecipeItem(new short[]{73, 73, 73, 0, 15, 0, 0, 15, 0}, (short) 169, (short) 1), // Magnetite Pick
-            new RecipeItem(new short[]{69, 69, 69, 0, 15, 0, 0, 15, 0}, (short) 172, (short) 1), // Irradium Pick
-            new RecipeItem(new short[]{15, 15, 0, 15, 15, 0, 0, 15, 0}, (short) 155, (short) 1), // Wooden Axe
-            new RecipeItem(new short[]{0, 15, 15, 0, 15, 15, 0, 15, 0}, (short) 155, (short) 1),
-            new RecipeItem(new short[]{15, 15, 0, 15, 15, 0, 15, 0, 0}, (short) 155, (short) 1),
-            new RecipeItem(new short[]{0, 15, 15, 0, 15, 15, 0, 0, 15}, (short) 155, (short) 1),
-            new RecipeItem(new short[]{2, 2, 0, 2, 15, 0, 0, 15, 0}, (short) 158, (short) 1), // Stone Axe
-            new RecipeItem(new short[]{0, 2, 2, 0, 15, 2, 0, 15, 0}, (short) 158, (short) 1),
-            new RecipeItem(new short[]{2, 2, 0, 15, 2, 0, 15, 0, 0}, (short) 158, (short) 1),
-            new RecipeItem(new short[]{0, 2, 2, 0, 2, 15, 0, 0, 15}, (short) 158, (short) 1),
-            new RecipeItem(new short[]{29, 29, 0, 29, 15, 0, 0, 15, 0}, (short) 11, (short) 1), // Copper Axe
-            new RecipeItem(new short[]{0, 29, 29, 0, 15, 29, 0, 15, 0}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{29, 29, 0, 15, 29, 0, 15, 0, 0}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{0, 29, 29, 0, 29, 15, 0, 0, 15}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{30, 30, 0, 30, 15, 0, 0, 15, 0}, (short) 11, (short) 1), // Iron Axe
-            new RecipeItem(new short[]{0, 30, 30, 0, 15, 30, 0, 15, 0}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{30, 30, 0, 15, 30, 0, 15, 0, 0}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{0, 30, 30, 0, 30, 15, 0, 0, 15}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{31, 31, 0, 31, 15, 0, 0, 15, 0}, (short) 11, (short) 1), // Silver Axe
-            new RecipeItem(new short[]{0, 31, 31, 0, 15, 31, 0, 15, 0}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{31, 31, 0, 15, 31, 0, 15, 0, 0}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{0, 31, 31, 0, 31, 15, 0, 0, 15}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{32, 32, 0, 32, 15, 0, 0, 15, 0}, (short) 11, (short) 1), // Gold Axe
-            new RecipeItem(new short[]{0, 32, 32, 0, 15, 32, 0, 15, 0}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{32, 32, 0, 15, 32, 0, 15, 0, 0}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{0, 32, 32, 0, 32, 15, 0, 0, 15}, (short) 11, (short) 1),
-            new RecipeItem(new short[]{60, 60, 0, 60, 15, 0, 0, 15, 0}, (short) 52, (short) 1), // Zinc Axe
-            new RecipeItem(new short[]{0, 60, 60, 0, 15, 60, 0, 15, 0}, (short) 52, (short) 1),
-            new RecipeItem(new short[]{60, 60, 0, 15, 60, 0, 15, 0, 0}, (short) 52, (short) 1),
-            new RecipeItem(new short[]{0, 60, 60, 0, 60, 15, 0, 0, 15}, (short) 52, (short) 1),
-            new RecipeItem(new short[]{61, 61, 0, 61, 15, 0, 0, 15, 0}, (short) 55, (short) 1), // Rhymestone Axe
-            new RecipeItem(new short[]{0, 61, 61, 0, 15, 61, 0, 15, 0}, (short) 55, (short) 1),
-            new RecipeItem(new short[]{61, 61, 0, 15, 61, 0, 15, 0, 0}, (short) 55, (short) 1),
-            new RecipeItem(new short[]{0, 61, 61, 0, 61, 15, 0, 0, 15}, (short) 55, (short) 1),
-            new RecipeItem(new short[]{62, 62, 0, 62, 15, 0, 0, 15, 0}, (short) 58, (short) 1), // Obdurite Axe
-            new RecipeItem(new short[]{0, 62, 62, 0, 15, 62, 0, 15, 0}, (short) 58, (short) 1),
-            new RecipeItem(new short[]{62, 62, 0, 15, 62, 0, 15, 0, 0}, (short) 58, (short) 1),
-            new RecipeItem(new short[]{0, 62, 62, 0, 62, 15, 0, 0, 15}, (short) 58, (short) 1),
-            new RecipeItem(new short[]{73, 73, 0, 73, 15, 0, 0, 15, 0}, (short) 170, (short) 1), // Magnetite Axe
-            new RecipeItem(new short[]{0, 73, 73, 0, 15, 73, 0, 15, 0}, (short) 170, (short) 1),
-            new RecipeItem(new short[]{73, 73, 0, 15, 73, 0, 15, 0, 0}, (short) 170, (short) 1),
-            new RecipeItem(new short[]{0, 73, 73, 0, 73, 15, 0, 0, 15}, (short) 170, (short) 1),
-            new RecipeItem(new short[]{69, 69, 0, 69, 15, 0, 0, 15, 0}, (short) 169, (short) 1), // Irradium Axe
-            new RecipeItem(new short[]{0, 69, 69, 0, 15, 69, 0, 15, 0}, (short) 169, (short) 1),
-            new RecipeItem(new short[]{69, 69, 0, 15, 69, 0, 15, 0, 0}, (short) 169, (short) 1),
-            new RecipeItem(new short[]{0, 69, 69, 0, 69, 15, 0, 0, 15}, (short) 169, (short) 1),
-            new RecipeItem(new short[]{15, 0, 0, 15, 0, 0, 15, 0, 0}, (short) 156, (short) 1), // Wooden Sword
-            new RecipeItem(new short[]{0, 15, 0, 0, 15, 0, 0, 15, 0}, (short) 156, (short) 1),
-            new RecipeItem(new short[]{0, 0, 15, 0, 0, 15, 0, 0, 15}, (short) 156, (short) 1),
-            new RecipeItem(new short[]{2, 0, 0, 2, 0, 0, 15, 0, 0}, (short) 159, (short) 1), // Stone Sword
-            new RecipeItem(new short[]{0, 2, 0, 0, 2, 0, 0, 15, 0}, (short) 159, (short) 1),
-            new RecipeItem(new short[]{0, 0, 2, 0, 0, 2, 0, 0, 15}, (short) 159, (short) 1),
-            new RecipeItem(new short[]{29, 0, 0, 29, 0, 0, 15, 0, 0}, (short) 16, (short) 1), // Copper Sword
-            new RecipeItem(new short[]{0, 29, 0, 0, 29, 0, 0, 15, 0}, (short) 16, (short) 1),
-            new RecipeItem(new short[]{0, 0, 29, 0, 0, 29, 0, 0, 15}, (short) 16, (short) 1),
-            new RecipeItem(new short[]{30, 0, 0, 30, 0, 0, 15, 0, 0}, (short) 17, (short) 1), // Iron Sword
-            new RecipeItem(new short[]{0, 30, 0, 0, 30, 0, 0, 15, 0}, (short) 17, (short) 1),
-            new RecipeItem(new short[]{0, 0, 30, 0, 0, 30, 0, 0, 15}, (short) 17, (short) 1),
-            new RecipeItem(new short[]{31, 0, 0, 31, 0, 0, 15, 0, 0}, (short) 18, (short) 1), // Silver Sword
-            new RecipeItem(new short[]{0, 31, 0, 0, 31, 0, 0, 15, 0}, (short) 18, (short) 1),
-            new RecipeItem(new short[]{0, 0, 31, 0, 0, 31, 0, 0, 15}, (short) 18, (short) 1),
-            new RecipeItem(new short[]{32, 0, 0, 32, 0, 0, 15, 0, 0}, (short) 19, (short) 1), // Gold Sword
-            new RecipeItem(new short[]{0, 32, 0, 0, 32, 0, 0, 15, 0}, (short) 19, (short) 1),
-            new RecipeItem(new short[]{0, 0, 32, 0, 0, 32, 0, 0, 15}, (short) 19, (short) 1),
-            new RecipeItem(new short[]{38, 0, 0, 38, 0, 0, 15, 0, 0}, (short) 19, (short) 1), // Zinc Sword
-            new RecipeItem(new short[]{0, 38, 0, 0, 38, 0, 0, 15, 0}, (short) 19, (short) 1),
-            new RecipeItem(new short[]{0, 0, 38, 0, 0, 38, 0, 0, 15}, (short) 19, (short) 1),
-            new RecipeItem(new short[]{39, 0, 0, 39, 0, 0, 15, 0, 0}, (short) 19, (short) 1), // Rhymestone Sword
-            new RecipeItem(new short[]{0, 39, 0, 0, 39, 0, 0, 15, 0}, (short) 19, (short) 1),
-            new RecipeItem(new short[]{0, 0, 39, 0, 0, 39, 0, 0, 15}, (short) 19, (short) 1),
-            new RecipeItem(new short[]{40, 0, 0, 40, 0, 0, 15, 0, 0}, (short) 19, (short) 1), // Obdurite Sword
-            new RecipeItem(new short[]{0, 40, 0, 0, 40, 0, 0, 15, 0}, (short) 19, (short) 1),
-            new RecipeItem(new short[]{0, 0, 40, 0, 0, 40, 0, 0, 15}, (short) 19, (short) 1),
-            new RecipeItem(new short[]{73, 0, 0, 73, 0, 0, 15, 0, 0}, (short) 171, (short) 1), // Magnetite Sword
-            new RecipeItem(new short[]{0, 73, 0, 0, 73, 0, 0, 15, 0}, (short) 171, (short) 1),
-            new RecipeItem(new short[]{0, 0, 73, 0, 0, 73, 0, 0, 15}, (short) 171, (short) 1),
-            new RecipeItem(new short[]{69, 0, 0, 69, 0, 0, 15, 0, 0}, (short) 174, (short) 1), // Irradium Sword
-            new RecipeItem(new short[]{0, 69, 0, 0, 69, 0, 0, 15, 0}, (short) 174, (short) 1),
-            new RecipeItem(new short[]{0, 0, 69, 0, 0, 69, 0, 0, 15}, (short) 174, (short) 1),
-            new RecipeItem(new short[]{63, 0, 63, 0, 63, 0, 0, 63, 0}, (short) 190, (short) 1), // Wrench
-            new RecipeItem(new short[]{15, 0, 0, 2, 0, 0, 175, 0, 0}, (short) 178, (short) 1), // Lever
-            new RecipeItem(new short[]{0, 15, 0, 0, 2, 0, 0, 175, 0}, (short) 178, (short) 1),
-            new RecipeItem(new short[]{0, 0, 15, 0, 0, 2, 0, 0, 175}, (short) 178, (short) 1),
-            new RecipeItem(new short[]{29, 29, 29, 29, 0, 29, 0, 0, 0}, (short) 105, (short) 1), // Copper Helmet
-            new RecipeItem(new short[]{0, 0, 0, 29, 29, 29, 29, 0, 29}, (short) 105, (short) 1),
-            new RecipeItem(new short[]{29, 0, 29, 29, 29, 29, 29, 29, 29}, (short) 106, (short) 1), // Copper Chestplate
-            new RecipeItem(new short[]{29, 29, 29, 29, 0, 29, 29, 0, 29}, (short) 107, (short) 1), // Copper Leggings
-            new RecipeItem(new short[]{29, 0, 29, 29, 0, 29, 0, 0, 0}, (short) 108, (short) 1), // Copper Greaves
-            new RecipeItem(new short[]{0, 0, 0, 29, 0, 29, 29, 0, 29}, (short) 108, (short) 1),
-            new RecipeItem(new short[]{30, 30, 30, 30, 0, 30, 0, 0, 0}, (short) 109, (short) 1), // Iron Helmet
-            new RecipeItem(new short[]{0, 0, 0, 30, 30, 30, 30, 0, 30}, (short) 109, (short) 1),
-            new RecipeItem(new short[]{30, 0, 30, 30, 30, 30, 30, 30, 30}, (short) 110, (short) 1), // Iron Chestplate
-            new RecipeItem(new short[]{30, 30, 30, 30, 0, 30, 30, 0, 30}, (short) 111, (short) 1), // Iron Leggings
-            new RecipeItem(new short[]{30, 0, 30, 30, 0, 30, 0, 0, 0}, (short) 112, (short) 1), // Iron Greaves
-            new RecipeItem(new short[]{0, 0, 0, 30, 0, 30, 30, 0, 30}, (short) 112, (short) 1),
-            new RecipeItem(new short[]{31, 31, 31, 31, 0, 31, 0, 0, 0}, (short) 113, (short) 1), // Silver Helmet
-            new RecipeItem(new short[]{0, 0, 0, 31, 31, 31, 31, 0, 31}, (short) 113, (short) 1),
-            new RecipeItem(new short[]{31, 0, 31, 31, 31, 31, 31, 31, 31}, (short) 114, (short) 1), // Silver Chestplate
-            new RecipeItem(new short[]{31, 31, 31, 31, 0, 31, 31, 0, 31}, (short) 115, (short) 1), // Silver Leggings
-            new RecipeItem(new short[]{31, 0, 31, 31, 0, 31, 0, 0, 0}, (short) 116, (short) 1), // Silver Greaves
-            new RecipeItem(new short[]{0, 0, 0, 31, 0, 31, 31, 0, 31}, (short) 116, (short) 1),
-            new RecipeItem(new short[]{32, 32, 32, 32, 0, 32, 0, 0, 0}, (short) 117, (short) 1), // Gold Helmet
-            new RecipeItem(new short[]{0, 0, 0, 32, 32, 32, 32, 0, 32}, (short) 117, (short) 1),
-            new RecipeItem(new short[]{32, 0, 32, 32, 32, 32, 32, 32, 32}, (short) 118, (short) 1), // Gold Chestplate
-            new RecipeItem(new short[]{32, 32, 32, 32, 0, 32, 32, 0, 32}, (short) 119, (short) 1), // Gold Leggings
-            new RecipeItem(new short[]{32, 0, 32, 32, 0, 32, 0, 0, 0}, (short) 120, (short) 1), // Gold Greaves
-            new RecipeItem(new short[]{0, 0, 0, 32, 0, 32, 32, 0, 32}, (short) 120, (short) 1),
-            new RecipeItem(new short[]{60, 60, 60, 60, 0, 60, 0, 0, 0}, (short) 121, (short) 1), // Zinc Helmet
-            new RecipeItem(new short[]{0, 0, 0, 60, 60, 60, 60, 0, 60}, (short) 121, (short) 1),
-            new RecipeItem(new short[]{60, 0, 60, 60, 60, 60, 60, 60, 60}, (short) 122, (short) 1), // Zinc Chestplate
-            new RecipeItem(new short[]{60, 60, 60, 60, 0, 60, 60, 0, 60}, (short) 123, (short) 1), // Zinc Leggings
-            new RecipeItem(new short[]{60, 0, 60, 60, 0, 60, 0, 0, 0}, (short) 124, (short) 1), // Zinc Greaves
-            new RecipeItem(new short[]{0, 0, 0, 60, 0, 60, 60, 0, 60}, (short) 124, (short) 1),
-            new RecipeItem(new short[]{61, 61, 61, 61, 0, 61, 0, 0, 0}, (short) 125, (short) 1), // Rhymestone Helmet
-            new RecipeItem(new short[]{0, 0, 0, 61, 61, 61, 61, 0, 61}, (short) 125, (short) 1),
-            new RecipeItem(new short[]{61, 0, 61, 61, 61, 61, 61, 61, 61}, (short) 126, (short) 1), // Rhymestone Chestplate
-            new RecipeItem(new short[]{61, 61, 61, 61, 0, 61, 61, 0, 61}, (short) 127, (short) 1), // Rhymestone Leggings
-            new RecipeItem(new short[]{61, 0, 61, 61, 0, 61, 0, 0, 0}, (short) 128, (short) 1), // Rhymestone Greaves
-            new RecipeItem(new short[]{0, 0, 0, 61, 0, 61, 61, 0, 61}, (short) 128, (short) 1),
-            new RecipeItem(new short[]{62, 62, 62, 62, 0, 62, 0, 0, 0}, (short) 129, (short) 1), // Obdurite Helmet
-            new RecipeItem(new short[]{0, 0, 0, 62, 62, 62, 62, 0, 62}, (short) 129, (short) 1),
-            new RecipeItem(new short[]{62, 0, 62, 62, 62, 62, 62, 62, 62}, (short) 130, (short) 1), // Obdurite Chestplate
-            new RecipeItem(new short[]{62, 62, 62, 62, 0, 62, 62, 0, 62}, (short) 131, (short) 1), // Obdurite Leggings
-            new RecipeItem(new short[]{62, 0, 62, 62, 0, 62, 0, 0, 0}, (short) 132, (short) 1), // Obdurite Greaves
-            new RecipeItem(new short[]{0, 0, 0, 62, 0, 62, 62, 0, 62}, (short) 132, (short) 1),
-            new RecipeItem(new short[]{63, 63, 63, 63, 0, 63, 0, 0, 0}, (short) 133, (short) 1), // Aluminum Helmet
-            new RecipeItem(new short[]{0, 0, 0, 63, 63, 63, 63, 0, 63}, (short) 133, (short) 1),
-            new RecipeItem(new short[]{63, 0, 63, 63, 63, 63, 63, 63, 63}, (short) 134, (short) 1), // Aluminum Chestplate
-            new RecipeItem(new short[]{63, 63, 63, 63, 0, 63, 63, 0, 63}, (short) 135, (short) 1), // Aluminum Leggings
-            new RecipeItem(new short[]{63, 0, 63, 63, 0, 63, 0, 0, 0}, (short) 136, (short) 1), // Aluminum Greaves
-            new RecipeItem(new short[]{0, 0, 0, 63, 0, 63, 63, 0, 63}, (short) 136, (short) 1),
-            new RecipeItem(new short[]{64, 64, 64, 64, 0, 64, 0, 0, 0}, (short) 137, (short) 1), // Lead Helmet
-            new RecipeItem(new short[]{0, 0, 0, 64, 64, 64, 64, 0, 64}, (short) 137, (short) 1),
-            new RecipeItem(new short[]{64, 0, 64, 64, 64, 64, 64, 64, 64}, (short) 138, (short) 1), // Lead Chestplate
-            new RecipeItem(new short[]{64, 64, 64, 64, 0, 64, 64, 0, 64}, (short) 139, (short) 1), // Lead Leggings
-            new RecipeItem(new short[]{64, 0, 64, 64, 0, 64, 0, 0, 0}, (short) 140, (short) 1), // Lead Greaves
-            new RecipeItem(new short[]{0, 0, 0, 64, 0, 64, 64, 0, 64}, (short) 140, (short) 1),
-            new RecipeItem(new short[]{15, 15, 15, 15, 0, 15, 15, 15, 15}, (short) 21, (short) 1), // Wooden Chest
-            new RecipeItem(new short[]{2, 2, 2, 2, 21, 2, 2, 2, 2}, (short) 22, (short) 1), // Stone Chest
-            new RecipeItem(new short[]{29, 29, 29, 29, 22, 29, 29, 29, 29}, (short) 23, (short) 1), // Copper Chest
-            new RecipeItem(new short[]{30, 30, 30, 30, 22, 30, 30, 30, 30}, (short) 24, (short) 1), // Iron Chest
-            new RecipeItem(new short[]{31, 31, 31, 31, 22, 31, 31, 31, 31}, (short) 25, (short) 1), // Silver Chest
-            new RecipeItem(new short[]{32, 32, 32, 32, 22, 32, 32, 32, 32}, (short) 26, (short) 1), // Gold Chest
-            new RecipeItem(new short[]{60, 60, 60, 60, 22, 60, 60, 60, 60}, (short) 151, (short) 1), // Zinc Chest
-            new RecipeItem(new short[]{61, 61, 61, 61, 22, 61, 61, 61, 61}, (short) 152, (short) 1), // Rhymestone Chest
-            new RecipeItem(new short[]{62, 62, 62, 62, 22, 62, 62, 62, 62}, (short) 153, (short) 1), // Obdurite Chest
-            new RecipeItem(new short[]{76, 76, 76, 76, 34, 76, 76, 175, 76}, (short) 177, (short) 1), // Zythium Lamp
-            new RecipeItem(new short[]{76, 76, 76, 175, 44, 175, 76, 76, 76}, (short) 180, (short) 1), // Zythium Amplifier
-            new RecipeItem(new short[]{76, 76, 76, 44, 175, 44, 76, 76, 76}, (short) 181, (short) 1), // Zythium Inverter
-            new RecipeItem(new short[]{76, 175, 76, 175, 175, 175, 76, 175, 76}, (short) 186, (short) 1), // Zythium Delayer
-            new RecipeItem(new short[]{15, 15, 0, 15, 15, 0, 0, 0, 0}, (short) 20, (short) 1), // Workbench
-            new RecipeItem(new short[]{0, 15, 15, 0, 15, 15, 0, 0, 0}, (short) 20, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 15, 15, 0, 15, 15, 0}, (short) 20, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 0, 15, 15, 0, 15, 15}, (short) 20, (short) 1),
-            new RecipeItem(new short[]{160, 160, 0, 160, 160, 0, 0, 0, 0}, (short) 15, (short) 1), // Bark -> Wood
-            new RecipeItem(new short[]{0, 160, 160, 0, 160, 160, 0, 0, 0}, (short) 15, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 160, 160, 0, 160, 160, 0}, (short) 15, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 0, 160, 160, 0, 160, 160}, (short) 15, (short) 1),
-            new RecipeItem(new short[]{2, 2, 0, 2, 2, 0, 0, 0, 0}, (short) 161, (short) 4), // Cobblestone
-            new RecipeItem(new short[]{0, 2, 2, 0, 2, 2, 0, 0, 0}, (short) 161, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 2, 2, 0, 2, 2, 0}, (short) 161, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 0, 2, 2, 0, 2, 2}, (short) 161, (short) 4),
-            new RecipeItem(new short[]{162, 162, 0, 162, 162, 0, 0, 0, 0}, (short) 163, (short) 4), // Chiseled Cobblestone
-            new RecipeItem(new short[]{0, 162, 162, 0, 162, 162, 0, 0, 0}, (short) 163, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 162, 162, 0, 162, 162, 0}, (short) 163, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 0, 162, 162, 0, 162, 162}, (short) 163, (short) 4),
-            new RecipeItem(new short[]{163, 163, 0, 163, 163, 0, 0, 0, 0}, (short) 164, (short) 4), // Stone Bricks
-            new RecipeItem(new short[]{0, 163, 163, 0, 163, 163, 0, 0, 0}, (short) 164, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 163, 163, 0, 163, 163, 0}, (short) 164, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 0, 163, 163, 0, 163, 163}, (short) 164, (short) 4),
-            new RecipeItem(new short[]{2, 2, 2, 2, 0, 2, 2, 2, 2}, (short) 27, (short) 1), // Furnace
-            new RecipeItem(new short[]{67, 67, 67, 0, 0, 0, 0, 0, 0}, (short) 175, (short) 10), // Zythium Wire
-            new RecipeItem(new short[]{0, 0, 0, 67, 67, 67, 0, 0, 0}, (short) 175, (short) 20),
-            new RecipeItem(new short[]{0, 0, 0, 0, 0, 0, 67, 67, 67}, (short) 175, (short) 20),
-            new RecipeItem(new short[]{2, 0, 0, 0, 2, 0, 0, 0, 0}, (short) 33, (short) 1), // Stone Lighter
-            new RecipeItem(new short[]{0, 2, 0, 0, 0, 2, 0, 0, 0}, (short) 33, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 2, 0, 0, 0, 2, 0}, (short) 33, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 0, 2, 0, 0, 0, 2}, (short) 33, (short) 1),
-            new RecipeItem(new short[]{0, 2, 0, 2, 0, 0, 0, 0, 0}, (short) 33, (short) 1),
-            new RecipeItem(new short[]{0, 0, 2, 0, 2, 0, 0, 0, 0}, (short) 33, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 0, 2, 0, 2, 0, 0}, (short) 33, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 0, 0, 2, 0, 2, 0}, (short) 33, (short) 1),
-            new RecipeItem(new short[]{15, 0, 0, 15, 0, 0, 0, 0, 0}, (short) 35, (short) 4),  // Wooden Torch
-            new RecipeItem(new short[]{0, 15, 0, 0, 15, 0, 0, 0, 0}, (short) 35, (short) 4),
-            new RecipeItem(new short[]{0, 0, 15, 0, 0, 15, 0, 0, 0}, (short) 35, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 15, 0, 0, 15, 0, 0}, (short) 35, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 0, 15, 0, 0, 15, 0}, (short) 35, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 0, 0, 15, 0, 0, 15}, (short) 35, (short) 4),
-            new RecipeItem(new short[]{28, 0, 0, 15, 0, 0, 0, 0, 0}, (short) 36, (short) 4), // Coal Torch
-            new RecipeItem(new short[]{0, 28, 0, 0, 15, 0, 0, 0, 0}, (short) 36, (short) 4),
-            new RecipeItem(new short[]{0, 0, 28, 0, 0, 15, 0, 0, 0}, (short) 36, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 28, 0, 0, 15, 0, 0}, (short) 36, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 0, 28, 0, 0, 15, 0}, (short) 36, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 0, 0, 28, 0, 0, 15}, (short) 36, (short) 4),
-            new RecipeItem(new short[]{34, 0, 0, 15, 0, 0, 0, 0, 0}, (short) 37, (short) 4), // Lumenstone Torch
-            new RecipeItem(new short[]{0, 34, 0, 0, 15, 0, 0, 0, 0}, (short) 37, (short) 4),
-            new RecipeItem(new short[]{0, 0, 34, 0, 0, 15, 0, 0, 0}, (short) 37, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 34, 0, 0, 15, 0, 0}, (short) 37, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 0, 34, 0, 0, 15, 0}, (short) 37, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 0, 0, 34, 0, 0, 15}, (short) 37, (short) 4),
-            new RecipeItem(new short[]{44, 0, 0, 15, 0, 0, 0, 0, 0}, (short) 176, (short) 4), // Zythium Torch
-            new RecipeItem(new short[]{0, 44, 0, 0, 15, 0, 0, 0, 0}, (short) 176, (short) 4),
-            new RecipeItem(new short[]{0, 0, 44, 0, 0, 15, 0, 0, 0}, (short) 176, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 44, 0, 0, 15, 0, 0}, (short) 176, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 0, 44, 0, 0, 15, 0}, (short) 176, (short) 4),
-            new RecipeItem(new short[]{0, 0, 0, 0, 0, 44, 0, 0, 15}, (short) 176, (short) 4),
-            new RecipeItem(new short[]{15, 15, 0, 0, 0, 0, 0, 0, 0}, (short) 183, (short) 1), // Wooden Pressure Plate
-            new RecipeItem(new short[]{0, 15, 15, 0, 0, 0, 0, 0, 0}, (short) 183, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 15, 15, 0, 0, 0, 0}, (short) 183, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 0, 15, 15, 0, 0, 0}, (short) 183, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 0, 0, 0, 15, 15, 0}, (short) 183, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 0, 0, 0, 0, 15, 15}, (short) 183, (short) 1),
-            new RecipeItem(new short[]{2, 2, 0, 0, 0, 0, 0, 0, 0}, (short) 184, (short) 1), // Stone Pressure Plate
-            new RecipeItem(new short[]{0, 2, 2, 0, 0, 0, 0, 0, 0}, (short) 184, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 2, 2, 0, 0, 0, 0}, (short) 184, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 0, 2, 2, 0, 0, 0}, (short) 184, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 0, 0, 0, 2, 2, 0}, (short) 184, (short) 1),
-            new RecipeItem(new short[]{0, 0, 0, 0, 0, 0, 0, 2, 2}, (short) 184, (short) 1),
-            new RecipeItem(new short[]{162, 44, 162, 0, 175, 0, 0, 0, 0}, (short) 185, (short) 1), // Zythium Pressure Plate
-            new RecipeItem(new short[]{0, 0, 0, 162, 44, 162, 0, 175, 0}, (short) 185, (short) 1)
+            new RecipeItem(new Items[]{Items.WOOD, Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.WOODEN_PICK, (short) 1), // Wooden Pick
+            new RecipeItem(new Items[]{Items.STONE, Items.STONE, Items.STONE, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.STONE_PICK, (short) 1), // Stone Pick
+            new RecipeItem(new Items[]{Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.COPPER_PICK, (short) 1), // Copper Pick
+            new RecipeItem(new Items[]{Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.IRON_PICK, (short) 1), // Iron Pick
+            new RecipeItem(new Items[]{Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.SILVER_PICK, (short) 1), // Silver Pick
+            new RecipeItem(new Items[]{Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.GOLD_PICK, (short) 1), // Gold Pick
+            new RecipeItem(new Items[]{Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.ZINC_PICK, (short) 1), // Zinc Pick
+            new RecipeItem(new Items[]{Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.RHYMESTONE_PICK, (short) 1), // Rhymestone Pick
+            new RecipeItem(new Items[]{Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.OBDURITE_PICK, (short) 1), // Obdurite Pick
+            new RecipeItem(new Items[]{Items.MAGNETITE_INGOT, Items.MAGNETITE_INGOT, Items.MAGNETITE_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.MAGNETITE_PICK, (short) 1), // Magnetite Pick
+            new RecipeItem(new Items[]{Items.IRRADIUM_INGOT, Items.IRRADIUM_INGOT, Items.IRRADIUM_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.IRRADIUM_PICK, (short) 1), // Irradium Pick
+            new RecipeItem(new Items[]{Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.WOODEN_AXE, (short) 1), // Wooden Axe
+            new RecipeItem(new Items[]{Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.WOODEN_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.WOODEN_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.WOODEN_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.STONE, Items.STONE, Items.EMPTY, Items.STONE, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.STONE_AXE, (short) 1), // Stone Axe
+            new RecipeItem(new Items[]{Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY, Items.WOOD, Items.STONE, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.STONE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.STONE, Items.STONE, Items.EMPTY, Items.WOOD, Items.STONE, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.STONE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY, Items.STONE, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.STONE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.COPPER_INGOT, Items.COPPER_INGOT, Items.EMPTY, Items.COPPER_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.COPPER_AXE, (short) 1), // Copper Axe
+            new RecipeItem(new Items[]{Items.EMPTY, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.EMPTY, Items.WOOD, Items.COPPER_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.COPPER_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.COPPER_INGOT, Items.COPPER_INGOT, Items.EMPTY, Items.WOOD, Items.COPPER_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.COPPER_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.EMPTY, Items.COPPER_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.COPPER_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.IRON_INGOT, Items.IRON_INGOT, Items.EMPTY, Items.IRON_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.IRON_AXE, (short) 1), // Iron Axe
+            new RecipeItem(new Items[]{Items.EMPTY, Items.IRON_INGOT, Items.IRON_INGOT, Items.EMPTY, Items.WOOD, Items.IRON_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.IRON_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.IRON_INGOT, Items.IRON_INGOT, Items.EMPTY, Items.WOOD, Items.IRON_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.IRON_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.IRON_INGOT, Items.IRON_INGOT, Items.EMPTY, Items.IRON_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.IRON_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.SILVER_INGOT, Items.SILVER_INGOT, Items.EMPTY, Items.SILVER_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.SILVER_AXE, (short) 1), // Silver Axe
+            new RecipeItem(new Items[]{Items.EMPTY, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.EMPTY, Items.WOOD, Items.SILVER_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.SILVER_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.SILVER_INGOT, Items.SILVER_INGOT, Items.EMPTY, Items.WOOD, Items.SILVER_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.SILVER_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.EMPTY, Items.SILVER_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.SILVER_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.GOLD_INGOT, Items.GOLD_INGOT, Items.EMPTY, Items.GOLD_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.GOLD_AXE, (short) 1), // Gold Axe
+            new RecipeItem(new Items[]{Items.EMPTY, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.EMPTY, Items.WOOD, Items.GOLD_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.GOLD_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.GOLD_INGOT, Items.GOLD_INGOT, Items.EMPTY, Items.WOOD, Items.GOLD_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.GOLD_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.EMPTY, Items.GOLD_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.GOLD_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.ZINC_INGOT, Items.ZINC_INGOT, Items.EMPTY, Items.ZINC_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.ZINC_AXE, (short) 1), // Zinc Axe
+            new RecipeItem(new Items[]{Items.EMPTY, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.EMPTY, Items.WOOD, Items.ZINC_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.ZINC_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.ZINC_INGOT, Items.ZINC_INGOT, Items.EMPTY, Items.WOOD, Items.ZINC_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.ZINC_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.EMPTY, Items.ZINC_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.ZINC_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.RHYMESTONE_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.RHYMESTONE_AXE, (short) 1), // Rhymestone Axe
+            new RecipeItem(new Items[]{Items.EMPTY, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.WOOD, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.RHYMESTONE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.WOOD, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.RHYMESTONE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.RHYMESTONE_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.RHYMESTONE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.EMPTY, Items.OBDURITE_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.OBDURITE_AXE, (short) 1), // Obdurite Axe
+            new RecipeItem(new Items[]{Items.EMPTY, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.EMPTY, Items.WOOD, Items.OBDURITE_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.OBDURITE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.EMPTY, Items.WOOD, Items.OBDURITE_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.OBDURITE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.EMPTY, Items.OBDURITE_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.OBDURITE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.MAGNETITE_INGOT, Items.MAGNETITE_INGOT, Items.EMPTY, Items.MAGNETITE_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.MAGNETITE_AXE, (short) 1), // Magnetite Axe
+            new RecipeItem(new Items[]{Items.EMPTY, Items.MAGNETITE_INGOT, Items.MAGNETITE_INGOT, Items.EMPTY, Items.WOOD, Items.MAGNETITE_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.MAGNETITE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.MAGNETITE_INGOT, Items.MAGNETITE_INGOT, Items.EMPTY, Items.WOOD, Items.MAGNETITE_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.MAGNETITE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.MAGNETITE_INGOT, Items.MAGNETITE_INGOT, Items.EMPTY, Items.MAGNETITE_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.MAGNETITE_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.IRRADIUM_INGOT, Items.IRRADIUM_INGOT, Items.EMPTY, Items.IRRADIUM_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.IRRADIUM_AXE, (short) 1), // Irradium Axe
+            new RecipeItem(new Items[]{Items.EMPTY, Items.IRRADIUM_INGOT, Items.IRRADIUM_INGOT, Items.EMPTY, Items.WOOD, Items.IRRADIUM_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.IRRADIUM_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.IRRADIUM_INGOT, Items.IRRADIUM_INGOT, Items.EMPTY, Items.WOOD, Items.IRRADIUM_INGOT, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.IRRADIUM_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.IRRADIUM_INGOT, Items.IRRADIUM_INGOT, Items.EMPTY, Items.IRRADIUM_INGOT, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.IRRADIUM_AXE, (short) 1),
+            new RecipeItem(new Items[]{Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.WOODEN_SWORD, (short) 1), // Wooden Sword
+            new RecipeItem(new Items[]{Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.WOODEN_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.WOODEN_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.STONE, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.STONE_SWORD, (short) 1), // Stone Sword
+            new RecipeItem(new Items[]{Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.STONE_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.STONE_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.COPPER_INGOT, Items.EMPTY, Items.EMPTY, Items.COPPER_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.COPPER_SWORD, (short) 1), // Copper Sword
+            new RecipeItem(new Items[]{Items.EMPTY, Items.COPPER_INGOT, Items.EMPTY, Items.EMPTY, Items.COPPER_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.COPPER_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.COPPER_INGOT, Items.EMPTY, Items.EMPTY, Items.COPPER_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.COPPER_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.IRON_INGOT, Items.EMPTY, Items.EMPTY, Items.IRON_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.IRON_SWORD, (short) 1), // Iron Sword
+            new RecipeItem(new Items[]{Items.EMPTY, Items.IRON_INGOT, Items.EMPTY, Items.EMPTY, Items.IRON_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.IRON_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.IRON_INGOT, Items.EMPTY, Items.EMPTY, Items.IRON_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.IRON_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.SILVER_INGOT, Items.EMPTY, Items.EMPTY, Items.SILVER_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.SILVER_SWORD, (short) 1), // Silver Sword
+            new RecipeItem(new Items[]{Items.EMPTY, Items.SILVER_INGOT, Items.EMPTY, Items.EMPTY, Items.SILVER_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.SILVER_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.SILVER_INGOT, Items.EMPTY, Items.EMPTY, Items.SILVER_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.SILVER_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.GOLD_INGOT, Items.EMPTY, Items.EMPTY, Items.GOLD_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.GOLD_SWORD, (short) 1), // Gold Sword
+            new RecipeItem(new Items[]{Items.EMPTY, Items.GOLD_INGOT, Items.EMPTY, Items.EMPTY, Items.GOLD_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.GOLD_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.GOLD_INGOT, Items.EMPTY, Items.EMPTY, Items.GOLD_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.GOLD_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.ZINC_ORE, Items.EMPTY, Items.EMPTY, Items.ZINC_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.ZINC_SWORD, (short) 1), // Zinc Sword
+            new RecipeItem(new Items[]{Items.EMPTY, Items.ZINC_ORE, Items.EMPTY, Items.EMPTY, Items.ZINC_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.ZINC_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.ZINC_ORE, Items.EMPTY, Items.EMPTY, Items.ZINC_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.ZINC_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.RHYMESTONE_ORE, Items.EMPTY, Items.EMPTY, Items.RHYMESTONE_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.RHYMESTONE_SWORD, (short) 1), // Rhymestone Sword
+            new RecipeItem(new Items[]{Items.EMPTY, Items.RHYMESTONE_ORE, Items.EMPTY, Items.EMPTY, Items.RHYMESTONE_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.RHYMESTONE_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.RHYMESTONE_ORE, Items.EMPTY, Items.EMPTY, Items.RHYMESTONE_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.RHYMESTONE_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.OBDURITE_ORE, Items.EMPTY, Items.EMPTY, Items.OBDURITE_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.OBDURITE_SWORD, (short) 1), // Obdurite Sword
+            new RecipeItem(new Items[]{Items.EMPTY, Items.OBDURITE_ORE, Items.EMPTY, Items.EMPTY, Items.OBDURITE_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.OBDURITE_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.OBDURITE_ORE, Items.EMPTY, Items.EMPTY, Items.OBDURITE_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.OBDURITE_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.MAGNETITE_INGOT, Items.EMPTY, Items.EMPTY, Items.MAGNETITE_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.MAGNETITE_SWORD, (short) 1), // Magnetite Sword
+            new RecipeItem(new Items[]{Items.EMPTY, Items.MAGNETITE_INGOT, Items.EMPTY, Items.EMPTY, Items.MAGNETITE_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.MAGNETITE_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.MAGNETITE_INGOT, Items.EMPTY, Items.EMPTY, Items.MAGNETITE_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.MAGNETITE_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.IRRADIUM_INGOT, Items.EMPTY, Items.EMPTY, Items.IRRADIUM_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.IRRADIUM_SWORD, (short) 1), // Irradium Sword
+            new RecipeItem(new Items[]{Items.EMPTY, Items.IRRADIUM_INGOT, Items.EMPTY, Items.EMPTY, Items.IRRADIUM_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.IRRADIUM_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.IRRADIUM_INGOT, Items.EMPTY, Items.EMPTY, Items.IRRADIUM_INGOT, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.IRRADIUM_SWORD, (short) 1),
+            new RecipeItem(new Items[]{Items.ALUMINUM_INGOT, Items.EMPTY, Items.ALUMINUM_INGOT, Items.EMPTY, Items.ALUMINUM_INGOT, Items.EMPTY, Items.EMPTY, Items.ALUMINUM_INGOT, Items.EMPTY},
+					Items.WRENCH, (short) 1), // Wrench
+            new RecipeItem(new Items[]{Items.WOOD, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.ZYTHIUM_WIRE, Items.EMPTY, Items.EMPTY},
+					Items.LEVER, (short) 1), // Lever
+            new RecipeItem(new Items[]{Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.ZYTHIUM_WIRE, Items.EMPTY},
+					Items.LEVER, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.ZYTHIUM_WIRE},
+					Items.LEVER, (short) 1),
+            new RecipeItem(new Items[]{Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.EMPTY, Items.COPPER_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.COPPER_HELMET, (short) 1), // Copper Helmet
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.EMPTY, Items.COPPER_INGOT},
+					Items.COPPER_HELMET, (short) 1),
+            new RecipeItem(new Items[]{Items.COPPER_INGOT, Items.EMPTY, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT},
+					Items.COPPER_CHESTPLATE, (short) 1), // Copper Chestplate
+            new RecipeItem(new Items[]{Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.EMPTY, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.EMPTY, Items.COPPER_INGOT},
+					Items.COPPER_LEGGINGS, (short) 1), // Copper Leggings
+            new RecipeItem(new Items[]{Items.COPPER_INGOT, Items.EMPTY, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.EMPTY, Items.COPPER_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.COPPER_GREAVES, (short) 1), // Copper Greaves
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.COPPER_INGOT, Items.EMPTY, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.EMPTY, Items.COPPER_INGOT},
+					Items.COPPER_GREAVES, (short) 1),
+            new RecipeItem(new Items[]{Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.EMPTY, Items.IRON_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.IRON_HELMET, (short) 1), // Iron Helmet
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.EMPTY, Items.IRON_INGOT},
+					Items.IRON_HELMET, (short) 1),
+            new RecipeItem(new Items[]{Items.IRON_INGOT, Items.EMPTY, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT},
+					Items.IRON_CHESTPLATE, (short) 1), // Iron Chestplate
+            new RecipeItem(new Items[]{Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.EMPTY, Items.IRON_INGOT, Items.IRON_INGOT, Items.EMPTY, Items.IRON_INGOT},
+					Items.IRON_CHESTPLATE, (short) 1), // Iron Leggings
+            new RecipeItem(new Items[]{Items.IRON_INGOT, Items.EMPTY, Items.IRON_INGOT, Items.IRON_INGOT, Items.EMPTY, Items.IRON_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.IRON_GREAVES, (short) 1), // Iron Greaves
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.IRON_INGOT, Items.EMPTY, Items.IRON_INGOT, Items.IRON_INGOT, Items.EMPTY, Items.IRON_INGOT},
+					Items.IRON_GREAVES, (short) 1),
+            new RecipeItem(new Items[]{Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.EMPTY, Items.SILVER_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.SILVER_HELMET, (short) 1), // Silver Helmet
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.EMPTY, Items.SILVER_INGOT},
+					Items.SILVER_HELMET, (short) 1),
+            new RecipeItem(new Items[]{Items.SILVER_INGOT, Items.EMPTY, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT},
+					Items.SILVER_CHESTPLATE, (short) 1), // Silver Chestplate
+            new RecipeItem(new Items[]{Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.EMPTY, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.EMPTY, Items.SILVER_INGOT},
+					Items.SILVER_LEGGINGS, (short) 1), // Silver Leggings
+            new RecipeItem(new Items[]{Items.SILVER_INGOT, Items.EMPTY, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.EMPTY, Items.SILVER_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.SILVER_GREAVES, (short) 1), // Silver Greaves
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.SILVER_INGOT, Items.EMPTY, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.EMPTY, Items.SILVER_INGOT},
+					Items.SILVER_GREAVES, (short) 1),
+            new RecipeItem(new Items[]{Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.EMPTY, Items.GOLD_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.GOLD_HELMET, (short) 1), // Gold Helmet
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.EMPTY, Items.GOLD_INGOT},
+					Items.GOLD_HELMET, (short) 1),
+            new RecipeItem(new Items[]{Items.GOLD_INGOT, Items.EMPTY, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT},
+					Items.GOLD_CHESTPLATE, (short) 1), // Gold Chestplate
+            new RecipeItem(new Items[]{Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.EMPTY, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.EMPTY, Items.GOLD_INGOT},
+					Items.GOLD_LEGGINGS, (short) 1), // Gold Leggings
+            new RecipeItem(new Items[]{Items.GOLD_INGOT, Items.EMPTY, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.EMPTY, Items.GOLD_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.GOLD_GREAVES, (short) 1), // Gold Greaves
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.GOLD_INGOT, Items.EMPTY, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.EMPTY, Items.GOLD_INGOT},
+					Items.GOLD_GREAVES, (short) 1),
+            new RecipeItem(new Items[]{Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.EMPTY, Items.ZINC_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.ZINC_HELMET, (short) 1), // Zinc Helmet
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.EMPTY, Items.ZINC_INGOT},
+					Items.ZINC_HELMET, (short) 1),
+            new RecipeItem(new Items[]{Items.ZINC_INGOT, Items.EMPTY, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT},
+					Items.ZINC_CHESTPLATE, (short) 1), // Zinc Chestplate
+            new RecipeItem(new Items[]{Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.EMPTY, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.EMPTY, Items.ZINC_INGOT},
+					Items.ZINC_LEGGINGS, (short) 1), // Zinc Leggings
+            new RecipeItem(new Items[]{Items.ZINC_INGOT, Items.EMPTY, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.EMPTY, Items.ZINC_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.ZINC_GREAVES, (short) 1), // Zinc Greaves
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.ZINC_INGOT, Items.EMPTY, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.EMPTY, Items.ZINC_INGOT},
+					Items.ZINC_GREAVES, (short) 1),
+            new RecipeItem(new Items[]{Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.RHYMESTONE_HELMET, (short) 1), // Rhymestone Helmet
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.RHYMESTONE_INGOT},
+					Items.RHYMESTONE_HELMET, (short) 1),
+            new RecipeItem(new Items[]{Items.RHYMESTONE_INGOT, Items.EMPTY, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT},
+					Items.RHYMESTONE_CHESTPLATE, (short) 1), // Rhymestone Chestplate
+            new RecipeItem(new Items[]{Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.RHYMESTONE_INGOT},
+					Items.RHYMESTONE_LEGGINGS, (short) 1), // Rhymestone Leggings
+            new RecipeItem(new Items[]{Items.RHYMESTONE_INGOT, Items.EMPTY, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.RHYMESTONE_GREAVES, (short) 1), // Rhymestone Greaves
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.EMPTY, Items.RHYMESTONE_INGOT},
+					Items.RHYMESTONE_GREAVES, (short) 1),
+            new RecipeItem(new Items[]{Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.EMPTY, Items.OBDURITE_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.OBDURITE_HELMET, (short) 1), // Obdurite Helmet
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.EMPTY, Items.OBDURITE_INGOT},
+					Items.OBDURITE_HELMET, (short) 1),
+            new RecipeItem(new Items[]{Items.OBDURITE_INGOT, Items.EMPTY, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT},
+					Items.OBDURITE_CHESTPLATE, (short) 1), // Obdurite Chestplate
+            new RecipeItem(new Items[]{Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.EMPTY, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.EMPTY, Items.OBDURITE_INGOT},
+					Items.OBDURITE_LEGGINGS, (short) 1), // Obdurite Leggings
+            new RecipeItem(new Items[]{Items.OBDURITE_INGOT, Items.EMPTY, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.EMPTY, Items.OBDURITE_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.OBDURITE_GREAVES, (short) 1), // Obdurite Greaves
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.OBDURITE_INGOT, Items.EMPTY, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.EMPTY, Items.OBDURITE_INGOT},
+					Items.OBDURITE_GREAVES, (short) 1),
+            new RecipeItem(new Items[]{Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.EMPTY, Items.ALUMINUM_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.ALUMINUM_HELMET, (short) 1), // Aluminum Helmet
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.EMPTY, Items.ALUMINUM_INGOT},
+					Items.ALUMINUM_HELMET, (short) 1),
+            new RecipeItem(new Items[]{Items.ALUMINUM_INGOT, Items.EMPTY, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT},
+					Items.ALUMINUM_CHESTPLATE, (short) 1), // Aluminum Chestplate
+            new RecipeItem(new Items[]{Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.EMPTY, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.EMPTY, Items.ALUMINUM_INGOT},
+					Items.ALUMINUM_LEGGINGS, (short) 1), // Aluminum Leggings
+            new RecipeItem(new Items[]{Items.ALUMINUM_INGOT, Items.EMPTY, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.EMPTY, Items.ALUMINUM_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.ALUMINUM_GREAVES, (short) 1), // Aluminum Greaves
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.ALUMINUM_INGOT, Items.EMPTY, Items.ALUMINUM_INGOT, Items.ALUMINUM_INGOT, Items.EMPTY, Items.ALUMINUM_INGOT},
+					Items.ALUMINUM_GREAVES, (short) 1),
+            new RecipeItem(new Items[]{Items.LEAD_INGOT, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.EMPTY, Items.LEAD_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.LEAD_HELMET, (short) 1), // Lead Helmet
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.EMPTY, Items.LEAD_INGOT},
+					Items.LEAD_HELMET, (short) 1),
+            new RecipeItem(new Items[]{Items.LEAD_INGOT, Items.EMPTY, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.LEAD_INGOT},
+					Items.LEAD_CHESTPLATE, (short) 1), // Lead Chestplate
+            new RecipeItem(new Items[]{Items.LEAD_INGOT, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.EMPTY, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.EMPTY, Items.LEAD_INGOT},
+					Items.LEAD_LEGGINGS, (short) 1), // Lead Leggings
+            new RecipeItem(new Items[]{Items.LEAD_INGOT, Items.EMPTY, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.EMPTY, Items.LEAD_INGOT, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.LEAD_GREAVES, (short) 1), // Lead Greaves
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.LEAD_INGOT, Items.EMPTY, Items.LEAD_INGOT, Items.LEAD_INGOT, Items.EMPTY, Items.LEAD_INGOT},
+					Items.LEAD_GREAVES, (short) 1),
+            new RecipeItem(new Items[]{Items.WOOD, Items.WOOD, Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.WOOD, Items.WOOD, Items.WOOD},
+					Items.WOODEN_CHEST, (short) 1), // Wooden Chest
+            new RecipeItem(new Items[]{Items.STONE, Items.STONE, Items.STONE, Items.STONE, Items.WOODEN_CHEST, Items.STONE, Items.STONE, Items.STONE, Items.STONE},
+					Items.STONE_CHEST, (short) 1), // Stone Chest
+            new RecipeItem(new Items[]{Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.STONE_CHEST, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT, Items.COPPER_INGOT},
+					Items.COPPER_CHEST, (short) 1), // Copper Chest
+            new RecipeItem(new Items[]{Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.STONE_CHEST, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT, Items.IRON_INGOT},
+					Items.IRON_CHEST, (short) 1), // Iron Chest
+            new RecipeItem(new Items[]{Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.STONE_CHEST, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT, Items.SILVER_INGOT},
+					Items.SILVER_CHEST, (short) 1), // Silver Chest
+            new RecipeItem(new Items[]{Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.STONE_CHEST, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT, Items.GOLD_INGOT},
+					Items.GOLD_CHEST, (short) 1), // Gold Chest
+            new RecipeItem(new Items[]{Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.STONE_CHEST, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT, Items.ZINC_INGOT},
+					Items.ZINC_CHEST, (short) 1), // Zinc Chest
+            new RecipeItem(new Items[]{Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.STONE_CHEST, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT, Items.RHYMESTONE_INGOT},
+					Items.RHYMESTONE_CHEST, (short) 1), // Rhymestone Chest
+            new RecipeItem(new Items[]{Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.STONE_CHEST, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT, Items.OBDURITE_INGOT},
+					Items.OBDURITE_CHEST, (short) 1), // Obdurite Chest
+            new RecipeItem(new Items[]{Items.GLASS, Items.GLASS, Items.GLASS, Items.GLASS, Items.LUMENSTONE, Items.GLASS, Items.GLASS, Items.ZYTHIUM_WIRE, Items.GLASS},
+					Items.ZYTHIUM_LAMP, (short) 1), // Zythium Lamp
+            new RecipeItem(new Items[]{Items.GLASS, Items.GLASS, Items.GLASS, Items.ZYTHIUM_WIRE, Items.ZYTHIUM_ORE, Items.ZYTHIUM_WIRE, Items.GLASS, Items.GLASS, Items.GLASS},
+					Items.ZYTHIUM_AMPLIFIER, (short) 1), // Zythium Amplifier
+            new RecipeItem(new Items[]{Items.GLASS, Items.GLASS, Items.GLASS, Items.ZYTHIUM_ORE, Items.ZYTHIUM_WIRE, Items.ZYTHIUM_ORE, Items.GLASS, Items.GLASS, Items.GLASS},
+					Items.ZYTHIUM_INVERTER, (short) 1), // Zythium Inverter
+            new RecipeItem(new Items[]{Items.GLASS, Items.ZYTHIUM_WIRE, Items.GLASS, Items.ZYTHIUM_WIRE, Items.ZYTHIUM_WIRE, Items.ZYTHIUM_WIRE, Items.GLASS, Items.ZYTHIUM_WIRE, Items.GLASS},
+					Items.ZYTHIUM_DELAYER_1, (short) 1), // Zythium Delayer
+            new RecipeItem(new Items[]{Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.WORKBENCH, (short) 1), // Workbench
+            new RecipeItem(new Items[]{Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.WORKBENCH, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY},
+					Items.WORKBENCH, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.WOOD},
+					Items.WORKBENCH, (short) 1),
+            new RecipeItem(new Items[]{Items.BARK, Items.BARK, Items.EMPTY, Items.BARK, Items.BARK, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.WOOD, (short) 1), // Bark -> Wood
+            new RecipeItem(new Items[]{Items.EMPTY, Items.BARK, Items.BARK, Items.EMPTY, Items.BARK, Items.BARK, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.WOOD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.BARK, Items.BARK, Items.EMPTY, Items.BARK, Items.BARK, Items.EMPTY},
+					Items.WOOD, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.BARK, Items.BARK, Items.EMPTY, Items.BARK, Items.BARK},
+					Items.WOOD, (short) 1),
+            new RecipeItem(new Items[]{Items.STONE, Items.STONE, Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.COBBLESTONE, (short) 4), // Cobblestone
+            new RecipeItem(new Items[]{Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.COBBLESTONE, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY},
+					Items.COBBLESTONE, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY, Items.STONE, Items.STONE},
+					Items.COBBLESTONE, (short) 4),
+            new RecipeItem(new Items[]{Items.CHISELED_STONE, Items.CHISELED_STONE, Items.EMPTY, Items.CHISELED_STONE, Items.CHISELED_STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.CHISELED_COBBLESTONE, (short) 4), // Chiseled Cobblestone
+            new RecipeItem(new Items[]{Items.EMPTY, Items.CHISELED_STONE, Items.CHISELED_STONE, Items.EMPTY, Items.CHISELED_STONE, Items.CHISELED_STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.CHISELED_COBBLESTONE, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.CHISELED_STONE, Items.CHISELED_STONE, Items.EMPTY, Items.CHISELED_STONE, Items.CHISELED_STONE, Items.EMPTY},
+					Items.CHISELED_COBBLESTONE, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.CHISELED_STONE, Items.CHISELED_STONE, Items.EMPTY, Items.CHISELED_STONE, Items.CHISELED_STONE},
+					Items.CHISELED_COBBLESTONE, (short) 4),
+            new RecipeItem(new Items[]{Items.CHISELED_COBBLESTONE, Items.CHISELED_COBBLESTONE, Items.EMPTY, Items.CHISELED_COBBLESTONE, Items.CHISELED_COBBLESTONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.STONE_BRICKS, (short) 4), // Stone Bricks
+            new RecipeItem(new Items[]{Items.EMPTY, Items.CHISELED_COBBLESTONE, Items.CHISELED_COBBLESTONE, Items.EMPTY, Items.CHISELED_COBBLESTONE, Items.CHISELED_COBBLESTONE, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.STONE_BRICKS, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.CHISELED_COBBLESTONE, Items.CHISELED_COBBLESTONE, Items.EMPTY, Items.CHISELED_COBBLESTONE, Items.CHISELED_COBBLESTONE, Items.EMPTY},
+					Items.STONE_BRICKS, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.CHISELED_COBBLESTONE, Items.CHISELED_COBBLESTONE, Items.EMPTY, Items.CHISELED_COBBLESTONE, Items.CHISELED_COBBLESTONE},
+					Items.STONE_BRICKS, (short) 4),
+            new RecipeItem(new Items[]{Items.STONE, Items.STONE, Items.STONE, Items.STONE, Items.EMPTY, Items.STONE, Items.STONE, Items.STONE, Items.STONE},
+					Items.FURNACE, (short) 1), // Furnace
+            new RecipeItem(new Items[]{Items.ZYTHIUM_BAR, Items.ZYTHIUM_BAR, Items.ZYTHIUM_BAR, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.ZYTHIUM_WIRE, (short) 10), // Zythium Wire
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.ZYTHIUM_BAR, Items.ZYTHIUM_BAR, Items.ZYTHIUM_BAR, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.ZYTHIUM_WIRE, (short) 20),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.ZYTHIUM_BAR, Items.ZYTHIUM_BAR, Items.ZYTHIUM_BAR},
+					Items.ZYTHIUM_WIRE, (short) 20),
+            new RecipeItem(new Items[]{Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.STONE_LIGHTER, (short) 1), // Stone Lighter
+            new RecipeItem(new Items[]{Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.STONE_LIGHTER, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY},
+					Items.STONE_LIGHTER, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE},
+					Items.STONE_LIGHTER, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.STONE, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.STONE_LIGHTER, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.STONE_LIGHTER, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.STONE, Items.EMPTY, Items.EMPTY},
+					Items.STONE_LIGHTER, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.EMPTY, Items.STONE, Items.EMPTY},
+					Items.STONE_LIGHTER, (short) 1),
+            new RecipeItem(new Items[]{Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.WOODEN_TORCH, (short) 4),  // Wooden Torch
+            new RecipeItem(new Items[]{Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.WOODEN_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.WOODEN_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.WOODEN_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.WOODEN_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.WOODEN_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.COAL, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.COAL_TORCH, (short) 4), // Coal Torch
+            new RecipeItem(new Items[]{Items.EMPTY, Items.COAL, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.COAL_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.COAL, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.COAL_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.COAL, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.COAL_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.COAL, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.COAL_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.COAL, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.COAL_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.LUMENSTONE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.LUMENSTONE_TORCH, (short) 4), // Lumenstone Torch
+            new RecipeItem(new Items[]{Items.EMPTY, Items.LUMENSTONE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.LUMENSTONE_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.LUMENSTONE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.LUMENSTONE_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.LUMENSTONE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.LUMENSTONE_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.LUMENSTONE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.LUMENSTONE_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.LUMENSTONE, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.LUMENSTONE_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.ZYTHIUM_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.ZYTHIUM_TORCH, (short) 4), // Zythium Torch
+            new RecipeItem(new Items[]{Items.EMPTY, Items.ZYTHIUM_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.ZYTHIUM_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.ZYTHIUM_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.ZYTHIUM_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.ZYTHIUM_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.ZYTHIUM_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.ZYTHIUM_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.ZYTHIUM_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.ZYTHIUM_ORE, Items.EMPTY, Items.EMPTY, Items.WOOD},
+					Items.ZYTHIUM_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.WOOD, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.WOODEN_PRESSURE_PLATE, (short) 1), // Wooden Pressure Plate
+            new RecipeItem(new Items[]{Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.WOODEN_PRESSURE_PLATE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.WOODEN_PRESSURE_PLATE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.WOODEN_PRESSURE_PLATE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.WOOD, Items.EMPTY},
+					Items.WOODEN_PRESSURE_PLATE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.WOOD},
+					Items.WOODEN_PRESSURE_PLATE, (short) 1),
+            new RecipeItem(new Items[]{Items.STONE, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.STONE_PRESSURE_PLATE, (short) 1), // Stone Pressure Plate
+            new RecipeItem(new Items[]{Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.STONE_PRESSURE_PLATE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.STONE_PRESSURE_PLATE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.STONE_PRESSURE_PLATE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY},
+					Items.STONE_PRESSURE_PLATE, (short) 1),
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.STONE, Items.STONE},
+					Items.STONE_PRESSURE_PLATE, (short) 1),
+            new RecipeItem(new Items[]{Items.CHISELED_STONE, Items.ZYTHIUM_ORE, Items.CHISELED_STONE, Items.EMPTY, Items.ZYTHIUM_WIRE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.ZYTHIUM_PRESSURE_PLATE, (short) 1), // Zythium Pressure Plate
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.CHISELED_STONE, Items.ZYTHIUM_ORE, Items.CHISELED_STONE, Items.EMPTY, Items.ZYTHIUM_WIRE, Items.EMPTY},
+					Items.ZYTHIUM_PRESSURE_PLATE, (short) 1)
         };
 
         RECIPES.put("workbench", list_thing1);
 
         RecipeItem[] list_thing2 = {
-            new RecipeItem(new short[]{15, 15, 15, 15}, (short) 20, (short) 1), // Workbench
-            new RecipeItem(new short[]{160, 160, 160, 160}, (short) 15, (short) 1), // Bark -> Wood
-            new RecipeItem(new short[]{2, 2, 2, 2}, (short) 161, (short) 4), // Cobblestone
-            new RecipeItem(new short[]{162, 162, 162, 162}, (short) 163, (short) 4), // Chiseled Cobblestone
-            new RecipeItem(new short[]{163, 163, 163, 163}, (short) 164, (short) 4), // Stone Bricks
-            new RecipeItem(new short[]{2, 0, 0, 2}, (short) 33, (short) 1), // Stone Lighter
-            new RecipeItem(new short[]{0, 2, 2, 0}, (short) 33, (short) 1),
-            new RecipeItem(new short[]{15, 0, 15, 0}, (short) 35, (short) 4),  // Wooden Torch
-            new RecipeItem(new short[]{0, 15, 0, 15}, (short) 35, (short) 4),
-            new RecipeItem(new short[]{28, 0, 15, 0}, (short) 36, (short) 4), // Coal Torch
-            new RecipeItem(new short[]{0, 28, 0, 15}, (short) 36, (short) 4),
-            new RecipeItem(new short[]{34, 0, 15, 0}, (short) 37, (short) 4), // Lumenstone Torch
-            new RecipeItem(new short[]{0, 34, 0, 15}, (short) 37, (short) 4),
-            new RecipeItem(new short[]{44, 0, 15, 0}, (short) 176, (short) 4), // Zythium Torch
-            new RecipeItem(new short[]{0, 44, 0, 15}, (short) 176, (short) 4),
-            new RecipeItem(new short[]{15, 15, 0, 0}, (short) 183, (short) 1), // Wooden Pressure Plate
-            new RecipeItem(new short[]{0, 0, 15, 15}, (short) 183, (short) 1),
-            new RecipeItem(new short[]{2, 2, 0, 0}, (short) 184, (short) 1), // Stone Pressure Plate
-            new RecipeItem(new short[]{0, 0, 2, 2}, (short) 184, (short) 1)
+            new RecipeItem(new Items[]{Items.WOOD, Items.WOOD, Items.WOOD, Items.WOOD},
+					Items.WORKBENCH, (short) 1), // Workbench
+            new RecipeItem(new Items[]{Items.BARK, Items.BARK, Items.BARK, Items.BARK},
+					Items.WOOD, (short) 1), // Bark -> Wood
+            new RecipeItem(new Items[]{Items.STONE, Items.STONE, Items.STONE, Items.STONE},
+					Items.COBBLESTONE, (short) 4), // Cobblestone
+            new RecipeItem(new Items[]{Items.CHISELED_STONE, Items.CHISELED_STONE, Items.CHISELED_STONE, Items.CHISELED_STONE},
+					Items.CHISELED_COBBLESTONE, (short) 4), // Chiseled Cobblestone
+            new RecipeItem(new Items[]{Items.CHISELED_COBBLESTONE, Items.CHISELED_COBBLESTONE, Items.CHISELED_COBBLESTONE, Items.CHISELED_COBBLESTONE},
+					Items.STONE_BRICKS, (short) 4), // Stone Bricks
+            new RecipeItem(new Items[]{Items.STONE, Items.EMPTY, Items.EMPTY, Items.STONE},
+					Items.STONE_LIGHTER, (short) 1), // Stone Lighter
+            new RecipeItem(new Items[]{Items.EMPTY, Items.STONE, Items.STONE, Items.EMPTY},
+					Items.STONE_LIGHTER, (short) 1),
+            new RecipeItem(new Items[]{Items.WOOD, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.WOODEN_TORCH, (short) 4),  // Wooden Torch
+            new RecipeItem(new Items[]{Items.EMPTY, Items.WOOD, Items.EMPTY, Items.WOOD},
+					Items.WOODEN_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.COAL, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.COAL_TORCH, (short) 4), // Coal Torch
+            new RecipeItem(new Items[]{Items.EMPTY, Items.COAL, Items.EMPTY, Items.WOOD},
+					Items.COAL_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.LUMENSTONE, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.LUMENSTONE_TORCH, (short) 4), // Lumenstone Torch
+            new RecipeItem(new Items[]{Items.EMPTY, Items.LUMENSTONE, Items.EMPTY, Items.WOOD},
+					Items.LUMENSTONE_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.ZYTHIUM_ORE, Items.EMPTY, Items.WOOD, Items.EMPTY},
+					Items.ZYTHIUM_TORCH, (short) 4), // Zythium Torch
+            new RecipeItem(new Items[]{Items.EMPTY, Items.ZYTHIUM_ORE, Items.EMPTY, Items.WOOD},
+					Items.ZYTHIUM_TORCH, (short) 4),
+            new RecipeItem(new Items[]{Items.WOOD, Items.WOOD, Items.EMPTY, Items.EMPTY},
+					Items.WOODEN_PRESSURE_PLATE, (short) 1), // Wooden Pressure Plate
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.WOOD, Items.WOOD},
+					Items.WOODEN_PRESSURE_PLATE, (short) 1),
+            new RecipeItem(new Items[]{Items.STONE, Items.STONE, Items.EMPTY, Items.EMPTY},
+					Items.STONE_PRESSURE_PLATE, (short) 1), // Stone Pressure Plate
+            new RecipeItem(new Items[]{Items.EMPTY, Items.EMPTY, Items.STONE, Items.STONE},
+					Items.STONE_PRESSURE_PLATE, (short) 1)
         };
 
         RECIPES.put("cic", list_thing2);
 
         RecipeItem[] list_thing3 = {
-            new RecipeItem(new short[]{15, 167, 0, 0, 0, 0, 0, 0, 0}, (short) 168, (short) 1),
-            new RecipeItem(new short[]{162, 0, 0, 0, 0, 0, 0, 0, 0}, (short) 182, (short) 1)
+            new RecipeItem(new Items[]{Items.WOOD, Items.VARNISH, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.VARNISHED_WOOD, (short) 1),
+            new RecipeItem(new Items[]{Items.CHISELED_STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.BUTTON, (short) 1)
         };
 
         RECIPES.put("shapeless", list_thing3);
 
         RecipeItem[] list_thing4 = {
-            new RecipeItem(new short[]{15, 167, 0, 0}, (short) 168, (short) 1),
-            new RecipeItem(new short[]{162, 0, 0, 0}, (short) 182, (short) 1)
+            new RecipeItem(new Items[]{Items.WOOD, Items.VARNISH, Items.EMPTY, Items.EMPTY},
+					Items.VARNISHED_WOOD, (short) 1),
+            new RecipeItem(new Items[]{Items.CHISELED_STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY},
+					Items.BUTTON, (short) 1)
         };
 
         RECIPES.put("shapeless_cic", list_thing4);
     }
 
-    public int addItem(short item, short quantity) {
-        if (Items.findByIndex(item).getDurability() != null) {
-            return addItem(item, quantity, Items.findByIndex(item).getDurability().shortValue());
+    public int addItem(Items item, short quantity) {
+        if (item.getDurability() != null) {
+            return addItem(item, quantity, item.getDurability().shortValue());
         }
         else {
             return addItem(item, quantity, (short)0);
         }
     }
 
-    public int addItem(short item, short quantity, short durability) {
+    public int addItem(Items item, short quantity, short durability) {
         for (int i = 0; i < MAXIMUM_ITEMS; i++) {
-            if (ids[i] == item && nums[i] < Items.findByIndex(ids[i]).getMaxStacks()) {
-                if (quantity + nums[i] <= Items.findByIndex(ids[i]).getMaxStacks()) {
+            if (items[i] == item && nums[i] < items[i].getMaxStacks()) {
+                if (quantity + nums[i] <= items[i].getMaxStacks()) {
                     nums[i] += quantity;
                     update(i);
                     return 0;
                 } else {
-                    quantity -= Items.findByIndex(ids[i]).getMaxStacks() - nums[i];
-                    nums[i] = (short) Items.findByIndex(ids[i]).getMaxStacks();
+                    quantity -= items[i].getMaxStacks() - nums[i];
+                    nums[i] = (short) items[i].getMaxStacks();
                     update(i);
                 }
             }
         }
         for (int i = 0; i < MAXIMUM_ITEMS; i++) {
-            if (ids[i] == 0) {
-                ids[i] = item;
-                if (quantity <= Items.findByIndex(ids[i]).getMaxStacks()) {
+            if (items[i] == Items.EMPTY) {
+                items[i] = item;
+                if (quantity <= items[i].getMaxStacks()) {
                     nums[i] = quantity;
                     durs[i] = durability;
                     update(i);
                     return 0;
                 } else {
-                    nums[i] = (short) Items.findByIndex(ids[i]).getMaxStacks();
+                    nums[i] = (short) items[i].getMaxStacks();
                     durs[i] = durability;
-                    quantity -= Items.findByIndex(ids[i]).getMaxStacks();
+                    quantity -= items[i].getMaxStacks();
                     update(i);
                 }
             }
@@ -399,26 +651,26 @@ public class Inventory implements Serializable {
         return quantity;
     }
 
-    public int addLocation(int i, short item, short quantity, short durability) {
-        if (ids[i] == item) {
-            if (quantity + nums[i] <= Items.findByIndex(ids[i]).getMaxStacks()) {
+    public int addLocation(int i, Items item, short quantity, short durability) {
+        if (items[i] == item) {
+            if (quantity + nums[i] <= items[i].getMaxStacks()) {
                 nums[i] += quantity;
                 update(i);
                 return 0;
             } else {
-                quantity -= Items.findByIndex(ids[i]).getMaxStacks() - nums[i];
-                nums[i] = (short) Items.findByIndex(ids[i]).getMaxStacks();
+                quantity -= items[i].getMaxStacks() - nums[i];
+                nums[i] = (short) items[i].getMaxStacks();
                 update(i);
             }
         } else {
-            if (quantity <= Items.findByIndex(ids[i]).getMaxStacks()) {
-                ids[i] = item;
+            if (quantity <= items[i].getMaxStacks()) {
+                items[i] = item;
                 nums[i] = quantity;
                 durs[i] = durability;
                 update(i);
                 return 0;
             } else {
-                quantity -= Items.findByIndex(ids[i]).getMaxStacks();
+                quantity -= items[i].getMaxStacks();
                 return quantity;
             }
         }
@@ -429,7 +681,7 @@ public class Inventory implements Serializable {
         if (nums[i] >= quantity) {
             nums[i] -= quantity;
             if (nums[i] == 0) {
-                ids[i] = 0;
+                items[i] = Items.EMPTY;
             }
             update(i);
             return 0;
@@ -437,7 +689,7 @@ public class Inventory implements Serializable {
         else {
             quantity -= nums[i];
             nums[i] = 0;
-            ids[i] = 0;
+            items[i] = Items.EMPTY;
             update(i);
         }
         return quantity;
@@ -509,10 +761,10 @@ public class Inventory implements Serializable {
                 g2.drawString(f(px) + " ", px*46+trolx, py*46+troly);
             }
         }
-        if (ids[i] != 0) {
-            width = TerrariaClone.getItemImgs().get(ids[i]).getWidth();
-            height = TerrariaClone.getItemImgs().get(ids[i]).getHeight();
-            g2.drawImage(TerrariaClone.getItemImgs().get(ids[i]),
+        if (items[i] != Items.EMPTY) {
+            width = TerrariaClone.getItemImgs().get(items[i]).getWidth();
+            height = TerrariaClone.getItemImgs().get(items[i]).getHeight();
+            g2.drawImage(TerrariaClone.getItemImgs().get(items[i]),
                 px*46+14+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+14+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), px*46+38-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+38-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                 0, 0, width, height,
                 null);
@@ -547,8 +799,8 @@ public class Inventory implements Serializable {
         update(i);
     }
 
-    public short tool() {
-        return ids[selection];
+    public Items tool() {
+        return items[selection];
     }
 
     public void renderCollection(ItemCollection ic) {
@@ -666,13 +918,13 @@ public class Inventory implements Serializable {
         }
     }
 
-    public int addLocationIC(ItemCollection ic, int i, short item, short quantity) {
+    public int addLocationIC(ItemCollection ic, int i, Items item, short quantity) {
         return addLocationIC(ic, i, item, quantity, (short)0);
     }
 
-    public int addLocationIC(ItemCollection ic, int i, short item, short quantity, short durability) {
+    public int addLocationIC(ItemCollection ic, int i, Items item, short quantity, short durability) {
         if (ic.getIds()[i] == item) {
-            if (Items.findByIndex(ic.getIds()[i]).getMaxStacks() - ic.getNums()[i] >= quantity) {
+            if (ic.getIds()[i].getMaxStacks() - ic.getNums()[i] >= quantity) {
                 ic.getNums()[i] += quantity;
                 if (ic.getImage() != null) {
                     updateIC(ic, i);
@@ -680,14 +932,14 @@ public class Inventory implements Serializable {
                 return 0;
             }
             else {
-                quantity -= Items.findByIndex(ic.getIds()[i]).getMaxStacks() - ic.getNums()[i];
-                ic.getNums()[i] = (short) Items.findByIndex(ic.getIds()[i]).getMaxStacks();
+                quantity -= ic.getIds()[i].getMaxStacks() - ic.getNums()[i];
+                ic.getNums()[i] = (short) ic.getIds()[i].getMaxStacks();
                 if (ic.getImage() != null) {
                     updateIC(ic, i);
                 }
             }
         } else {
-            if (quantity <= Items.findByIndex(ic.getIds()[i]).getMaxStacks()) {
+            if (quantity <= ic.getIds()[i].getMaxStacks()) {
                 ic.getIds()[i] = item;
                 ic.getNums()[i] = quantity;
                 ic.getNums()[i] = durability;
@@ -697,7 +949,7 @@ public class Inventory implements Serializable {
                 return 0;
             }
             else {
-                quantity -= Items.findByIndex(ic.getIds()[i]).getMaxStacks();
+                quantity -= ic.getIds()[i].getMaxStacks();
                 return quantity;
             }
         }
@@ -708,7 +960,7 @@ public class Inventory implements Serializable {
         if (ic.getNums()[i] >= quantity) {
             ic.getNums()[i] -= quantity;
             if (ic.getNums()[i] == 0) {
-                ic.getIds()[i] = 0;
+                ic.getIds()[i] = Items.EMPTY;
             }
             if (ic.getImage() != null) {
                 updateIC(ic, i);
@@ -718,7 +970,7 @@ public class Inventory implements Serializable {
         else {
             quantity -= ic.getNums()[i];
             ic.getNums()[i] = 0;
-            ic.getIds()[i] = 0;
+            ic.getIds()[i] = Items.EMPTY;
             if (ic.getImage() != null) {
                 updateIC(ic, i);
             }
@@ -740,7 +992,7 @@ public class Inventory implements Serializable {
                 px*40, py*40, px*40+40, py*40+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[i] != 0) {
+            if (ic.getIds()[i] != Items.EMPTY) {
                 width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
                 height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
                 g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
@@ -753,23 +1005,23 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.getNums()[i] + " ", px*40+9, py*40+34);
                 }
             }
-            ic.getIds()[4] = 0;
-            ic.getIds()[4] = 0;
+            ic.getIds()[4] = Items.EMPTY;
+            ic.getIds()[4] = Items.EMPTY;
             for (RecipeItem r2 : RECIPES.get("cic")) {
-                if (ic.areIdsEquals(r2.getValues())) {
-                    ic.getIds()[4] = r2.getId();
+                if (ic.areIdsEquals(r2.getIngredients())) {
+                    ic.getIds()[4] = r2.getResultingItem();
                     ic.getNums()[4] = r2.getNum();
-                    if (Items.findByIndex(r2.getId()).getDurability() != null)
-                        ic.getDurs()[4] = Items.findByIndex(r2.getId()).getDurability().shortValue();
+                    if (r2.getResultingItem().getDurability() != null)
+                        ic.getDurs()[4] = r2.getResultingItem().getDurability().shortValue();
                     break;
                 }
             }
             for (RecipeItem r2 : RECIPES.get("shapeless_cic")) {
-                if (ic.areInvalidIds(r2.getValues())) {
-                    ic.getIds()[4] = r2.getId();
+                if (ic.areInvalidIds(r2.getIngredients())) {
+                    ic.getIds()[4] = r2.getResultingItem();
                     ic.getNums()[4] = r2.getNum();
-                    if (Items.findByIndex(r2.getId()).getDurability() != null)
-                        ic.getDurs()[4] = Items.findByIndex(r2.getId()).getDurability().shortValue();
+                    if (r2.getResultingItem().getDurability() != null)
+                        ic.getDurs()[4] = r2.getResultingItem().getDurability().shortValue();
                     break;
                 }
             }
@@ -783,7 +1035,7 @@ public class Inventory implements Serializable {
                 3*40, 20, 3*40+40, 20+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[4] != 0) {
+            if (ic.getIds()[4] != Items.EMPTY) {
                 width = TerrariaClone.getItemImgs().get(ic.getIds()[4]).getWidth();
                 height = TerrariaClone.getItemImgs().get(ic.getIds()[4]).getHeight();
                 g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[4]),
@@ -810,7 +1062,7 @@ public class Inventory implements Serializable {
                 px*46, py*46, px*46+40, py*46+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[i] != 0) {
+            if (ic.getIds()[i] != Items.EMPTY) {
                 width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
                 height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
                 g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
@@ -837,7 +1089,7 @@ public class Inventory implements Serializable {
                 px*40, py*40, px*40+40, py*40+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[i] != 0) {
+            if (ic.getIds()[i] != Items.EMPTY) {
                 width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
                 height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
                 g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
@@ -850,22 +1102,22 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.getNums()[i] + " ", px*40+9, py*40+34);
                 }
             }
-            ic.getIds()[9] = 0;
+            ic.getIds()[9] = Items.EMPTY;
             for (RecipeItem r2 : RECIPES.get("workbench")) {
-                if (ic.areIdsEquals(r2.getValues())) {
-                    ic.getIds()[9] = r2.getId();
+                if (ic.areIdsEquals(r2.getIngredients())) {
+                    ic.getIds()[9] = r2.getResultingItem();
                     ic.getNums()[9] = r2.getNum();
-                    if (Items.findByIndex(r2.getId()).getDurability() != null)
-                        ic.getDurs()[9] = Items.findByIndex(r2.getId()).getDurability().shortValue();
+                    if (r2.getResultingItem().getDurability() != null)
+                        ic.getDurs()[9] = r2.getResultingItem().getDurability().shortValue();
                     break;
                 }
             }
             for (RecipeItem r2 : RECIPES.get("shapeless")) {
-                if (ic.areInvalidIds(r2.getValues())) {
-                    ic.getIds()[9] = r2.getId();
+                if (ic.areInvalidIds(r2.getIngredients())) {
+                    ic.getIds()[9] = r2.getResultingItem();
                     ic.getNums()[9] = r2.getNum();
-                    if (Items.findByIndex(r2.getId()).getDurability() != null)
-                        ic.getDurs()[9] = Items.findByIndex(r2.getId()).getDurability().shortValue();
+                    if (r2.getResultingItem().getDurability() != null)
+                        ic.getDurs()[9] = r2.getResultingItem().getDurability().shortValue();
                     break;
                 }
             }
@@ -879,7 +1131,7 @@ public class Inventory implements Serializable {
                 4*40, 1*40, 4*40+40, 1*40+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[9] != 0) {
+            if (ic.getIds()[9] != Items.EMPTY) {
                 width = TerrariaClone.getItemImgs().get(ic.getIds()[9]).getWidth();
                 height = TerrariaClone.getItemImgs().get(ic.getIds()[9]).getHeight();
                     g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[9]),
@@ -910,7 +1162,7 @@ public class Inventory implements Serializable {
                 px*46, py*46, px*46+40, py*46+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[i] != 0) {
+            if (ic.getIds()[i] != Items.EMPTY) {
                 width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
                 height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
                 g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
@@ -970,7 +1222,7 @@ public class Inventory implements Serializable {
                     (int)(fpx*40), (int)(fpy*40), (int)(fpx*40+40), (int)(fpy*40+40),
                     0, 0, 40, 40,
                     null);
-                if (ic.getIds()[i] != 0) {
+                if (ic.getIds()[i] != Items.EMPTY) {
                     width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
                     height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
                     g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
@@ -990,7 +1242,7 @@ public class Inventory implements Serializable {
 
     public void useRecipeWorkbench(ItemCollection ic) {
         for (RecipeItem r2 : RECIPES.get("workbench")) {
-            if (ic.areIdsEquals(r2.getValues())) {
+            if (ic.areIdsEquals(r2.getIngredients())) {
                 for (i=0; i<9; i++) {
                     removeLocationIC(ic, i, (short) 1);
                     updateIC(ic, i);
@@ -998,14 +1250,13 @@ public class Inventory implements Serializable {
             }
         }
         for (RecipeItem r2 : RECIPES.get("shapeless")) {
-            if (ic.areInvalidIds(r2.getValues())) {
-                List<Short> r3 = new ArrayList<>(11);
-                for (k=0; k<r2.getValues().length; k++) {
-                    r3.add(r2.getValues()[k]);
+            if (ic.areInvalidIds(r2.getIngredients())) {
+                List<Items> r3 = new ArrayList<>(11);
+                for (k=0; k<r2.getIngredients().length; k++) {
+                    r3.add(r2.getIngredients()[k]);
                 }
                 for (k=0; k<9; k++) {
-                    n = r3.indexOf(ic.getIds()[k]);
-                    r3.remove(n);
+                    r3.remove(ic.getIds()[k]);
                     removeLocationIC(ic, k, (short) 1);
                     updateIC(ic, k);
                 }
@@ -1016,7 +1267,7 @@ public class Inventory implements Serializable {
 
     public void useRecipeCIC(ItemCollection ic) {
         for (RecipeItem r2 : RECIPES.get("cic")) {
-            if (ic.areIdsEquals(r2.getValues())) {
+            if (ic.areIdsEquals(r2.getIngredients())) {
                 for (i=0; i<4; i++) {
                     removeLocationIC(ic, i, (short) 1);
                     updateIC(ic, i);
@@ -1024,14 +1275,13 @@ public class Inventory implements Serializable {
             }
         }
         for (RecipeItem r2 : RECIPES.get("shapeless_cic")) {
-            if (ic.areInvalidIds(r2.getValues())) {
-                List<Short> r3 = new ArrayList<>(6);
-                for (k=0; k<r2.getValues().length-2; k++) {
-                    r3.add(r2.getValues()[k]);
+            if (ic.areInvalidIds(r2.getIngredients())) {
+                List<Items> r3 = new ArrayList<>(6);
+                for (k=0; k<r2.getIngredients().length-2; k++) {
+                    r3.add(r2.getIngredients()[k]);
                 }
                 for (k=0; k<4; k++) {
-                    n = r3.indexOf(ic.getIds()[k]);
-                    r3.remove(n);
+                    r3.remove(ic.getIds()[k]);
                     removeLocationIC(ic, k, (short) 1);
                     updateIC(ic, k);
                 }
