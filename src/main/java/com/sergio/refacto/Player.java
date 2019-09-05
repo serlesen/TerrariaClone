@@ -8,6 +8,7 @@ import javax.imageio.ImageIO;
 
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ImageState;
+import com.sergio.refacto.dto.Items;
 import com.sergio.refacto.dto.KeyPressed;
 
 public class Player implements Serializable {
@@ -278,10 +279,10 @@ public class Player implements Serializable {
     }
 
     public int sumArmor() {
-        return (TerrariaClone.getARMOR().get(TerrariaClone.armor.getIds()[0]) +
-                TerrariaClone.getARMOR().get(TerrariaClone.armor.getIds()[1]) +
-                TerrariaClone.getARMOR().get(TerrariaClone.armor.getIds()[2]) +
-                TerrariaClone.getARMOR().get(TerrariaClone.armor.getIds()[3]));
+        return (Items.findByIndex(TerrariaClone.armor.getIds()[0]).getArmor() +
+                Items.findByIndex(TerrariaClone.armor.getIds()[1]).getArmor() +
+                Items.findByIndex(TerrariaClone.armor.getIds()[2]).getArmor() +
+                Items.findByIndex(TerrariaClone.armor.getIds()[3]).getArmor());
     }
 
     private static BufferedImage loadImage(String path) {
