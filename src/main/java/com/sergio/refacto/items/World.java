@@ -11,19 +11,19 @@ public class World {
         int width = blocks[0].length;
         int height = blocks.length;
         Byte[][] blockds = new Byte[height][width];
-        return generate(blocks, blockds, width, height);
+        return generate(blocks, blockds, 0, 0, width, height);
     }
 
     public static Byte[][] generateOutlines(BlockNames[][] blocks, Byte[][] blockds, int xpos, int ypos) {
-        return generate(blocks, blockds, xpos+2, ypos+2);
+        return generate(blocks, blockds, xpos-1, ypos-1, xpos+2, ypos+2);
     }
 
-    private static Byte[][] generate(BlockNames[][] blocks, Byte[][] blockds, int xpos, int ypos) {
+    private static Byte[][] generate(BlockNames[][] blocks, Byte[][] blockds, int initialX, int initialY, int xpos, int ypos) {
         int width = blocks[0].length;
         int height = blocks.length;
         boolean left, right, up, down, upleft, upright, downleft, downright;
-        for (int y=ypos-1; y<ypos; y++) {
-            for (int x2=xpos-1; x2<xpos; x2++) {
+        for (int y=initialY; y<ypos; y++) {
+            for (int x2=initialX; x2<xpos; x2++) {
                 int x = MathTool.mod(x2,width);
                 if (y > 0 && y < height-1 && blocks[y][x] != BlockNames.AIR) {
                     left = connect(x-1, y, x, y, blocks);
