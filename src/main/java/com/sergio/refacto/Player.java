@@ -9,12 +9,15 @@ import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.KeyPressed;
 import com.sergio.refacto.tools.ResourcesLoader;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@FieldDefaults(level = AccessLevel.PUBLIC)
 public class Player implements Serializable {
     transient BufferedImage image;
-    int ix, iy, width, height, thp, hp;
+    int ix, iy, width, height, totalHealthPoints, healthPoints;
     double x, y, vx, vy, pvy, oldx, oldy;
     private boolean onGround, onGroundDelay, grounded;
     Rectangle rect;
@@ -46,9 +49,9 @@ public class Player implements Serializable {
         imgDelay = 0;
         imgState = ImageState.STILL_RIGHT;
 
-        thp = 50;
+        totalHealthPoints = 50;
 
-        hp = thp;
+        healthPoints = totalHealthPoints;
     }
 
     public void update(Blocks[][] blocks, KeyPressed keyPressed, int u, int v) {
@@ -137,7 +140,7 @@ public class Player implements Serializable {
                                 if (oldy <= j*16 - height && vy > 0) {
                                     y = j*16 - height;
                                     if (pvy >= 10 && !DebugContext.INVINCIBLE) {
-                                        hp -= (int)((pvy - 12.5))*2;
+                                        healthPoints -= (int)((pvy - 12.5))*2;
                                     }
                                     onGround = true;
                                     vy = 0; // down
@@ -276,7 +279,7 @@ public class Player implements Serializable {
         if (fd < 1) {
             fd = 1;
         }
-        hp -= fd;
+        healthPoints -= fd;
     }
 
     public int sumArmor() {

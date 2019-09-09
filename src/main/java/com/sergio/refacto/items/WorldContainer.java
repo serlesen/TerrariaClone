@@ -12,25 +12,29 @@ import java.util.List;
 
 import com.sergio.refacto.Entity;
 import com.sergio.refacto.Inventory;
-import com.sergio.refacto.dto.Backgrounds;
-import com.sergio.refacto.dto.Blocks;
-import com.sergio.refacto.dto.ItemCollection;
 import com.sergio.refacto.Player;
 import com.sergio.refacto.TerrariaClone;
+import com.sergio.refacto.dto.Backgrounds;
+import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.DebugContext;
+import com.sergio.refacto.dto.Directions;
+import com.sergio.refacto.dto.ItemCollection;
 import com.sergio.refacto.dto.ItemType;
 import com.sergio.refacto.dto.Items;
+import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PUBLIC)
 public class WorldContainer implements Serializable {
 
+    private static final int[] SKY_COLORS = {28800, 28980, 29160, 29340, 29520, 29700, 29880, 30060, 30240, 30420, 30600, 30780, 30960, 31140, 31320, 31500, 31680, 31860, 32040, 32220, 72000, 72180, 72360, 72540, 72720, 72900, 73080, 73260, 73440, 73620, 73800, 73980, 74160, 74340, 74520, 74700, 74880, 75060, 75240, 75420};
+
     Blocks[][][] blocks;
-    Byte[][][] blockds;
-    Byte[][] blockdns;
-    Backgrounds[][] blockbgs;
-    Byte[][] blockts;
+    Directions[][][] blocksDirections;
+    Byte[][] BlocksDirectionsIntensity;
+    Backgrounds[][] blocksBackgrounds;
+    Byte[][] blocksTextureIntensity;
     Float[][] lights;
     Float[][][] power;
     Boolean[][] lsources;
@@ -44,8 +48,8 @@ public class WorldContainer implements Serializable {
     CloudsAggregate cloudsAggregate;
     List<Integer> machinesx, machinesy;
 
-    int rgnc1;
-    int rgnc2;
+    int regenerationCounter1;
+    int regenerationCounter2;
     int layer;
     int layerTemp;
     Blocks blockTemp;
@@ -100,12 +104,12 @@ public class WorldContainer implements Serializable {
         version = "0.3_01";
     }
 
-    public WorldContainer(Blocks[][][] blocks, Byte[][][] blockds, Byte[][] blockdns, Backgrounds[][] blockbgs, Byte[][] blockts,
+    public WorldContainer(Blocks[][][] blocks, Directions[][][] blocksDirections, Byte[][] BlocksDirectionsIntensity, Backgrounds[][] blocksBackgrounds, Byte[][] blocksTextureIntensity,
                           Float[][] lights, Float[][][] power, Boolean[][] drawn, Boolean[][] ldrawn, Boolean[][] rdrawn,
                           Player player, Inventory inventory, ItemCollection cic,
                           List<Entity> entities, CloudsAggregate cloudsAggregate,
                           List<Integer> machinesx, List<Integer> machinesy, Boolean[][] lsources, List<Integer> lqx, List<Integer> lqy, Boolean[][] lqd,
-                          int rgnc1, int rgnc2, int layer, int layerTemp, Blocks blockTemp,
+                          int regenerationCounter1, int regenerationCounter2, int layer, int layerTemp, Blocks blockTemp,
                           int mx, int my, int icx, int icy, int mining, int immune,
                           Items moveItem, short moveNum, Items moveItemTemp, short moveNumTemp, int msi,
                           double toolAngle, double toolSpeed, double timeOfDay, int currentSkyLight, int day, int mobCount,
@@ -115,10 +119,10 @@ public class WorldContainer implements Serializable {
                           ItemCollection ic, boolean[][] kworlds, ItemCollection[][][] icmatrix, String version) {
 
         this.blocks = blocks;
-        this.blockds = blockds;
-        this.blockdns = blockdns;
-        this.blockbgs = blockbgs;
-        this.blockts = blockts;
+        this.blocksDirections = blocksDirections;
+        this.BlocksDirectionsIntensity = BlocksDirectionsIntensity;
+        this.blocksBackgrounds = blocksBackgrounds;
+        this.blocksTextureIntensity = blocksTextureIntensity;
         this.lights = lights;
         this.power = power;
         this.drawn = drawn;
@@ -135,8 +139,8 @@ public class WorldContainer implements Serializable {
         this.lqx = lqx;
         this.lqy = lqy;
         this.lqd = lqd;
-        this.rgnc1 = rgnc1;
-        this.rgnc2 = rgnc2;
+        this.regenerationCounter1 = regenerationCounter1;
+        this.regenerationCounter2 = regenerationCounter2;
         this.layer = layer;
         this.layerTemp = layerTemp;
         this.blockTemp = blockTemp;
@@ -174,10 +178,10 @@ public class WorldContainer implements Serializable {
 
     private void load(WorldContainer wc) {
         blocks = wc.blocks;
-        blockds = wc.blockds;
-        blockdns = wc.blockdns;
-        blockbgs = wc.blockbgs;
-        blockts = wc.blockts;
+        blocksDirections = wc.blocksDirections;
+        BlocksDirectionsIntensity = wc.BlocksDirectionsIntensity;
+        blocksBackgrounds = wc.blocksBackgrounds;
+        blocksTextureIntensity = wc.blocksTextureIntensity;
         lights = wc.lights;
         power = wc.power;
         player = wc.player;
@@ -191,8 +195,8 @@ public class WorldContainer implements Serializable {
         lqx = wc.lqx;
         lqy = wc.lqy;
         lqd = wc.lqd;
-        rgnc1 = wc.rgnc1;
-        rgnc2 = wc.rgnc2;
+        regenerationCounter1 = wc.regenerationCounter1;
+        regenerationCounter2 = wc.regenerationCounter2;
         layer = wc.layer;
         layerTemp = wc.layerTemp;
         blockTemp = wc.blockTemp;
@@ -298,10 +302,10 @@ public class WorldContainer implements Serializable {
 
     public void createNewWorld(int size) {
         blocks = new Blocks[3][size][size];
-        blockds = new Byte[3][size][size];
-        blockdns = new Byte[size][size];
-        blockbgs = new Backgrounds[size][size];
-        blockts = new Byte[size][size];
+        blocksDirections = new Directions[3][size][size];
+        BlocksDirectionsIntensity = new Byte[size][size];
+        blocksBackgrounds = new Backgrounds[size][size];
+        blocksTextureIntensity = new Byte[size][size];
         lights = new Float[size][size];
         power = new Float[3][size][size];
         lsources = new Boolean[size][size];
@@ -429,12 +433,12 @@ public class WorldContainer implements Serializable {
     }
 
     public WorldContainer getCopy() {
-        return new WorldContainer(blocks, blockds, blockdns, blockbgs, blockts,
+        return new WorldContainer(blocks, blocksDirections, BlocksDirectionsIntensity, blocksBackgrounds, blocksTextureIntensity,
                 lights, power, drawn, ldrawn, rdrawn,
                 player, inventory, cic,
                 entities, cloudsAggregate,
                 machinesx, machinesy, lsources, lqx, lqy, lqd,
-                rgnc1, rgnc2, layer, layerTemp, blockTemp,
+                regenerationCounter1, regenerationCounter2, layer, layerTemp, blockTemp,
                 mx, my, icx, icy, mining, immune,
                 moveItem, moveNum, moveItemTemp, moveNumTemp, msi,
                 toolAngle, toolSpeed, timeOfDay, currentSkyLight, day, mobCount,
@@ -442,5 +446,262 @@ public class WorldContainer implements Serializable {
                 WIDTH, HEIGHT, WORLDWIDTH, WORLDHEIGHT,
                 resunlight,
                 ic, kworlds, icmatrix, version);
+    }
+
+    public void upgradeBlocksState(int u, int v, int size) {
+        for (int l = 0; l < 3; l++) {
+            for (int y = 0; y < size; y++) {
+                for (int x = 0; x < size; x++) {
+                    if (RandomTool.nextInt(22500) == 0) {
+                        Blocks t = Blocks.AIR;
+                        switch (blocks[l][y][x]) {
+                            case SUNFLOWER_STAGE_1:
+                                if (timeOfDay >= 75913 || timeOfDay < 28883) {
+                                    t = Blocks.SUNFLOWER_STAGE_2;
+                                }
+                                break;
+                            case SUNFLOWER_STAGE_2:
+                                if (timeOfDay >= 75913 || timeOfDay < 28883) {
+                                    t = Blocks.SUNFLOWER_STAGE_3;
+                                }
+                                break;
+                            case MOONFLOWER_STAGE_1:
+                                if (timeOfDay >= 32302 && timeOfDay < 72093) {
+                                    t = Blocks.MOONFLOWER_STAGE_2;
+                                }
+                                break;
+                            case MOONFLOWER_STAGE_2:
+                                if (timeOfDay >= 32302 && timeOfDay < 72093) {
+                                    t = Blocks.MOONFLOWER_STAGE_3;
+                                }
+                                break;
+                            case DRYWEED_STAGE_1:
+                                if (checkBiome(x, y, u, v).equals("desert")) {
+                                    t = Blocks.DRYWEED_STAGE_2;
+                                }
+                                break;
+                            case DRYWEED_STAGE_2:
+                                if (checkBiome(x, y, u, v).equals("desert")) {
+                                    t = Blocks.DRYWEED_STAGE_3;
+                                }
+                                break;
+                            case GREENLEAF_STAGE_1:
+                                if (checkBiome(x, y, u, v).equals("jungle")) {
+                                    t = Blocks.GREENLEAF_STAGE_2;
+                                }
+                                break;
+                            case GREENLEAF_STAGE_2:
+                                if (checkBiome(x, y, u, v).equals("jungle")) {
+                                    t = Blocks.GREENLEAF_STAGE_3;
+                                }
+                                break;
+                            case FROSTLEAF_STAGE_1:
+                                if (checkBiome(x, y, u, v).equals("frost")) {
+                                    t = Blocks.FROSTLEAF_STAGE_2;
+                                }
+                                break;
+                            case FROSTLEAF_STAGE_2:
+                                if (checkBiome(x, y, u, v).equals("frost")) {
+                                    t = Blocks.FROSTLEAF_STAGE_3;
+                                }
+                                break;
+                            case CAVEROOT_STAGE_1:
+                                if (checkBiome(x, y, u, v).equals("cavern") || y >= 0/*stonelayer[x]*/) {
+                                    t = Blocks.CAVEROOT_STAGE_2;
+                                }
+                                break;
+                            case CAVEROOT_STAGE_2:
+                                if (checkBiome(x, y, u, v).equals("cavern") || y >= 0/*stonelayer[x]*/) {
+                                    t = Blocks.CAVEROOT_STAGE_3;
+                                }
+                                break;
+                            case SKYBLOSSOM_STAGE_1:
+                                if (y <= HEIGHT * 0.08 && RandomTool.nextInt(3) == 0 || y <= HEIGHT * 0.04) {
+                                    t = Blocks.SKYBLOSSOM_STAGE_2;
+                                }
+                                break;
+                            case SKYBLOSSOM_STAGE_2:
+                                if (y <= HEIGHT * 0.08 && RandomTool.nextInt(3) == 0 || y <= HEIGHT * 0.04) {
+                                    t = Blocks.SKYBLOSSOM_STAGE_3;
+                                }
+                                break;
+                            case VOID_ROT_STAGE_1:
+                                if (y >= HEIGHT * 0.98) {
+                                    t = Blocks.VOID_ROT_STAGE_2;
+                                }
+                                break;
+                            case VOID_ROT_STAGE_2:
+                                if (y >= HEIGHT * 0.98) {
+                                    t = Blocks.VOID_ROT_STAGE_3;
+                                }
+                                break;
+                            case MARSHLEAF_STAGE_1:
+                                if (checkBiome(x, y, u, v).equals("swamp")) {
+                                    t = Blocks.MARSHLEAF_STAGE_2;
+                                }
+                                break;
+                            case MARSHLEAF_STAGE_2:
+                                if (checkBiome(x, y, u, v).equals("swamp")) {
+                                    t = Blocks.MARSHLEAF_STAGE_3;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                        if (t != Blocks.AIR) {
+                            blocks[l][y][x] = t;
+                            drawn[y][x] = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void updateGrassState(int u, int v, int size) {
+        for (int l = 0; l < 3; l++) {
+            for (int y = 0; y < size; y++) {
+                for (int x = 0; x < size; x++) {
+                    if (RandomTool.nextInt(1000) == 0) {
+                        if (y >= 1 && y < HEIGHT - 1) {
+                            boolean doGrassGrow = false;
+                            if (blocks[l][y][x] == Blocks.DIRT && hasOpenSpace(x + u, y + v, l) && blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == Blocks.GRASS) {
+                                blocks[l][y][x] = Blocks.GRASS;
+                                doGrassGrow = true;
+                            }
+                            if (blocks[l][y][x] == Blocks.DIRT && hasOpenSpace(x + u, y + v, l) && blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == Blocks.JUNGLE_GRASS) {
+                                blocks[l][y][x] = Blocks.JUNGLE_GRASS;
+                                doGrassGrow = true;
+                            }
+                            if (blocks[l][y][x] == Blocks.MUD && hasOpenSpace(x + u, y + v, l) && blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == Blocks.SWAMP_GRASS) {
+                                blocks[l][y][x] = Blocks.SWAMP_GRASS;
+                                doGrassGrow = true;
+                            }
+                            if (doGrassGrow) {
+                                for (int y2 = y - 1; y2 < y + 2; y2++) {
+                                    for (int x2 = x - 1; x2 < x + 2; x2++) {
+                                        if (y2 >= 0 && y2 < HEIGHT) {
+                                            drawn[y2][x2] = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    public void updateTreesState(int size) {
+        for (int l = 0; l < 3; l++) {
+            for (int y = 0; y < size; y++) {
+                for (int x = 0; x < size; x++) {
+                    if (RandomTool.nextInt(1000) == 0) {
+                        if (blocks[1][y][x] == Blocks.TREE_NO_BARK) {
+                            blocks[1][y][x] = Blocks.TREE;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean hasOpenSpace(int x, int y, int l) {
+        try {
+            return (blocks[l][y - 1][x - 1] == Blocks.AIR || !blocks[l][y - 1][x - 1].isCds() ||
+                    blocks[l][y - 1][x] == Blocks.AIR || !blocks[l][y - 1][x].isCds() ||
+                    blocks[l][y - 1][x + 1] == Blocks.AIR || !blocks[l][y - 1][x + 1].isCds() ||
+                    blocks[l][y][x - 1] == Blocks.AIR || !blocks[l][y][x - 1].isCds() ||
+                    blocks[l][y][x + 1] == Blocks.AIR || !blocks[l][y][x + 1].isCds() ||
+                    blocks[l][y + 1][x - 1] == Blocks.AIR || !blocks[l][y + 1][x - 1].isCds() ||
+                    blocks[l][y + 1][x] == Blocks.AIR || !blocks[l][y + 1][x].isCds() ||
+                    blocks[l][y + 1][x + 1] == Blocks.AIR || !blocks[l][y + 1][x + 1].isCds());
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return false;
+        }
+    }
+
+    public String checkBiome(int x, int y, int u, int v) {
+        int desert = 0;
+        int frost = 0;
+        int swamp = 0;
+        int jungle = 0;
+        int cavern = 0;
+        for (int x2 = x - 15; x2 < x + 16; x2++) {
+            for (int y2 = y - 15; y2 < y + 16; y2++) {
+                if (x2 + u >= 0 && x2 + u < WIDTH && y2 + v >= 0 && y2 + v < HEIGHT) {
+                    if (blocks[1][y2 + v][x2 + u] == Blocks.SAND || blocks[1][y2 + v][x2 + u] == Blocks.SANDSTONE) {
+                        desert += 1;
+                    } else if (blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
+                        desert -= 1;
+                    }
+                    if (blocks[1][y2 + v][x2 + u] == Blocks.DIRT || blocks[1][y2 + v][x2 + u] == Blocks.GRASS || blocks[1][y2 + v][x2 + u] == Blocks.JUNGLE_GRASS) {
+                        jungle += 1;
+                    } else if (blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
+                        jungle -= 1;
+                    }
+                    if (blocks[1][y2 + v][x2 + u] == Blocks.SWAMP_GRASS || blocks[1][y2 + v][x2 + u] == Blocks.MUD) {
+                        swamp += 1;
+                    } else if (blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
+                        swamp -= 1;
+                    }
+                    if (blocks[1][y2 + v][x2 + u] == Blocks.SNOW) {
+                        frost += 1;
+                    } else if (blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
+                        frost -= 1;
+                    }
+                    if (blocksBackgrounds[y2 + v][x2 + u] == Backgrounds.EMPTY) {
+                        cavern += 1;
+                    }
+                    if (blocks[1][y2 + v][x2 + u] == Blocks.DIRT || blocks[1][y2 + v][x2 + u] == Blocks.STONE) {
+                        cavern += 1;
+                    } else {
+                        cavern -= 1;
+                    }
+                }
+            }
+        }
+        if (desert > 0) {
+            return "desert";
+        }
+        if (jungle > 0) {
+            return "jungle";
+        }
+        if (swamp > 0) {
+            return "swamp";
+        }
+        if (frost > 0) {
+            return "frost";
+        }
+        if (cavern > 0) {
+            return "cavern";
+        }
+        return "other";
+    }
+
+    public void updateSkyLights() {
+        currentSkyLight = SKY_COLORS[0];
+        for (int i = 0; i < SKY_COLORS.length; i++) {
+            if (timeOfDay >= SKY_COLORS[i]) {
+                currentSkyLight = SKY_COLORS[i];
+            }
+        }
+    }
+
+    public void updateHealthPoints() {
+        if (regenerationCounter1 == 0) {
+            if (regenerationCounter2 == 0) {
+                if (player.healthPoints < player.totalHealthPoints) {
+                    player.healthPoints += 1;
+                    regenerationCounter2 = 125;
+                }
+            } else {
+                regenerationCounter2 -= 1;
+            }
+        } else {
+            regenerationCounter1 -= 1;
+        }
     }
 }

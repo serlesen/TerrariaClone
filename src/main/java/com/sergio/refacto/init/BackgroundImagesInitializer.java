@@ -14,6 +14,9 @@ public class BackgroundImagesInitializer {
         Map<Backgrounds, BufferedImage> backgroundImgs = new HashMap<>();
 
         for (Backgrounds background : Backgrounds.values()) {
+            if (background == Backgrounds.EMPTY) {
+                continue;
+            }
             backgroundImgs.put(background, ResourcesLoader.loadImage("backgrounds/" + background.getFileName()));
         }
         return backgroundImgs;

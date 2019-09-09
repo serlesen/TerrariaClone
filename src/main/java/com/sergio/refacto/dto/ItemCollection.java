@@ -19,7 +19,7 @@ public class ItemCollection implements Serializable {
     transient BufferedImage image;
     double FUELP = 0;
     double SMELTP = 0;
-    boolean F_ON = false;
+    boolean furnaceOn = false;
 
     public ItemCollection(ItemType type, Items[] ids, short[] nums, short[] durs) {
         this.type = type;

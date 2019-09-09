@@ -3,6 +3,8 @@ package com.sergio.refacto.items;
 import com.sergio.refacto.TerrariaClone;
 import com.sergio.refacto.dto.Backgrounds;
 import com.sergio.refacto.dto.Blocks;
+import com.sergio.refacto.dto.Directions;
+import com.sergio.refacto.services.OutlinesService;
 import com.sergio.refacto.tools.PerlinNoise;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
@@ -16,10 +18,10 @@ public class Chunk {
     int cx, cy;
 
     Blocks[][][] blocks;
-    Byte[][][] blockds;
-    Byte[][] blockdns;
-    Backgrounds[][] blockbgs;
-    Byte[][] blockts;
+    Directions[][][] blocksDirections;
+    Byte[][] BlocksDirectionsIntensity;
+    Backgrounds[][] blocksBackgrounds;
+    Byte[][] blocksTextureIntesity;
     Float[][] lights;
     Float[][][] power;
     Boolean[][] lsources;
@@ -35,10 +37,10 @@ public class Chunk {
 
         int size = TerrariaClone.CHUNKBLOCKS;
         blocks = new Blocks[3][size][size];
-        blockds = new Byte[3][size][size];
-        blockdns = new Byte[size][size];
-        blockbgs = new Backgrounds[size][size];
-        blockts = new Byte[size][size];
+        blocksDirections = new Directions[3][size][size];
+        BlocksDirectionsIntensity = new Byte[size][size];
+        blocksBackgrounds = new Backgrounds[size][size];
+        blocksTextureIntesity = new Byte[size][size];
         lights = new Float[size][size];
         power = new Float[3][size][size];
         lsources = new Boolean[size][size];
@@ -61,19 +63,19 @@ public class Chunk {
                     arbprd[l][y][x] = false;
                     power[l][y][x] = (float)0;
                 }
-                blockdns[y][x] = (byte) RandomTool.nextInt(5);
-                blockbgs[y][x] = Backgrounds.EMPTY;
-                blockts[y][x] = (byte) RandomTool.nextInt(8);
+                BlocksDirectionsIntensity[y][x] = (byte) RandomTool.nextInt(5);
+                blocksBackgrounds[y][x] = Backgrounds.EMPTY;
+                blocksTextureIntesity[y][x] = (byte) RandomTool.nextInt(8);
                 lights[y][x] = (float)19;
                 lsources[y][x] = false;
                 wcnct[y][x] = false;
                 drawn[y][x] = false;
                 rdrawn[y][x] = false;
                 ldrawn[y][x] = false;
-                blockds[0][y][x] = (byte)0;
-                blockds[2][y][x] = (byte)0;
+                blocksDirections[0][y][x] = Directions.CENTER;
+                blocksDirections[2][y][x] = Directions.CENTER;
             }
         }
-        blockds[1] = World.generateOutlines(blocks[1]);
+        blocksDirections[1] = OutlinesService.generateOutlines(blocks[1]);
     }
 }
