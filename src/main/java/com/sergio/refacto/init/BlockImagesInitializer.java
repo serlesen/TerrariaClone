@@ -6,7 +6,10 @@ import java.util.Map;
 
 import com.sergio.refacto.dto.BlockNames;
 import com.sergio.refacto.tools.ResourcesLoader;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class BlockImagesInitializer {
 
     public static Map<String, BufferedImage> init() {
@@ -17,7 +20,7 @@ public class BlockImagesInitializer {
                 blockImgs.put("blocks/" + BlockNames.findByIndex(i).getFileName() + "/texture" + (j+1) + ".png",
                         ResourcesLoader.loadImage("blocks/" + BlockNames.findByIndex(i).getFileName() + "/texture" + (j+1) + ".png"));
                 if (blockImgs.get("blocks/" + BlockNames.findByIndex(i).getFileName() + "/texture" + (j+1) + ".png") == null) {
-                    System.out.println("[ERROR] Could not load block graphic '" + BlockNames.findByIndex(i).getFileName() + "'.");
+                    log.error("[ERROR] Could not load block graphic '" + BlockNames.findByIndex(i).getFileName() + "'.");
                 }
             }
         }

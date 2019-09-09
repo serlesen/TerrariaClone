@@ -6,6 +6,9 @@ import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class LightConverter {
 
     static int BLOCKSIZE = 16;
@@ -35,7 +38,7 @@ public class LightConverter {
                     ImageIO.write(texture, "png", new File("blocks/" + name + "/texture" + j + ".png"));
                 }
                 catch (IOException e) {
-                    System.out.println("Error in writing file.");
+                    log.error("Error in writing file.", e);
                 }
             }
         }
@@ -48,7 +51,7 @@ public class LightConverter {
             image = ImageIO.read(url);
         }
         catch (Exception e) {
-            System.out.println("Error: could not load image '" + path + "'.");
+            log.error("Error: could not load image '" + path + "'.", e);
         }
         return image;
     }

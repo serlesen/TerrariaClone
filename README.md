@@ -16,5 +16,6 @@ Refactorings done:
 * Pack some fields together into contexts
 * Migrate Arrays into classes with a meaning for each field
 * Move some methods to objects/aggregates
+* Use Logger instead of System.out.println
 
 [terraria]: https://terraria.org/

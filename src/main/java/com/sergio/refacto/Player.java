@@ -2,15 +2,18 @@ package com.sergio.refacto;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.io.Serializable;
-import java.net.URL;
 import javax.imageio.ImageIO;
 
+import com.sergio.refacto.dto.BlockNames;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ImageState;
-import com.sergio.refacto.dto.Items;
 import com.sergio.refacto.dto.KeyPressed;
+import com.sergio.refacto.tools.ResourcesLoader;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Player implements Serializable {
     transient BufferedImage image;
     int ix, iy, width, height, thp, hp;
@@ -32,7 +35,7 @@ public class Player implements Serializable {
 
         onGround = false;
 
-        image = loadImage("sprites/player/right_still.png");
+        image = ResourcesLoader.loadImage("sprites/player/right_still.png");
 
         width = TerrariaClone.getPLAYERSIZEX();
         height = TerrariaClone.getPLAYERSIZEY();
@@ -50,7 +53,7 @@ public class Player implements Serializable {
         hp = thp;
     }
 
-    public void update(Integer[][] blocks, KeyPressed keyPressed, int u, int v) {
+    public void update(BlockNames[][] blocks, KeyPressed keyPressed, int u, int v) {
         grounded = (onGround || onGroundDelay);
 
         handleMovement(keyPressed);
@@ -67,9 +70,9 @@ public class Player implements Serializable {
 
         if (!grounded) {
             if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
-                image = loadImage("sprites/player/left_jump.png");
+                image = ResourcesLoader.loadImage("sprites/player/left_jump.png");
             } else if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
-                image = loadImage("sprites/player/right_jump.png");
+                image = ResourcesLoader.loadImage("sprites/player/right_jump.png");
             }
         }
 
@@ -94,7 +97,7 @@ public class Player implements Serializable {
 
                 for (int i = bx1; i <= bx2; i++) {
                     for (int j = by1; j <= by2; j++) {
-                        if (blocks[j+v][i+u] != 0 && TerrariaClone.getBLOCKCD().get(blocks[j+v][i+u])) {
+                        if (blocks[j+v][i+u] != BlockNames.AIR && blocks[j+v][i+u].isCds()) {
                             if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                                 if (oldx <= i*16 - width && vx > 0) {
                                     x = i*16 - width;
@@ -131,7 +134,7 @@ public class Player implements Serializable {
 
                 for (int i = bx1; i <= bx2; i++) {
                     for (int j = by1; j <= by2; j++) {
-                        if (blocks[j+v][i+u] != 0 && TerrariaClone.getBLOCKCD().get(blocks[j+v][i+u])) {
+                        if (blocks[j+v][i+u] != BlockNames.AIR && blocks[j+v][i+u].isCds()) {
                             if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                                 if (oldy <= j*16 - height && vy > 0) {
                                     y = j*16 - height;
@@ -173,10 +176,10 @@ public class Player implements Serializable {
             if (grounded) {
                 if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
                     imgState = ImageState.STILL_LEFT;
-                    image = loadImage("sprites/player/left_still.png");
+                    image = ResourcesLoader.loadImage("sprites/player/left_still.png");
                 } else if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
                     imgState = ImageState.STILL_RIGHT;
-                    image = loadImage("sprites/player/right_still.png");
+                    image = ResourcesLoader.loadImage("sprites/player/right_still.png");
                 }
             }
         }
@@ -238,25 +241,25 @@ public class Player implements Serializable {
     private void setMovementImageTo(ImageState walkLeft2, String path) {
         imgDelay = 5;
         imgState = walkLeft2;
-        image = loadImage(path);
+        image = ResourcesLoader.loadImage(path);
     }
 
     public void reloadImage() {
         if (grounded) {
             if (imgState == ImageState.STILL_LEFT || imgState == ImageState.WALK_LEFT_1) {
-                image = loadImage("sprites/player/left_still.png");
+                image = ResourcesLoader.loadImage("sprites/player/left_still.png");
             } else if (imgState == ImageState.WALK_LEFT_2) {
-                image = loadImage("sprites/player/left_walk.png");
+                image = ResourcesLoader.loadImage("sprites/player/left_walk.png");
             } else if (imgState == ImageState.STILL_RIGHT || imgState == ImageState.WALK_RIGHT_1) {
-                image = loadImage("sprites/player/right_still.png");
+                image = ResourcesLoader.loadImage("sprites/player/right_still.png");
             } else if (imgState == ImageState.WALK_RIGHT_2) {
-                image = loadImage("sprites/player/right_walk.png");
+                image = ResourcesLoader.loadImage("sprites/player/right_walk.png");
             }
         } else {
             if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
-                image = loadImage("sprites/player/left_jump.png");
+                image = ResourcesLoader.loadImage("sprites/player/left_jump.png");
             } else if (imgState == ImageState.STILL_RIGHT || imgState.isWalkRight()) {
-                image = loadImage("sprites/player/right_jump.png");
+                image = ResourcesLoader.loadImage("sprites/player/right_jump.png");
             }
         }
     }
@@ -283,17 +286,5 @@ public class Player implements Serializable {
                 TerrariaClone.armor.getIds()[1].getArmor() +
                 TerrariaClone.armor.getIds()[2].getArmor() +
                 TerrariaClone.armor.getIds()[3].getArmor());
-    }
-
-    private static BufferedImage loadImage(String path) {
-        URL url = TerrariaClone.class.getResource(path);
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(url);
-        }
-        catch (Exception e) {
-            System.out.println("[ERROR] could not load image '" + path + "'.");
-        }
-        return image;
     }
 }

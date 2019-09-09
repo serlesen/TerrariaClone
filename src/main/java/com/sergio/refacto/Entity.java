@@ -1,13 +1,14 @@
 package com.sergio.refacto;
 
-import java.awt.*;
-import java.awt.image.*;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 
+import com.sergio.refacto.dto.BlockNames;
 import com.sergio.refacto.dto.EntityType;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.Items;
@@ -15,7 +16,9 @@ import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Entity implements Serializable {
@@ -159,7 +162,7 @@ public class Entity implements Serializable {
         width = image.getWidth()*2; height = image.getHeight()*2;
     }
 
-    public boolean update(Integer[][] blocks, Player player, int u, int v) {
+    public boolean update(BlockNames[][] blocks, Player player, int u, int v) {
         newMob = null;
         if (entityType == null) {
             if (!onGround) {
@@ -389,7 +392,7 @@ public class Entity implements Serializable {
         return false;
     }
 
-    public boolean collide(Integer[][] blocks, Player player, int u, int v) {
+    public boolean collide(BlockNames[][] blocks, Player player, int u, int v) {
         boolean rv = false;
 
         grounded = (onGround || onGroundDelay);
@@ -416,7 +419,7 @@ public class Entity implements Serializable {
 
             for (i=bx1; i<=bx2; i++) {
                 for (j=by1; j<=by2; j++) {
-                    if (blocks[j][i] != 0 && TerrariaClone.getBLOCKCD().get(blocks[j+v][i+u])) {
+                    if (blocks[j][i] != BlockNames.AIR && blocks[j+v][i+u].isCds()) {
                         if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                             if (oldx <= i*16 - width && (vx > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 x = i*16 - width;
@@ -481,7 +484,7 @@ public class Entity implements Serializable {
 
             for (i=bx1; i<=bx2; i++) {
                 for (j=by1; j<=by2; j++) {
-                    if (blocks[j][i] != 0 && TerrariaClone.getBLOCKCD().get(blocks[j+v][i+u])) {
+                    if (blocks[j][i] != BlockNames.AIR && blocks[j+v][i+u].isCds()) {
                         if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                             if (oldy <= j*16 - height && (vy > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 y = j*16 - height;
@@ -629,32 +632,8 @@ public class Entity implements Serializable {
             image = ImageIO.read(url);
         }
         catch (Exception e) {
-//            System.out.println("[ERROR] could not load image '" + path + "'.");
+            log.error("[ERROR] could not load image '" + path + "'.", e);
         }
         return image;
-    }
-
-    public static void print(String text) {
-        System.out.println(text);
-    }
-
-    public static void print(int text) {
-        System.out.println(text);
-    }
-
-    public static void print(double text) {
-        System.out.println(text);
-    }
-
-    public static void print(short text) {
-        System.out.println(text);
-    }
-
-    public static void print(boolean text) {
-        System.out.println(text);
-    }
-
-    public static void print(Object text) {
-        System.out.println(text);
     }
 }

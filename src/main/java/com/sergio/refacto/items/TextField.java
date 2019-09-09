@@ -53,28 +53,4 @@ public class TextField {
         g2.fillRect(0, height-3, width, 3);
         g2.fillRect(width-3, 0, 3, height);
     }
-
-    public static void print(String text) {
-        System.out.println(text);
-    }
-
-    public static void print(int text) {
-        System.out.println(text);
-    }
-
-    public static void print(double text) {
-        System.out.println(text);
-    }
-
-    public static void print(short text) {
-        System.out.println(text);
-    }
-
-    public static void print(boolean text) {
-        System.out.println(text);
-    }
-
-    public static void print(Object text) {
-        System.out.println(text);
-    }
 }

@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +16,10 @@ import com.sergio.refacto.dto.ItemCollection;
 import com.sergio.refacto.dto.ItemType;
 import com.sergio.refacto.dto.Items;
 import com.sergio.refacto.dto.RecipeItem;
+import com.sergio.refacto.tools.ResourcesLoader;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Inventory implements Serializable {
 
     int i, j, k, x, y, n, px, py, selection, width, height;
@@ -52,8 +55,8 @@ public class Inventory implements Serializable {
         }
         selection = 0;
         image = new BufferedImage(466, 190, BufferedImage.TYPE_INT_ARGB);
-        box = loadImage("interface/inventory.png");
-        box_selected = loadImage("interface/inventory_selected.png");
+        box = ResourcesLoader.loadImage("interface/inventory.png");
+        box_selected = ResourcesLoader.loadImage("interface/inventory_selected.png");
         g2 = image.createGraphics();
         for (x=0; x<10; x++) {
             for (y=0; y<4; y++) {
@@ -697,8 +700,8 @@ public class Inventory implements Serializable {
 
     public void reloadImage() {
         image = new BufferedImage(466, 190, BufferedImage.TYPE_INT_ARGB);
-        box = loadImage("interface/inventory.png");
-        box_selected = loadImage("interface/inventory_selected.png");
+        box = ResourcesLoader.loadImage("interface/inventory.png");
+        box_selected = ResourcesLoader.loadImage("interface/inventory_selected.png");
         g2 = image.createGraphics();
         for (x=0; x<10; x++) {
             for (y=0; y<4; y++) {
@@ -806,14 +809,14 @@ public class Inventory implements Serializable {
     public void renderCollection(ItemCollection ic) {
         if (ic.getType() == ItemType.CIC) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/cic.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/cic.png"));
                 for (i=0; i<4; i++) {
                     updateIC(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.ARMOR) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/armor.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/armor.png"));
                 CX = 1;
                 CY = 4;
                 for (i=0; i<4; i++) {
@@ -822,14 +825,14 @@ public class Inventory implements Serializable {
             }
         } else if (ic.getType() == ItemType.WORKBENCH) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/workbench.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/workbench.png"));
                 for (i=0; i<9; i++) {
                     updateIC(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.WOODEN_CHEST) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/wooden_chest.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/wooden_chest.png"));
                 CX = 3;
                 CY = 3;
                 for (i=0; i<9; i++) {
@@ -838,7 +841,7 @@ public class Inventory implements Serializable {
             }
         } else if (ic.getType() == ItemType.STONE_CHEST) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/stone_chest.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/stone_chest.png"));
                 CX = 5;
                 CY = 3;
                 for (i=0; i<15; i++) {
@@ -847,7 +850,7 @@ public class Inventory implements Serializable {
             }
         } else if (ic.getType() == ItemType.COPPER_CHEST) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/copper_chest.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/copper_chest.png"));
                 CX = 5;
                 CY = 4;
                 for (i=0; i<20; i++) {
@@ -856,7 +859,7 @@ public class Inventory implements Serializable {
             }
         } else if (ic.getType() == ItemType.IRON_CHEST) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/iron_chest.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/iron_chest.png"));
                 CX = 7;
                 CY = 4;
                 for (i=0; i<28; i++) {
@@ -865,7 +868,7 @@ public class Inventory implements Serializable {
             }
         } else if (ic.getType() == ItemType.SILVER_CHEST) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/silver_chest.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/silver_chest.png"));
                 CX = 7;
                 CY = 5;
                 for (i=0; i<35; i++) {
@@ -874,7 +877,7 @@ public class Inventory implements Serializable {
             }
         } else if (ic.getType() == ItemType.GOLD_CHEST) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/gold_chest.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/gold_chest.png"));
                 CX = 7;
                 CY = 6;
                 for (i=0; i<42; i++) {
@@ -883,7 +886,7 @@ public class Inventory implements Serializable {
             }
         } else if (ic.getType() == ItemType.ZINC_CHEST) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/zinc_chest.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/zinc_chest.png"));
                 CX = 7;
                 CY = 8;
                 for (i=0; i<56; i++) {
@@ -892,7 +895,7 @@ public class Inventory implements Serializable {
             }
         } else if (ic.getType() == ItemType.RHYMESTONE_CHEST) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/rhymestone_chest.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/rhymestone_chest.png"));
                 CX = 8;
                 CY = 9;
                 for (i=0; i<72; i++) {
@@ -901,7 +904,7 @@ public class Inventory implements Serializable {
             }
         } else if (ic.getType() == ItemType.OBDURITE_CHEST) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/obdurite_chest.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/obdurite_chest.png"));
                 CX = 10;
                 CY = 10;
                 for (i=0; i<100; i++) {
@@ -910,7 +913,7 @@ public class Inventory implements Serializable {
             }
         } else if (ic.getType() == ItemType.FURNACE) {
             if (ic.getImage() == null) {
-                ic.setImage(loadImage("interface/furnace.png"));
+                ic.setImage(ResourcesLoader.loadImage("interface/furnace.png"));
                 for (i=-1; i<4; i++) {
                     updateIC(ic, i);
                 }
@@ -1290,18 +1293,6 @@ public class Inventory implements Serializable {
         }
     }
 
-    private static BufferedImage loadImage(String path) {
-        URL url = TerrariaClone.class.getResource(path);
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(url);
-        }
-        catch (Exception e) {
-            System.out.println("[ERROR] could not load image '" + path + "'.");
-        }
-        return image;
-    }
-
     private static int f(int x) {
         if (x == 9) {
             return 0;
@@ -1311,29 +1302,5 @@ public class Inventory implements Serializable {
 
     public static int max(int a, int b, int c) {
         return Math.max(Math.max(a, b), c);
-    }
-
-    public static void print(String text) {
-        System.out.println(text);
-    }
-
-    public static void print(int text) {
-        System.out.println(text);
-    }
-
-    public static void print(double text) {
-        System.out.println(text);
-    }
-
-    public static void print(short text) {
-        System.out.println(text);
-    }
-
-    public static void print(boolean text) {
-        System.out.println(text);
-    }
-
-    public static void print(Object text) {
-        System.out.println(text);
     }
 }

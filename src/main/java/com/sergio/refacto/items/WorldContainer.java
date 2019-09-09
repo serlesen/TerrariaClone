@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.sergio.refacto.Entity;
 import com.sergio.refacto.Inventory;
+import com.sergio.refacto.dto.BlockNames;
 import com.sergio.refacto.dto.ItemCollection;
 import com.sergio.refacto.Player;
 import com.sergio.refacto.TerrariaClone;
@@ -24,7 +25,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PUBLIC)
 public class WorldContainer implements Serializable {
 
-    Integer[][][] blocks;
+    BlockNames[][][] blocks;
     Byte[][][] blockds;
     Byte[][] blockdns;
     Byte[][] blockbgs;
@@ -46,7 +47,7 @@ public class WorldContainer implements Serializable {
     int rgnc2;
     int layer;
     int layerTemp;
-    int blockTemp;
+    BlockNames blockTemp;
 
     int mx, my, icx, icy, mining, immune;
 
@@ -98,12 +99,12 @@ public class WorldContainer implements Serializable {
         version = "0.3_01";
     }
 
-    public WorldContainer(Integer[][][] blocks, Byte[][][] blockds, Byte[][] blockdns, Byte[][] blockbgs, Byte[][] blockts,
+    public WorldContainer(BlockNames[][][] blocks, Byte[][][] blockds, Byte[][] blockdns, Byte[][] blockbgs, Byte[][] blockts,
         Float[][] lights, Float[][][] power, Boolean[][] drawn, Boolean[][] ldrawn, Boolean[][] rdrawn,
         Player player, Inventory inventory, ItemCollection cic,
         List<Entity> entities, CloudsAggregate cloudsAggregate,
         List<Integer> machinesx, List<Integer> machinesy, Boolean[][] lsources, List<Integer> lqx, List<Integer> lqy, Boolean[][] lqd,
-        int rgnc1, int rgnc2, int layer, int layerTemp, int blockTemp,
+        int rgnc1, int rgnc2, int layer, int layerTemp, BlockNames blockTemp,
         int mx, int my, int icx, int icy, int mining, int immune,
         Items moveItem, short moveNum, Items moveItemTemp, short moveNumTemp, int msi,
         double toolAngle, double toolSpeed, double timeOfDay, int currentSkyLight, int day, int mobCount,
@@ -295,7 +296,7 @@ public class WorldContainer implements Serializable {
     }
 
     public void createNewWorld(int size) {
-        blocks = new Integer[3][size][size];
+        blocks = new BlockNames[3][size][size];
         blockds = new Byte[3][size][size];
         blockdns = new Byte[size][size];
         blockbgs = new Byte[size][size];

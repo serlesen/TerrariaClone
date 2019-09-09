@@ -6,7 +6,9 @@ import javax.imageio.ImageIO;
 
 import com.sergio.refacto.TerrariaClone;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @UtilityClass
 public class ResourcesLoader {
 
@@ -15,9 +17,8 @@ public class ResourcesLoader {
         BufferedImage image = null;
         try {
             image = ImageIO.read(url);
-        }
-        catch (Exception e) {
-            //
+        } catch (Exception e) {
+            log.error("[ERROR] could not load image '" + path + "'.", e);
         }
         return image;
     }

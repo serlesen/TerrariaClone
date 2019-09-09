@@ -3,19 +3,21 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sergio.refacto.dto.BlockNames;
+
 public class TorchesLInitializer {
 
-    public static Map<Integer, Integer> init() {
-        Map<Integer, Integer> torchesL = new HashMap<>();
+    public static Map<BlockNames, BlockNames> init() {
+        Map<BlockNames, BlockNames> torchesL = new HashMap<>();
 
-        torchesL.put(20, 24);
-        torchesL.put(21, 26);
-        torchesL.put(22, 28);
-        torchesL.put(100, 101);
-        torchesL.put(105, 107);
-        torchesL.put(106, 108);
-        torchesL.put(127, 127);
-        torchesL.put(128, 128);
+        torchesL.put(BlockNames.WOODEN_TORCH, BlockNames.WOODEN_TORCH_LEFT_WALL);
+        torchesL.put(BlockNames.COAL_TORCH, BlockNames.COAL_TORCH_LEFT_WALL);
+        torchesL.put(BlockNames.LUMENSTONE_TORCH, BlockNames.LUMENSTONE_TORCH_LEFT_WALL);
+        torchesL.put(BlockNames.ZYTHIUM_TORCH, BlockNames.ZYTHIUM_TORCH_LEFT_WALL);
+        torchesL.put(BlockNames.LEVER, BlockNames.LEVER_LEFT_WALL);
+        torchesL.put(BlockNames.LEVER_ON, BlockNames.LEVER_LEFT_WALL_ON);
+        torchesL.put(BlockNames.BUTTON_LEFT, BlockNames.BUTTON_LEFT);
+        torchesL.put(BlockNames.BUTTON_LEFT_ON, BlockNames.BUTTON_LEFT_ON);
 
         return torchesL;
     }

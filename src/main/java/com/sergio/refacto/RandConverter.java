@@ -6,6 +6,9 @@ import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RandConverter {
 
     static int BLOCKSIZE = 16;
@@ -53,9 +56,8 @@ public class RandConverter {
                             }
                             try {
                                 ImageIO.write(result, "png", new File("outlines/" + name + "/" + dirs[k] + j + ".png"));
-                            }
-                            catch (IOException e) {
-                                System.out.println("Error in writing file.");
+                            } catch (IOException e) {
+                                log.error("Error in writing file.", e);
                             }
                         }
                     }
@@ -86,9 +88,8 @@ public class RandConverter {
                     }
                     try {
                         ImageIO.write(result, "png", new File("blocks/" + name + "/texture" + (i+2) + ".png"));
-                    }
-                    catch (IOException e) {
-                        System.out.println("Error in writing file.");
+                    } catch (IOException e) {
+                        log.error("Error in writing file.", e);
                     }
                 }
             }
@@ -100,9 +101,8 @@ public class RandConverter {
         BufferedImage image = null;
         try {
             image = ImageIO.read(url);
-        }
-        catch (Exception e) {
-            System.out.println("Error: could not load image '" + path + "'.");
+        } catch (Exception e) {
+            log.error("Error: could not load image '" + path + "'.", e);
         }
         return image;
     }

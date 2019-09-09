@@ -35,7 +35,7 @@ public class BackgroundImagesInitializer {
     public static Map<Byte, BufferedImage> init() {
         Map<Byte,BufferedImage> backgroundImgs = new HashMap<>();
 
-        for (int i = 0; i < BGS.length; i++) {
+        for (int i = 1; i < BGS.length; i++) {
             backgroundImgs.put((byte) i, ResourcesLoader.loadImage("backgrounds/" + BGS[i] + ".png"));
         }
 
