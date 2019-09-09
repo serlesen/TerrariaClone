@@ -3,21 +3,21 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sergio.refacto.dto.BlockNames;
+import com.sergio.refacto.dto.Blocks;
 
 public class TorchesLInitializer {
 
-    public static Map<BlockNames, BlockNames> init() {
-        Map<BlockNames, BlockNames> torchesL = new HashMap<>();
+    public static Map<Blocks, Blocks> init() {
+        Map<Blocks, Blocks> torchesL = new HashMap<>();
 
-        torchesL.put(BlockNames.WOODEN_TORCH, BlockNames.WOODEN_TORCH_LEFT_WALL);
-        torchesL.put(BlockNames.COAL_TORCH, BlockNames.COAL_TORCH_LEFT_WALL);
-        torchesL.put(BlockNames.LUMENSTONE_TORCH, BlockNames.LUMENSTONE_TORCH_LEFT_WALL);
-        torchesL.put(BlockNames.ZYTHIUM_TORCH, BlockNames.ZYTHIUM_TORCH_LEFT_WALL);
-        torchesL.put(BlockNames.LEVER, BlockNames.LEVER_LEFT_WALL);
-        torchesL.put(BlockNames.LEVER_ON, BlockNames.LEVER_LEFT_WALL_ON);
-        torchesL.put(BlockNames.BUTTON_LEFT, BlockNames.BUTTON_LEFT);
-        torchesL.put(BlockNames.BUTTON_LEFT_ON, BlockNames.BUTTON_LEFT_ON);
+        torchesL.put(Blocks.WOODEN_TORCH, Blocks.WOODEN_TORCH_LEFT_WALL);
+        torchesL.put(Blocks.COAL_TORCH, Blocks.COAL_TORCH_LEFT_WALL);
+        torchesL.put(Blocks.LUMENSTONE_TORCH, Blocks.LUMENSTONE_TORCH_LEFT_WALL);
+        torchesL.put(Blocks.ZYTHIUM_TORCH, Blocks.ZYTHIUM_TORCH_LEFT_WALL);
+        torchesL.put(Blocks.LEVER, Blocks.LEVER_LEFT_WALL);
+        torchesL.put(Blocks.LEVER_ON, Blocks.LEVER_LEFT_WALL_ON);
+        torchesL.put(Blocks.BUTTON_LEFT, Blocks.BUTTON_LEFT);
+        torchesL.put(Blocks.BUTTON_LEFT_ON, Blocks.BUTTON_LEFT_ON);
 
         return torchesL;
     }

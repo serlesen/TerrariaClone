@@ -41,10 +41,12 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.sergio.refacto.dto.BlockNames;
+import com.sergio.refacto.dto.Backgrounds;
+import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.Directions;
 import com.sergio.refacto.dto.EntityType;
@@ -170,7 +172,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     BufferedImage tool;
 
-    static Map<Byte, BufferedImage> backgroundImgs;
+    static Map<Backgrounds, BufferedImage> backgroundImgs;
     static Map<Items, BufferedImage> itemImgs;
     static Map<Short, Map<Integer, Integer>> DURABILITY;
     static Map<EntityType, String> UIENTITIES;
@@ -178,12 +180,12 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     static Map<Integer, BufferedImage> LIGHTLEVELS;
     static Map<String, BufferedImage> blockImgs;
     static Map<String, BufferedImage> outlineImgs;
-    static Map<Integer, Integer> GRASSDIRT;
-    static Map<Short, Double> FUELS;
-    static Map<Integer, BlockNames> WIREP;
-    static Map<BlockNames, BlockNames> TORCHESL;
-    static Map<BlockNames, BlockNames> TORCHESR;
-    static Map<Integer, Integer> DDELAY;
+    static Map<Blocks, Blocks> GRASSDIRT;
+    static Map<Items, Double> FUELS;
+    static Map<Integer, Blocks> WIREP;
+    static Map<Blocks, Blocks> TORCHESL;
+    static Map<Blocks, Blocks> TORCHESR;
+    static Map<Blocks, Integer> DDELAY;
 
     List<Items> FRI1, FRI2;
     List<Short> FRN1, FRN2;
@@ -370,281 +372,279 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
             menuTimer = new javax.swing.Timer(20, null);
 
-            menuTimer.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    try {
-                        if (mousePressed == MousePressed.LEFT_MOUSE) {
-                            Action mainThread = new AbstractAction() {
-                                public void actionPerformed(ActionEvent ae) {
-                                    try {
-                                        if (worldContainer.ready) {
-                                            worldContainer.ready = false;
-                                            uNew = (int) ((worldContainer.player.x - getWidth() / 2 + worldContainer.player.width) / (double) CHUNKSIZE);
-                                            vNew = (int) ((worldContainer.player.y - getHeight() / 2 + worldContainer.player.height) / (double) CHUNKSIZE);
-                                            if (ou != uNew || ov != vNew) {
-                                                ou = uNew;
-                                                ov = vNew;
-                                                List<Chunk> chunkTemp = new ArrayList<>(0);
-                                                for (twy = 0; twy < 2; twy++) {
-                                                    for (twx = 0; twx < 2; twx++) {
-                                                        if (chunkMatrix[twy][twx] != null) {
-                                                            chunkTemp.add(chunkMatrix[twy][twx]);
-                                                            chunkMatrix[twy][twx] = null;
-                                                        }
-                                                    }
-                                                }
-                                                for (twy = 0; twy < 2; twy++) {
-                                                    for (twx = 0; twx < 2; twx++) {
-                                                        for (i = chunkTemp.size() - 1; i > -1; i--) {
-                                                            if (chunkTemp.get(i).getCx() == twx && chunkTemp.get(i).getCy() == twy) {
-                                                                chunkMatrix[twy][twx] = chunkTemp.get(i);
-                                                                chunkTemp.remove(i);
-                                                                break;
-                                                            }
-                                                        }
-                                                        if (chunkMatrix[twy][twx] == null) {
-                                                            if (temporarySaveFile[twy][twx] != null) {
-                                                                chunkMatrix[twy][twx] = temporarySaveFile[twy][twx];
-                                                            } else {
-                                                                chunkMatrix[twy][twx] = new Chunk(twx + ou, twy + ov);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                for (i = 0; i < chunkTemp.size(); i++) {
-                                                    temporarySaveFile[twy][twx] = chunkTemp.get(i);
-                                                }
-                                                chunkTemp = null;
-                                                for (twy = 0; twy < 2; twy++) {
-                                                    for (twx = 0; twx < 2; twx++) {
-                                                        for (y = 0; y < CHUNKBLOCKS; y++) {
-                                                            for (x = 0; x < CHUNKBLOCKS; x++) {
-                                                                for (int l = 0; l < 3; l++) {
-                                                                    worldContainer.blocks[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocks()[l][y][x];
-                                                                    worldContainer.power[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getPower()[l][y][x];
-                                                                    pzqn[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getPzqn()[l][y][x];
-                                                                    arbprd[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getArbprd()[l][y][x];
-                                                                    worldContainer.blockds[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlockds()[l][y][x];
-                                                                }
-                                                                worldContainer.blockdns[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlockdns()[y][x];
-                                                                worldContainer.blockbgs[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlockbgs()[y][x];
-                                                                worldContainer.blockts[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlockts()[y][x];
-                                                                worldContainer.lights[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLights()[y][x];
-                                                                worldContainer.lsources[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLsources()[y][x];
-                                                                zqn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getZqn()[y][x];
-                                                                wcnct[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getWcnct()[y][x];
-                                                                worldContainer.drawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getDrawn()[y][x];
-                                                                worldContainer.rdrawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getRdrawn()[y][x];
-                                                                worldContainer.ldrawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLdrawn()[y][x];
-                                                            }
-                                                        }
-                                                        worldContainer.worlds[twy][twx] = null;
+            menuTimer.addActionListener((ActionListener) ae -> {
+                try {
+                    if (mousePressed == MousePressed.LEFT_MOUSE) {
+                        Action mainThread = new AbstractAction() {
+                            public void actionPerformed(ActionEvent ae) {
+                                try {
+                                    if (worldContainer.ready) {
+                                        worldContainer.ready = false;
+                                        uNew = (int) ((worldContainer.player.x - getWidth() / 2 + worldContainer.player.width) / (double) CHUNKSIZE);
+                                        vNew = (int) ((worldContainer.player.y - getHeight() / 2 + worldContainer.player.height) / (double) CHUNKSIZE);
+                                        if (ou != uNew || ov != vNew) {
+                                            ou = uNew;
+                                            ov = vNew;
+                                            List<Chunk> chunkTemp = new ArrayList<>(0);
+                                            for (twy = 0; twy < 2; twy++) {
+                                                for (twx = 0; twx < 2; twx++) {
+                                                    if (chunkMatrix[twy][twx] != null) {
+                                                        chunkTemp.add(chunkMatrix[twy][twx]);
+                                                        chunkMatrix[twy][twx] = null;
                                                     }
                                                 }
                                             }
-                                            u = -ou * CHUNKBLOCKS;
-                                            v = -ov * CHUNKBLOCKS;
                                             for (twy = 0; twy < 2; twy++) {
                                                 for (twx = 0; twx < 2; twx++) {
-                                                    worldContainer.kworlds[twy][twx] = false;
+                                                    for (i = chunkTemp.size() - 1; i > -1; i--) {
+                                                        if (chunkTemp.get(i).getCx() == twx && chunkTemp.get(i).getCy() == twy) {
+                                                            chunkMatrix[twy][twx] = chunkTemp.get(i);
+                                                            chunkTemp.remove(i);
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (chunkMatrix[twy][twx] == null) {
+                                                        if (temporarySaveFile[twy][twx] != null) {
+                                                            chunkMatrix[twy][twx] = temporarySaveFile[twy][twx];
+                                                        } else {
+                                                            chunkMatrix[twy][twx] = new Chunk(twx + ou, twy + ov);
+                                                        }
+                                                    }
                                                 }
                                             }
-                                            boolean somevar = false;
+                                            for (i = 0; i < chunkTemp.size(); i++) {
+                                                temporarySaveFile[twy][twx] = chunkTemp.get(i);
+                                            }
+                                            chunkTemp = null;
                                             for (twy = 0; twy < 2; twy++) {
                                                 for (twx = 0; twx < 2; twx++) {
-                                                    int twxc = twx + ou;
-                                                    int twyc = twy + ov;
-                                                    if (((worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width >= twxc * CHUNKSIZE &&
-                                                            worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width <= twxc * CHUNKSIZE + CHUNKSIZE) ||
-                                                            (worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width + BLOCKSIZE >= twxc * CHUNKSIZE &&
-                                                                    worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width - BLOCKSIZE <= twxc * CHUNKSIZE + CHUNKSIZE)) &&
-                                                            ((worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height >= twyc * CHUNKSIZE &&
-                                                                    worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height <= twyc * CHUNKSIZE + CHUNKSIZE) ||
-                                                                    (worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height >= twyc * CHUNKSIZE &&
-                                                                            worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height <= twyc * CHUNKSIZE + CHUNKSIZE))) {
-                                                        worldContainer.kworlds[twy][twx] = true;
-                                                        if (worldContainer.worlds[twy][twx] == null) {
-                                                            worldContainer.worlds[twy][twx] = config.createCompatibleImage(CHUNKSIZE, CHUNKSIZE, Transparency.TRANSLUCENT);
-                                                            worldContainer.fworlds[twy][twx] = config.createCompatibleImage(CHUNKSIZE, CHUNKSIZE, Transparency.TRANSLUCENT);
-                                                            log.info("Created image at " + twx + " " + twy);
+                                                    for (y = 0; y < CHUNKBLOCKS; y++) {
+                                                        for (x = 0; x < CHUNKBLOCKS; x++) {
+                                                            for (int l = 0; l < 3; l++) {
+                                                                worldContainer.blocks[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocks()[l][y][x];
+                                                                worldContainer.power[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getPower()[l][y][x];
+                                                                pzqn[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getPzqn()[l][y][x];
+                                                                arbprd[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getArbprd()[l][y][x];
+                                                                worldContainer.blockds[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlockds()[l][y][x];
+                                                            }
+                                                            worldContainer.blockdns[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlockdns()[y][x];
+                                                            worldContainer.blockbgs[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlockbgs()[y][x];
+                                                            worldContainer.blockts[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlockts()[y][x];
+                                                            worldContainer.lights[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLights()[y][x];
+                                                            worldContainer.lsources[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLsources()[y][x];
+                                                            zqn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getZqn()[y][x];
+                                                            wcnct[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getWcnct()[y][x];
+                                                            worldContainer.drawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getDrawn()[y][x];
+                                                            worldContainer.rdrawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getRdrawn()[y][x];
+                                                            worldContainer.ldrawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLdrawn()[y][x];
                                                         }
-                                                        if (worldContainer.worlds[twy][twx] != null) {
-                                                            wg2 = worldContainer.worlds[twy][twx].createGraphics();
-                                                            fwg2 = worldContainer.fworlds[twy][twx].createGraphics();
-                                                            for (tly = Math.max(twy * CHUNKSIZE, (int) (worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height / 2 + v * BLOCKSIZE) - 64); tly < Math.min(twy * CHUNKSIZE + CHUNKSIZE, (int) (worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2 + v * BLOCKSIZE) + 128); tly += BLOCKSIZE) {
-                                                                for (tlx = Math.max(twx * CHUNKSIZE, (int) (worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width / 2 + u * BLOCKSIZE) - 64); tlx < Math.min(twx * CHUNKSIZE + CHUNKSIZE, (int) (worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2 + u * BLOCKSIZE) + 112); tlx += BLOCKSIZE) {
-                                                                    tx = (int) (tlx / BLOCKSIZE);
-                                                                    ty = (int) (tly / BLOCKSIZE);
-                                                                    if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
-                                                                        if (!worldContainer.drawn[ty][tx]) {
-                                                                            somevar = true;
-                                                                            worldContainer.blockts[ty][tx] = (byte) RandomTool.nextInt(8);
-                                                                            for (y = 0; y < BLOCKSIZE; y++) {
-                                                                                for (x = 0; x < BLOCKSIZE; x++) {
-                                                                                    try {
-                                                                                        worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                        worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                    } catch (ArrayIndexOutOfBoundsException e) {
-                                                                                        //
-                                                                                    }
+                                                    }
+                                                    worldContainer.worlds[twy][twx] = null;
+                                                }
+                                            }
+                                        }
+                                        u = -ou * CHUNKBLOCKS;
+                                        v = -ov * CHUNKBLOCKS;
+                                        for (twy = 0; twy < 2; twy++) {
+                                            for (twx = 0; twx < 2; twx++) {
+                                                worldContainer.kworlds[twy][twx] = false;
+                                            }
+                                        }
+                                        boolean somevar = false;
+                                        for (twy = 0; twy < 2; twy++) {
+                                            for (twx = 0; twx < 2; twx++) {
+                                                int twxc = twx + ou;
+                                                int twyc = twy + ov;
+                                                if (((worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width >= twxc * CHUNKSIZE &&
+                                                        worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width <= twxc * CHUNKSIZE + CHUNKSIZE) ||
+                                                        (worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width + BLOCKSIZE >= twxc * CHUNKSIZE &&
+                                                                worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width - BLOCKSIZE <= twxc * CHUNKSIZE + CHUNKSIZE)) &&
+                                                        ((worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height >= twyc * CHUNKSIZE &&
+                                                                worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height <= twyc * CHUNKSIZE + CHUNKSIZE) ||
+                                                                (worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height >= twyc * CHUNKSIZE &&
+                                                                        worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height <= twyc * CHUNKSIZE + CHUNKSIZE))) {
+                                                    worldContainer.kworlds[twy][twx] = true;
+                                                    if (worldContainer.worlds[twy][twx] == null) {
+                                                        worldContainer.worlds[twy][twx] = config.createCompatibleImage(CHUNKSIZE, CHUNKSIZE, Transparency.TRANSLUCENT);
+                                                        worldContainer.fworlds[twy][twx] = config.createCompatibleImage(CHUNKSIZE, CHUNKSIZE, Transparency.TRANSLUCENT);
+                                                        log.info("Created image at " + twx + " " + twy);
+                                                    }
+                                                    if (worldContainer.worlds[twy][twx] != null) {
+                                                        wg2 = worldContainer.worlds[twy][twx].createGraphics();
+                                                        fwg2 = worldContainer.fworlds[twy][twx].createGraphics();
+                                                        for (tly = Math.max(twy * CHUNKSIZE, (int) (worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height / 2 + v * BLOCKSIZE) - 64); tly < Math.min(twy * CHUNKSIZE + CHUNKSIZE, (int) (worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2 + v * BLOCKSIZE) + 128); tly += BLOCKSIZE) {
+                                                            for (tlx = Math.max(twx * CHUNKSIZE, (int) (worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width / 2 + u * BLOCKSIZE) - 64); tlx < Math.min(twx * CHUNKSIZE + CHUNKSIZE, (int) (worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2 + u * BLOCKSIZE) + 112); tlx += BLOCKSIZE) {
+                                                                tx = (int) (tlx / BLOCKSIZE);
+                                                                ty = (int) (tly / BLOCKSIZE);
+                                                                if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
+                                                                    if (!worldContainer.drawn[ty][tx]) {
+                                                                        somevar = true;
+                                                                        worldContainer.blockts[ty][tx] = (byte) RandomTool.nextInt(8);
+                                                                        for (y = 0; y < BLOCKSIZE; y++) {
+                                                                            for (x = 0; x < BLOCKSIZE; x++) {
+                                                                                try {
+                                                                                    worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                                                    worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                                                } catch (ArrayIndexOutOfBoundsException e) {
+                                                                                    //
                                                                                 }
                                                                             }
-                                                                            if (worldContainer.blockbgs[ty][tx] != 0) {
-                                                                                wg2.drawImage(backgroundImgs.get(worldContainer.blockbgs[ty][tx]),
-                                                                                        tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                        0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                        null);
-                                                                            }
-                                                                            for (int l = 0; l < 3; l++) {
-                                                                                if (worldContainer.blocks[l][ty][tx] != BlockNames.AIR) {
-                                                                                    if (l == 2) {
-                                                                                        fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    } else {
-                                                                                        wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    }
-                                                                                }
-                                                                                if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
-                                                                                    if (l == 2) {
-                                                                                        fwg2.drawImage(wcnct_px,
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    } else {
-                                                                                        wg2.drawImage(wcnct_px,
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                            if (!DebugContext.LIGHT) {
-                                                                                fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
-                                                                                        tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                        0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                        null);
-                                                                            }
-                                                                            worldContainer.drawn[ty][tx] = true;
-                                                                            worldContainer.rdrawn[ty][tx] = true;
-                                                                            worldContainer.ldrawn[ty][tx] = true;
                                                                         }
-                                                                        if (!worldContainer.rdrawn[ty][tx]) {
-                                                                            somevar = true;
-                                                                            for (y = 0; y < BLOCKSIZE; y++) {
-                                                                                for (x = 0; x < BLOCKSIZE; x++) {
-                                                                                    try {
-                                                                                        worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                        worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                    } catch (ArrayIndexOutOfBoundsException e) {
-                                                                                        //
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                            if (worldContainer.blockbgs[ty][tx] != 0) {
-                                                                                wg2.drawImage(backgroundImgs.get(worldContainer.blockbgs[ty][tx]),
-                                                                                        tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                        0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                        null);
-                                                                            }
-                                                                            for (int l = 0; l < 3; l++) {
-                                                                                if (worldContainer.blocks[l][ty][tx] != BlockNames.AIR) {
-                                                                                    if (l == 2) {
-                                                                                        fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    } else {
-                                                                                        wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    }
-                                                                                }
-                                                                                if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
-                                                                                    if (l == 2) {
-                                                                                        fwg2.drawImage(wcnct_px,
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    } else {
-                                                                                        wg2.drawImage(wcnct_px,
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                            if (!DebugContext.LIGHT) {
-                                                                                fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
-                                                                                        tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                        0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                        null);
-                                                                            }
-                                                                            worldContainer.drawn[ty][tx] = true;
-                                                                            worldContainer.rdrawn[ty][tx] = true;
-                                                                            worldContainer.ldrawn[ty][tx] = true;
+                                                                        if (worldContainer.blockbgs[ty][tx] != Backgrounds.EMPTY) {
+                                                                            wg2.drawImage(backgroundImgs.get(worldContainer.blockbgs[ty][tx]),
+                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                    null);
                                                                         }
-                                                                        if (!worldContainer.ldrawn[ty][tx] && RandomTool.nextInt(10) == 0) {
-                                                                            somevar = true;
-                                                                            for (y = 0; y < BLOCKSIZE; y++) {
-                                                                                for (x = 0; x < BLOCKSIZE; x++) {
-                                                                                    try {
-                                                                                        worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                        worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                    } catch (ArrayIndexOutOfBoundsException e) {
-                                                                                        //
-                                                                                    }
+                                                                        for (int l = 0; l < 3; l++) {
+                                                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
+                                                                                if (l == 2) {
+                                                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
+                                                                                } else {
+                                                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
                                                                                 }
                                                                             }
-                                                                            if (worldContainer.blockbgs[ty][tx] != 0) {
-                                                                                wg2.drawImage(backgroundImgs.get(worldContainer.blockbgs[ty][tx]),
-                                                                                        tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                        0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                        null);
-                                                                            }
-                                                                            for (int l = 0; l < 3; l++) {
-                                                                                if (worldContainer.blocks[l][ty][tx] != BlockNames.AIR) {
-                                                                                    if (l == 2) {
-                                                                                        fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    } else {
-                                                                                        wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    }
-                                                                                }
-                                                                                if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
-                                                                                    if (l == 2) {
-                                                                                        fwg2.drawImage(wcnct_px,
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    } else {
-                                                                                        wg2.drawImage(wcnct_px,
-                                                                                                tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                                0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                                null);
-                                                                                    }
+                                                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
+                                                                                if (l == 2) {
+                                                                                    fwg2.drawImage(wcnct_px,
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
+                                                                                } else {
+                                                                                    wg2.drawImage(wcnct_px,
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
                                                                                 }
                                                                             }
-                                                                            if (!DebugContext.LIGHT) {
-                                                                                fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
-                                                                                        tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                        0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                        null);
-                                                                            }
-                                                                            worldContainer.drawn[ty][tx] = true;
-                                                                            worldContainer.rdrawn[ty][tx] = true;
-                                                                            worldContainer.ldrawn[ty][tx] = true;
                                                                         }
+                                                                        if (!DebugContext.LIGHT) {
+                                                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
+                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                    null);
+                                                                        }
+                                                                        worldContainer.drawn[ty][tx] = true;
+                                                                        worldContainer.rdrawn[ty][tx] = true;
+                                                                        worldContainer.ldrawn[ty][tx] = true;
+                                                                    }
+                                                                    if (!worldContainer.rdrawn[ty][tx]) {
+                                                                        somevar = true;
+                                                                        for (y = 0; y < BLOCKSIZE; y++) {
+                                                                            for (x = 0; x < BLOCKSIZE; x++) {
+                                                                                try {
+                                                                                    worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                                                    worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                                                } catch (ArrayIndexOutOfBoundsException e) {
+                                                                                    //
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                        if (worldContainer.blockbgs[ty][tx] != Backgrounds.EMPTY) {
+                                                                            wg2.drawImage(backgroundImgs.get(worldContainer.blockbgs[ty][tx]),
+                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                    null);
+                                                                        }
+                                                                        for (int l = 0; l < 3; l++) {
+                                                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
+                                                                                if (l == 2) {
+                                                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
+                                                                                } else {
+                                                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
+                                                                                }
+                                                                            }
+                                                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
+                                                                                if (l == 2) {
+                                                                                    fwg2.drawImage(wcnct_px,
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
+                                                                                } else {
+                                                                                    wg2.drawImage(wcnct_px,
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                        if (!DebugContext.LIGHT) {
+                                                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
+                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                    null);
+                                                                        }
+                                                                        worldContainer.drawn[ty][tx] = true;
+                                                                        worldContainer.rdrawn[ty][tx] = true;
+                                                                        worldContainer.ldrawn[ty][tx] = true;
+                                                                    }
+                                                                    if (!worldContainer.ldrawn[ty][tx] && RandomTool.nextInt(10) == 0) {
+                                                                        somevar = true;
+                                                                        for (y = 0; y < BLOCKSIZE; y++) {
+                                                                            for (x = 0; x < BLOCKSIZE; x++) {
+                                                                                try {
+                                                                                    worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                                                    worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                                                } catch (ArrayIndexOutOfBoundsException e) {
+                                                                                    //
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                        if (worldContainer.blockbgs[ty][tx] != Backgrounds.EMPTY) {
+                                                                            wg2.drawImage(backgroundImgs.get(worldContainer.blockbgs[ty][tx]),
+                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                    null);
+                                                                        }
+                                                                        for (int l = 0; l < 3; l++) {
+                                                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
+                                                                                if (l == 2) {
+                                                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
+                                                                                } else {
+                                                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blockds[l][ty][tx], worldContainer.blockdns[ty][tx], worldContainer.blockts[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
+                                                                                }
+                                                                            }
+                                                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
+                                                                                if (l == 2) {
+                                                                                    fwg2.drawImage(wcnct_px,
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
+                                                                                } else {
+                                                                                    wg2.drawImage(wcnct_px,
+                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                            null);
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                        if (!DebugContext.LIGHT) {
+                                                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
+                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                                                    null);
+                                                                        }
+                                                                        worldContainer.drawn[ty][tx] = true;
+                                                                        worldContainer.rdrawn[ty][tx] = true;
+                                                                        worldContainer.ldrawn[ty][tx] = true;
                                                                     }
                                                                 }
                                                             }
@@ -652,122 +652,122 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                                     }
                                                 }
                                             }
-                                            if (somevar) {
-                                                log.info("Drew at least one block.");
-                                            }
-                                            for (twy = 0; twy < 2; twy++) {
-                                                for (twx = 0; twx < 2; twx++) {
-                                                    if (!worldContainer.kworlds[twy][twx] && worldContainer.worlds[twy][twx] != null) {
-                                                        worldContainer.worlds[twy][twx] = null;
-                                                        worldContainer.fworlds[twy][twx] = null;
-                                                        for (ty = twy * CHUNKBLOCKS; ty < twy * CHUNKBLOCKS + CHUNKBLOCKS; ty++) {
-                                                            for (tx = twx * CHUNKBLOCKS; tx < twx * CHUNKBLOCKS + CHUNKBLOCKS; tx++) {
-                                                                if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
-                                                                    worldContainer.drawn[ty][tx] = false;
-                                                                }
+                                        }
+                                        if (somevar) {
+                                            log.info("Drew at least one block.");
+                                        }
+                                        for (twy = 0; twy < 2; twy++) {
+                                            for (twx = 0; twx < 2; twx++) {
+                                                if (!worldContainer.kworlds[twy][twx] && worldContainer.worlds[twy][twx] != null) {
+                                                    worldContainer.worlds[twy][twx] = null;
+                                                    worldContainer.fworlds[twy][twx] = null;
+                                                    for (ty = twy * CHUNKBLOCKS; ty < twy * CHUNKBLOCKS + CHUNKBLOCKS; ty++) {
+                                                        for (tx = twx * CHUNKBLOCKS; tx < twx * CHUNKBLOCKS + CHUNKBLOCKS; tx++) {
+                                                            if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
+                                                                worldContainer.drawn[ty][tx] = false;
                                                             }
                                                         }
-                                                        log.info("Destroyed image at " + twx + " " + twy);
                                                     }
+                                                    log.info("Destroyed image at " + twx + " " + twy);
                                                 }
                                             }
-                                            updateApp();
-                                            updateEnvironment();
-                                            worldContainer.player.update(worldContainer.blocks[1], keyPressed, u, v);
-                                            if (worldContainer.timeOfDay >= 86400) {
-                                                worldContainer.timeOfDay = 0;
-                                                worldContainer.day += 1;
-                                            }
-                                            repaint();
-                                            worldContainer.ready = true;
                                         }
-                                    } catch (Exception e) {
-                                        postError(e);
-                                    }
-                                }
-                            };
-                            timer = new javax.swing.Timer(20, mainThread);
-
-                            if (state == State.TITLE_SCREEN && !menuPressed) {
-                                if (mousePos.isInBetweenInclusive(ItemPositionInScreen.SINGLE_PLAYER_MENU)) {
-                                    filesInfo = worldService.findWorlds();
-                                    state = State.SELECT_WORLD;
-                                    repaint();
-                                    menuPressed = true;
-                                }
-                            } else if (state == State.SELECT_WORLD && !menuPressed) {
-                                if (mousePos.isInBetweenInclusive(ItemPositionInScreen.CREATE_NEW_WORLD_MENU)) {
-                                    state = State.NEW_WORLD;
-                                    newWorldName = new TextField(400, "New World");
-                                    repaint();
-                                    menuPressed = true;
-                                } else if (mousePos.isInBetweenInclusive(ItemPositionInScreen.BACK_BUTTON)) {
-                                    state = State.TITLE_SCREEN;
-                                    repaint();
-                                    menuPressed = true;
-                                }
-                                for (i = 0; i < filesInfo.size(); i++) {
-                                    if (mousePos.isInBetweenInclusive(166, 470, 117 + i * 35, 152 + i * 35)) { // load world
-                                        currentWorld = filesInfo.get(i).getName();
-                                        state = State.LOADING_WORLD;
-                                        bg = Color.BLACK;
-                                        if (worldContainer.loadWorld(filesInfo.get(i).getFileName())) {
-                                            menuTimer.stop();
-                                            bg = CYANISH;
-                                            state = State.IN_GAME;
-                                            worldContainer.ready = true;
-                                            timer.start();
-                                            break;
+                                        updateApp();
+                                        updateEnvironment();
+                                        worldContainer.player.update(worldContainer.blocks[1], keyPressed, u, v);
+                                        if (worldContainer.timeOfDay >= 86400) {
+                                            worldContainer.timeOfDay = 0;
+                                            worldContainer.day += 1;
                                         }
+                                        repaint();
+                                        worldContainer.ready = true;
                                     }
+                                } catch (Exception e) {
+                                    postError(e);
                                 }
                             }
-                            if (state == State.NEW_WORLD && !menuPressed) {
-                                if (mousePos.isInBetweenInclusive(ItemPositionInScreen.CREATE_NEW_WORLD_MENU)) {
-                                    if (!newWorldName.getText().equals("")) {
-                                        filesInfo = worldService.findWorlds();
-                                        doGenerateWorld = true;
-                                        for (i = 0; i < filesInfo.size(); i++) {
-                                            if (newWorldName.getText().equals(filesInfo.get(i).getName())) {
-                                                doGenerateWorld = false;
-                                                break;
-                                            }
-                                        }
-                                        if (doGenerateWorld) {
-                                            menuTimer.stop();
-                                            bg = Color.BLACK;
-                                            state = State.GENERATING_WORLD;
-                                            currentWorld = newWorldName.getText();
-                                            repaint();
-                                            Action createWorldThread = new AbstractAction() {
-                                                public void actionPerformed(ActionEvent ae) {
-                                                    try {
-                                                        createNewWorld();
-                                                        bg = CYANISH;
-                                                        state = State.IN_GAME;
-                                                        worldContainer.ready = true;
-                                                        timer.start();
-                                                        createWorldTimer.stop();
-                                                    } catch (Exception e) {
-                                                        postError(e);
-                                                    }
-                                                }
-                                            };
-                                            createWorldTimer = new javax.swing.Timer(1, createWorldThread);
-                                            createWorldTimer.start();
-                                        }
+                        };
+                        timer = new Timer(20, mainThread);
+
+                        if (state == State.TITLE_SCREEN && !menuPressed) {
+                            if (mousePos.isInBetweenInclusive(ItemPositionInScreen.SINGLE_PLAYER_MENU)) {
+                                filesInfo = worldService.findWorlds();
+                                state = State.SELECT_WORLD;
+                                repaint();
+                                menuPressed = true;
+                            }
+                        } else if (state == State.SELECT_WORLD && !menuPressed) {
+                            if (mousePos.isInBetweenInclusive(ItemPositionInScreen.CREATE_NEW_WORLD_MENU)) {
+                                state = State.NEW_WORLD;
+                                newWorldName = new TextField(400, "New World");
+                                repaint();
+                                menuPressed = true;
+                            } else if (mousePos.isInBetweenInclusive(ItemPositionInScreen.BACK_BUTTON)) {
+                                state = State.TITLE_SCREEN;
+                                repaint();
+                                menuPressed = true;
+                            }
+                            for (i = 0; i < filesInfo.size(); i++) {
+                                if (mousePos.isInBetweenInclusive(166, 470, 117 + i * 35, 152 + i * 35)) { // load world
+                                    currentWorld = filesInfo.get(i).getName();
+                                    state = State.LOADING_WORLD;
+                                    bg = Color.BLACK;
+                                    if (worldContainer.loadWorld(filesInfo.get(i).getFileName())) {
+                                        menuTimer.stop();
+                                        bg = CYANISH;
+                                        state = State.IN_GAME;
+                                        worldContainer.ready = true;
+                                        timer.start();
+                                        break;
                                     }
-                                }
-                                if (mousePos.isInBetweenInclusive(ItemPositionInScreen.BACK_BUTTON)) {
-                                    state = State.SELECT_WORLD;
-                                    repaint();
-                                    menuPressed = true;
                                 }
                             }
                         }
-                    } catch (Exception e) {
-                        postError(e);
+                        if (state == State.NEW_WORLD && !menuPressed) {
+                            if (mousePos.isInBetweenInclusive(ItemPositionInScreen.CREATE_NEW_WORLD_MENU)) {
+                                if (!newWorldName.getText().equals("")) {
+                                    filesInfo = worldService.findWorlds();
+                                    doGenerateWorld = true;
+                                    for (i = 0; i < filesInfo.size(); i++) {
+                                        if (newWorldName.getText().equals(filesInfo.get(i).getName())) {
+                                            doGenerateWorld = false;
+                                            break;
+                                        }
+                                    }
+                                    if (doGenerateWorld) {
+                                        menuTimer.stop();
+                                        bg = Color.BLACK;
+                                        state = State.GENERATING_WORLD;
+                                        currentWorld = newWorldName.getText();
+                                        repaint();
+                                        Action createWorldThread = new AbstractAction() {
+                                            public void actionPerformed(ActionEvent ae) {
+                                                try {
+                                                    createNewWorld();
+                                                    bg = CYANISH;
+                                                    state = State.IN_GAME;
+                                                    worldContainer.ready = true;
+                                                    timer.start();
+                                                    createWorldTimer.stop();
+                                                } catch (Exception e) {
+                                                    postError(e);
+                                                }
+                                            }
+                                        };
+                                        createWorldTimer = new Timer(1, createWorldThread);
+                                        createWorldTimer.start();
+                                    }
+                                }
+                            }
+                            if (mousePos.isInBetweenInclusive(ItemPositionInScreen.BACK_BUTTON)) {
+                                state = State.SELECT_WORLD;
+                                repaint();
+                                menuPressed = true;
+                            }
+                        }
                     }
+                } catch (Exception e) {
+                    postError(e);
                 }
             });
 
@@ -863,7 +863,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             } else {
                                 worldContainer.icmatrix[l][y][x].setF_ON(false);
                                 removeBlockLighting(x, y);
-                                worldContainer.blocks[l][y][x] = BlockNames.FURNACE;
+                                worldContainer.blocks[l][y][x] = Blocks.FURNACE;
                                 worldContainer.rdrawn[y][x] = false;
                             }
                         }
@@ -875,7 +875,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             }
                             for (i = 0; i < FRI1.size(); i++) {
                                 if (worldContainer.icmatrix[l][y][x].getIds()[0] == FRI1.get(i) && worldContainer.icmatrix[l][y][x].getNums()[0] >= FRN1.get(i)) {
-                                    worldContainer.icmatrix[l][y][x].setSMELTP(worldContainer.icmatrix[l][y][x].getSMELTP() + BlockNames.findByIndex(worldContainer.icmatrix[l][y][x].getIds()[1].getIndex()).getFSpeed());
+                                    worldContainer.icmatrix[l][y][x].setSMELTP(worldContainer.icmatrix[l][y][x].getSMELTP() + Blocks.findByIndex(worldContainer.icmatrix[l][y][x].getIds()[1].getIndex()).getFSpeed());
                                     if (worldContainer.icmatrix[l][y][x].getSMELTP() > 1) {
                                         worldContainer.icmatrix[l][y][x].setSMELTP(0);
                                         worldContainer.inventory.removeLocationIC(worldContainer.icmatrix[l][y][x], 0, FRN1.get(i));
@@ -905,7 +905,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     } else {
                         worldContainer.ic.setF_ON(false);
                         removeBlockLighting(worldContainer.icx, worldContainer.icy);
-                        worldContainer.blocks[iclayer][worldContainer.icy][worldContainer.icx] = BlockNames.FURNACE;
+                        worldContainer.blocks[iclayer][worldContainer.icy][worldContainer.icx] = Blocks.FURNACE;
                         worldContainer.rdrawn[worldContainer.icy][worldContainer.icx] = false;
                     }
                 }
@@ -917,7 +917,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     }
                     for (i = 0; i < FRI1.size(); i++) {
                         if (worldContainer.ic.getIds()[0] == FRI1.get(i) && worldContainer.ic.getNums()[0] >= FRN1.get(i)) {
-                            worldContainer.ic.setSMELTP(worldContainer.ic.getSMELTP() + BlockNames.findByIndex(worldContainer.ic.getIds()[1].getIndex()).getFSpeed());
+                            worldContainer.ic.setSMELTP(worldContainer.ic.getSMELTP() + Blocks.findByIndex(worldContainer.ic.getIds()[1].getIndex()).getFSpeed());
                             if (worldContainer.ic.getSMELTP() > 1) {
                                 worldContainer.ic.setSMELTP(0);
                                 worldContainer.inventory.removeLocationIC(worldContainer.ic, 0, FRN1.get(i));
@@ -969,102 +969,102 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             for (y = 0; y < size; y++) {
                 for (x = 0; x < size; x++) {
                     if (RandomTool.nextInt(22500) == 0) {
-                        BlockNames t = BlockNames.AIR;
+                        Blocks t = Blocks.AIR;
                         switch (worldContainer.blocks[l][y][x]) {
                             case SUNFLOWER_STAGE_1:
                                 if (worldContainer.timeOfDay >= 75913 || worldContainer.timeOfDay < 28883) {
-                                    t = BlockNames.SUNFLOWER_STAGE_2;
+                                    t = Blocks.SUNFLOWER_STAGE_2;
                                 }
                                 break;
                             case SUNFLOWER_STAGE_2:
                                 if (worldContainer.timeOfDay >= 75913 || worldContainer.timeOfDay < 28883) {
-                                    t = BlockNames.SUNFLOWER_STAGE_3;
+                                    t = Blocks.SUNFLOWER_STAGE_3;
                                 }
                                 break;
                             case MOONFLOWER_STAGE_1:
                                 if (worldContainer.timeOfDay >= 32302 && worldContainer.timeOfDay < 72093) {
-                                    t = BlockNames.MOONFLOWER_STAGE_2;
+                                    t = Blocks.MOONFLOWER_STAGE_2;
                                 }
                                 break;
                             case MOONFLOWER_STAGE_2:
                                 if (worldContainer.timeOfDay >= 32302 && worldContainer.timeOfDay < 72093) {
-                                    t = BlockNames.MOONFLOWER_STAGE_3;
+                                    t = Blocks.MOONFLOWER_STAGE_3;
                                 }
                                 break;
                             case DRYWEED_STAGE_1:
                                 if (checkBiome(x, y).equals("desert")) {
-                                    t = BlockNames.DRYWEED_STAGE_2;
+                                    t = Blocks.DRYWEED_STAGE_2;
                                 }
                                 break;
                             case DRYWEED_STAGE_2:
                                 if (checkBiome(x, y).equals("desert")) {
-                                    t = BlockNames.DRYWEED_STAGE_3;
+                                    t = Blocks.DRYWEED_STAGE_3;
                                 }
                                 break;
                             case GREENLEAF_STAGE_1:
                                 if (checkBiome(x, y).equals("jungle")) {
-                                    t = BlockNames.GREENLEAF_STAGE_2;
+                                    t = Blocks.GREENLEAF_STAGE_2;
                                 }
                                 break;
                             case GREENLEAF_STAGE_2:
                                 if (checkBiome(x, y).equals("jungle")) {
-                                    t = BlockNames.GREENLEAF_STAGE_3;
+                                    t = Blocks.GREENLEAF_STAGE_3;
                                 }
                                 break;
                             case FROSTLEAF_STAGE_1:
                                 if (checkBiome(x, y).equals("frost")) {
-                                    t = BlockNames.FROSTLEAF_STAGE_2;
+                                    t = Blocks.FROSTLEAF_STAGE_2;
                                 }
                                 break;
                             case FROSTLEAF_STAGE_2:
                                 if (checkBiome(x, y).equals("frost")) {
-                                    t = BlockNames.FROSTLEAF_STAGE_3;
+                                    t = Blocks.FROSTLEAF_STAGE_3;
                                 }
                                 break;
                             case CAVEROOT_STAGE_1:
                                 if (checkBiome(x, y).equals("cavern") || y >= 0/*stonelayer[x]*/) {
-                                    t = BlockNames.CAVEROOT_STAGE_2;
+                                    t = Blocks.CAVEROOT_STAGE_2;
                                 }
                                 break;
                             case CAVEROOT_STAGE_2:
                                 if (checkBiome(x, y).equals("cavern") || y >= 0/*stonelayer[x]*/) {
-                                    t = BlockNames.CAVEROOT_STAGE_3;
+                                    t = Blocks.CAVEROOT_STAGE_3;
                                 }
                                 break;
                             case SKYBLOSSOM_STAGE_1:
                                 if (y <= HEIGHT * 0.08 && RandomTool.nextInt(3) == 0 || y <= HEIGHT * 0.04) {
-                                    t = BlockNames.SKYBLOSSOM_STAGE_2;
+                                    t = Blocks.SKYBLOSSOM_STAGE_2;
                                 }
                                 break;
                             case SKYBLOSSOM_STAGE_2:
                                 if (y <= HEIGHT * 0.08 && RandomTool.nextInt(3) == 0 || y <= HEIGHT * 0.04) {
-                                    t = BlockNames.SKYBLOSSOM_STAGE_3;
+                                    t = Blocks.SKYBLOSSOM_STAGE_3;
                                 }
                                 break;
                             case VOID_ROT_STAGE_1:
                                 if (y >= HEIGHT * 0.98) {
-                                    t = BlockNames.VOID_ROT_STAGE_2;
+                                    t = Blocks.VOID_ROT_STAGE_2;
                                 }
                                 break;
                             case VOID_ROT_STAGE_2:
                                 if (y >= HEIGHT * 0.98) {
-                                    t = BlockNames.VOID_ROT_STAGE_3;
+                                    t = Blocks.VOID_ROT_STAGE_3;
                                 }
                                 break;
                             case MARSHLEAF_STAGE_1:
                                 if (checkBiome(x, y).equals("swamp")) {
-                                    t = BlockNames.MARSHLEAF_STAGE_2;
+                                    t = Blocks.MARSHLEAF_STAGE_2;
                                 }
                                 break;
                             case MARSHLEAF_STAGE_2:
                                 if (checkBiome(x, y).equals("swamp")) {
-                                    t = BlockNames.MARSHLEAF_STAGE_3;
+                                    t = Blocks.MARSHLEAF_STAGE_3;
                                 }
                                 break;
                             default:
                                 break;
                         }
-                        if (t != BlockNames.AIR) {
+                        if (t != Blocks.AIR) {
                             worldContainer.blocks[l][y][x] = t;
                             worldContainer.drawn[y][x] = false;
                         }
@@ -1079,16 +1079,16 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     if (RandomTool.nextInt(1000) == 0) {
                         if (y >= 1 && y < HEIGHT - 1) {
                             doGrassGrow = false;
-                            if (worldContainer.blocks[l][y][x] == BlockNames.DIRT && hasOpenSpace(x + u, y + v, l) && worldContainer.blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == BlockNames.GRASS) {
-                                worldContainer.blocks[l][y][x] = BlockNames.GRASS;
+                            if (worldContainer.blocks[l][y][x] == Blocks.DIRT && hasOpenSpace(x + u, y + v, l) && worldContainer.blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == Blocks.GRASS) {
+                                worldContainer.blocks[l][y][x] = Blocks.GRASS;
                                 doGrassGrow = true;
                             }
-                            if (worldContainer.blocks[l][y][x] == BlockNames.DIRT && hasOpenSpace(x + u, y + v, l) && worldContainer.blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == BlockNames.JUNGLE_GRASS) {
-                                worldContainer.blocks[l][y][x] = BlockNames.JUNGLE_GRASS;
+                            if (worldContainer.blocks[l][y][x] == Blocks.DIRT && hasOpenSpace(x + u, y + v, l) && worldContainer.blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == Blocks.JUNGLE_GRASS) {
+                                worldContainer.blocks[l][y][x] = Blocks.JUNGLE_GRASS;
                                 doGrassGrow = true;
                             }
-                            if (worldContainer.blocks[l][y][x] == BlockNames.MUD && hasOpenSpace(x + u, y + v, l) && worldContainer.blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == BlockNames.SWAMP_GRASS) {
-                                worldContainer.blocks[l][y][x] = BlockNames.SWAMP_GRASS;
+                            if (worldContainer.blocks[l][y][x] == Blocks.MUD && hasOpenSpace(x + u, y + v, l) && worldContainer.blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == Blocks.SWAMP_GRASS) {
+                                worldContainer.blocks[l][y][x] = Blocks.SWAMP_GRASS;
                                 doGrassGrow = true;
                             }
                             if (doGrassGrow) {
@@ -1110,8 +1110,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             for (y = 0; y < size; y++) {
                 for (x = 0; x < size; x++) {
                     if (RandomTool.nextInt(1000) == 0) {
-                        if (worldContainer.blocks[1][y][x] == BlockNames.TREE_NO_BARK) {
-                            worldContainer.blocks[1][y][x] = BlockNames.TREE;
+                        if (worldContainer.blocks[1][y][x] == Blocks.TREE_NO_BARK) {
+                            worldContainer.blocks[1][y][x] = Blocks.TREE;
                         }
                     }
                 }
@@ -1121,40 +1121,40 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         for (i = updatex.size() - 1; i > -1; i--) {
             updatet.set(i, updatet.get(i) - 1);
             if (updatet.get(i) <= 0) {
-                if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == BlockNames.BUTTON_LEFT_ON) {
+                if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == Blocks.BUTTON_LEFT_ON) {
                     worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
                     removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i));
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = BlockNames.BUTTON_LEFT;
+                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.BUTTON_LEFT;
                     worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
-                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == BlockNames.BUTTON_RIGHT_ON) {
+                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == Blocks.BUTTON_RIGHT_ON) {
                     worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
                     removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i));
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = BlockNames.BUTTON_RIGHT;
+                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.BUTTON_RIGHT;
                     worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
-                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == BlockNames.WOODEN_PRESSURE_PLATE_ON) {
+                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == Blocks.WOODEN_PRESSURE_PLATE_ON) {
                     worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
                     removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i));
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = BlockNames.WOODEN_PRESSURE_PLATE;
+                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.WOODEN_PRESSURE_PLATE;
                     worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
-                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == BlockNames.STONE_PRESSURE_PLATE_ON) {
+                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == Blocks.STONE_PRESSURE_PLATE_ON) {
                     worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
                     removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i));
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = BlockNames.STONE_PRESSURE_PLATE;
+                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.STONE_PRESSURE_PLATE;
                     worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
-                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == BlockNames.ZYTHIUM_PRESSURE_PLATE_ON) {
+                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == Blocks.ZYTHIUM_PRESSURE_PLATE_ON) {
                     worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
                     removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i));
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = BlockNames.ZYTHIUM_PRESSURE_PLATE;
+                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.ZYTHIUM_PRESSURE_PLATE;
                     worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
                 } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)].isZythiumDelayerOnAll()) {
                     log.info("[DEBUG2R]");
                     worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
                     removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i), false);
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = BlockNames.turnZythiumDelayerOff(worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)]);
+                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.turnZythiumDelayerOff(worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)]);
                     worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
                 } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)].isZythiumDelayerAll()) {
                     log.info("[DEBUG2A]");
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = BlockNames.turnZythiumDelayerOn(worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)]);
+                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.turnZythiumDelayerOn(worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)]);
                     worldContainer.power[updatel.get(i)][updatey.get(i)][updatex.get(i)] = (float) 5;
                     addBlockLighting(updatex.get(i), updatey.get(i));
                     addTileToPQueue(updatex.get(i), updatey.get(i));
@@ -1176,8 +1176,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             ypos = ay + RandomTool.nextInt(20) - 10;
                             xpos2 = ax + RandomTool.nextInt(20) - 10;
                             ypos2 = ay + RandomTool.nextInt(20) - 10;
-                            if (xpos > 0 && xpos < WIDTH - 1 && ypos > 0 && ypos < HEIGHT - 1 && (worldContainer.blocks[1][ypos][xpos] == BlockNames.AIR || !worldContainer.blocks[1][ypos][xpos].isCds() &&
-                                    xpos2 > 0 && xpos2 < WIDTH - 1 && ypos2 > 0 && ypos2 < HEIGHT - 1 && worldContainer.blocks[1][ypos2][xpos2] != BlockNames.AIR && worldContainer.blocks[1][ypos2][xpos2].isCds())) {
+                            if (xpos > 0 && xpos < WIDTH - 1 && ypos > 0 && ypos < HEIGHT - 1 && (worldContainer.blocks[1][ypos][xpos] == Blocks.AIR || !worldContainer.blocks[1][ypos][xpos].isCds() &&
+                                    xpos2 > 0 && xpos2 < WIDTH - 1 && ypos2 > 0 && ypos2 < HEIGHT - 1 && worldContainer.blocks[1][ypos2][xpos2] != Blocks.AIR && worldContainer.blocks[1][ypos2][xpos2].isCds())) {
                                 mobSpawn = null;
                                 if (!checkBiome(xpos, ypos).equals("underground")) {
                                     if ((worldContainer.day != 0 || DebugContext.HOSTILE > 1) && (worldContainer.timeOfDay >= 75913 || worldContainer.timeOfDay < 28883)) {
@@ -1279,7 +1279,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 worldContainer.doMobSpawn = true;
                                 for (x = (int) (xpos / BLOCKSIZE); x < (int) (xpos / BLOCKSIZE + xmax); x++) {
                                     for (y = (int) (ypos / BLOCKSIZE); y < (int) (ypos / BLOCKSIZE + ymax); y++) {
-                                        if (y > 0 && y < HEIGHT - 1 && worldContainer.blocks[1][y][x] != BlockNames.AIR && worldContainer.blocks[1][y][x].isCds()) {
+                                        if (y > 0 && y < HEIGHT - 1 && worldContainer.blocks[1][y][x] != Blocks.AIR && worldContainer.blocks[1][y][x].isCds()) {
                                             worldContainer.doMobSpawn = false;
                                         }
                                     }
@@ -1611,7 +1611,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         ucx = ux - CHUNKBLOCKS * ((int) (ux / CHUNKBLOCKS));
                         ucy = uy - CHUNKBLOCKS * ((int) (uy / CHUNKBLOCKS));
                         if (Arrays.asList(TOOL_LIST).contains(worldContainer.inventory.tool())) {
-                            if (worldContainer.blocks[worldContainer.layer][uy][ux] != BlockNames.AIR && worldContainer.blocks[worldContainer.layer][uy][ux].getTools().contains(worldContainer.inventory.tool())) {
+                            if (worldContainer.blocks[worldContainer.layer][uy][ux] != Blocks.AIR && worldContainer.blocks[worldContainer.layer][uy][ux].getTools().contains(worldContainer.inventory.tool())) {
                                 worldContainer.blockdns[uy][ux] = (byte) RandomTool.nextInt(5);
                                 worldContainer.drawn[uy][ux] = false;
                                 if (ux == worldContainer.mx && uy == worldContainer.my && worldContainer.inventory.tool() == miningTool) {
@@ -1635,11 +1635,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 ug2 = null;
                             }
                         } else if (worldContainer.inventory.tool() == Items.STONE_LIGHTER) {
-                            if (worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.FURNACE || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.FURNACE_ON) {
+                            if (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE_ON) {
                                 if (worldContainer.icmatrix[worldContainer.layer][uy][ux] != null && worldContainer.icmatrix[worldContainer.layer][uy][ux].getType() == ItemType.FURNACE) {
                                     worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
                                     worldContainer.icmatrix[worldContainer.layer][uy][ux].setF_ON(true);
-                                    worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.FURNACE_ON;
+                                    worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.FURNACE_ON;
                                     addBlockLighting(ux, uy);
                                     if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
                                         worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
@@ -1649,7 +1649,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     if (worldContainer.ic != null && worldContainer.ic.getType() == ItemType.FURNACE) {
                                         worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
                                         worldContainer.ic.setF_ON(true);
-                                        worldContainer.blocks[worldContainer.layer][worldContainer.icy][worldContainer.icx] = BlockNames.FURNACE_ON;
+                                        worldContainer.blocks[worldContainer.layer][worldContainer.icy][worldContainer.icx] = Blocks.FURNACE_ON;
                                         addBlockLighting(ux, uy);
                                         worldContainer.rdrawn[worldContainer.icy][worldContainer.icx] = false;
                                         if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
@@ -1661,45 +1661,45 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         } else if (worldContainer.inventory.tool() == Items.WRENCH) {
                             if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayer() || worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayerOn()) {
                                 worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.increaseZythiumDelayerLevel(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.increaseZythiumDelayerLevel(worldContainer.blocks[worldContainer.layer][uy][ux]);
                                 worldContainer.rdrawn[uy][ux] = false;
                                 if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
                                     worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
                                 }
                             } else if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayer8() || worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayer8On()) {
                                 worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.resetZythiumDelayerLevel(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.resetZythiumDelayerLevel(worldContainer.blocks[worldContainer.layer][uy][ux]);
                                 worldContainer.rdrawn[uy][ux] = false;
                                 if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
                                     worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
                                 }
                             }
-                        } else if (worldContainer.inventory.tool().getBlocks() != BlockNames.AIR) {
+                        } else if (worldContainer.inventory.tool().getBlocks() != Blocks.AIR) {
                             worldContainer.blockTemp = worldContainer.inventory.tool().getBlocks();
-                            if (uy >= 1 && (worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.AIR) &&
+                            if (uy >= 1 && (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.AIR) &&
                                     (worldContainer.layer == 0 && (
-                                            worldContainer.blocks[worldContainer.layer][uy][ux - 1] != BlockNames.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != BlockNames.AIR ||
-                                                    worldContainer.blocks[worldContainer.layer][uy - 1][ux] != BlockNames.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.AIR ||
-                                                    worldContainer.blocks[worldContainer.layer + 1][uy][ux] != BlockNames.AIR) ||
+                                            worldContainer.blocks[worldContainer.layer][uy][ux - 1] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != Blocks.AIR ||
+                                                    worldContainer.blocks[worldContainer.layer][uy - 1][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.AIR ||
+                                                    worldContainer.blocks[worldContainer.layer + 1][uy][ux] != Blocks.AIR) ||
                                             worldContainer.layer == 1 && (
-                                                    worldContainer.blocks[worldContainer.layer][uy][ux - 1] != BlockNames.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != BlockNames.AIR ||
-                                                            worldContainer.blocks[worldContainer.layer][uy - 1][ux] != BlockNames.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.AIR ||
-                                                            worldContainer.blocks[worldContainer.layer - 1][uy][ux] != BlockNames.AIR || worldContainer.blocks[worldContainer.layer + 1][uy][ux] != BlockNames.AIR) ||
+                                                    worldContainer.blocks[worldContainer.layer][uy][ux - 1] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != Blocks.AIR ||
+                                                            worldContainer.blocks[worldContainer.layer][uy - 1][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.AIR ||
+                                                            worldContainer.blocks[worldContainer.layer - 1][uy][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer + 1][uy][ux] != Blocks.AIR) ||
                                             worldContainer.layer == 2 && (
-                                                    worldContainer.blocks[worldContainer.layer][uy][ux - 1] != BlockNames.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != BlockNames.AIR ||
-                                                            worldContainer.blocks[worldContainer.layer][uy - 1][ux] != BlockNames.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.AIR ||
-                                                            worldContainer.blocks[worldContainer.layer - 1][uy][ux] != BlockNames.AIR)) &&
-                                    !(worldContainer.blockTemp == BlockNames.SUNFLOWER_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.JUNGLE_GRASS) || // sunflower
-                                            worldContainer.blockTemp == BlockNames.MOONFLOWER_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.JUNGLE_GRASS) || // moonflower
-                                            worldContainer.blockTemp == BlockNames.DRYWEED_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.SAND) || // dryweed
-                                            worldContainer.blockTemp == BlockNames.GREENLEAF_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.JUNGLE_GRASS) || // greenleaf
-                                            worldContainer.blockTemp == BlockNames.FROSTLEAF_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.SNOW) || // frostleaf
-                                            worldContainer.blockTemp == BlockNames.CAVEROOT_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.STONE) || // caveroot
-                                            worldContainer.blockTemp == BlockNames.SKYBLOSSOM_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.JUNGLE_GRASS) || // skyblossom
-                                            worldContainer.blockTemp == BlockNames.VOID_ROT_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != BlockNames.STONE))) { // void_rot
-                                if (!(TORCHESL.get(worldContainer.blockTemp) != null) || uy < HEIGHT - 1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux].isSolid() && worldContainer.blockTemp != BlockNames.BUTTON_LEFT || worldContainer.blocks[worldContainer.layer][uy][ux + 1].isSolid() || worldContainer.blocks[worldContainer.layer][uy][ux - 1].isSolid())) {
+                                                    worldContainer.blocks[worldContainer.layer][uy][ux - 1] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != Blocks.AIR ||
+                                                            worldContainer.blocks[worldContainer.layer][uy - 1][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.AIR ||
+                                                            worldContainer.blocks[worldContainer.layer - 1][uy][ux] != Blocks.AIR)) &&
+                                    !(worldContainer.blockTemp == Blocks.SUNFLOWER_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // sunflower
+                                            worldContainer.blockTemp == Blocks.MOONFLOWER_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // moonflower
+                                            worldContainer.blockTemp == Blocks.DRYWEED_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.SAND) || // dryweed
+                                            worldContainer.blockTemp == Blocks.GREENLEAF_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // greenleaf
+                                            worldContainer.blockTemp == Blocks.FROSTLEAF_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.SNOW) || // frostleaf
+                                            worldContainer.blockTemp == Blocks.CAVEROOT_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.STONE) || // caveroot
+                                            worldContainer.blockTemp == Blocks.SKYBLOSSOM_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // skyblossom
+                                            worldContainer.blockTemp == Blocks.VOID_ROT_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.STONE))) { // void_rot
+                                if (!(TORCHESL.get(worldContainer.blockTemp) != null) || uy < HEIGHT - 1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux].isSolid() && worldContainer.blockTemp != Blocks.BUTTON_LEFT || worldContainer.blocks[worldContainer.layer][uy][ux + 1].isSolid() || worldContainer.blocks[worldContainer.layer][uy][ux - 1].isSolid())) {
                                     if (TORCHESL.get(worldContainer.blockTemp) != null) {
-                                        if (worldContainer.blocks[worldContainer.layer][uy + 1][ux].isSolid() && worldContainer.blockTemp != BlockNames.BUTTON_LEFT) {
+                                        if (worldContainer.blocks[worldContainer.layer][uy + 1][ux].isSolid() && worldContainer.blockTemp != Blocks.BUTTON_LEFT) {
                                             worldContainer.blockTemp = worldContainer.blockTemp;
                                         } else if (worldContainer.blocks[worldContainer.layer][uy][ux - 1].isSolid()) {
                                             worldContainer.blockTemp = TORCHESL.get(worldContainer.blockTemp);
@@ -1710,14 +1710,14 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     if (worldContainer.layer == 1 && !DebugContext.GPLACE && worldContainer.blockTemp.isCds()) {
                                         for (i = 0; i < worldContainer.entities.size(); i++) {
                                             if (worldContainer.entities.get(i).getEntityType() != null && worldContainer.entities.get(i).getRect().intersects(new Rectangle(ux * BLOCKSIZE, uy * BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
-                                                worldContainer.blockTemp = BlockNames.AIR;
+                                                worldContainer.blockTemp = Blocks.AIR;
                                             }
                                         }
                                         if (worldContainer.player.rect.intersects(new Rectangle(ux * BLOCKSIZE, uy * BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
-                                            worldContainer.blockTemp = BlockNames.AIR;
+                                            worldContainer.blockTemp = Blocks.AIR;
                                         }
                                     }
-                                    if (worldContainer.blockTemp != BlockNames.AIR) {
+                                    if (worldContainer.blockTemp != Blocks.AIR) {
                                         worldContainer.blocks[worldContainer.layer][uy][ux] = worldContainer.blockTemp;
                                         if (worldContainer.blocks[worldContainer.layer][uy][ux].isReceive()) {
                                             addAdjacentTilesToPQueue(ux, uy);
@@ -1731,7 +1731,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         }
                                         addBlockLighting(ux, uy);
                                     }
-                                    if (worldContainer.blockTemp != BlockNames.AIR) {
+                                    if (worldContainer.blockTemp != Blocks.AIR) {
                                         worldContainer.inventory.removeLocation(worldContainer.inventory.selection, (short) 1);
                                         worldContainer.blockds[worldContainer.layer] = World.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
                                         for (uly = uy - 1; uly < uy + 2; uly++) {
@@ -1969,18 +1969,18 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     if (DebugContext.REACH || Math.sqrt(Math.pow(worldContainer.player.x + worldContainer.player.image.getWidth() - ux * BLOCKSIZE + BLOCKSIZE / 2, 2) + Math.pow(worldContainer.player.y + worldContainer.player.image.getHeight() - uy * BLOCKSIZE + BLOCKSIZE / 2, 2)) <= 160) {
                         ucx = ux - CHUNKBLOCKS * ((int) (ux / CHUNKBLOCKS));
                         ucy = uy - CHUNKBLOCKS * ((int) (uy / CHUNKBLOCKS));
-                        if (worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.WORKBENCH
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.WOODEN_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.STONE_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.COPPER_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.IRON_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.SILVER_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.GOLD_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.FURNACE
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.FURNACE_ON
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.ZINC_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.RHYMESTONE_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.OBDURITE_CHEST) {
+                        if (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.WORKBENCH
+                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.WOODEN_CHEST
+                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.STONE_CHEST
+                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.COPPER_CHEST
+                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.IRON_CHEST
+                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.SILVER_CHEST
+                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.GOLD_CHEST
+                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE
+                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE_ON
+                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.ZINC_CHEST
+                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.RHYMESTONE_CHEST
+                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.OBDURITE_CHEST) {
                             if (worldContainer.ic != null) {
                                 if (worldContainer.ic.getType() != ItemType.WORKBENCH) {
                                     worldContainer.machinesx.add(worldContainer.icx);
@@ -2011,7 +2011,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             }
                             iclayer = worldContainer.layer;
                             for (int l = 0; l < 3; l++) {
-                                if (worldContainer.blocks[l][uy][ux] == BlockNames.WORKBENCH) {
+                                if (worldContainer.blocks[l][uy][ux] == Blocks.WORKBENCH) {
                                     if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.WORKBENCH) {
                                         worldContainer.ic = new ItemCollection(ItemType.WORKBENCH, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
                                     } else {
@@ -2021,7 +2021,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     worldContainer.icy = uy;
                                     worldContainer.inventory.renderCollection(worldContainer.ic);
                                     worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == BlockNames.WOODEN_CHEST) {
+                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.WOODEN_CHEST) {
                                     if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.WOODEN_CHEST) {
                                         worldContainer.ic = new ItemCollection(ItemType.WOODEN_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
                                     } else {
@@ -2031,7 +2031,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     worldContainer.icy = uy;
                                     worldContainer.inventory.renderCollection(worldContainer.ic);
                                     worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == BlockNames.STONE_CHEST) {
+                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.STONE_CHEST) {
                                     if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.STONE_CHEST) {
                                         worldContainer.ic = new ItemCollection(ItemType.STONE_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
                                     } else {
@@ -2041,7 +2041,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     worldContainer.icy = uy;
                                     worldContainer.inventory.renderCollection(worldContainer.ic);
                                     worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == BlockNames.COPPER_CHEST) {
+                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.COPPER_CHEST) {
                                     if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.COPPER_CHEST) {
                                         worldContainer.ic = new ItemCollection(ItemType.COPPER_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
                                     } else {
@@ -2051,7 +2051,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     worldContainer.icy = uy;
                                     worldContainer.inventory.renderCollection(worldContainer.ic);
                                     worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == BlockNames.IRON_CHEST) {
+                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.IRON_CHEST) {
                                     if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.IRON_CHEST) {
                                         worldContainer.ic = new ItemCollection(ItemType.IRON_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
                                     } else {
@@ -2061,7 +2061,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     worldContainer.icy = uy;
                                     worldContainer.inventory.renderCollection(worldContainer.ic);
                                     worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == BlockNames.SILVER_CHEST) {
+                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.SILVER_CHEST) {
                                     if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.SILVER_CHEST) {
                                         worldContainer.ic = new ItemCollection(ItemType.SILVER_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
                                     } else {
@@ -2071,7 +2071,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     worldContainer.icy = uy;
                                     worldContainer.inventory.renderCollection(worldContainer.ic);
                                     worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == BlockNames.GOLD_CHEST) {
+                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.GOLD_CHEST) {
                                     if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.GOLD_CHEST) {
                                         worldContainer.ic = new ItemCollection(ItemType.GOLD_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
                                     } else {
@@ -2081,7 +2081,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     worldContainer.icy = uy;
                                     worldContainer.inventory.renderCollection(worldContainer.ic);
                                     worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == BlockNames.ZINC_CHEST) {
+                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.ZINC_CHEST) {
                                     if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.ZINC_CHEST) {
                                         worldContainer.ic = new ItemCollection(ItemType.ZINC_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
                                     } else {
@@ -2091,7 +2091,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     worldContainer.icy = uy;
                                     worldContainer.inventory.renderCollection(worldContainer.ic);
                                     worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == BlockNames.RHYMESTONE_CHEST) {
+                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.RHYMESTONE_CHEST) {
                                     if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.RHYMESTONE_CHEST) {
                                         worldContainer.ic = new ItemCollection(ItemType.RHYMESTONE_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
                                     } else {
@@ -2101,7 +2101,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     worldContainer.icy = uy;
                                     worldContainer.inventory.renderCollection(worldContainer.ic);
                                     worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == BlockNames.OBDURITE_CHEST) {
+                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.OBDURITE_CHEST) {
                                     if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.OBDURITE_CHEST) {
                                         worldContainer.ic = new ItemCollection(ItemType.OBDURITE_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
                                     } else {
@@ -2111,7 +2111,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     worldContainer.icy = uy;
                                     worldContainer.inventory.renderCollection(worldContainer.ic);
                                     worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == BlockNames.FURNACE || worldContainer.blocks[l][uy][ux] == BlockNames.FURNACE_ON) {
+                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.FURNACE || worldContainer.blocks[l][uy][ux] == Blocks.FURNACE_ON) {
                                     if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.FURNACE) {
                                         worldContainer.ic = new ItemCollection(ItemType.FURNACE, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
                                         worldContainer.ic.setFUELP(worldContainer.icmatrix[l][uy][ux].getFUELP());
@@ -2126,7 +2126,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     worldContainer.inventory.renderCollection(worldContainer.ic);
                                     worldContainer.showInv = true;
                                 }
-                                if (worldContainer.ic != null && worldContainer.blocks[l][uy][ux] != BlockNames.WORKBENCH) {
+                                if (worldContainer.ic != null && worldContainer.blocks[l][uy][ux] != Blocks.WORKBENCH) {
                                     for (i = worldContainer.machinesx.size() - 1; i > -1; i--) {
                                         if (worldContainer.machinesx.get(i) == worldContainer.icx && worldContainer.machinesy.get(i) == worldContainer.icy) {
                                             worldContainer.machinesx.remove(i);
@@ -2136,17 +2136,17 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                         }
-                        if (worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.TREE) {
+                        if (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.TREE) {
                             if (RandomTool.nextInt(2) == 0) {
                                 worldContainer.entities.add(new Entity(ux * BLOCKSIZE, uy * BLOCKSIZE, RandomTool.nextDouble() * 8 - 4, -3, Items.BARK, (short) 1));
                             }
-                            worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.TREE_NO_BARK;
+                            worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.TREE_NO_BARK;
                         }
                         if (mousePos2.isClicked()) {
                             mousePos2.setReleased(true);
                             worldContainer.blockTemp = worldContainer.blocks[worldContainer.layer][uy][ux];
                             if (worldContainer.blocks[worldContainer.layer][uy][ux].isLever()) {
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.turnLeverOn(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnLeverOn(worldContainer.blocks[worldContainer.layer][uy][ux]);
                                 addBlockPower(ux, uy);
                                 worldContainer.rdrawn[uy][ux] = false;
                             } else if (worldContainer.blocks[worldContainer.layer][uy][ux].isLeverOn()) {
@@ -2158,7 +2158,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         }
                                     }
                                 }
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.turnLeverOff(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnLeverOff(worldContainer.blocks[worldContainer.layer][uy][ux]);
                                 worldContainer.rdrawn[uy][ux] = false;
                             }
                             if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumWire()) {
@@ -2168,20 +2168,20 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             }
                             if (worldContainer.blocks[worldContainer.layer][uy][ux].isCompleteZythiumAmplifier()) {
                                 removeBlockPower(ux, uy, worldContainer.layer);
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.turnZythiumAmplifier(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnZythiumAmplifier(worldContainer.blocks[worldContainer.layer][uy][ux]);
                                 worldContainer.blockds[worldContainer.layer] = World.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
                                 worldContainer.rdrawn[uy][ux] = false;
                                 addAdjacentTilesToPQueueConditionally(ux, uy);
                             }
                             if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumInverterAll() || worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumInverterOnAll()) {
                                 removeBlockPower(ux, uy, worldContainer.layer);
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.turnZythiumInverter(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnZythiumInverter(worldContainer.blocks[worldContainer.layer][uy][ux]);
                                 worldContainer.blockds[worldContainer.layer] = World.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
                                 worldContainer.rdrawn[uy][ux] = false;
                                 addAdjacentTilesToPQueueConditionally(ux, uy);
                             }
                             if (worldContainer.blocks[worldContainer.layer][uy][ux].isButton()) {
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.turnButtonOn(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnButtonOn(worldContainer.blocks[worldContainer.layer][uy][ux]);
                                 addBlockPower(ux, uy);
                                 worldContainer.rdrawn[uy][ux] = false;
                                 log.info("Srsly?");
@@ -2191,7 +2191,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 updatel.add(worldContainer.layer);
                             }
                             if (worldContainer.blocks[worldContainer.layer][uy][ux].isCompleteZythiumDelayer()) {
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.turnZythiumDelayer(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnZythiumDelayer(worldContainer.blocks[worldContainer.layer][uy][ux]);
                                 worldContainer.blockds[worldContainer.layer] = World.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blockds[worldContainer.layer], ux, uy);
                                 worldContainer.rdrawn[uy][ux] = false;
                                 redoBlockPower(ux, uy, worldContainer.layer);
@@ -2407,7 +2407,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             && (i == -1 || (worldContainer.blocks[worldContainer.layer][y][x].isStonePressurePlate() || worldContainer.blocks[worldContainer.layer][y][x].isWoodenPressurePlate())
                             && (x != -1 && worldContainer.entities.get(i).getEntityType() != null || worldContainer.blocks[worldContainer.layer][y][x].isWoodenPressurePlate()))) {
                         if (worldContainer.blocks[worldContainer.layer][y][x].isPressurePlate()) {
-                            worldContainer.blocks[worldContainer.layer][y][x] = BlockNames.turnPressurePlateOn(worldContainer.blocks[worldContainer.layer][y][x]);
+                            worldContainer.blocks[worldContainer.layer][y][x] = Blocks.turnPressurePlateOn(worldContainer.blocks[worldContainer.layer][y][x]);
                             worldContainer.rdrawn[y][x] = false;
                             addBlockPower(x, y);
                             log.info("Srsly?");
@@ -2428,14 +2428,14 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     public boolean hasOpenSpace(int x, int y, int l) {
         try {
-            return (worldContainer.blocks[l][y - 1][x - 1] == BlockNames.AIR || !worldContainer.blocks[l][y - 1][x - 1].isCds() ||
-                    worldContainer.blocks[l][y - 1][x] == BlockNames.AIR || !worldContainer.blocks[l][y - 1][x].isCds() ||
-                    worldContainer.blocks[l][y - 1][x + 1] == BlockNames.AIR || !worldContainer.blocks[l][y - 1][x + 1].isCds() ||
-                    worldContainer.blocks[l][y][x - 1] == BlockNames.AIR || !worldContainer.blocks[l][y][x - 1].isCds() ||
-                    worldContainer.blocks[l][y][x + 1] == BlockNames.AIR || !worldContainer.blocks[l][y][x + 1].isCds() ||
-                    worldContainer.blocks[l][y + 1][x - 1] == BlockNames.AIR || !worldContainer.blocks[l][y + 1][x - 1].isCds() ||
-                    worldContainer.blocks[l][y + 1][x] == BlockNames.AIR || !worldContainer.blocks[l][y + 1][x].isCds() ||
-                    worldContainer.blocks[l][y + 1][x + 1] == BlockNames.AIR || !worldContainer.blocks[l][y + 1][x + 1].isCds());
+            return (worldContainer.blocks[l][y - 1][x - 1] == Blocks.AIR || !worldContainer.blocks[l][y - 1][x - 1].isCds() ||
+                    worldContainer.blocks[l][y - 1][x] == Blocks.AIR || !worldContainer.blocks[l][y - 1][x].isCds() ||
+                    worldContainer.blocks[l][y - 1][x + 1] == Blocks.AIR || !worldContainer.blocks[l][y - 1][x + 1].isCds() ||
+                    worldContainer.blocks[l][y][x - 1] == Blocks.AIR || !worldContainer.blocks[l][y][x - 1].isCds() ||
+                    worldContainer.blocks[l][y][x + 1] == Blocks.AIR || !worldContainer.blocks[l][y][x + 1].isCds() ||
+                    worldContainer.blocks[l][y + 1][x - 1] == Blocks.AIR || !worldContainer.blocks[l][y + 1][x - 1].isCds() ||
+                    worldContainer.blocks[l][y + 1][x] == Blocks.AIR || !worldContainer.blocks[l][y + 1][x].isCds() ||
+                    worldContainer.blocks[l][y + 1][x + 1] == Blocks.AIR || !worldContainer.blocks[l][y + 1][x + 1].isCds());
         } catch (ArrayIndexOutOfBoundsException e) {
             return false;
         }
@@ -2450,30 +2450,30 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         for (x2 = x - 15; x2 < x + 16; x2++) {
             for (y2 = y - 15; y2 < y + 16; y2++) {
                 if (x2 + u >= 0 && x2 + u < WIDTH && y2 + v >= 0 && y2 + v < HEIGHT) {
-                    if (worldContainer.blocks[1][y2 + v][x2 + u] == BlockNames.SAND || worldContainer.blocks[1][y2 + v][x2 + u] == BlockNames.SANDSTONE) {
+                    if (worldContainer.blocks[1][y2 + v][x2 + u] == Blocks.SAND || worldContainer.blocks[1][y2 + v][x2 + u] == Blocks.SANDSTONE) {
                         desert += 1;
-                    } else if (worldContainer.blocks[1][y2 + v][x2 + u] != BlockNames.AIR) {
+                    } else if (worldContainer.blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
                         desert -= 1;
                     }
-                    if (worldContainer.blocks[1][y2 + v][x2 + u] == BlockNames.DIRT || worldContainer.blocks[1][y2 + v][x2 + u] == BlockNames.GRASS || worldContainer.blocks[1][y2 + v][x2 + u] == BlockNames.JUNGLE_GRASS) {
+                    if (worldContainer.blocks[1][y2 + v][x2 + u] == Blocks.DIRT || worldContainer.blocks[1][y2 + v][x2 + u] == Blocks.GRASS || worldContainer.blocks[1][y2 + v][x2 + u] == Blocks.JUNGLE_GRASS) {
                         jungle += 1;
-                    } else if (worldContainer.blocks[1][y2 + v][x2 + u] != BlockNames.AIR) {
+                    } else if (worldContainer.blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
                         jungle -= 1;
                     }
-                    if (worldContainer.blocks[1][y2 + v][x2 + u] == BlockNames.SWAMP_GRASS || worldContainer.blocks[1][y2 + v][x2 + u] == BlockNames.MUD) {
+                    if (worldContainer.blocks[1][y2 + v][x2 + u] == Blocks.SWAMP_GRASS || worldContainer.blocks[1][y2 + v][x2 + u] == Blocks.MUD) {
                         swamp += 1;
-                    } else if (worldContainer.blocks[1][y2 + v][x2 + u] != BlockNames.AIR) {
+                    } else if (worldContainer.blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
                         swamp -= 1;
                     }
-                    if (worldContainer.blocks[1][y2 + v][x2 + u] == BlockNames.SNOW) {
+                    if (worldContainer.blocks[1][y2 + v][x2 + u] == Blocks.SNOW) {
                         frost += 1;
-                    } else if (worldContainer.blocks[1][y2 + v][x2 + u] != BlockNames.AIR) {
+                    } else if (worldContainer.blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
                         frost -= 1;
                     }
-                    if (worldContainer.blockbgs[y2 + v][x2 + u] == 0) {
+                    if (worldContainer.blockbgs[y2 + v][x2 + u] == Backgrounds.EMPTY) {
                         cavern += 1;
                     }
-                    if (worldContainer.blocks[1][y2 + v][x2 + u] == BlockNames.DIRT || worldContainer.blocks[1][y2 + v][x2 + u] == BlockNames.STONE) {
+                    if (worldContainer.blocks[1][y2 + v][x2 + u] == Blocks.DIRT || worldContainer.blocks[1][y2 + v][x2 + u] == Blocks.STONE) {
                         cavern += 1;
                     } else {
                         cavern -= 1;
@@ -2501,8 +2501,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     public void breakCurrentBlock() {
         if (DebugContext.INSTAMINE || worldContainer.mining >= DURABILITY.get(worldContainer.inventory.tool()).get(worldContainer.blocks[worldContainer.layer][uy][ux])) {
-            if (worldContainer.blocks[0][uy][ux] == BlockNames.TREE_ROOT) {
-                worldContainer.blocks[0][uy][ux] = BlockNames.AIR;
+            if (worldContainer.blocks[0][uy][ux] == Blocks.TREE_ROOT) {
+                worldContainer.blocks[0][uy][ux] = Blocks.AIR;
                 for (uly = uy - 1; uly < uy + 2; uly++) {
                     for (ulx = ux - 1; ulx < ux + 2; ulx++) {
                         worldContainer.blockdns[uly][ulx] = (byte) RandomTool.nextInt(5);
@@ -2514,8 +2514,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     }
                 }
             }
-            if (worldContainer.blocks[0][uy + 1][ux] == BlockNames.TREE_ROOT) {
-                worldContainer.blocks[0][uy + 1][ux] = BlockNames.AIR;
+            if (worldContainer.blocks[0][uy + 1][ux] == Blocks.TREE_ROOT) {
+                worldContainer.blocks[0][uy + 1][ux] = Blocks.AIR;
                 for (uly = uy; uly < uy + 3; uly++) {
                     for (ulx = ux - 1; ulx < ux + 2; ulx++) {
                         worldContainer.blockdns[uly][ulx] = (byte) RandomTool.nextInt(5);
@@ -2527,18 +2527,18 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     }
                 }
             }
-            if (worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.WORKBENCH
-                    || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.WOODEN_CHEST
-                    || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.STONE_CHEST
-                    || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.COPPER_CHEST
-                    || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.IRON_CHEST
-                    || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.SILVER_CHEST
-                    || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.GOLD_CHEST
-                    || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.FURNACE
-                    || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.FURNACE_ON
-                    || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.ZINC_CHEST
-                    || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.RHYMESTONE_CHEST
-                    || worldContainer.blocks[worldContainer.layer][uy][ux] == BlockNames.OBDURITE_CHEST) {
+            if (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.WORKBENCH
+                    || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.WOODEN_CHEST
+                    || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.STONE_CHEST
+                    || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.COPPER_CHEST
+                    || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.IRON_CHEST
+                    || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.SILVER_CHEST
+                    || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.GOLD_CHEST
+                    || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE
+                    || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE_ON
+                    || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.ZINC_CHEST
+                    || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.RHYMESTONE_CHEST
+                    || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.OBDURITE_CHEST) {
                 if (worldContainer.ic != null) {
                     for (i = 0; i < worldContainer.ic.getIds().length; i++) {
                         if (worldContainer.ic.getIds()[i] != Items.EMPTY && !(worldContainer.ic.getType() == ItemType.FURNACE && i == 1)) {
@@ -2563,7 +2563,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     }
                 }
             }
-            if (worldContainer.blocks[worldContainer.layer][uy][ux] != BlockNames.AIR && worldContainer.blocks[worldContainer.layer][uy][ux].getDrops() != Items.EMPTY) {
+            if (worldContainer.blocks[worldContainer.layer][uy][ux] != Blocks.AIR && worldContainer.blocks[worldContainer.layer][uy][ux].getDrops() != Items.EMPTY) {
                 worldContainer.entities.add(new Entity(ux * BLOCKSIZE, uy * BLOCKSIZE, RandomTool.nextDouble() * 4 - 2, -2, worldContainer.blocks[worldContainer.layer][uy][ux].getDrops(), (short) 1));
             }
             Items t = Items.EMPTY;
@@ -2686,7 +2686,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
             removeBlockLighting(ux, uy);
             worldContainer.blockTemp = worldContainer.blocks[worldContainer.layer][uy][ux];
-            worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.AIR;
+            worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.AIR;
             if (worldContainer.blockTemp.isZythiumWire()) {
                 redoBlockPower(ux, uy, worldContainer.layer);
             }
@@ -2712,11 +2712,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             for (uly = uy - 4; uly < uy + 5; uly++) {
                 for (ulx = ux - 4; ulx < ux + 5; ulx++) {
                     for (int l = 0; l < 3; l += 2) {
-                        if (uly >= 0 && uly < HEIGHT && worldContainer.blocks[l][uly][ulx] == BlockNames.LEAVES) {
+                        if (uly >= 0 && uly < HEIGHT && worldContainer.blocks[l][uly][ulx] == Blocks.LEAVES) {
                             keepLeaf = false;
                             for (uly2 = uly - 4; uly2 < uly + 5; uly2++) {
                                 for (ulx2 = ulx - 4; ulx2 < ulx + 5; ulx2++) {
-                                    if (uly2 >= 0 && uly2 < HEIGHT && (worldContainer.blocks[1][uly2][ulx2] == BlockNames.TREE || worldContainer.blocks[1][uly2][ulx2] == BlockNames.TREE_NO_BARK)) {
+                                    if (uly2 >= 0 && uly2 < HEIGHT && (worldContainer.blocks[1][uly2][ulx2] == Blocks.TREE || worldContainer.blocks[1][uly2][ulx2] == Blocks.TREE_NO_BARK)) {
                                         keepLeaf = true;
                                         break;
                                     }
@@ -2726,7 +2726,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                             if (!keepLeaf) {
-                                worldContainer.blocks[l][uly][ulx] = BlockNames.AIR;
+                                worldContainer.blocks[l][uly][ulx] = Blocks.AIR;
                                 worldContainer.blockds[l] = World.generateOutlines(worldContainer.blocks[l], worldContainer.blockds[l], ulx, uly);
                                 for (uly2 = uly - 1; uly2 < uly + 2; uly2++) {
                                     for (ulx2 = ulx - 1; ulx2 < ulx + 2; ulx2++) {
@@ -2746,7 +2746,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         addSunLighting(ux - 1, uy);
                     }
                     worldContainer.blockTemp = worldContainer.blocks[worldContainer.layer][uy][ux - 1];
-                    worldContainer.blocks[worldContainer.layer][uy][ux - 1] = BlockNames.AIR;
+                    worldContainer.blocks[worldContainer.layer][uy][ux - 1] = Blocks.AIR;
                     if (worldContainer.blockTemp.isZythiumWire()) {
                         redoBlockPower(ux, uy, worldContainer.layer);
                     }
@@ -2762,7 +2762,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         addSunLighting(ux + 1, uy);
                     }
                     worldContainer.blockTemp = worldContainer.blocks[worldContainer.layer][uy][ux + 1];
-                    worldContainer.blocks[worldContainer.layer][uy][ux + 1] = BlockNames.AIR;
+                    worldContainer.blocks[worldContainer.layer][uy][ux + 1] = Blocks.AIR;
                     if (worldContainer.blockTemp.isZythiumWire()) {
                         redoBlockPower(ux, uy, worldContainer.layer);
                     }
@@ -2899,7 +2899,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 }
                 removeBlockLighting(ux, uy);
                 worldContainer.blockTemp = worldContainer.blocks[worldContainer.layer][uy][ux];
-                worldContainer.blocks[worldContainer.layer][uy][ux] = BlockNames.AIR;
+                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.AIR;
                 if (worldContainer.blockTemp.isZythiumWire()) {
                     redoBlockPower(ux, uy, worldContainer.layer);
                 }
@@ -2925,11 +2925,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 for (uly = uy - 4; uly < uy + 5; uly++) {
                     for (ulx = ux - 4; ulx < ux + 5; ulx++) {
                         for (int l = 0; l < 3; l += 2) {
-                            if (uly >= 0 && uly < HEIGHT && worldContainer.blocks[l][uly][ulx] == BlockNames.LEAVES) {
+                            if (uly >= 0 && uly < HEIGHT && worldContainer.blocks[l][uly][ulx] == Blocks.LEAVES) {
                                 keepLeaf = false;
                                 for (uly2 = uly - 4; uly2 < uly + 5; uly2++) {
                                     for (ulx2 = ulx - 4; ulx2 < ulx + 5; ulx2++) {
-                                        if (uly2 >= 0 && uly2 < HEIGHT && (worldContainer.blocks[1][uly2][ulx2] == BlockNames.TREE || worldContainer.blocks[1][uly2][ulx2] == BlockNames.TREE_NO_BARK)) {
+                                        if (uly2 >= 0 && uly2 < HEIGHT && (worldContainer.blocks[1][uly2][ulx2] == Blocks.TREE || worldContainer.blocks[1][uly2][ulx2] == Blocks.TREE_NO_BARK)) {
                                             keepLeaf = true;
                                             break;
                                         }
@@ -2939,7 +2939,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     }
                                 }
                                 if (!keepLeaf) {
-                                    worldContainer.blocks[l][uly][ulx] = BlockNames.AIR;
+                                    worldContainer.blocks[l][uly][ulx] = Blocks.AIR;
                                     worldContainer.blockds[l] = World.generateOutlines(worldContainer.blocks[l], worldContainer.blockds[l], ulx, uly);
                                     for (uly2 = uly - 1; uly2 < uly + 2; uly2++) {
                                         for (ulx2 = ulx - 1; ulx2 < ulx + 2; ulx2++) {
@@ -3097,18 +3097,18 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             if (ay3 >= 0 && ay3 < HEIGHT && worldContainer.power[lyr][ay3][ax3] != 0) {
                 if (worldContainer.power[lyr][ay3][ax3] != 0 && !(worldContainer.power[lyr][ay3][ax3] == worldContainer.power[lyr][uy][ux] - worldContainer.blocks[lyr][uy][ux].getConduct()) &&
                         (!(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter()) ||
-                                !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                        worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                        worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                        worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP_ON))) {
+                                !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
+                                        worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
+                                        worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
+                                        worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
+                                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
+                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
+                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
+                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
+                                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
+                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
+                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
+                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON))) {
                     log.info("Added tile " + ax3 + " " + ay3 + " to PQueue.");
                     addTileToPQueue(ax3, ay3);
                     remember[ir] = true;
@@ -3124,18 +3124,18 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 log.info("[rbpRecur] " + worldContainer.power[lyr][ay3][ax3] + " " + worldContainer.power[lyr][uy][ux] + " " + worldContainer.blocks[lyr][uy][ux].getConduct());
                 if ((worldContainer.power[lyr][ay3][ax3] == worldContainer.power[lyr][uy][ux] - worldContainer.blocks[lyr][uy][ux].getConduct()) &&
                         (!(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier()) ||
-                                !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP_ON))) {
+                                !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
+                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
+                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
+                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
+                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
+                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON))) {
                     if (!arbprd[lyr][ay3][ax3]) {
                         rbpRecur(ax3, ay3, lyr);
                         if (worldContainer.blocks[lyr][ay3][ax3].getConduct() >= 0 && wcnct[ay3][ax3]) {
@@ -3185,21 +3185,21 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     }
                 }
             }
-            if (worldContainer.blocks[lyr][ay3][ax3] == BlockNames.ZYTHIUM_LAMP_ON || (worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer()) &&
-                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_RIGHT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_DOWN_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_LEFT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_UP_ON) &&
-                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
+            if (worldContainer.blocks[lyr][ay3][ax3] == Blocks.ZYTHIUM_LAMP_ON || (worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer()) &&
+                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
+                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
+                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
+                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
+                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
+                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
+                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
+                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
+                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
+                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
+                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
+                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
                 if (worldContainer.blocks[lyr][ay3][ax3].isZythiumInverterOnAll()) {
-                    worldContainer.blocks[lyr][ay3][ax3] = BlockNames.turnZythiumInverterOff(worldContainer.blocks[lyr][ay3][ax3]);
+                    worldContainer.blocks[lyr][ay3][ax3] = Blocks.turnZythiumInverterOff(worldContainer.blocks[lyr][ay3][ax3]);
                     log.info("Adding power for inverter at (" + ax3 + ", " + ay3 + ").");
                     addBlockPower(ax3, ay3);
                     addBlockLighting(ax3, ay3);
@@ -3232,18 +3232,18 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 if (ay3 >= 0 && ay3 < HEIGHT && worldContainer.power[lyr][ay3][ax3] != 0) {
                     if (!(worldContainer.power[lyr][ay3][ax3] == worldContainer.power[lyr][uy][ux] - worldContainer.blocks[lyr][uy][ux].getConduct()) &&
                             (!(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter()) ||
-                                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                            !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_UP_ON) &&
-                                            !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP_ON))) {
+                                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
+                                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
+                                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
+                                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
+                                            !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
+                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
+                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
+                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
+                                            !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
+                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
+                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
+                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON))) {
                         log.info("Added tile " + ax3 + " " + ay3 + " to PQueue.");
                         addTileToPQueue(ax3, ay3);
                     }
@@ -3257,18 +3257,18 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     log.info(worldContainer.power[lyr][uy][ux] + " " + worldContainer.power[lyr][ay3][ax3] + " " + worldContainer.blocks[lyr][uy][ux].getConduct());
                     if (worldContainer.power[lyr][ay3][ax3] == worldContainer.power[lyr][uy][ux] - worldContainer.blocks[lyr][uy][ux].getConduct()) {
                         if (!(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter()) ||
-                                !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_INVERTER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
+                                !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
+                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
+                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
+                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
+                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
+                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
+                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
                             if (!arbprd[lyr][ay3][ax3]) {
                                 rbpRecur(ax3, ay3, lyr);
                                 if (worldContainer.blocks[lyr][ay3][ax3].getConduct() >= 0 && wcnct[ay3][ax3]) {
@@ -3319,21 +3319,21 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         }
                     }
                 }
-                if (worldContainer.blocks[lyr][ay3][ax3] == BlockNames.ZYTHIUM_LAMP_ON || (worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer()) &&
-                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_DOWN_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_LEFT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_INVERTER_UP_ON) &&
-                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
+                if (worldContainer.blocks[lyr][ay3][ax3] == Blocks.ZYTHIUM_LAMP_ON || (worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer()) &&
+                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
+                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
+                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
+                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
+                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
+                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
+                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
+                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
+                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
+                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
+                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
+                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
                     if (worldContainer.blocks[lyr][ay3][ax3].isZythiumInverterOnAll()) {
-                        worldContainer.blocks[lyr][ay3][ax3] = BlockNames.turnZythiumInverterOff(worldContainer.blocks[lyr][ay3][ax3]);
+                        worldContainer.blocks[lyr][ay3][ax3] = Blocks.turnZythiumInverterOff(worldContainer.blocks[lyr][ay3][ax3]);
                         log.info("Adding power for inverter at (" + ax3 + ", " + ay3 + ").");
                         addBlockPower(ax3, ay3);
                         addBlockLighting(ax3, ay3);
@@ -3344,14 +3344,14 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 }
             }
         }
-        if (worldContainer.blocks[lyr][uy][ux] == BlockNames.ZYTHIUM_LAMP_ON) {
+        if (worldContainer.blocks[lyr][uy][ux] == Blocks.ZYTHIUM_LAMP_ON) {
             removeBlockLighting(ux, uy);
-            worldContainer.blocks[lyr][uy][ux] = BlockNames.ZYTHIUM_LAMP;
+            worldContainer.blocks[lyr][uy][ux] = Blocks.ZYTHIUM_LAMP;
             worldContainer.rdrawn[uy][ux] = false;
         }
         if (worldContainer.blocks[lyr][uy][ux].isZythiumAmplifierOnAll()) {
             worldContainer.blockTemp = worldContainer.blocks[lyr][uy][ux];
-            worldContainer.blocks[lyr][uy][ux] = BlockNames.turnZythiumAmplifierOff(worldContainer.blocks[lyr][uy][ux]);
+            worldContainer.blocks[lyr][uy][ux] = Blocks.turnZythiumAmplifierOff(worldContainer.blocks[lyr][uy][ux]);
             removeBlockPower(ux, uy, lyr);
             removeBlockLighting(ux, uy);
             worldContainer.rdrawn[uy][ux] = false;
@@ -3462,9 +3462,9 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     }
 
     public boolean isBlockLightSource(int ux, int uy) {
-        return (worldContainer.blocks[0][uy][ux] != BlockNames.AIR && worldContainer.blocks[0][uy][ux].getLights() != 0 ||
-                worldContainer.blocks[1][uy][ux] != BlockNames.AIR && worldContainer.blocks[1][uy][ux].getLights() != 0 ||
-                worldContainer.blocks[2][uy][ux] != BlockNames.AIR && worldContainer.blocks[2][uy][ux].getLights() != 0);
+        return (worldContainer.blocks[0][uy][ux] != Blocks.AIR && worldContainer.blocks[0][uy][ux].getLights() != 0 ||
+                worldContainer.blocks[1][uy][ux] != Blocks.AIR && worldContainer.blocks[1][uy][ux].getLights() != 0 ||
+                worldContainer.blocks[2][uy][ux] != Blocks.AIR && worldContainer.blocks[2][uy][ux].getLights() != 0);
     }
 
     public boolean isNonLayeredBlockLightSource(int ux, int uy) {
@@ -3472,20 +3472,20 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     }
 
     public boolean isNonLayeredBlockLightSource(int ux, int uy, int layer) {
-        return (layer != 0 && worldContainer.blocks[0][uy][ux] != BlockNames.AIR && worldContainer.blocks[0][uy][ux].getLights() != 0 ||
-                layer != 1 && worldContainer.blocks[1][uy][ux] != BlockNames.AIR && worldContainer.blocks[1][uy][ux].getLights() != 0 ||
-                layer != 2 && worldContainer.blocks[2][uy][ux] != BlockNames.AIR && worldContainer.blocks[2][uy][ux].getLights() != 0);
+        return (layer != 0 && worldContainer.blocks[0][uy][ux] != Blocks.AIR && worldContainer.blocks[0][uy][ux].getLights() != 0 ||
+                layer != 1 && worldContainer.blocks[1][uy][ux] != Blocks.AIR && worldContainer.blocks[1][uy][ux].getLights() != 0 ||
+                layer != 2 && worldContainer.blocks[2][uy][ux] != Blocks.AIR && worldContainer.blocks[2][uy][ux].getLights() != 0);
     }
 
     public int findBlockLightSource(int ux, int uy) {
         n = 0;
-        if (worldContainer.blocks[0][uy][ux] != BlockNames.AIR) {
+        if (worldContainer.blocks[0][uy][ux] != Blocks.AIR) {
             n = Math.max(worldContainer.blocks[0][uy][ux].getLights(), n);
         }
-        if (worldContainer.blocks[1][uy][ux] != BlockNames.AIR) {
+        if (worldContainer.blocks[1][uy][ux] != Blocks.AIR) {
             n = Math.max(worldContainer.blocks[1][uy][ux].getLights(), n);
         }
-        if (worldContainer.blocks[2][uy][ux] != BlockNames.AIR) {
+        if (worldContainer.blocks[2][uy][ux] != Blocks.AIR) {
             n = Math.max(worldContainer.blocks[2][uy][ux].getLights(), n);
         }
         return n;
@@ -3497,13 +3497,13 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     public int findNonLayeredBlockLightSource(int ux, int uy, int layer) {
         n = 0;
-        if (worldContainer.blocks[0][uy][ux] != BlockNames.AIR) {
+        if (worldContainer.blocks[0][uy][ux] != Blocks.AIR) {
             n = Math.max(worldContainer.blocks[0][uy][ux].getLights(), n);
         }
-        if (worldContainer.blocks[1][uy][ux] != BlockNames.AIR) {
+        if (worldContainer.blocks[1][uy][ux] != Blocks.AIR) {
             n = Math.max(worldContainer.blocks[1][uy][ux].getLights(), n);
         }
-        if (worldContainer.blocks[2][uy][ux] != BlockNames.AIR) {
+        if (worldContainer.blocks[2][uy][ux] != Blocks.AIR) {
             n = Math.max(worldContainer.blocks[2][uy][ux].getLights(), n);
         }
         return n;
@@ -3634,30 +3634,30 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     if (y2 >= 0 && y2 < HEIGHT) {
                         for (int l = 0; l < 3; l++) {
                             if (worldContainer.power[l][y][x] > 0) {
-                                if (worldContainer.blocks[l][y][x].getConduct() >= 0 && worldContainer.blocks[l][y2][x2].isReceive() && !(worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && x < x2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                        worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && y < y2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                        worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && x > x2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                        worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && y > y2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                        !(worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && x < x2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && y < y2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && x > x2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && y > y2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                        !(worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && x < x2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && y < y2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && x > x2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && y > y2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_INVERTER_UP && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_INVERTER_UP_ON) &&
-                                        !(worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && x < x2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && y < y2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && x > x2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && y > y2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_INVERTER_UP && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_INVERTER_UP_ON) &&
-                                        !(worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && x < x2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && y < y2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && x > x2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && y > y2 && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[l][y2][x2] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP_ON) &&
-                                        !(worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && x < x2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && y < y2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && x > x2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && y > y2 && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[l][y][x] != BlockNames.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
+                                if (worldContainer.blocks[l][y][x].getConduct() >= 0 && worldContainer.blocks[l][y2][x2].isReceive() && !(worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && x < x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
+                                        worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && y < y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
+                                        worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && x > x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
+                                        worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && y > y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
+                                        !(worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && x < x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
+                                                worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && y < y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
+                                                worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && x > x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
+                                                worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && y > y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
+                                        !(worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && x < x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
+                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && y < y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
+                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && x > x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
+                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && y > y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
+                                        !(worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && x < x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
+                                                worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && y < y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
+                                                worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && x > x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
+                                                worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && y > y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
+                                        !(worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && x < x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
+                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && y < y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
+                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && x > x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
+                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && y > y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON) &&
+                                        !(worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && x < x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
+                                                worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && y < y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
+                                                worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && x > x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
+                                                worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && y > y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
                                     if (worldContainer.power[l][y2][x2] <= worldContainer.power[l][y][x] - worldContainer.blocks[l][y][x].getConduct()) {
                                         addTileToPZQueue(x2, y2);
                                         if (worldContainer.blocks[l][y2][x2].isZythiumDelayerAll()) {
@@ -3701,7 +3701,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     }
                                     if (worldContainer.power[l][y][x] - worldContainer.blocks[l][y][x].getConduct() > 0 && worldContainer.blocks[l][y2][x2].isZythiumInverterAll()) {
                                         removeBlockPower(x2, y2, l);
-                                        worldContainer.blocks[l][y2][x2] = BlockNames.turnZythiumInverterOn(worldContainer.blocks[l][y2][x2]);
+                                        worldContainer.blocks[l][y2][x2] = Blocks.turnZythiumInverterOn(worldContainer.blocks[l][y2][x2]);
                                         removeBlockLighting(x2, y2);
                                         worldContainer.rdrawn[y2][x2] = false;
                                     }
@@ -3716,14 +3716,14 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 for (int l = 0; l < 3; l++) {
                     log.info("[resolvePowerMatrix] " + x + " " + y + " " + l + " " + worldContainer.blocks[l][y][x] + " " + worldContainer.power[l][y][x]);
                     if (worldContainer.power[l][y][x] > 0) {
-                        if (worldContainer.blocks[l][y][x] == BlockNames.ZYTHIUM_LAMP) {
-                            worldContainer.blocks[l][y][x] = BlockNames.ZYTHIUM_LAMP_ON;
+                        if (worldContainer.blocks[l][y][x] == Blocks.ZYTHIUM_LAMP) {
+                            worldContainer.blocks[l][y][x] = Blocks.ZYTHIUM_LAMP_ON;
                             addBlockLighting(x, y);
                             worldContainer.rdrawn[y][x] = false;
                         }
                         if (worldContainer.blocks[l][y][x].isZythiumAmplifierAll()) {
                             log.info("Processed amplifier at " + x + " " + y);
-                            worldContainer.blocks[l][y][x] = BlockNames.turnZythiumAmplifierOn(worldContainer.blocks[l][y][x]);
+                            worldContainer.blocks[l][y][x] = Blocks.turnZythiumAmplifierOn(worldContainer.blocks[l][y][x]);
                             addTileToPQueue(x, y);
                             addBlockLighting(x, y);
                             worldContainer.rdrawn[y][x] = false;
@@ -4145,7 +4145,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 null);
     }
 
-    public BufferedImage loadBlock(BlockNames type, Byte dir, Byte dirn, Byte tnum, String outlineName, int x, int y, int lyr) {
+    public BufferedImage loadBlock(Blocks type, Byte dir, Byte dirn, Byte tnum, String outlineName, int x, int y, int lyr) {
         int fx, fy;
         int dir_is = (int) dir;
         String dir_s = Directions.findByIndex(dir_is).getFileName();
@@ -4155,22 +4155,21 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         BufferedImage texture = blockImgs.get("blocks/" + bName + "/texture" + (tnum + 1) + ".png");
         BufferedImage image = config.createCompatibleImage(IMAGESIZE, IMAGESIZE, Transparency.TRANSLUCENT);
         if (GRASSDIRT.get(type) != null) {
-            BufferedImage dirtOriginal = blockImgs.get("blocks/" + BlockNames.findByIndex(GRASSDIRT.get(type)).getFileName() + "/texture" + (tnum + 1) + ".png");
+            BufferedImage dirtOriginal = blockImgs.get("blocks/" + GRASSDIRT.get(type).getFileName() + "/texture" + (tnum + 1) + ".png");
             BufferedImage dirt = config.createCompatibleImage(IMAGESIZE, IMAGESIZE, Transparency.TRANSLUCENT);
             for (dy = 0; dy < IMAGESIZE; dy++) {
                 for (dx = 0; dx < IMAGESIZE; dx++) {
                     dirt.setRGB(dx, dy, dirtOriginal.getRGB(dx, dy));
                 }
             }
-            int dn = GRASSDIRT.get(type);
-            boolean left = (worldContainer.blocks[lyr][y][x - 1] == BlockNames.AIR || !worldContainer.blocks[lyr][y][x - 1].isCds());// && (worldContainer.blocks[lyr][y-1][x] != dn && worldContainer.blocks[lyr][y+1][x] != dn) && (worldContainer.blocks[lyr][y-1][x-1] != dn && worldContainer.blocks[lyr][y+1][x-1] != dn);
-            boolean right = (worldContainer.blocks[lyr][y][x + 1] == BlockNames.AIR || !worldContainer.blocks[lyr][y][x + 1].isCds());// && (worldContainer.blocks[lyr][y-1][x] != dn && worldContainer.blocks[lyr][y+1][x] != dn) && (worldContainer.blocks[lyr][y-1][x+1] != dn && worldContainer.blocks[lyr][y+1][x+1] != dn);
-            boolean up = (worldContainer.blocks[lyr][y - 1][x] == BlockNames.AIR || !worldContainer.blocks[lyr][y - 1][x].isCds());// && (worldContainer.blocks[lyr][y][x-1] != dn && worldContainer.blocks[lyr][y][x+1] != dn) && (worldContainer.blocks[lyr][y-1][x-1] != dn && worldContainer.blocks[lyr][y-1][x+1] != dn);
-            boolean down = (worldContainer.blocks[lyr][y + 1][x] == BlockNames.AIR || !worldContainer.blocks[lyr][y + 1][x].isCds());// && (worldContainer.blocks[lyr][y][x-1] != dn && worldContainer.blocks[lyr][y][x+1] != dn) && (worldContainer.blocks[lyr][y+1][x-1] != dn && worldContainer.blocks[lyr][y+1][x+1] != dn);
-            boolean upleft = (worldContainer.blocks[lyr][y - 1][x - 1] == BlockNames.AIR || !worldContainer.blocks[lyr][y - 1][x - 1].isCds());// && (worldContainer.blocks[lyr][y-1][x] != dn && worldContainer.blocks[lyr][y][x-1] != dn && worldContainer.blocks[lyr][y-1][x-1] != dn && worldContainer.blocks[lyr][y-2][x] != dn && worldContainer.blocks[lyr][y][x-2] != dn);
-            boolean upright = (worldContainer.blocks[lyr][y - 1][x + 1] == BlockNames.AIR || !worldContainer.blocks[lyr][y - 1][x + 1].isCds());// && (worldContainer.blocks[lyr][y-1][x] != dn && worldContainer.blocks[lyr][y][x+1] != dn && worldContainer.blocks[lyr][y-1][x+1] != dn && worldContainer.blocks[lyr][y-2][x] != dn && worldContainer.blocks[lyr][y][x+2] != dn);
-            boolean downleft = (worldContainer.blocks[lyr][y + 1][x - 1] == BlockNames.AIR || !worldContainer.blocks[lyr][y + 1][x - 1].isCds());// && (worldContainer.blocks[lyr][y+1][x] != dn && worldContainer.blocks[lyr][y][x-1] != dn && worldContainer.blocks[lyr][y+1][x-1] != dn && worldContainer.blocks[lyr][y+2][x] != dn && worldContainer.blocks[lyr][y][x-2] != dn);
-            boolean downright = (worldContainer.blocks[lyr][y + 1][x + 1] == BlockNames.AIR || !worldContainer.blocks[lyr][y + 1][x + 1].isCds());// && (worldContainer.blocks[lyr][y+1][x] != dn && worldContainer.blocks[lyr][y][x+1] != dn && worldContainer.blocks[lyr][y+1][x+1] != dn && worldContainer.blocks[lyr][y+2][x] != dn && worldContainer.blocks[lyr][y][x+2] != dn);
+            boolean left = (worldContainer.blocks[lyr][y][x - 1] == Blocks.AIR || !worldContainer.blocks[lyr][y][x - 1].isCds());// && (worldContainer.blocks[lyr][y-1][x] != dn && worldContainer.blocks[lyr][y+1][x] != dn) && (worldContainer.blocks[lyr][y-1][x-1] != dn && worldContainer.blocks[lyr][y+1][x-1] != dn);
+            boolean right = (worldContainer.blocks[lyr][y][x + 1] == Blocks.AIR || !worldContainer.blocks[lyr][y][x + 1].isCds());// && (worldContainer.blocks[lyr][y-1][x] != dn && worldContainer.blocks[lyr][y+1][x] != dn) && (worldContainer.blocks[lyr][y-1][x+1] != dn && worldContainer.blocks[lyr][y+1][x+1] != dn);
+            boolean up = (worldContainer.blocks[lyr][y - 1][x] == Blocks.AIR || !worldContainer.blocks[lyr][y - 1][x].isCds());// && (worldContainer.blocks[lyr][y][x-1] != dn && worldContainer.blocks[lyr][y][x+1] != dn) && (worldContainer.blocks[lyr][y-1][x-1] != dn && worldContainer.blocks[lyr][y-1][x+1] != dn);
+            boolean down = (worldContainer.blocks[lyr][y + 1][x] == Blocks.AIR || !worldContainer.blocks[lyr][y + 1][x].isCds());// && (worldContainer.blocks[lyr][y][x-1] != dn && worldContainer.blocks[lyr][y][x+1] != dn) && (worldContainer.blocks[lyr][y+1][x-1] != dn && worldContainer.blocks[lyr][y+1][x+1] != dn);
+            boolean upleft = (worldContainer.blocks[lyr][y - 1][x - 1] == Blocks.AIR || !worldContainer.blocks[lyr][y - 1][x - 1].isCds());// && (worldContainer.blocks[lyr][y-1][x] != dn && worldContainer.blocks[lyr][y][x-1] != dn && worldContainer.blocks[lyr][y-1][x-1] != dn && worldContainer.blocks[lyr][y-2][x] != dn && worldContainer.blocks[lyr][y][x-2] != dn);
+            boolean upright = (worldContainer.blocks[lyr][y - 1][x + 1] == Blocks.AIR || !worldContainer.blocks[lyr][y - 1][x + 1].isCds());// && (worldContainer.blocks[lyr][y-1][x] != dn && worldContainer.blocks[lyr][y][x+1] != dn && worldContainer.blocks[lyr][y-1][x+1] != dn && worldContainer.blocks[lyr][y-2][x] != dn && worldContainer.blocks[lyr][y][x+2] != dn);
+            boolean downleft = (worldContainer.blocks[lyr][y + 1][x - 1] == Blocks.AIR || !worldContainer.blocks[lyr][y + 1][x - 1].isCds());// && (worldContainer.blocks[lyr][y+1][x] != dn && worldContainer.blocks[lyr][y][x-1] != dn && worldContainer.blocks[lyr][y+1][x-1] != dn && worldContainer.blocks[lyr][y+2][x] != dn && worldContainer.blocks[lyr][y][x-2] != dn);
+            boolean downright = (worldContainer.blocks[lyr][y + 1][x + 1] == Blocks.AIR || !worldContainer.blocks[lyr][y + 1][x + 1].isCds());// && (worldContainer.blocks[lyr][y+1][x] != dn && worldContainer.blocks[lyr][y][x+1] != dn && worldContainer.blocks[lyr][y+1][x+1] != dn && worldContainer.blocks[lyr][y+2][x] != dn && worldContainer.blocks[lyr][y][x+2] != dn);
             int[][] pixm = new int[IMAGESIZE][IMAGESIZE];
             for (dy = 0; dy < 8; dy++) {
                 for (dx = 0; dx < 8; dx++) {

@@ -1,7 +1,8 @@
 package com.sergio.refacto.items;
 
 import com.sergio.refacto.TerrariaClone;
-import com.sergio.refacto.dto.BlockNames;
+import com.sergio.refacto.dto.Backgrounds;
+import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.tools.PerlinNoise;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
@@ -14,10 +15,10 @@ public class Chunk {
 
     int cx, cy;
 
-    BlockNames[][][] blocks;
+    Blocks[][][] blocks;
     Byte[][][] blockds;
     Byte[][] blockdns;
-    Byte[][] blockbgs;
+    Backgrounds[][] blockbgs;
     Byte[][] blockts;
     Float[][] lights;
     Float[][][] power;
@@ -33,10 +34,10 @@ public class Chunk {
         this.cy = cy;
 
         int size = TerrariaClone.CHUNKBLOCKS;
-        blocks = new BlockNames[3][size][size];
+        blocks = new Blocks[3][size][size];
         blockds = new Byte[3][size][size];
         blockdns = new Byte[size][size];
-        blockbgs = new Byte[size][size];
+        blockbgs = new Backgrounds[size][size];
         blockts = new Byte[size][size];
         lights = new Float[size][size];
         power = new Float[3][size][size];
@@ -52,16 +53,16 @@ public class Chunk {
             for (int x=0; x<size; x++) {
                 for (int l=0; l<3; l++) {
                     if (l == 1 && cy*size+y >= PerlinNoise.perlinNoise((cx*size+x) / 10.0, 0.5, 0) * 30 + 50) {
-                        blocks[l][y][x] = BlockNames.DIRT; // dirt
+                        blocks[l][y][x] = Blocks.DIRT; // dirt
                     }
                     else {
-                        blocks[l][y][x] = BlockNames.AIR;
+                        blocks[l][y][x] = Blocks.AIR;
                     }
                     arbprd[l][y][x] = false;
                     power[l][y][x] = (float)0;
                 }
                 blockdns[y][x] = (byte) RandomTool.nextInt(5);
-                blockbgs[y][x] = 0;
+                blockbgs[y][x] = Backgrounds.EMPTY;
                 blockts[y][x] = (byte) RandomTool.nextInt(8);
                 lights[y][x] = (float)19;
                 lsources[y][x] = false;

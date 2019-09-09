@@ -1,31 +1,30 @@
 package com.sergio.refacto.items;
 
-import com.sergio.refacto.TerrariaClone;
-import com.sergio.refacto.dto.BlockNames;
+import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.Constants;
 import com.sergio.refacto.tools.MathTool;
 
 public class World {
 
-    public static Byte[][] generateOutlines(BlockNames[][] blocks) {
+    public static Byte[][] generateOutlines(Blocks[][] blocks) {
         int width = blocks[0].length;
         int height = blocks.length;
         Byte[][] blockds = new Byte[height][width];
         return generate(blocks, blockds, 0, 0, width, height);
     }
 
-    public static Byte[][] generateOutlines(BlockNames[][] blocks, Byte[][] blockds, int xpos, int ypos) {
+    public static Byte[][] generateOutlines(Blocks[][] blocks, Byte[][] blockds, int xpos, int ypos) {
         return generate(blocks, blockds, xpos-1, ypos-1, xpos+2, ypos+2);
     }
 
-    private static Byte[][] generate(BlockNames[][] blocks, Byte[][] blockds, int initialX, int initialY, int xpos, int ypos) {
+    private static Byte[][] generate(Blocks[][] blocks, Byte[][] blockds, int initialX, int initialY, int xpos, int ypos) {
         int width = blocks[0].length;
         int height = blocks.length;
         boolean left, right, up, down, upleft, upright, downleft, downright;
         for (int y=initialY; y<ypos; y++) {
             for (int x2=initialX; x2<xpos; x2++) {
                 int x = MathTool.mod(x2,width);
-                if (y > 0 && y < height-1 && blocks[y][x] != BlockNames.AIR) {
+                if (y > 0 && y < height-1 && blocks[y][x] != Blocks.AIR) {
                     left = connect(x-1, y, x, y, blocks);
                     right = connect(x+1, y, x, y, blocks);
                     up = connect(x, y-1, x, y, blocks);
@@ -196,24 +195,24 @@ public class World {
         return blockds;
     }
 
-    private static boolean connect(BlockNames b1, BlockNames b2) {
-        return ((b1 != BlockNames.AIR && b1 == b2) ||
-                (b1 == BlockNames.DIRT && b2 == BlockNames.GRASS) ||
-                (b2 == BlockNames.DIRT && b1 == BlockNames.GRASS) ||
-                (b1 == BlockNames.DIRT && b2 == BlockNames.JUNGLE_GRASS) ||
-                (b2 == BlockNames.DIRT && b1 == BlockNames.JUNGLE_GRASS) ||
-                (b1 == BlockNames.MUD && b2 == BlockNames.SWAMP_GRASS) ||
-                (b2 == BlockNames.MUD && b1 == BlockNames.SWAMP_GRASS) ||
-                (b1 == BlockNames.DIRT_TRANSPARENT && b2 == BlockNames.GRASS_TRANSPARENT) ||
-                (b2 == BlockNames.DIRT_TRANSPARENT && b1 == BlockNames.GRASS_TRANSPARENT) ||
-                ((b2 == BlockNames.ZYTHIUM_WIRE || b2 == BlockNames.ZYTHIUM_WIRE_1_POWER || b2 == BlockNames.ZYTHIUM_WIRE_2_POWER || b2 == BlockNames.ZYTHIUM_WIRE_3_POWER || b2 == BlockNames.ZYTHIUM_WIRE_4_POWER || b2 == BlockNames.ZYTHIUM_WIRE_5_POWER) && Constants.WIRE_C[b1.getIndex()]) ||
-                (b1 == BlockNames.ZYTHIUM_LAMP && b2 == BlockNames.ZYTHIUM_LAMP_ON) ||
-                (b2 == BlockNames.ZYTHIUM_LAMP && b1 == BlockNames.ZYTHIUM_LAMP_ON) ||
-                (b1 == BlockNames.TREE && b2 == BlockNames.TREE_NO_BARK) ||
-                (b1 == BlockNames.TREE_NO_BARK && b2 == BlockNames.TREE));
+    private static boolean connect(Blocks b1, Blocks b2) {
+        return ((b1 != Blocks.AIR && b1 == b2) ||
+                (b1 == Blocks.DIRT && b2 == Blocks.GRASS) ||
+                (b2 == Blocks.DIRT && b1 == Blocks.GRASS) ||
+                (b1 == Blocks.DIRT && b2 == Blocks.JUNGLE_GRASS) ||
+                (b2 == Blocks.DIRT && b1 == Blocks.JUNGLE_GRASS) ||
+                (b1 == Blocks.MUD && b2 == Blocks.SWAMP_GRASS) ||
+                (b2 == Blocks.MUD && b1 == Blocks.SWAMP_GRASS) ||
+                (b1 == Blocks.DIRT_TRANSPARENT && b2 == Blocks.GRASS_TRANSPARENT) ||
+                (b2 == Blocks.DIRT_TRANSPARENT && b1 == Blocks.GRASS_TRANSPARENT) ||
+                ((b2 == Blocks.ZYTHIUM_WIRE || b2 == Blocks.ZYTHIUM_WIRE_1_POWER || b2 == Blocks.ZYTHIUM_WIRE_2_POWER || b2 == Blocks.ZYTHIUM_WIRE_3_POWER || b2 == Blocks.ZYTHIUM_WIRE_4_POWER || b2 == Blocks.ZYTHIUM_WIRE_5_POWER) && Constants.WIRE_C[b1.getIndex()]) ||
+                (b1 == Blocks.ZYTHIUM_LAMP && b2 == Blocks.ZYTHIUM_LAMP_ON) ||
+                (b2 == Blocks.ZYTHIUM_LAMP && b1 == Blocks.ZYTHIUM_LAMP_ON) ||
+                (b1 == Blocks.TREE && b2 == Blocks.TREE_NO_BARK) ||
+                (b1 == Blocks.TREE_NO_BARK && b2 == Blocks.TREE));
     }
 
-    private static boolean connect(int x1, int y1, int x2, int y2, BlockNames[][] blocks) {
+    private static boolean connect(int x1, int y1, int x2, int y2, Blocks[][] blocks) {
         return y1 > 0 && y1 < blocks.length-1
                 && connect(blocks[y1][MathTool.mod(x1, blocks[0].length)], blocks[y2][MathTool.mod(x2, blocks[0].length)]);
     }

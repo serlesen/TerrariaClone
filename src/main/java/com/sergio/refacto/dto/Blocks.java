@@ -185,7 +185,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public enum BlockNames {
+public enum Blocks {
 	AIR(0, "air", Items.EMPTY, 0, 0.001, false, null, Collections.emptyList(), false, false, false, false, false, -1),
     DIRT(1, "dirt", Items.DIRT, 0, 0.001, false, "default", Arrays.asList(7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172), true, false, false, false, true, -1),
     STONE(2, "stone", Items.STONE, 0, 0.001, false, "default", Arrays.asList(7, 8, 9, 10, 51, 54, 57, 145, 148, 154, 157, 169, 172), true, false, false, false, true, -1),
@@ -371,16 +371,16 @@ public enum BlockNames {
     boolean lTrans;
     double conduct;
 
-    private static final Map<Integer, BlockNames> BLOCK_NAMES_MAP;
+    private static final Map<Integer, Blocks> BLOCK_NAMES_MAP;
 
     static {
         BLOCK_NAMES_MAP = new HashMap<>();
-        for (BlockNames blockNames : BlockNames.values()) {
-            BLOCK_NAMES_MAP.put(blockNames.getIndex(), blockNames);
+        for (Blocks blocks : Blocks.values()) {
+            BLOCK_NAMES_MAP.put(blocks.getIndex(), blocks);
         }
     }
 
-    public static BlockNames findByIndex(int index) {
+    public static Blocks findByIndex(int index) {
         return BLOCK_NAMES_MAP.get(index);
     }
     
@@ -412,7 +412,7 @@ public enum BlockNames {
                 || this == ZYTHIUM_DELAYER_8_DELAY_UP_ON;
     }
 
-    public static BlockNames turnZythiumDelayerOn(BlockNames block) {
+    public static Blocks turnZythiumDelayerOn(Blocks block) {
         switch (block) {
             case ZYTHIUM_DELAYER_1_DELAY_RIGHT:
                 return ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON;
@@ -450,7 +450,7 @@ public enum BlockNames {
         throw new UnsupportedOperationException("Turn on only accepted for ZYTHIUM_DELAYER_DELAY");
     }
 
-    public static BlockNames turnZythiumDelayerOff(BlockNames block) {
+    public static Blocks turnZythiumDelayerOff(Blocks block) {
         switch (block) {
             case ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON:
                 return ZYTHIUM_DELAYER_1_DELAY_RIGHT;
@@ -488,7 +488,7 @@ public enum BlockNames {
         throw new UnsupportedOperationException("Turn off only accepted for ZYTHIUM_DELAYER_DELAY_ON");
     }
 
-    public static BlockNames increaseZythiumDelayerLevel(BlockNames block) {
+    public static Blocks increaseZythiumDelayerLevel(Blocks block) {
         switch (block) {
             case ZYTHIUM_DELAYER_1_DELAY_RIGHT:
 				return ZYTHIUM_DELAYER_2_DELAY_RIGHT;
@@ -542,7 +542,7 @@ public enum BlockNames {
         throw new UnsupportedOperationException("Increase level only accepted for ZYTHIUM_DELAYER_DELAY");
     }
 
-    public static BlockNames resetZythiumDelayerLevel(BlockNames block) {
+    public static Blocks resetZythiumDelayerLevel(Blocks block) {
         switch (block) {
             case ZYTHIUM_DELAYER_8_DELAY_RIGHT:
                 return ZYTHIUM_DELAYER_1_DELAY_RIGHT;
@@ -637,7 +637,7 @@ public enum BlockNames {
                 || this == ZYTHIUM_DELAYER_8_DELAY_UP;
     }
 
-    public static BlockNames turnZythiumDelayer(BlockNames block) {
+    public static Blocks turnZythiumDelayer(Blocks block) {
         switch (block) {
             case ZYTHIUM_DELAYER_1_DELAY_RIGHT:
                 return ZYTHIUM_DELAYER_1_DELAY_DOWN;
@@ -744,7 +744,7 @@ public enum BlockNames {
                 || this == ZYTHIUM_AMPLIFIER_LEFT_ON;
     }
 
-    public static BlockNames turnZythiumAmplifier(BlockNames block) {
+    public static Blocks turnZythiumAmplifier(Blocks block) {
         switch (block) {
             case ZYTHIUM_AMPLIFIER_RIGHT:
                 return ZYTHIUM_AMPLIFIER_DOWN;
@@ -766,7 +766,7 @@ public enum BlockNames {
         throw new UnsupportedOperationException("Turn only accepted for ZYTHIUM_AMPLIFIER");
     }
 
-    public static BlockNames turnZythiumAmplifierOn(BlockNames block) {
+    public static Blocks turnZythiumAmplifierOn(Blocks block) {
         switch (block) {
             case ZYTHIUM_AMPLIFIER_RIGHT:
                 return ZYTHIUM_AMPLIFIER_RIGHT_ON;
@@ -780,7 +780,7 @@ public enum BlockNames {
         throw new UnsupportedOperationException("Turn on only accepted for ZYTHIUM_AMPLIFIER");
     }
 
-    public static BlockNames turnZythiumAmplifierOff(BlockNames block) {
+    public static Blocks turnZythiumAmplifierOff(Blocks block) {
         switch (block) {
             case ZYTHIUM_AMPLIFIER_RIGHT_ON:
                 return ZYTHIUM_AMPLIFIER_RIGHT;
@@ -830,7 +830,7 @@ public enum BlockNames {
                 || this == ZYTHIUM_INVERTER_LEFT_ON;
     }
 
-    public static BlockNames turnZythiumInverter(BlockNames block) {
+    public static Blocks turnZythiumInverter(Blocks block) {
         switch (block) {
             case ZYTHIUM_INVERTER_RIGHT:
                 return ZYTHIUM_INVERTER_DOWN;
@@ -852,7 +852,7 @@ public enum BlockNames {
         throw new UnsupportedOperationException("Turn only accepted for ZYTHIUM_INVERTER");
     }
 
-    public static BlockNames turnZythiumInverterOff(BlockNames block) {
+    public static Blocks turnZythiumInverterOff(Blocks block) {
         switch (block) {
             case ZYTHIUM_INVERTER_RIGHT_ON:
                 return ZYTHIUM_INVERTER_RIGHT;
@@ -866,7 +866,7 @@ public enum BlockNames {
         throw new UnsupportedOperationException("Turn off only accepted for ZYTHIUM_INVERTER_ON");
     }
 
-    public static BlockNames turnZythiumInverterOn(BlockNames block) {
+    public static Blocks turnZythiumInverterOn(Blocks block) {
         switch (block) {
             case ZYTHIUM_INVERTER_RIGHT:
                 return ZYTHIUM_INVERTER_RIGHT_ON;
@@ -892,7 +892,7 @@ public enum BlockNames {
                 || this == LEVER_RIGHT_WALL_ON;
     }
 
-    public static BlockNames turnLeverOn(BlockNames block) {
+    public static Blocks turnLeverOn(Blocks block) {
         switch (block) {
             case LEVER:
                 return LEVER_ON;
@@ -904,7 +904,7 @@ public enum BlockNames {
         throw new UnsupportedOperationException("Turn on only accepted for LEVER");
     }
 
-    public static BlockNames turnLeverOff(BlockNames block) {
+    public static Blocks turnLeverOff(Blocks block) {
         switch (block) {
             case LEVER_ON:
                 return LEVER;
@@ -921,7 +921,7 @@ public enum BlockNames {
                 || this == BUTTON_RIGHT;
     }
 
-    public static BlockNames turnButtonOn(BlockNames block) {
+    public static Blocks turnButtonOn(Blocks block) {
         switch (block) {
             case BUTTON_LEFT:
                 return BUTTON_LEFT_ON;
@@ -957,7 +957,7 @@ public enum BlockNames {
                 || this == STONE_PRESSURE_PLATE_ON;
     }
 
-    public static BlockNames turnPressurePlateOn(BlockNames block) {
+    public static Blocks turnPressurePlateOn(Blocks block) {
         switch(block) {
             case WOODEN_PRESSURE_PLATE:
                 return WOODEN_PRESSURE_PLATE_ON;

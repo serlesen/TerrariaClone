@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 
-import com.sergio.refacto.dto.BlockNames;
+import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.EntityType;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.Items;
@@ -162,7 +162,7 @@ public class Entity implements Serializable {
         width = image.getWidth()*2; height = image.getHeight()*2;
     }
 
-    public boolean update(BlockNames[][] blocks, Player player, int u, int v) {
+    public boolean update(Blocks[][] blocks, Player player, int u, int v) {
         newMob = null;
         if (entityType == null) {
             if (!onGround) {
@@ -392,7 +392,7 @@ public class Entity implements Serializable {
         return false;
     }
 
-    public boolean collide(BlockNames[][] blocks, Player player, int u, int v) {
+    public boolean collide(Blocks[][] blocks, Player player, int u, int v) {
         boolean rv = false;
 
         grounded = (onGround || onGroundDelay);
@@ -419,7 +419,7 @@ public class Entity implements Serializable {
 
             for (i=bx1; i<=bx2; i++) {
                 for (j=by1; j<=by2; j++) {
-                    if (blocks[j][i] != BlockNames.AIR && blocks[j+v][i+u].isCds()) {
+                    if (blocks[j][i] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
                         if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                             if (oldx <= i*16 - width && (vx > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 x = i*16 - width;
@@ -484,7 +484,7 @@ public class Entity implements Serializable {
 
             for (i=bx1; i<=bx2; i++) {
                 for (j=by1; j<=by2; j++) {
-                    if (blocks[j][i] != BlockNames.AIR && blocks[j+v][i+u].isCds()) {
+                    if (blocks[j][i] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
                         if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                             if (oldy <= j*16 - height && (vy > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 y = j*16 - height;

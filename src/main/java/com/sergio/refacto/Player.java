@@ -2,11 +2,9 @@ package com.sergio.refacto;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.io.Serializable;
-import javax.imageio.ImageIO;
 
-import com.sergio.refacto.dto.BlockNames;
+import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.KeyPressed;
@@ -53,7 +51,7 @@ public class Player implements Serializable {
         hp = thp;
     }
 
-    public void update(BlockNames[][] blocks, KeyPressed keyPressed, int u, int v) {
+    public void update(Blocks[][] blocks, KeyPressed keyPressed, int u, int v) {
         grounded = (onGround || onGroundDelay);
 
         handleMovement(keyPressed);
@@ -97,7 +95,7 @@ public class Player implements Serializable {
 
                 for (int i = bx1; i <= bx2; i++) {
                     for (int j = by1; j <= by2; j++) {
-                        if (blocks[j+v][i+u] != BlockNames.AIR && blocks[j+v][i+u].isCds()) {
+                        if (blocks[j+v][i+u] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
                             if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                                 if (oldx <= i*16 - width && vx > 0) {
                                     x = i*16 - width;
@@ -134,7 +132,7 @@ public class Player implements Serializable {
 
                 for (int i = bx1; i <= bx2; i++) {
                     for (int j = by1; j <= by2; j++) {
-                        if (blocks[j+v][i+u] != BlockNames.AIR && blocks[j+v][i+u].isCds()) {
+                        if (blocks[j+v][i+u] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
                             if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
                                 if (oldy <= j*16 - height && vy > 0) {
                                     y = j*16 - height;

@@ -3,44 +3,49 @@ package com.sergio.refacto.init;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sergio.refacto.dto.Items;
+
 public class FuelsInitializer {
 
-    public static Map<Short, Double> init() {
-        Map<Short, Double> fuels = new HashMap<>();
+    public static Map<Items, Double> init() {
+        Map<Items, Double> fuels = new HashMap<>();
 
-        fuels.put((short) 15, 0.01);
-        fuels.put((short) 28, 0.001);
-        fuels.put((short) 160, 0.02);
-        fuels.put((short) 168, 0.01);
-        fuels.put((short) 179, 0.0035);
-        fuels.put((short) 20, 0.0025);
-        fuels.put((short) 21, 0.00125);
-        fuels.put((short) 35, 0.02);
-        fuels.put((short) 36, 0.011);
-        fuels.put((short) 77, 0.02);
-        fuels.put((short) 79, 0.02);
-        fuels.put((short) 81, 0.02);
-        fuels.put((short) 83, 0.02);
-        fuels.put((short) 85, 0.02);
-        fuels.put((short) 87, 0.02);
-        fuels.put((short) 89, 0.0035);
-        fuels.put((short) 91, 0.02);
-        fuels.put((short) 95, 0.02);
-        fuels.put((short) 78, 0.01);
-        fuels.put((short) 80, 0.01);
-        fuels.put((short) 82, 0.01);
-        fuels.put((short) 84, 0.01);
-        fuels.put((short) 86, 0.01);
-        fuels.put((short) 88, 0.01);
-        fuels.put((short) 90, 0.01);
-        fuels.put((short) 92, 0.01);
-        fuels.put((short) 96, 0.01);
-        for (int i = 97; i < 103; i++) {
-            fuels.put((short) i, 0.0035);
-        }
-        fuels.put((short) 154, 0.002);
-        fuels.put((short) 155, 0.002);
-        fuels.put((short) 156, 0.00333);
+        fuels.put(Items.WOOD, 0.01);
+        fuels.put(Items.COAL, 0.001);
+        fuels.put(Items.BARK, 0.02);
+        fuels.put(Items.VARNISHED_WOOD, 0.01);
+        fuels.put(Items.CHARCOAL, 0.0035);
+        fuels.put(Items.WORKBENCH, 0.0025);
+        fuels.put(Items.WOODEN_CHEST, 0.00125);
+        fuels.put(Items.WOODEN_TORCH, 0.02);
+        fuels.put(Items.COAL_TORCH, 0.011);
+        fuels.put(Items.SUNFLOWER_SEEDS, 0.02);
+        fuels.put(Items.MOONFLOWER_SEEDS, 0.02);
+        fuels.put(Items.DRYWEED_SEEDS, 0.02);
+        fuels.put(Items.GREENLEAF_SEEDS, 0.02);
+        fuels.put(Items.FROSTLEAF_SEEDS, 0.02);
+        fuels.put(Items.CAVEROOT_SEEDS, 0.02);
+        fuels.put(Items.SKYBLOSSOM_SEEDS, 0.0035);
+        fuels.put(Items.VOID_ROT_SEEDS, 0.02);
+        fuels.put(Items.MARSHLEAF_SEEDS, 0.02);
+        fuels.put(Items.SUNFLOWER, 0.01);
+        fuels.put(Items.MOONFLOWER, 0.01);
+        fuels.put(Items.DRYWEED, 0.01);
+        fuels.put(Items.GREENLEAF, 0.01);
+        fuels.put(Items.FROSTLEAF, 0.01);
+        fuels.put(Items.CAVEROOT, 0.01);
+        fuels.put(Items.SKYBLOSSOM, 0.01);
+        fuels.put(Items.VOID_ROT, 0.01);
+        fuels.put(Items.MARSHLEAF, 0.01);
+        fuels.put(Items.BLUE_GOO, 0.0035);
+        fuels.put(Items.GREEN_GOO, 0.0035);
+        fuels.put(Items.RED_GOO, 0.0035);
+        fuels.put(Items.YELLOW_GOO, 0.0035);
+        fuels.put(Items.BLACK_GOO, 0.0035);
+        fuels.put(Items.WHITE_GOO, 0.0035);
+        fuels.put(Items.WOODEN_PICK, 0.002);
+        fuels.put(Items.WOODEN_AXE, 0.002);
+        fuels.put(Items.WOODEN_SWORD, 0.00333);
         
         return fuels;
     }
