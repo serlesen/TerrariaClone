@@ -26,19 +26,21 @@ public class Inventory implements Serializable {
     private double fpx, fpy;
     private short r;
 
-    transient BufferedImage image, box, box_selected;
+    public transient BufferedImage image;
+	transient BufferedImage box;
+	transient BufferedImage box_selected;
     private Font font = new Font("Chalkboard", Font.PLAIN, 12);
 
     private transient Graphics2D g2;
 
-    Items[] items;
+    public Items[] items;
     short[] nums;
-    short[] durs;
+    public short[] durs;
 
     private int trolx = 37;
     private int troly = 17;
 
-    int CX, CY;
+    public int CX, CY;
 
     private Map<String, RecipeItem[]> RECIPES;
 

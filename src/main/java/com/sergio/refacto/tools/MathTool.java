@@ -30,6 +30,6 @@ public class MathTool {
     }
 
     public int mod(int a, int q) {
-        return a % q;
+        return ((a % q) + q) % q;
     }
 }

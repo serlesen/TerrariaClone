@@ -78,18 +78,23 @@ import com.sergio.refacto.items.Mouse;
 import com.sergio.refacto.items.TextField;
 import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.services.OutlinesService;
+import com.sergio.refacto.services.PaintService;
 import com.sergio.refacto.services.WorldService;
 import com.sergio.refacto.tools.MathTool;
 import com.sergio.refacto.tools.RandomTool;
 import com.sergio.refacto.tools.ResourcesLoader;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.sergio.refacto.dto.Constants.*;
 
 @Slf4j
+@FieldDefaults(level = AccessLevel.PUBLIC)
 public class TerrariaClone extends JApplet implements ChangeListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
     private WorldService worldService = new WorldService();
+    private PaintService paintService = new PaintService();
 
     static GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     BufferedImage screen;
@@ -99,12 +104,12 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     int[][] cl = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
 
-    javax.swing.Timer timer, menuTimer;
+    javax.swing.Timer inGameTimer, menuTimer;
     List<FileInfo> filesInfo;
     String currentWorld;
     TextField newWorldName;
 
-    private WorldContainer worldContainer;
+    WorldContainer worldContainer;
 
     List<Integer> pqx, pqy, zqx, zqy, pzqx, pzqy;
     Boolean[][] zqd, pqd, pzqd;
@@ -119,15 +124,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     Chunk[][] chunkMatrix;
 
     int iclayer;
-    BufferedImage layerImg;
 
-    Entity entity;
     State state = State.LOADING_GRAPHICS;
     EntityType mobSpawn;
 
     int ou, ov, uNew, vNew;
-    //int u, v, ou, ov, uNew, vNew;
-    //int x, y, i, j, tx, ty, twx, twy, ux, uy, ux2, uy2, ulx, uly, ulx2, uly2, ucx, ucy, pwx, pwy, n, ax, ay, axl, ayl, vc, xpos, ypos, xpos2, ypos2, x2, y2, rnum, width, height, xmax, ymax;
     double p, q;
     Items miningTool;
 
@@ -161,7 +162,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     public static final int CHUNKBLOCKS = 96;
     public static final int BLOCKSIZE = 16;
     private static final int IMAGESIZE = 8;
-    private static final int CHUNKSIZE = CHUNKBLOCKS * BLOCKSIZE;
+    public static final int CHUNKSIZE = CHUNKBLOCKS * BLOCKSIZE;
     private static final int PLAYERSIZEX = 20;
     private static final int PLAYERSIZEY = 46;
 
@@ -172,9 +173,9 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     BufferedImage tool;
 
     static Map<Backgrounds, BufferedImage> backgroundImgs;
-    static Map<Items, BufferedImage> itemImgs;
+    public static Map<Items, BufferedImage> itemImgs;
     static Map<Short, Map<Integer, Integer>> DURABILITY;
-    static Map<EntityType, String> UIENTITIES;
+    public static Map<EntityType, String> UIENTITIES;
     static Map<Integer, Color> SKYCOLORS;
     static Map<Integer, BufferedImage> LIGHTLEVELS;
     static Map<String, BufferedImage> blockImgs;
@@ -370,326 +371,21 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             repaint();
 
             menuTimer = new javax.swing.Timer(20, null);
-
             menuTimer.addActionListener(ae -> {
                 try {
                     if (mousePressed == MousePressed.LEFT_MOUSE) {
-                        Action mainThread = new AbstractAction() {
-                            public void actionPerformed(ActionEvent ae) {
-                                try {
-                                    if (worldContainer.ready) {
-                                        worldContainer.ready = false;
-                                        uNew = (int) ((worldContainer.player.x - getWidth() / 2 + worldContainer.player.width) / (double) CHUNKSIZE);
-                                        vNew = (int) ((worldContainer.player.y - getHeight() / 2 + worldContainer.player.height) / (double) CHUNKSIZE);
-                                        if (ou != uNew || ov != vNew) {
-                                            ou = uNew;
-                                            ov = vNew;
-                                            List<Chunk> chunkTemp = new ArrayList<>(0);
-                                            for (int twy = 0; twy < 2; twy++) {
-                                                for (int twx = 0; twx < 2; twx++) {
-                                                    if (chunkMatrix[twy][twx] != null) {
-                                                        chunkTemp.add(chunkMatrix[twy][twx]);
-                                                        chunkMatrix[twy][twx] = null;
-                                                    }
-                                                }
-                                            }
-                                            int twy, twx = 0;
-                                            for (twy = 0; twy < 2; twy++) {
-                                                for (twx = 0; twx < 2; twx++) {
-                                                    for (int i = chunkTemp.size() - 1; i > -1; i--) {
-                                                        if (chunkTemp.get(i).getCx() == twx && chunkTemp.get(i).getCy() == twy) {
-                                                            chunkMatrix[twy][twx] = chunkTemp.get(i);
-                                                            chunkTemp.remove(i);
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (chunkMatrix[twy][twx] == null) {
-                                                        if (temporarySaveFile[twy][twx] != null) {
-                                                            chunkMatrix[twy][twx] = temporarySaveFile[twy][twx];
-                                                        } else {
-                                                            chunkMatrix[twy][twx] = new Chunk(twx + ou, twy + ov);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            for (int i = 0; i < chunkTemp.size(); i++) {
-                                                temporarySaveFile[twy][twx] = chunkTemp.get(i);
-                                            }
-                                            chunkTemp = null;
-                                            for (twy = 0; twy < 2; twy++) {
-                                                for (twx = 0; twx < 2; twx++) {
-                                                    for (int y = 0; y < CHUNKBLOCKS; y++) {
-                                                        for (int x = 0; x < CHUNKBLOCKS; x++) {
-                                                            for (int l = 0; l < 3; l++) {
-                                                                worldContainer.blocks[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocks()[l][y][x];
-                                                                worldContainer.power[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getPower()[l][y][x];
-                                                                pzqn[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getPzqn()[l][y][x];
-                                                                arbprd[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getArbprd()[l][y][x];
-                                                                worldContainer.blocksDirections[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocksDirections()[l][y][x];
-                                                            }
-                                                            worldContainer.BlocksDirectionsIntensity[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocksDirectionsIntensity()[y][x];
-                                                            worldContainer.blocksBackgrounds[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocksBackgrounds()[y][x];
-                                                            worldContainer.blocksTextureIntensity[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocksTextureIntesity()[y][x];
-                                                            worldContainer.lights[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLights()[y][x];
-                                                            worldContainer.lsources[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLsources()[y][x];
-                                                            zqn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getZqn()[y][x];
-                                                            wcnct[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getWcnct()[y][x];
-                                                            worldContainer.drawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getDrawn()[y][x];
-                                                            worldContainer.rdrawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getRdrawn()[y][x];
-                                                            worldContainer.ldrawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLdrawn()[y][x];
-                                                        }
-                                                    }
-                                                    worldContainer.worlds[twy][twx] = null;
-                                                }
-                                            }
-                                        }
-                                        int u = -ou * CHUNKBLOCKS;
-                                        int v = -ov * CHUNKBLOCKS;
-                                        for (int twy = 0; twy < 2; twy++) {
-                                            for (int twx = 0; twx < 2; twx++) {
-                                                worldContainer.kworlds[twy][twx] = false;
-                                            }
-                                        }
-                                        boolean somevar = false;
-                                        for (int twy = 0; twy < 2; twy++) {
-                                            for (int twx = 0; twx < 2; twx++) {
-                                                int twxc = twx + ou;
-                                                int twyc = twy + ov;
-                                                if (((worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width >= twxc * CHUNKSIZE &&
-                                                        worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width <= twxc * CHUNKSIZE + CHUNKSIZE) ||
-                                                        (worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width + BLOCKSIZE >= twxc * CHUNKSIZE &&
-                                                                worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width - BLOCKSIZE <= twxc * CHUNKSIZE + CHUNKSIZE)) &&
-                                                        ((worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height >= twyc * CHUNKSIZE &&
-                                                                worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height <= twyc * CHUNKSIZE + CHUNKSIZE) ||
-                                                                (worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height >= twyc * CHUNKSIZE &&
-                                                                        worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height <= twyc * CHUNKSIZE + CHUNKSIZE))) {
-                                                    worldContainer.kworlds[twy][twx] = true;
-                                                    if (worldContainer.worlds[twy][twx] == null) {
-                                                        worldContainer.worlds[twy][twx] = config.createCompatibleImage(CHUNKSIZE, CHUNKSIZE, Transparency.TRANSLUCENT);
-                                                        worldContainer.fworlds[twy][twx] = config.createCompatibleImage(CHUNKSIZE, CHUNKSIZE, Transparency.TRANSLUCENT);
-                                                        log.info("Created image at " + twx + " " + twy);
-                                                    }
-                                                    if (worldContainer.worlds[twy][twx] != null) {
-                                                        wg2 = worldContainer.worlds[twy][twx].createGraphics();
-                                                        fwg2 = worldContainer.fworlds[twy][twx].createGraphics();
-                                                        for (int tly = Math.max(twy * CHUNKSIZE, (int) (worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height / 2 + v * BLOCKSIZE) - 64); tly < Math.min(twy * CHUNKSIZE + CHUNKSIZE, (int) (worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2 + v * BLOCKSIZE) + 128); tly += BLOCKSIZE) {
-                                                            for (int tlx = Math.max(twx * CHUNKSIZE, (int) (worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width / 2 + u * BLOCKSIZE) - 64); tlx < Math.min(twx * CHUNKSIZE + CHUNKSIZE, (int) (worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2 + u * BLOCKSIZE) + 112); tlx += BLOCKSIZE) {
-                                                                int tx = (int) (tlx / BLOCKSIZE);
-                                                                int ty = (int) (tly / BLOCKSIZE);
-                                                                if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
-                                                                    if (!worldContainer.drawn[ty][tx]) {
-                                                                        somevar = true;
-                                                                        worldContainer.blocksTextureIntensity[ty][tx] = (byte) RandomTool.nextInt(8);
-                                                                        for (int y = 0; y < BLOCKSIZE; y++) {
-                                                                            for (int x = 0; x < BLOCKSIZE; x++) {
-                                                                                try {
-                                                                                    worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                    worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                } catch (ArrayIndexOutOfBoundsException e) {
-                                                                                    //
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
-                                                                            wg2.drawImage(backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
-                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                    null);
-                                                                        }
-                                                                        for (int l = 0; l < 3; l++) {
-                                                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
-                                                                                if (l == 2) {
-                                                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                } else {
-                                                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                }
-                                                                            }
-                                                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
-                                                                                if (l == 2) {
-                                                                                    fwg2.drawImage(wcnct_px,
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                } else {
-                                                                                    wg2.drawImage(wcnct_px,
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        if (!DebugContext.LIGHT) {
-                                                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
-                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                    null);
-                                                                        }
-                                                                        worldContainer.drawn[ty][tx] = true;
-                                                                        worldContainer.rdrawn[ty][tx] = true;
-                                                                        worldContainer.ldrawn[ty][tx] = true;
-                                                                    }
-                                                                    if (!worldContainer.rdrawn[ty][tx]) {
-                                                                        somevar = true;
-                                                                        for (int y = 0; y < BLOCKSIZE; y++) {
-                                                                            for (int x = 0; x < BLOCKSIZE; x++) {
-                                                                                try {
-                                                                                    worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                    worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                } catch (ArrayIndexOutOfBoundsException e) {
-                                                                                    //
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
-                                                                            wg2.drawImage(backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
-                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                    null);
-                                                                        }
-                                                                        for (int l = 0; l < 3; l++) {
-                                                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
-                                                                                if (l == 2) {
-                                                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                } else {
-                                                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                }
-                                                                            }
-                                                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
-                                                                                if (l == 2) {
-                                                                                    fwg2.drawImage(wcnct_px,
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                } else {
-                                                                                    wg2.drawImage(wcnct_px,
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        if (!DebugContext.LIGHT) {
-                                                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
-                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                    null);
-                                                                        }
-                                                                        worldContainer.drawn[ty][tx] = true;
-                                                                        worldContainer.rdrawn[ty][tx] = true;
-                                                                        worldContainer.ldrawn[ty][tx] = true;
-                                                                    }
-                                                                    if (!worldContainer.ldrawn[ty][tx] && RandomTool.nextInt(10) == 0) {
-                                                                        somevar = true;
-                                                                        for (int y = 0; y < BLOCKSIZE; y++) {
-                                                                            for (int x = 0; x < BLOCKSIZE; x++) {
-                                                                                try {
-                                                                                    worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                    worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
-                                                                                } catch (ArrayIndexOutOfBoundsException e) {
-                                                                                    //
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
-                                                                            wg2.drawImage(backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
-                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                    null);
-                                                                        }
-                                                                        for (int l = 0; l < 3; l++) {
-                                                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
-                                                                                if (l == 2) {
-                                                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                } else {
-                                                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                }
-                                                                            }
-                                                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
-                                                                                if (l == 2) {
-                                                                                    fwg2.drawImage(wcnct_px,
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                } else {
-                                                                                    wg2.drawImage(wcnct_px,
-                                                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                            null);
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        if (!DebugContext.LIGHT) {
-                                                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
-                                                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
-                                                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                                                    null);
-                                                                        }
-                                                                        worldContainer.drawn[ty][tx] = true;
-                                                                        worldContainer.rdrawn[ty][tx] = true;
-                                                                        worldContainer.ldrawn[ty][tx] = true;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        if (somevar) {
-                                            log.info("Drew at least one block.");
-                                        }
-                                        for (int twy = 0; twy < 2; twy++) {
-                                            for (int twx = 0; twx < 2; twx++) {
-                                                if (!worldContainer.kworlds[twy][twx] && worldContainer.worlds[twy][twx] != null) {
-                                                    worldContainer.worlds[twy][twx] = null;
-                                                    worldContainer.fworlds[twy][twx] = null;
-                                                    for (int ty = twy * CHUNKBLOCKS; ty < twy * CHUNKBLOCKS + CHUNKBLOCKS; ty++) {
-                                                        for (int tx = twx * CHUNKBLOCKS; tx < twx * CHUNKBLOCKS + CHUNKBLOCKS; tx++) {
-                                                            if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
-                                                                worldContainer.drawn[ty][tx] = false;
-                                                            }
-                                                        }
-                                                    }
-                                                    log.info("Destroyed image at " + twx + " " + twy);
-                                                }
-                                            }
-                                        }
-                                        updateApp(u, v);
-                                        updateEnvironment();
-                                        worldContainer.player.update(worldContainer.blocks[1], keyPressed, u, v);
-                                        if (worldContainer.timeOfDay >= 86400) {
-                                            worldContainer.timeOfDay = 0;
-                                            worldContainer.day += 1;
-                                        }
-                                        repaint();
-                                        worldContainer.ready = true;
-                                    }
-                                } catch (Exception e) {
-                                    postError(e);
-                                }
-                            }
-                        };
-                        timer = new Timer(20, mainThread);
-
                         handleMenuBehavior();
+                    }
+                } catch (Exception e) {
+                    postError(e);
+                }
+            });
+
+            inGameTimer = new Timer(20, null);
+            inGameTimer.addActionListener(ae -> {
+                try {
+                    if (worldContainer.ready) {
+                        handleInGameBehavior();
                     }
                 } catch (Exception e) {
                     postError(e);
@@ -700,6 +396,312 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         } catch (Exception e) {
             postError(e);
         }
+    }
+
+    private void handleInGameBehavior() {
+        worldContainer.ready = false;
+        uNew = (int) ((worldContainer.player.x - getWidth() / 2 + worldContainer.player.width) / (double) CHUNKSIZE);
+        vNew = (int) ((worldContainer.player.y - getHeight() / 2 + worldContainer.player.height) / (double) CHUNKSIZE);
+        if (ou != uNew || ov != vNew) {
+            ou = uNew;
+            ov = vNew;
+            List<Chunk> chunkTemp = new ArrayList<>(0);
+            for (int twy = 0; twy < 2; twy++) {
+                for (int twx = 0; twx < 2; twx++) {
+                    if (chunkMatrix[twy][twx] != null) {
+                        chunkTemp.add(chunkMatrix[twy][twx]);
+                        chunkMatrix[twy][twx] = null;
+                    }
+                }
+            }
+            int twy, twx = 0;
+            for (twy = 0; twy < 2; twy++) {
+                for (twx = 0; twx < 2; twx++) {
+                    for (int i = chunkTemp.size() - 1; i > -1; i--) {
+                        if (chunkTemp.get(i).getCx() == twx && chunkTemp.get(i).getCy() == twy) {
+                            chunkMatrix[twy][twx] = chunkTemp.get(i);
+                            chunkTemp.remove(i);
+                            break;
+                        }
+                    }
+                    if (chunkMatrix[twy][twx] == null) {
+                        if (temporarySaveFile[twy][twx] != null) {
+                            chunkMatrix[twy][twx] = temporarySaveFile[twy][twx];
+                        } else {
+                            chunkMatrix[twy][twx] = new Chunk(twx + ou, twy + ov);
+                        }
+                    }
+                }
+            }
+            for (int i = 0; i < chunkTemp.size(); i++) {
+                temporarySaveFile[twy][twx] = chunkTemp.get(i);
+            }
+            chunkTemp = null;
+            for (twy = 0; twy < 2; twy++) {
+                for (twx = 0; twx < 2; twx++) {
+                    for (int y = 0; y < CHUNKBLOCKS; y++) {
+                        for (int x = 0; x < CHUNKBLOCKS; x++) {
+                            for (int l = 0; l < 3; l++) {
+                                worldContainer.blocks[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocks()[l][y][x];
+                                worldContainer.power[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getPower()[l][y][x];
+                                pzqn[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getPzqn()[l][y][x];
+                                arbprd[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getArbprd()[l][y][x];
+                                worldContainer.blocksDirections[l][twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocksDirections()[l][y][x];
+                            }
+                            worldContainer.BlocksDirectionsIntensity[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocksDirectionsIntensity()[y][x];
+                            worldContainer.blocksBackgrounds[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocksBackgrounds()[y][x];
+                            worldContainer.blocksTextureIntensity[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getBlocksTextureIntesity()[y][x];
+                            worldContainer.lights[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLights()[y][x];
+                            worldContainer.lsources[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLsources()[y][x];
+                            zqn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getZqn()[y][x];
+                            wcnct[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getWcnct()[y][x];
+                            worldContainer.drawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getDrawn()[y][x];
+                            worldContainer.rdrawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getRdrawn()[y][x];
+                            worldContainer.ldrawn[twy * CHUNKBLOCKS + y][twx * CHUNKBLOCKS + x] = chunkMatrix[twy][twx].getLdrawn()[y][x];
+                        }
+                    }
+                    worldContainer.worlds[twy][twx] = null;
+                }
+            }
+        }
+        int u = -ou * CHUNKBLOCKS;
+        int v = -ov * CHUNKBLOCKS;
+        for (int twy = 0; twy < 2; twy++) {
+            for (int twx = 0; twx < 2; twx++) {
+                worldContainer.kworlds[twy][twx] = false;
+            }
+        }
+        boolean somevar = false;
+        for (int twy = 0; twy < 2; twy++) {
+            for (int twx = 0; twx < 2; twx++) {
+                int twxc = twx + ou;
+                int twyc = twy + ov;
+                if (((worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width >= twxc * CHUNKSIZE &&
+                        worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width <= twxc * CHUNKSIZE + CHUNKSIZE) ||
+                        (worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width + BLOCKSIZE >= twxc * CHUNKSIZE &&
+                                worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width - BLOCKSIZE <= twxc * CHUNKSIZE + CHUNKSIZE)) &&
+                        ((worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height >= twyc * CHUNKSIZE &&
+                                worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height <= twyc * CHUNKSIZE + CHUNKSIZE) ||
+                                (worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height >= twyc * CHUNKSIZE &&
+                                        worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height <= twyc * CHUNKSIZE + CHUNKSIZE))) {
+                    worldContainer.kworlds[twy][twx] = true;
+                    if (worldContainer.worlds[twy][twx] == null) {
+                        worldContainer.worlds[twy][twx] = config.createCompatibleImage(CHUNKSIZE, CHUNKSIZE, Transparency.TRANSLUCENT);
+                        worldContainer.fworlds[twy][twx] = config.createCompatibleImage(CHUNKSIZE, CHUNKSIZE, Transparency.TRANSLUCENT);
+                        log.info("Created image at " + twx + " " + twy);
+                    }
+                    if (worldContainer.worlds[twy][twx] != null) {
+                        wg2 = worldContainer.worlds[twy][twx].createGraphics();
+                        fwg2 = worldContainer.fworlds[twy][twx].createGraphics();
+                        for (int tly = Math.max(twy * CHUNKSIZE, (int) (worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height / 2 + v * BLOCKSIZE) - 64); tly < Math.min(twy * CHUNKSIZE + CHUNKSIZE, (int) (worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2 + v * BLOCKSIZE) + 128); tly += BLOCKSIZE) {
+                            for (int tlx = Math.max(twx * CHUNKSIZE, (int) (worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width / 2 + u * BLOCKSIZE) - 64); tlx < Math.min(twx * CHUNKSIZE + CHUNKSIZE, (int) (worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2 + u * BLOCKSIZE) + 112); tlx += BLOCKSIZE) {
+                                int tx = (int) (tlx / BLOCKSIZE);
+                                int ty = (int) (tly / BLOCKSIZE);
+                                if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
+                                    if (!worldContainer.drawn[ty][tx]) {
+                                        somevar = true;
+                                        worldContainer.blocksTextureIntensity[ty][tx] = (byte) RandomTool.nextInt(8);
+                                        for (int y = 0; y < BLOCKSIZE; y++) {
+                                            for (int x = 0; x < BLOCKSIZE; x++) {
+                                                try {
+                                                    worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                    worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                } catch (ArrayIndexOutOfBoundsException e) {
+                                                    //
+                                                }
+                                            }
+                                        }
+                                        if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
+                                            wg2.drawImage(backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
+                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                    null);
+                                        }
+                                        for (int l = 0; l < 3; l++) {
+                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
+                                                if (l == 2) {
+                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                } else {
+                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                }
+                                            }
+                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
+                                                if (l == 2) {
+                                                    fwg2.drawImage(wcnct_px,
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                } else {
+                                                    wg2.drawImage(wcnct_px,
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                }
+                                            }
+                                        }
+                                        if (!DebugContext.LIGHT) {
+                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
+                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                    null);
+                                        }
+                                        worldContainer.drawn[ty][tx] = true;
+                                        worldContainer.rdrawn[ty][tx] = true;
+                                        worldContainer.ldrawn[ty][tx] = true;
+                                    }
+                                    if (!worldContainer.rdrawn[ty][tx]) {
+                                        somevar = true;
+                                        for (int y = 0; y < BLOCKSIZE; y++) {
+                                            for (int x = 0; x < BLOCKSIZE; x++) {
+                                                try {
+                                                    worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                    worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                } catch (ArrayIndexOutOfBoundsException e) {
+                                                    //
+                                                }
+                                            }
+                                        }
+                                        if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
+                                            wg2.drawImage(backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
+                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                    null);
+                                        }
+                                        for (int l = 0; l < 3; l++) {
+                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
+                                                if (l == 2) {
+                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                } else {
+                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                }
+                                            }
+                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
+                                                if (l == 2) {
+                                                    fwg2.drawImage(wcnct_px,
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                } else {
+                                                    wg2.drawImage(wcnct_px,
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                }
+                                            }
+                                        }
+                                        if (!DebugContext.LIGHT) {
+                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
+                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                    null);
+                                        }
+                                        worldContainer.drawn[ty][tx] = true;
+                                        worldContainer.rdrawn[ty][tx] = true;
+                                        worldContainer.ldrawn[ty][tx] = true;
+                                    }
+                                    if (!worldContainer.ldrawn[ty][tx] && RandomTool.nextInt(10) == 0) {
+                                        somevar = true;
+                                        for (int y = 0; y < BLOCKSIZE; y++) {
+                                            for (int x = 0; x < BLOCKSIZE; x++) {
+                                                try {
+                                                    worldContainer.worlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                    worldContainer.fworlds[twy][twx].setRGB(tx * BLOCKSIZE - twxc * CHUNKSIZE + x, ty * BLOCKSIZE - twyc * CHUNKSIZE + y, 9539985);
+                                                } catch (ArrayIndexOutOfBoundsException e) {
+                                                    //
+                                                }
+                                            }
+                                        }
+                                        if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
+                                            wg2.drawImage(backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
+                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                    null);
+                                        }
+                                        for (int l = 0; l < 3; l++) {
+                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
+                                                if (l == 2) {
+                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                } else {
+                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                }
+                                            }
+                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
+                                                if (l == 2) {
+                                                    fwg2.drawImage(wcnct_px,
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                } else {
+                                                    wg2.drawImage(wcnct_px,
+                                                            tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                            0, 0, IMAGESIZE, IMAGESIZE,
+                                                            null);
+                                                }
+                                            }
+                                        }
+                                        if (!DebugContext.LIGHT) {
+                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
+                                                    tx * BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE - twy * CHUNKSIZE, tx * BLOCKSIZE + BLOCKSIZE - twx * CHUNKSIZE, ty * BLOCKSIZE + BLOCKSIZE - twy * CHUNKSIZE,
+                                                    0, 0, IMAGESIZE, IMAGESIZE,
+                                                    null);
+                                        }
+                                        worldContainer.drawn[ty][tx] = true;
+                                        worldContainer.rdrawn[ty][tx] = true;
+                                        worldContainer.ldrawn[ty][tx] = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (somevar) {
+            log.info("Drew at least one block.");
+        }
+        for (int twy = 0; twy < 2; twy++) {
+            for (int twx = 0; twx < 2; twx++) {
+                if (!worldContainer.kworlds[twy][twx] && worldContainer.worlds[twy][twx] != null) {
+                    worldContainer.worlds[twy][twx] = null;
+                    worldContainer.fworlds[twy][twx] = null;
+                    for (int ty = twy * CHUNKBLOCKS; ty < twy * CHUNKBLOCKS + CHUNKBLOCKS; ty++) {
+                        for (int tx = twx * CHUNKBLOCKS; tx < twx * CHUNKBLOCKS + CHUNKBLOCKS; tx++) {
+                            if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
+                                worldContainer.drawn[ty][tx] = false;
+                            }
+                        }
+                    }
+                    log.info("Destroyed image at " + twx + " " + twy);
+                }
+            }
+        }
+        updateApp(u, v);
+        updateEnvironment();
+        worldContainer.player.update(worldContainer.blocks[1], keyPressed, u, v);
+        if (worldContainer.timeOfDay >= 86400) {
+            worldContainer.timeOfDay = 0;
+            worldContainer.day += 1;
+        }
+        repaint();
+        worldContainer.ready = true;
     }
 
     private void handleMenuBehavior() {
@@ -731,7 +733,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         bg = CYANISH;
                         state = State.IN_GAME;
                         worldContainer.ready = true;
-                        timer.start();
+                        inGameTimer.start();
                         break;
                     }
                 }
@@ -761,7 +763,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                     bg = CYANISH;
                                     state = State.IN_GAME;
                                     worldContainer.ready = true;
-                                    timer.start();
+                                    inGameTimer.start();
                                     createWorldTimer.stop();
                                 } catch (Exception e) {
                                     postError(e);
@@ -1160,7 +1162,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         mousePos.setReleased(true);
                         worldContainer.saveWorld(currentWorld);
                         state = State.TITLE_SCREEN;
-                        timer.stop();
+                        inGameTimer.stop();
                         menuTimer.start();
                         return;
                     }
@@ -3523,409 +3525,13 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         if (screen == null) {
             return;
         }
-        pg2 = screen.createGraphics();
-        pg2.setColor(bg);
-        pg2.fillRect(0, 0, getWidth(), getHeight());
-        if (state == State.IN_GAME) {
 
-            // paint sun, moon and clouds
-            if (worldContainer.player.y / 16 < HEIGHT * 0.5) {
-                pg2.translate(getWidth() / 2, getHeight() * 0.85);
-                pg2.rotate((worldContainer.timeOfDay - 70200) / 86400 * Math.PI * 2);
-
-                pg2.drawImage(sun,
-                        (int) (-getWidth() * 0.65), 0, (int) (-getWidth() * 0.65 + sun.getWidth() * 2), sun.getHeight() * 2,
-                        0, 0, sun.getWidth(), sun.getHeight(),
-                        null);
-
-                pg2.rotate(Math.PI);
-
-                pg2.drawImage(moon,
-                        (int) (-getWidth() * 0.65), 0, (int) (-getWidth() * 0.65 + moon.getWidth() * 2), moon.getHeight() * 2,
-                        0, 0, moon.getWidth(), moon.getHeight(),
-                        null);
-
-                pg2.rotate(-(worldContainer.timeOfDay - 70200) / 86400 * Math.PI * 2 - Math.PI);
-                pg2.translate(-getWidth() / 2, -getHeight() * 0.85);
-
-                for (int i = 0; i < worldContainer.cloudsAggregate.getClouds().size(); i++) {
-                    cloudImage = cloudsImages[worldContainer.cloudsAggregate.getClouds().get(i).getN()];
-                    pg2.drawImage(cloudsImages[worldContainer.cloudsAggregate.getClouds().get(i).getN()],
-                            (int) worldContainer.cloudsAggregate.getClouds().get(i).getX(), (int) worldContainer.cloudsAggregate.getClouds().get(i).getY(), (int) worldContainer.cloudsAggregate.getClouds().get(i).getX() + cloudImage.getWidth() * 2, (int) worldContainer.cloudsAggregate.getClouds().get(i).getY() + cloudImage.getHeight() * 2,
-                            0, 0, cloudImage.getWidth(), cloudImage.getHeight(),
-                            null);
-                }
-            }
-
-            for (int pwy = 0; pwy < 2; pwy++) {
-                for (int pwx = 0; pwx < 2; pwx++) {
-                    int pwxc = pwx + ou;
-                    int pwyc = pwy + ov;
-                    if (worldContainer.worlds[pwy][pwx] != null) {
-                        if (((worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width >= pwxc * CHUNKSIZE &&
-                                worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width <= pwxc * CHUNKSIZE + CHUNKSIZE) ||
-                                (worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width + BLOCKSIZE >= pwxc * CHUNKSIZE &&
-                                        worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width - BLOCKSIZE <= pwxc * CHUNKSIZE + CHUNKSIZE)) &&
-                                ((worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height >= pwyc * CHUNKSIZE &&
-                                        worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height <= pwyc * CHUNKSIZE + CHUNKSIZE) ||
-                                        (worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height >= pwyc * CHUNKSIZE &&
-                                                worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height <= pwyc * CHUNKSIZE + CHUNKSIZE))) {
-                            pg2.drawImage(worldContainer.worlds[pwy][pwx],
-                                    pwxc * CHUNKSIZE - worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2, pwyc * CHUNKSIZE - worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2, pwxc * CHUNKSIZE - worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2 + CHUNKSIZE, pwyc * CHUNKSIZE - worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2 + CHUNKSIZE,
-                                    0, 0, CHUNKSIZE, CHUNKSIZE,
-                                    null);
-                        }
-                    }
-                }
-            }
-
-            // paint player
-            pg2.drawImage(worldContainer.player.image,
-                    getWidth() / 2 - worldContainer.player.width / 2, getHeight() / 2 - worldContainer.player.height / 2, getWidth() / 2 + worldContainer.player.width / 2, getHeight() / 2 + worldContainer.player.height / 2,
-                    0, 0, worldContainer.player.image.getWidth(), worldContainer.player.image.getHeight(),
-                    null);
-
-            // paint all the entities
-            for (int i = 0; i < worldContainer.entities.size(); i++) {
-                entity = worldContainer.entities.get(i);
-                pg2.drawImage(entity.getImage(),
-                        entity.getIx() - worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2, entity.getIy() - worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2, entity.getIx() - worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2 + entity.getWidth(), entity.getIy() - worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2 + entity.getHeight(),
-                        0, 0, entity.getImage().getWidth(), entity.getImage().getHeight(),
-                        null);
-                pg2.drawImage(entity.getImage(),
-                        entity.getIx() - worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2 - WIDTH * BLOCKSIZE, entity.getIy() - worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2, entity.getIx() - worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2 + entity.getWidth() - WIDTH * BLOCKSIZE, entity.getIy() - worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2 + entity.getHeight(),
-                        0, 0, entity.getImage().getWidth(), entity.getImage().getHeight(),
-                        null);
-                pg2.drawImage(entity.getImage(),
-                        entity.getIx() - worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2 + WIDTH * BLOCKSIZE, entity.getIy() - worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2, entity.getIx() - worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2 + entity.getWidth() + WIDTH * BLOCKSIZE, entity.getIy() - worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2 + entity.getHeight(),
-                        0, 0, entity.getImage().getWidth(), entity.getImage().getHeight(),
-                        null);
-            }
-
-            // paint all the tools
-            if (worldContainer.showTool && tool != null) {
-                if (worldContainer.player.imgState == ImageState.STILL_RIGHT || worldContainer.player.imgState.isWalkRight()) {
-                    pg2.translate(getWidth() / 2 + 6, getHeight() / 2);
-                    pg2.rotate(worldContainer.toolAngle);
-
-                    pg2.drawImage(tool,
-                            0, -tool.getHeight() * 2, tool.getWidth() * 2, 0,
-                            0, 0, tool.getWidth(), tool.getHeight(),
-                            null);
-
-                    pg2.rotate(-worldContainer.toolAngle);
-                    pg2.translate(-getWidth() / 2 - 6, -getHeight() / 2);
-                }
-                if (worldContainer.player.imgState == ImageState.STILL_LEFT || worldContainer.player.imgState.isWalkLeft()) {
-                    pg2.translate(getWidth() / 2 - 6, getHeight() / 2);
-                    pg2.rotate((Math.PI * 1.5) - worldContainer.toolAngle);
-
-                    pg2.drawImage(tool,
-                            0, -tool.getHeight() * 2, tool.getWidth() * 2, 0,
-                            0, 0, tool.getWidth(), tool.getHeight(),
-                            null);
-
-                    pg2.rotate(-((Math.PI * 1.5) - worldContainer.toolAngle));
-                    pg2.translate(-getWidth() / 2 + 6, -getHeight() / 2);
-                }
-            }
-
-            for (int pwy = 0; pwy < 2; pwy++) {
-                for (int pwx = 0; pwx < 2; pwx++) {
-                    int pwxc = pwx + ou;
-                    int pwyc = pwy + ov;
-                    if (worldContainer.fworlds[pwy][pwx] != null) {
-                        if (((worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width >= pwxc * CHUNKSIZE &&
-                                worldContainer.player.ix + getWidth() / 2 + worldContainer.player.width <= pwxc * CHUNKSIZE + CHUNKSIZE) ||
-                                (worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width + BLOCKSIZE >= pwxc * CHUNKSIZE &&
-                                        worldContainer.player.ix - getWidth() / 2 + worldContainer.player.width - BLOCKSIZE <= pwxc * CHUNKSIZE + CHUNKSIZE)) &&
-                                ((worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height >= pwyc * CHUNKSIZE &&
-                                        worldContainer.player.iy + getHeight() / 2 + worldContainer.player.height <= pwyc * CHUNKSIZE + CHUNKSIZE) ||
-                                        (worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height >= pwyc * CHUNKSIZE &&
-                                                worldContainer.player.iy - getHeight() / 2 + worldContainer.player.height <= pwyc * CHUNKSIZE + CHUNKSIZE))) {
-                            pg2.drawImage(worldContainer.fworlds[pwy][pwx],
-                                    pwxc * CHUNKSIZE - worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2, pwyc * CHUNKSIZE - worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2, pwxc * CHUNKSIZE - worldContainer.player.ix + getWidth() / 2 - worldContainer.player.width / 2 + CHUNKSIZE, pwyc * CHUNKSIZE - worldContainer.player.iy + getHeight() / 2 - worldContainer.player.height / 2 + CHUNKSIZE,
-                                    0, 0, CHUNKSIZE, CHUNKSIZE,
-                                    null);
-                        }
-                    }
-                }
-            }
-
-            // paint the inventory
-            if (worldContainer.showInv) {
-                pg2.drawImage(worldContainer.inventory.image,
-                        0, 0, worldContainer.inventory.image.getWidth(), (int) worldContainer.inventory.image.getHeight(),
-                        0, 0, worldContainer.inventory.image.getWidth(), (int) worldContainer.inventory.image.getHeight(),
-                        null);
-                pg2.drawImage(armor.getImage(),
-                        worldContainer.inventory.image.getWidth() + 6, 6, worldContainer.inventory.image.getWidth() + 6 + armor.getImage().getWidth(), 6 + armor.getImage().getHeight(),
-                        0, 0, armor.getImage().getWidth(), armor.getImage().getHeight(),
-                        null);
-                pg2.drawImage(worldContainer.cic.getImage(),
-                        worldContainer.inventory.image.getWidth() + 75, 52, worldContainer.inventory.image.getWidth() + 75 + worldContainer.cic.getImage().getWidth(), 52 + worldContainer.cic.getImage().getHeight(),
-                        0, 0, worldContainer.cic.getImage().getWidth(), worldContainer.cic.getImage().getHeight(),
-                        null);
-            } else {
-                pg2.drawImage(worldContainer.inventory.image,
-                        0, 0, worldContainer.inventory.image.getWidth(), (int) worldContainer.inventory.image.getHeight() / 4,
-                        0, 0, worldContainer.inventory.image.getWidth(), (int) worldContainer.inventory.image.getHeight() / 4,
-                        null);
-            }
-
-            if (worldContainer.ic != null) {
-                pg2.drawImage(worldContainer.ic.getImage(),
-                        6, worldContainer.inventory.image.getHeight() + 46, 6 + worldContainer.ic.getImage().getWidth(), worldContainer.inventory.image.getHeight() + 46 + worldContainer.ic.getImage().getHeight(),
-                        0, 0, worldContainer.ic.getImage().getWidth(), worldContainer.ic.getImage().getHeight(),
-                        null);
-            }
-
-            // paint layer
-            if (worldContainer.layer == 0) {
-                layerImg = ResourcesLoader.loadImage("interface/layersB.png");
-            } else if (worldContainer.layer == 1) {
-                layerImg = ResourcesLoader.loadImage("interface/layersN.png");
-            } else if (worldContainer.layer == 2) {
-                layerImg = ResourcesLoader.loadImage("interface/layersF.png");
-            }
-            pg2.drawImage(layerImg,
-                    worldContainer.inventory.image.getWidth() + 58, 6, worldContainer.inventory.image.getWidth() + 58 + layerImg.getWidth(), 6 + layerImg.getHeight(),
-                    0, 0, layerImg.getWidth(), layerImg.getHeight(),
-                    null);
-
-            if (worldContainer.showInv) {
-                pg2.drawImage(save_exit,
-                        getWidth() - save_exit.getWidth() - 24, getHeight() - save_exit.getHeight() - 24, getWidth() - 24, getHeight() - 24,
-                        0, 0, save_exit.getWidth(), save_exit.getHeight(),
-                        null);
-            }
-
-            if (worldContainer.moveItem != Items.EMPTY) {
-                int width = itemImgs.get(worldContainer.moveItem).getWidth();
-                int height = itemImgs.get(worldContainer.moveItem).getHeight();
-                pg2.drawImage(itemImgs.get(worldContainer.moveItem),
-                        mousePos.getX() + 12 + ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * width * 2) / 2), mousePos.getY() + 12 + ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * height * 2) / 2), mousePos.getX() + 36 - ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * width * 2) / 2), mousePos.getY() + 36 - ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * height * 2) / 2),
-                        0, 0, width, height,
-                        null);
-                if (worldContainer.moveNum > 1) {
-                    pg2.setFont(font);
-                    pg2.setColor(Color.WHITE);
-                    pg2.drawString(worldContainer.moveNum + " ", mousePos.getX() + 13, mousePos.getY() + 38);
-                }
-            }
-            for (int i = 0; i < worldContainer.entities.size(); i++) {
-                if (UIENTITIES.get(worldContainer.entities.get(i).getEntityType().getName()) != null && worldContainer.entities.get(i).getRect() != null && worldContainer.entities.get(i).getRect().contains(new Point(mousePos2.getX(), mousePos2.getY()))) {
-                    pg2.setFont(mobFont);
-                    pg2.setColor(Color.WHITE);
-                    pg2.drawString(UIENTITIES.get(worldContainer.entities.get(i).getEntityType()) + " (" + worldContainer.entities.get(i).getHealthPoints() + "/" + worldContainer.entities.get(i).getTotalHealthPoints() + ")", mousePos.getX(), mousePos.getY());
-                    break;
-                }
-            }
-
-            // paint inventory items
-            int ymax;
-            if (worldContainer.showInv) {
-                ymax = 4;
-            } else {
-                ymax = 1;
-            }
-            for (int ux = 0; ux < 10; ux++) {
-                for (int uy = 0; uy < ymax; uy++) {
-                    if (mousePos.isInBetweenInclusive(ux * 46 + 6, ux * 46 + 46, uy * 46 + 6, uy * 46 + 46) && worldContainer.inventory.items[uy * 10 + ux] != Items.EMPTY) {
-                        pg2.setFont(mobFont);
-                        pg2.setColor(Color.WHITE);
-                        if (worldContainer.inventory.items[uy * 10 + ux].getDurability() != null) {
-                            pg2.drawString(worldContainer.inventory.items[uy * 10 + ux].getUiName() + " (" + (int) ((double) worldContainer.inventory.durs[uy * 10 + ux] / worldContainer.inventory.items[uy * 10 + ux].getDurability() * 100) + "%)", mousePos.getX(), mousePos.getY());
-                        } else {
-                            pg2.drawString(worldContainer.inventory.items[uy * 10 + ux].getUiName(), mousePos.getX(), mousePos.getY());
-                        }
-                    }
-                }
-            }
-            pg2.setFont(mobFont);
-            pg2.setColor(Color.WHITE);
-            pg2.drawString("Health: " + worldContainer.player.healthPoints + "/" + worldContainer.player.totalHealthPoints, getWidth() - 125, 20);
-            pg2.drawString("Armor: " + worldContainer.player.sumArmor(), getWidth() - 125, 40);
-            if (DebugContext.STATS) {
-                pg2.drawString("(" + ((int) worldContainer.player.ix / 16) + ", " + ((int) worldContainer.player.iy / 16) + ")", getWidth() - 125, 60);
-                if (worldContainer.player.iy >= 0 && worldContainer.player.iy < HEIGHT * BLOCKSIZE) {
-                    int u = -ou * CHUNKBLOCKS;
-                    int v = -ov * CHUNKBLOCKS;
-                    pg2.drawString(worldContainer.checkBiome((int) worldContainer.player.ix / 16 + u, (int) worldContainer.player.iy / 16 + v, u, v) + " " + worldContainer.lights[(int) worldContainer.player.iy / 16 + v][(int) worldContainer.player.ix / 16 + u], getWidth() - 125, 80);
-                }
-            }
-            if (worldContainer.showInv) {
-                for (int ux = 0; ux < 2; ux++) {
-                    for (int uy = 0; uy < 2; uy++) {
-                        if (mousePos.isInBetween(worldContainer.inventory.image.getWidth() + ux * 40 + 75, worldContainer.inventory.image.getWidth() + ux * 40 + 115, uy * 40 + 52, uy * 40 + 92) && worldContainer.cic.getIds()[uy * 2 + ux] != Items.EMPTY) {
-                            pg2.setFont(mobFont);
-                            pg2.setColor(Color.WHITE);
-                            if (worldContainer.cic.getIds()[uy * 2 + ux].getDurability() != null) {
-                                pg2.drawString(worldContainer.cic.getIds()[uy * 2 + ux].getUiName() + " (" + (int) ((double) worldContainer.cic.getDurs()[uy * 2 + ux] / worldContainer.cic.getIds()[uy * 2 + ux].getDurability() * 100) + "%)", mousePos.getX(), mousePos.getY());
-                            } else {
-                                pg2.drawString(worldContainer.cic.getIds()[uy * 2 + ux].getUiName(), mousePos.getX(), mousePos.getY());
-                            }
-                        }
-                    }
-                }
-                if (mousePos.isInBetween(worldContainer.inventory.image.getWidth() + 3 * 40 + 75, worldContainer.inventory.image.getWidth() + 3 * 40 + 115, 20 + 52, 20 + 92) && worldContainer.cic.getIds()[4] != Items.EMPTY) {
-                    pg2.setFont(mobFont);
-                    pg2.setColor(Color.WHITE);
-                    if (worldContainer.cic.getIds()[4].getDurability() != null) {
-                        pg2.drawString(worldContainer.cic.getIds()[4].getUiName() + " (" + (int) ((double) worldContainer.cic.getDurs()[4] / worldContainer.cic.getIds()[4].getDurability() * 100) + "%)", mousePos.getX(), mousePos.getY());
-                    } else {
-                        pg2.drawString(worldContainer.cic.getIds()[4].getUiName(), mousePos.getX(), mousePos.getY());
-                    }
-                }
-                for (int uy = 0; uy < 4; uy++) {
-                    if (mousePos.isInBetween(worldContainer.inventory.image.getWidth() + 6, worldContainer.inventory.image.getWidth() + 6 + armor.getImage().getWidth(), 6 + uy * 46, 6 + uy * 46 + 46) && armor.getIds()[uy] != Items.EMPTY) {
-                        pg2.setFont(mobFont);
-                        pg2.setColor(Color.WHITE);
-                        if (armor.getIds()[uy].getDurability() != null) {
-                            pg2.drawString(armor.getIds()[uy].getUiName() + " (" + (int) ((double) armor.getDurs()[uy] / armor.getIds()[uy].getDurability() * 100) + "%)", mousePos.getX(), mousePos.getY());
-                        } else {
-                            pg2.drawString(armor.getIds()[uy].getUiName(), mousePos.getX(), mousePos.getY());
-                        }
-                    }
-                }
-            }
-            if (worldContainer.ic != null) {
-                if (worldContainer.ic.getType() == ItemType.WORKBENCH) {
-                    // paint WORKBENCH
-                    for (int ux = 0; ux < 3; ux++) {
-                        for (int uy = 0; uy < 3; uy++) {
-                            if (mousePos.isInBetween(ux * 40 + 6, ux * 40 + 46, uy * 40 + worldContainer.inventory.image.getHeight() + 46, uy * 40 + worldContainer.inventory.image.getHeight() + 86) &&
-                                    worldContainer.ic.getIds()[uy * 3 + ux] != Items.EMPTY) {
-                                pg2.setFont(mobFont);
-                                pg2.setColor(Color.WHITE);
-                                if (worldContainer.ic.getIds()[uy * 3 + ux].getDurability() != null) {
-                                    pg2.drawString(worldContainer.ic.getIds()[uy * 3 + ux].getUiName() + " (" + (int) ((double) worldContainer.ic.getDurs()[uy * 3 + ux] / worldContainer.ic.getIds()[uy * 3 + ux].getDurability() * 100) + "%)", mousePos.getX(), mousePos.getY());
-                                } else {
-                                    pg2.drawString(worldContainer.ic.getIds()[uy * 3 + ux].getUiName(), mousePos.getX(), mousePos.getY());
-                                }
-                            }
-                        }
-                    }
-                    if (mousePos.isInBetween(4 * 40 + 6, 4 * 40 + 46, 1 * 40 + worldContainer.inventory.image.getHeight() + 46, 1 * 40 + worldContainer.inventory.image.getHeight() + 86) &&
-                            worldContainer.ic.getIds()[9] != Items.EMPTY) {
-                        pg2.setFont(mobFont);
-                        pg2.setColor(Color.WHITE);
-                        if (worldContainer.ic.getIds()[9].getDurability() != null) {
-                            pg2.drawString(worldContainer.ic.getIds()[9].getUiName() + " (" + (int) ((double) worldContainer.ic.getDurs()[9] / worldContainer.ic.getIds()[9].getDurability() * 100) + "%)", mousePos.getX(), mousePos.getY());
-                        } else {
-                            pg2.drawString(worldContainer.ic.getIds()[9].getUiName(), mousePos.getX(), mousePos.getY());
-                        }
-                    }
-                } else if (worldContainer.ic.getType() == ItemType.WOODEN_CHEST || worldContainer.ic.getType() == ItemType.STONE_CHEST ||
-                        worldContainer.ic.getType() == ItemType.COPPER_CHEST || worldContainer.ic.getType() == ItemType.IRON_CHEST ||
-                        worldContainer.ic.getType() == ItemType.SILVER_CHEST || worldContainer.ic.getType() == ItemType.GOLD_CHEST ||
-                        worldContainer.ic.getType() == ItemType.ZINC_CHEST || worldContainer.ic.getType() == ItemType.RHYMESTONE_CHEST ||
-                        worldContainer.ic.getType() == ItemType.OBDURITE_CHEST) {
-                    // paint CHEST armor
-                    for (int ux = 0; ux < worldContainer.inventory.CX; ux++) {
-                        for (int uy = 0; uy < worldContainer.inventory.CY; uy++) {
-                            if (mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + worldContainer.inventory.image.getHeight() + 46, uy * 46 + worldContainer.inventory.image.getHeight() + 86) &&
-                                    worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux] != Items.EMPTY) {
-                                pg2.setFont(mobFont);
-                                pg2.setColor(Color.WHITE);
-                                if (worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux].getDurability() != null) {
-                                    pg2.drawString(worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux].getUiName() + " (" + (int) ((double) worldContainer.ic.getDurs()[uy * worldContainer.inventory.CX + ux] / worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux].getDurability() * 100) + "%)", mousePos.getX(), mousePos.getY());
-                                } else {
-                                    pg2.drawString(worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux].getUiName(), mousePos.getX(), mousePos.getY());
-                                }
-                            }
-                        }
-                    }
-                } else if (worldContainer.ic.getType() == ItemType.FURNACE) {
-                    // paint FURNACE
-                    if (mousePos.isInBetween(6, 46, worldContainer.inventory.image.getHeight() + 46, worldContainer.inventory.image.getHeight() + 86) &&
-                            worldContainer.ic.getIds()[0] != Items.EMPTY) {
-                        pg2.setFont(mobFont);
-                        pg2.setColor(Color.WHITE);
-                        if (worldContainer.ic.getIds()[0].getDurability() != null) {
-                            pg2.drawString(worldContainer.ic.getIds()[0].getUiName() + " (" + (int) ((double) worldContainer.ic.getDurs()[0] / worldContainer.ic.getIds()[0].getDurability() * 100) + "%)", mousePos.getX(), mousePos.getY());
-                        } else {
-                            pg2.drawString(worldContainer.ic.getIds()[0].getUiName(), mousePos.getX(), mousePos.getY());
-                        }
-                    }
-                    if (mousePos.isInBetween(6, 46, worldContainer.inventory.image.getHeight() + 102, worldContainer.inventory.image.getHeight() + 142) &&
-                            worldContainer.ic.getIds()[1] != Items.EMPTY) {
-                        pg2.setFont(mobFont);
-                        pg2.setColor(Color.WHITE);
-                        if (worldContainer.ic.getIds()[1].getDurability() != null) {
-                            pg2.drawString(worldContainer.ic.getIds()[1].getUiName() + " (" + (int) ((double) worldContainer.ic.getDurs()[1] / worldContainer.ic.getIds()[1].getDurability() * 100) + "%)", mousePos.getX(), mousePos.getY());
-                        } else {
-                            pg2.drawString(worldContainer.ic.getIds()[1].getUiName(), mousePos.getX(), mousePos.getY());
-                        }
-                    }
-                    if (mousePos.isInBetween(6, 46, worldContainer.inventory.image.getHeight() + 142, worldContainer.inventory.image.getHeight() + 182) &&
-                            worldContainer.ic.getIds()[2] != Items.EMPTY) {
-                        pg2.setFont(mobFont);
-                        pg2.setColor(Color.WHITE);
-                        if (worldContainer.ic.getIds()[2].getDurability() != null) {
-                            pg2.drawString(worldContainer.ic.getIds()[2].getUiName() + " (" + (int) ((double) worldContainer.ic.getDurs()[2] / worldContainer.ic.getIds()[2].getDurability() * 100) + "%)", mousePos.getX(), mousePos.getY());
-                        } else {
-                            pg2.drawString(worldContainer.ic.getIds()[2].getUiName(), mousePos.getX(), mousePos.getY());
-                        }
-                    }
-                    if (mousePos.isInBetween(62, 102, worldContainer.inventory.image.getHeight() + 46, worldContainer.inventory.image.getHeight() + 86) &&
-                            worldContainer.ic.getIds()[3] != Items.EMPTY) {
-                        pg2.setFont(mobFont);
-                        pg2.setColor(Color.WHITE);
-                        if (worldContainer.ic.getIds()[3].getDurability() != null) {
-                            pg2.drawString(worldContainer.ic.getIds()[3].getUiName() + " (" + (int) ((double) worldContainer.ic.getDurs()[3] / worldContainer.ic.getIds()[3].getDurability() * 100) + "%)", mousePos.getX(), mousePos.getY());
-                        } else {
-                            pg2.drawString(worldContainer.ic.getIds()[3].getUiName(), mousePos.getX(), mousePos.getY());
-                        }
-                    }
-                }
-            }
-        }
-        if (state == State.LOADING_GRAPHICS) {
-            pg2.setFont(loadFont);
-            pg2.setColor(Color.GREEN);
-            pg2.drawString("Loading graphics... Please wait.", getWidth() / 2 - 200, getHeight() / 2 - 5);
-        }
-        if (state == State.TITLE_SCREEN) {
-            pg2.drawImage(title_screen,
-                    0, 0, getWidth(), getHeight(),
-                    0, 0, getWidth(), getHeight(),
-                    null);
-        }
-        if (state == State.SELECT_WORLD) {
-            pg2.drawImage(select_world,
-                    0, 0, getWidth(), getHeight(),
-                    0, 0, getWidth(), getHeight(),
-                    null);
-            for (int i = 0; i < filesInfo.size(); i++) {
-                pg2.setFont(worldFont);
-                pg2.setColor(Color.BLACK);
-                pg2.drawString(filesInfo.get(i).getName(), 180, 140 + i * 35);
-                pg2.fillRect(166, 150 + i * 35, 470, 3);
-            }
-        }
-        if (state == State.NEW_WORLD) {
-            pg2.drawImage(new_world,
-                    0, 0, getWidth(), getHeight(),
-                    0, 0, getWidth(), getHeight(),
-                    null);
-            pg2.drawImage(newWorldName.getImage(),
-                    200, 240, 600, 270,
-                    0, 0, 400, 30,
-                    null);
-        }
-        if (state == State.GENERATING_WORLD) {
-            pg2.setFont(loadFont);
-            pg2.setColor(Color.GREEN);
-            pg2.drawString("Generating new world... Please wait.", getWidth() / 2 - 200, getHeight() / 2 - 5);
-        }
-        g.drawImage(screen,
-                0, 0, getWidth(), getHeight(),
-                0, 0, getWidth(), getHeight(),
-                null);
+        paintService.paint(this, g);
     }
 
     public BufferedImage loadBlock(Blocks type, Directions direction, Byte directionIntensity, Byte textureIntensity, String outlineName, int x, int y, int lyr) {
+        log.info("Loading block {}/{} at layer {}", x, y, lyr);
+
         BufferedImage outline = outlineImgs.get("outlines/" + outlineName + "/" + direction.getFileName() + (directionIntensity + 1) + ".png");
         String bName = type.getFileName();
         BufferedImage texture = blockImgs.get("blocks/" + bName + "/texture" + (textureIntensity + 1) + ".png");
@@ -4044,6 +3650,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     }
 
     public void keyPressed(KeyEvent key) {
+        log.info("Handling key pressed");
+
         if (key.getKeyCode() == key.VK_LEFT || key.getKeyCode() == key.VK_A) {
             keyPressed = KeyPressed.LEFT;
         } else if (key.getKeyCode() == key.VK_RIGHT || key.getKeyCode() == key.VK_D) {
