@@ -17,5 +17,6 @@ Refactorings done:
 * Migrate Arrays into classes with a meaning for each field
 * Move some methods to objects/aggregates
 * Use Logger instead of System.out.println
+* Use local variables for for-loops instead of instance variables
 
 [terraria]: https://terraria.org/
