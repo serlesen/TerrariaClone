@@ -15,6 +15,7 @@ import com.sergio.refacto.Inventory;
 import com.sergio.refacto.Player;
 import com.sergio.refacto.TerrariaClone;
 import com.sergio.refacto.dto.Backgrounds;
+import com.sergio.refacto.dto.Biome;
 import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.Directions;
@@ -476,42 +477,42 @@ public class WorldContainer implements Serializable {
                                 }
                                 break;
                             case DRYWEED_STAGE_1:
-                                if (checkBiome(x, y, u, v).equals("desert")) {
+                                if (checkBiome(x, y, u, v) == Biome.DESERT) {
                                     t = Blocks.DRYWEED_STAGE_2;
                                 }
                                 break;
                             case DRYWEED_STAGE_2:
-                                if (checkBiome(x, y, u, v).equals("desert")) {
+                                if (checkBiome(x, y, u, v) == Biome.DESERT) {
                                     t = Blocks.DRYWEED_STAGE_3;
                                 }
                                 break;
                             case GREENLEAF_STAGE_1:
-                                if (checkBiome(x, y, u, v).equals("jungle")) {
+                                if (checkBiome(x, y, u, v) == Biome.JUNGLE) {
                                     t = Blocks.GREENLEAF_STAGE_2;
                                 }
                                 break;
                             case GREENLEAF_STAGE_2:
-                                if (checkBiome(x, y, u, v).equals("jungle")) {
+                                if (checkBiome(x, y, u, v) == Biome.JUNGLE) {
                                     t = Blocks.GREENLEAF_STAGE_3;
                                 }
                                 break;
                             case FROSTLEAF_STAGE_1:
-                                if (checkBiome(x, y, u, v).equals("frost")) {
+                                if (checkBiome(x, y, u, v) == Biome.FROST) {
                                     t = Blocks.FROSTLEAF_STAGE_2;
                                 }
                                 break;
                             case FROSTLEAF_STAGE_2:
-                                if (checkBiome(x, y, u, v).equals("frost")) {
+                                if (checkBiome(x, y, u, v) == Biome.FROST) {
                                     t = Blocks.FROSTLEAF_STAGE_3;
                                 }
                                 break;
                             case CAVEROOT_STAGE_1:
-                                if (checkBiome(x, y, u, v).equals("cavern") || y >= 0/*stonelayer[x]*/) {
+                                if (checkBiome(x, y, u, v) == Biome.CAVERN || y >= 0/*stonelayer[x]*/) {
                                     t = Blocks.CAVEROOT_STAGE_2;
                                 }
                                 break;
                             case CAVEROOT_STAGE_2:
-                                if (checkBiome(x, y, u, v).equals("cavern") || y >= 0/*stonelayer[x]*/) {
+                                if (checkBiome(x, y, u, v) == Biome.CAVERN || y >= 0/*stonelayer[x]*/) {
                                     t = Blocks.CAVEROOT_STAGE_3;
                                 }
                                 break;
@@ -536,12 +537,12 @@ public class WorldContainer implements Serializable {
                                 }
                                 break;
                             case MARSHLEAF_STAGE_1:
-                                if (checkBiome(x, y, u, v).equals("swamp")) {
+                                if (checkBiome(x, y, u, v) == Biome.SWAMP) {
                                     t = Blocks.MARSHLEAF_STAGE_2;
                                 }
                                 break;
                             case MARSHLEAF_STAGE_2:
-                                if (checkBiome(x, y, u, v).equals("swamp")) {
+                                if (checkBiome(x, y, u, v) == Biome.SWAMP) {
                                     t = Blocks.MARSHLEAF_STAGE_3;
                                 }
                                 break;
@@ -623,7 +624,7 @@ public class WorldContainer implements Serializable {
         }
     }
 
-    public String checkBiome(int x, int y, int u, int v) {
+    public Biome checkBiome(int x, int y, int u, int v) {
         int desert = 0;
         int frost = 0;
         int swamp = 0;
@@ -664,21 +665,21 @@ public class WorldContainer implements Serializable {
             }
         }
         if (desert > 0) {
-            return "desert";
+            return Biome.DESERT;
         }
         if (jungle > 0) {
-            return "jungle";
+            return Biome.JUNGLE;
         }
         if (swamp > 0) {
-            return "swamp";
+            return Biome.SWAMP;
         }
         if (frost > 0) {
-            return "frost";
+            return Biome.FROST;
         }
         if (cavern > 0) {
-            return "cavern";
+            return Biome.CAVERN;
         }
-        return "other";
+        return Biome.OTHER;
     }
 
     public void updateSkyLights() {

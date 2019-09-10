@@ -17,6 +17,13 @@ import com.sergio.refacto.tools.ResourcesLoader;
 
 public class PaintService {
 
+    BufferedImage sun, moon;
+
+    public PaintService() {
+        sun = ResourcesLoader.loadImage("environment/sun.png");
+        moon = ResourcesLoader.loadImage("environment/moon.png");
+    }
+
     public void paint(TerrariaClone graphicContainer, Graphics g) {
         graphicContainer.pg2 = graphicContainer.screen.createGraphics();
         graphicContainer.pg2.setColor(graphicContainer.bg);
@@ -130,7 +137,7 @@ public class PaintService {
                 if (graphicContainer.worldContainer.player.iy >= 0 && graphicContainer.worldContainer.player.iy < graphicContainer.HEIGHT * graphicContainer.BLOCKSIZE) {
                     int u = -graphicContainer.ou * TerrariaClone.CHUNKBLOCKS;
                     int v = -graphicContainer.ov * TerrariaClone.CHUNKBLOCKS;
-                    graphicContainer.pg2.drawString(graphicContainer.worldContainer.checkBiome((int) graphicContainer.worldContainer.player.ix / 16 + u, (int) graphicContainer.worldContainer.player.iy / 16 + v, u, v) + " " + graphicContainer.worldContainer.lights[(int) graphicContainer.worldContainer.player.iy / 16 + v][(int) graphicContainer.worldContainer.player.ix / 16 + u], graphicContainer.getWidth() - 125, 80);
+                    graphicContainer.pg2.drawString(graphicContainer.worldContainer.checkBiome((int) graphicContainer.worldContainer.player.ix / 16 + u, (int) graphicContainer.worldContainer.player.iy / 16 + v, u, v).getTitle() + " " + graphicContainer.worldContainer.lights[(int) graphicContainer.worldContainer.player.iy / 16 + v][(int) graphicContainer.worldContainer.player.ix / 16 + u], graphicContainer.getWidth() - 125, 80);
                 }
             }
             if (graphicContainer.worldContainer.showInv) {
@@ -415,16 +422,16 @@ public class PaintService {
             graphicContainer.pg2.translate(graphicContainer.getWidth() / 2, graphicContainer.getHeight() * 0.85);
             graphicContainer.pg2.rotate((graphicContainer.worldContainer.timeOfDay - 70200) / 86400 * Math.PI * 2);
 
-            graphicContainer.pg2.drawImage(graphicContainer.sun,
-                    (int) (-graphicContainer.getWidth() * 0.65), 0, (int) (-graphicContainer.getWidth() * 0.65 + graphicContainer.sun.getWidth() * 2), graphicContainer.sun.getHeight() * 2,
-                    0, 0, graphicContainer.sun.getWidth(), graphicContainer.sun.getHeight(),
+            graphicContainer.pg2.drawImage(sun,
+                    (int) (-graphicContainer.getWidth() * 0.65), 0, (int) (-graphicContainer.getWidth() * 0.65 + sun.getWidth() * 2), sun.getHeight() * 2,
+                    0, 0, sun.getWidth(), sun.getHeight(),
                     null);
 
             graphicContainer.pg2.rotate(Math.PI);
 
-            graphicContainer.pg2.drawImage(graphicContainer.moon,
-                    (int) (-graphicContainer.getWidth() * 0.65), 0, (int) (-graphicContainer.getWidth() * 0.65 + graphicContainer.moon.getWidth() * 2), graphicContainer.moon.getHeight() * 2,
-                    0, 0, graphicContainer.moon.getWidth(), graphicContainer.moon.getHeight(),
+            graphicContainer.pg2.drawImage(moon,
+                    (int) (-graphicContainer.getWidth() * 0.65), 0, (int) (-graphicContainer.getWidth() * 0.65 + moon.getWidth() * 2), moon.getHeight() * 2,
+                    0, 0, moon.getWidth(), moon.getHeight(),
                     null);
 
             graphicContainer.pg2.rotate(-(graphicContainer.worldContainer.timeOfDay - 70200) / 86400 * Math.PI * 2 - Math.PI);

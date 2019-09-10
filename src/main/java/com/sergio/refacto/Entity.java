@@ -26,7 +26,6 @@ public class Entity implements Serializable {
     double x, y, vx, vy, oldx, oldy, n;
     int ix, iy, ivx, ivy, width, height, bx1, bx2, by1, by2, bcount;
     int i, j, k;
-    int BLOCKSIZE = TerrariaClone.getBLOCKSIZE();
     double mdelay = 0;
 
     int totalHealthPoints, healthPoints, armorPoints, attackPoints;
@@ -411,8 +410,8 @@ public class Entity implements Serializable {
 
             rect = new Rectangle(ix-1, iy, width+2, height);
 
-            bx1 = (int)x/BLOCKSIZE; by1 = (int)y/BLOCKSIZE;
-            bx2 = (int)(x+width)/BLOCKSIZE; by2 = (int)(y+height)/BLOCKSIZE;
+            bx1 = (int)x/TerrariaClone.BLOCKSIZE; by1 = (int)y/TerrariaClone.BLOCKSIZE;
+            bx2 = (int)(x+width)/TerrariaClone.BLOCKSIZE; by2 = (int)(y+height)/TerrariaClone.BLOCKSIZE;
 
             bx1 = Math.max(0, bx1); by1 = Math.max(0, by1);
             bx2 = Math.min(blocks[0].length - 1, bx2); by2 = Math.min(blocks.length - 1, by2);
@@ -420,7 +419,7 @@ public class Entity implements Serializable {
             for (i=bx1; i<=bx2; i++) {
                 for (j=by1; j<=by2; j++) {
                     if (blocks[j][i] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
-                        if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
+                        if (rect.intersects(new Rectangle(i*TerrariaClone.BLOCKSIZE, j*TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE))) {
                             if (oldx <= i*16 - width && (vx > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 x = i*16 - width;
                                 if (AI == EntityType.BUBBLE) {
@@ -440,8 +439,8 @@ public class Entity implements Serializable {
                                 }
                                 rv = true;
                             }
-                            if (oldx >= i*16 + BLOCKSIZE && (vx < 0 || AI == EntityType.SHOOTING_STAR)) {
-                                x = i*16 + BLOCKSIZE;
+                            if (oldx >= i*16 + TerrariaClone.BLOCKSIZE && (vx < 0 || AI == EntityType.SHOOTING_STAR)) {
+                                x = i*16 + TerrariaClone.BLOCKSIZE;
                                 if (AI == EntityType.BUBBLE) {
                                     vx = -vx;
                                 }
@@ -476,8 +475,8 @@ public class Entity implements Serializable {
 
             rect = new Rectangle(ix, iy-1, width, height+2);
 
-            bx1 = (int)x/BLOCKSIZE; by1 = (int)y/BLOCKSIZE;
-            bx2 = (int)(x+width)/BLOCKSIZE; by2 = (int)(y+height)/BLOCKSIZE;
+            bx1 = (int)x/TerrariaClone.BLOCKSIZE; by1 = (int)y/TerrariaClone.BLOCKSIZE;
+            bx2 = (int)(x+width)/TerrariaClone.BLOCKSIZE; by2 = (int)(y+height)/TerrariaClone.BLOCKSIZE;
 
             bx1 = Math.max(0, bx1); by1 = Math.max(0, by1);
             bx2 = Math.min(blocks[0].length - 1, bx2); by2 = Math.min(blocks.length - 1, by2);
@@ -485,7 +484,7 @@ public class Entity implements Serializable {
             for (i=bx1; i<=bx2; i++) {
                 for (j=by1; j<=by2; j++) {
                     if (blocks[j][i] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
-                        if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
+                        if (rect.intersects(new Rectangle(i*TerrariaClone.BLOCKSIZE, j*TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE))) {
                             if (oldy <= j*16 - height && (vy > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 y = j*16 - height;
                                 onGround = true;
@@ -497,8 +496,8 @@ public class Entity implements Serializable {
                                 }
                                 rv = true;
                             }
-                            if (oldy >= j*16 + BLOCKSIZE && (vy < 0 || AI == EntityType.SHOOTING_STAR)) {
-                                y = j*16 + BLOCKSIZE;
+                            if (oldy >= j*16 + TerrariaClone.BLOCKSIZE && (vy < 0 || AI == EntityType.SHOOTING_STAR)) {
+                                y = j*16 + TerrariaClone.BLOCKSIZE;
                                 if (AI == EntityType.BUBBLE) {
                                     vy = -vy;
                                 }

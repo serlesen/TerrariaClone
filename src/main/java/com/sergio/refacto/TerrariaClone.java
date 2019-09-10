@@ -45,6 +45,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.sergio.refacto.dto.Backgrounds;
+import com.sergio.refacto.dto.Biome;
 import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.Directions;
@@ -93,8 +94,8 @@ import static com.sergio.refacto.dto.Constants.*;
 @FieldDefaults(level = AccessLevel.PUBLIC)
 public class TerrariaClone extends JApplet implements ChangeListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
-    private WorldService worldService = new WorldService();
-    private PaintService paintService = new PaintService();
+    private WorldService worldService;
+    private PaintService paintService;
 
     static GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
     BufferedImage screen;
@@ -126,7 +127,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     int iclayer;
 
     State state = State.LOADING_GRAPHICS;
-    EntityType mobSpawn;
 
     int ou, ov, uNew, vNew;
     double p, q;
@@ -144,7 +144,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     Font worldFont = new Font("Andale Mono", Font.BOLD, 16);
     Color CYANISH = new Color(75, 163, 243);
 
-    BufferedImage sun, moon, cloudImage, logo_white, logo_black, title_screen, select_world, new_world, save_exit;
+    BufferedImage title_screen, select_world, new_world, save_exit;
     BufferedImage[] cloudsImages = { ResourcesLoader.loadImage("environment/cloud1.png") };
     BufferedImage wcnct_px = ResourcesLoader.loadImage("misc/wcnct.png");
 
@@ -153,18 +153,12 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     MousePressed mousePressed;
 
     boolean checkBlocks = true;
-    boolean addSources = false;
-    boolean keepLeaf = false;
-    boolean newWorldFocus = false;
     boolean menuPressed = false;
-    boolean doGenerateWorld = true;
 
     public static final int CHUNKBLOCKS = 96;
     public static final int BLOCKSIZE = 16;
     private static final int IMAGESIZE = 8;
     public static final int CHUNKSIZE = CHUNKBLOCKS * BLOCKSIZE;
-    private static final int PLAYERSIZEX = 20;
-    private static final int PLAYERSIZEY = 46;
 
     private static final int BRIGHTEST = 21;
 
@@ -207,6 +201,9 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     public void init() {
         try {
+            paintService = new PaintService();
+            worldService = new WorldService();
+
             setLayout(new BorderLayout());
             bg = Color.BLACK;
 
@@ -222,8 +219,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
             worldContainer = new WorldContainer();
 
-            logo_white = ResourcesLoader.loadImage("interface/logo_white.png");
-            logo_black = ResourcesLoader.loadImage("interface/logo_black.png");
             title_screen = ResourcesLoader.loadImage("interface/title_screen.png");
             select_world = ResourcesLoader.loadImage("interface/select_world.png");
             new_world = ResourcesLoader.loadImage("interface/new_world.png");
@@ -261,8 +256,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
             DDELAY = DDelayInitializer.init();
 
-            sun = ResourcesLoader.loadImage("environment/sun.png");
-            moon = ResourcesLoader.loadImage("environment/moon.png");
             FRI1 = new ArrayList<>(0);
             FRN1 = new ArrayList<>(0);
             FRI2 = new ArrayList<>(0);
@@ -743,7 +736,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             if (mousePos.isInBetweenInclusive(ItemPositionInScreen.CREATE_NEW_WORLD_MENU)) {
                 if (!newWorldName.getText().equals("")) {
                     filesInfo = worldService.findWorlds();
-                    doGenerateWorld = true;
+                    boolean doGenerateWorld = true;
                     for (int i = 0; i < filesInfo.size(); i++) {
                         if (newWorldName.getText().equals(filesInfo.get(i).getName())) {
                             doGenerateWorld = false;
@@ -1020,65 +1013,41 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             int ypos2 = ay + RandomTool.nextInt(20) - 10;
                             if (xpos > 0 && xpos < WIDTH - 1 && ypos > 0 && ypos < HEIGHT - 1 && (worldContainer.blocks[1][ypos][xpos] == Blocks.AIR || !worldContainer.blocks[1][ypos][xpos].isCds() &&
                                     xpos2 > 0 && xpos2 < WIDTH - 1 && ypos2 > 0 && ypos2 < HEIGHT - 1 && worldContainer.blocks[1][ypos2][xpos2] != Blocks.AIR && worldContainer.blocks[1][ypos2][xpos2].isCds())) {
-                                mobSpawn = null;
-                                if (!worldContainer.checkBiome(xpos, ypos, u, v).equals("underground")) {
-                                    if ((worldContainer.day != 0 || DebugContext.HOSTILE > 1) && (worldContainer.timeOfDay >= 75913 || worldContainer.timeOfDay < 28883)) {
-                                        if (RandomTool.nextInt(350) == 0) {
-                                            int rnum = RandomTool.nextInt(100);
-                                            if (rnum >= 0 && rnum < 45) {
-                                                mobSpawn = EntityType.BLUE_BUBBLE; // 45%
-                                            }
-                                            if (rnum >= 45 && rnum < 85) {
-                                                mobSpawn = EntityType.GREEN_BUBBLE; // 40%
-                                            }
-                                            if (rnum >= 85 && rnum < 100) {
-                                                mobSpawn = EntityType.RED_BUBBLE; // 15%
-                                            }
-                                        }
-                                    }
-                                    if (worldContainer.timeOfDay >= 32302 && worldContainer.timeOfDay < 72093) {
-                                        if (RandomTool.nextInt(200) == 0) {
-                                            int rnum = RandomTool.nextInt(100);
-                                            if (rnum >= 0 && rnum < 80) {
-                                                mobSpawn = EntityType.ZOMBIE; // 80%
-                                            }
-                                            if (rnum >= 80 && rnum < 90) {
-                                                mobSpawn = EntityType.ARMORED_ZOMBIE; // 10%
-                                            }
-                                            if (rnum >= 90 && rnum < 100) {
-                                                mobSpawn = EntityType.SHOOTING_STAR; // 10%
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    if (RandomTool.nextInt(100) == 0) {
+                                EntityType mobSpawn = null;
+                                if ((worldContainer.day != 0 || DebugContext.HOSTILE > 1) && (worldContainer.timeOfDay >= 75913 || worldContainer.timeOfDay < 28883)) {
+                                    if (RandomTool.nextInt(350) == 0) {
                                         int rnum = RandomTool.nextInt(100);
-                                        if (rnum >= 0 && rnum < 25) {
-                                            mobSpawn = EntityType.YELLOW_BUBBLE; // 25%
+                                        if (rnum >= 0 && rnum < 45) {
+                                            mobSpawn = EntityType.BLUE_BUBBLE; // 45%
                                         }
-                                        if (rnum >= 25 && rnum < 45) {
-                                            mobSpawn = EntityType.ZOMBIE; // 20%
-                                        }
-                                        if (rnum >= 45 && rnum < 60) {
-                                            mobSpawn = EntityType.ARMORED_ZOMBIE; // 15%
-                                        }
-                                        if (rnum >= 60 && rnum < 70) {
-                                            mobSpawn = EntityType.BLACK_BUBBLE; // 10%
-                                        }
-                                        if (rnum >= 70 && rnum < 85) {
-                                            mobSpawn = EntityType.BAT; // 15%
+                                        if (rnum >= 45 && rnum < 85) {
+                                            mobSpawn = EntityType.GREEN_BUBBLE; // 40%
                                         }
                                         if (rnum >= 85 && rnum < 100) {
-                                            mobSpawn = EntityType.SKELETON; // 15%
+                                            mobSpawn = EntityType.RED_BUBBLE; // 15%
                                         }
                                     }
                                 }
-                                if (mobSpawn != null && worldContainer.checkBiome(xpos, ypos, u, v).equals("desert")) {
+                                if (worldContainer.timeOfDay >= 32302 && worldContainer.timeOfDay < 72093) {
+                                    if (RandomTool.nextInt(200) == 0) {
+                                        int rnum = RandomTool.nextInt(100);
+                                        if (rnum >= 0 && rnum < 80) {
+                                            mobSpawn = EntityType.ZOMBIE; // 80%
+                                        }
+                                        if (rnum >= 80 && rnum < 90) {
+                                            mobSpawn = EntityType.ARMORED_ZOMBIE; // 10%
+                                        }
+                                        if (rnum >= 90 && rnum < 100) {
+                                            mobSpawn = EntityType.SHOOTING_STAR; // 10%
+                                        }
+                                    }
+                                }
+                                if (mobSpawn != null && worldContainer.checkBiome(xpos, ypos, u, v) == Biome.DESERT) {
                                     if (RandomTool.nextInt(3) == 0) { // 33% of all spawns in desert
                                         mobSpawn = EntityType.SANDBOT;
                                     }
                                 }
-                                if (mobSpawn != null && worldContainer.checkBiome(xpos, ypos, u, v).equals("frost")) {
+                                if (mobSpawn != null && worldContainer.checkBiome(xpos, ypos, u, v) == Biome.FROST) {
                                     if (RandomTool.nextInt(3) == 0) { // 33% of all spawns in desert
                                         mobSpawn = EntityType.SNOWMAN;
                                     }
@@ -2218,18 +2187,15 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
         }
 
-        Rectangle rect;
         int bx1, bx2, by1, by2;
         for (int i = -1; i < worldContainer.entities.size(); i++) {
             int width, height;
             if (i == -1) {
-                rect = worldContainer.player.rect;
                 width = worldContainer.player.width;
                 height = worldContainer.player.height;
                 p = worldContainer.player.x;
                 q = worldContainer.player.y;
             } else {
-                rect = worldContainer.entities.get(i).getRect();
                 width = worldContainer.entities.get(i).getWidth();
                 height = worldContainer.entities.get(i).getHeight();
                 p = worldContainer.entities.get(i).getX();
@@ -2485,7 +2451,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 for (int ulx = ux - 4; ulx < ux + 5; ulx++) {
                     for (int l = 0; l < 3; l += 2) {
                         if (uly >= 0 && uly < HEIGHT && worldContainer.blocks[l][uly][ulx] == Blocks.LEAVES) {
-                            keepLeaf = false;
+                            boolean keepLeaf = false;
                             for (int uly2 = uly - 4; uly2 < uly + 5; uly2++) {
                                 for (int ulx2 = ulx - 4; ulx2 < ulx + 5; ulx2++) {
                                     if (uly2 >= 0 && uly2 < HEIGHT && (worldContainer.blocks[1][uly2][ulx2] == Blocks.TREE || worldContainer.blocks[1][uly2][ulx2] == Blocks.TREE_NO_BARK)) {
@@ -2699,7 +2665,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     for (int ulx = ux - 4; ulx < ux + 5; ulx++) {
                         for (int l = 0; l < 3; l += 2) {
                             if (uly >= 0 && uly < HEIGHT && worldContainer.blocks[l][uly][ulx] == Blocks.LEAVES) {
-                                keepLeaf = false;
+                                boolean keepLeaf = false;
                                 for (int uly2 = uly - 4; uly2 < uly + 5; uly2++) {
                                     for (int ulx2 = ulx - 4; ulx2 < ulx + 5; ulx2++) {
                                         if (uly2 >= 0 && uly2 < HEIGHT && (worldContainer.blocks[1][uly2][ulx2] == Blocks.TREE || worldContainer.blocks[1][uly2][ulx2] == Blocks.TREE_NO_BARK)) {
@@ -2741,7 +2707,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
             Cloud cloud = new Cloud();
             cloud.setN(RandomTool.nextInt(1));
-            cloudImage = cloudsImages[cloud.getN()];
+            BufferedImage cloudImage = cloudsImages[cloud.getN()];
             if (RandomTool.nextInt(2) == 0) {
                 cloud.setX(-cloudImage.getWidth() * 2);
                 cloud.setSpeed(0.1 * DebugContext.ACCEL);
@@ -2925,8 +2891,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         addTileToPQueue(ax3, ay3);
                                     }
                                 }
-                            }
-                            if (lyr == 1) {
+                            } else if (lyr == 1) {
                                 if (worldContainer.blocks[0][ay3][ax3].isReceive()) {
                                     rbpRecur(ax3, ay3, 0);
                                     if (worldContainer.blocks[0][ay3][ax3].isPower()) {
@@ -2939,8 +2904,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         addTileToPQueue(ax3, ay3);
                                     }
                                 }
-                            }
-                            if (lyr == 2) {
+                            } else if (lyr == 2) {
                                 if (worldContainer.blocks[0][ay3][ax3].isReceive()) {
                                     rbpRecur(ax3, ay3, 0);
                                     if (worldContainer.blocks[0][ay3][ax3].isPower()) {
@@ -3176,7 +3140,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 return;
             }
         }
-        addSources = false;
+        boolean addSources = false;
         for (int y = uy; y < HEIGHT - 1; y++) {
             if (worldContainer.blocks[1][y + 1][ux - 1].isLTrans() || worldContainer.blocks[1][y + 1][ux + 1].isLTrans()) {
                 addSources = true;
@@ -3756,7 +3720,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
         }
 
-        if (state == State.NEW_WORLD && !newWorldFocus) {
+        if (state == State.NEW_WORLD) {
             if ((key.getKeyChar() >= KeyEvent.VK_A && key.getKeyChar() <= KeyEvent.VK_Z)
                 || (key.getKeyChar() >= KeyEvent.VK_1 && key.getKeyChar() <= KeyEvent.VK_2)) {
                 newWorldName.typeKey(key.getKeyChar());
@@ -3821,21 +3785,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         return new Dimension(800, 600);
     }
 
-    public static int getBLOCKSIZE() {
-        return BLOCKSIZE;
-    }
-
-    public static int getIMAGESIZE() {
-        return IMAGESIZE;
-    }
-
-    public static int getPLAYERSIZEX() {
-        return PLAYERSIZEX;
-    }
-
-    public static int getPLAYERSIZEY() {
-        return PLAYERSIZEY;
-    }
 
     public static Map<Items, BufferedImage> getItemImgs() {
         return itemImgs;

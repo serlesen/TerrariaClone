@@ -16,6 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PUBLIC)
 public class Player implements Serializable {
+
+    private static final int PLAYERSIZEX = 20;
+    private static final int PLAYERSIZEY = 46;
+
     transient BufferedImage image;
     int ix, iy, width, height, totalHealthPoints, healthPoints;
     double x, y, vx, vy, pvy, oldx, oldy;
@@ -24,8 +28,6 @@ public class Player implements Serializable {
 
     private int imgDelay;
     ImageState imgState;
-
-    private int BLOCKSIZE = TerrariaClone.getBLOCKSIZE();
 
     public Player(double x, double y) {
         oldx = this.x = x; oldy = this.y = y;
@@ -38,8 +40,8 @@ public class Player implements Serializable {
 
         image = ResourcesLoader.loadImage("sprites/player/right_still.png");
 
-        width = TerrariaClone.getPLAYERSIZEX();
-        height = TerrariaClone.getPLAYERSIZEY();
+        width = PLAYERSIZEX;
+        height = PLAYERSIZEY;
 
         ix = (int)x;
         iy = (int)y;
@@ -91,21 +93,21 @@ public class Player implements Serializable {
 
                 rect = new Rectangle(ix-1, iy, width+2, height);
 
-                int bx1 = (int)x/BLOCKSIZE;
-                int by1 = (int)y/BLOCKSIZE;
-                int bx2 = (int)(x+width)/BLOCKSIZE;
-                int by2 = (int)(y+height)/BLOCKSIZE;
+                int bx1 = (int)x/TerrariaClone.BLOCKSIZE;
+                int by1 = (int)y/TerrariaClone.BLOCKSIZE;
+                int bx2 = (int)(x+width)/TerrariaClone.BLOCKSIZE;
+                int by2 = (int)(y+height)/TerrariaClone.BLOCKSIZE;
 
                 for (int i = bx1; i <= bx2; i++) {
                     for (int j = by1; j <= by2; j++) {
                         if (blocks[j+v][i+u] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
-                            if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
+                            if (rect.intersects(new Rectangle(i*TerrariaClone.BLOCKSIZE, j*TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE))) {
                                 if (oldx <= i*16 - width && vx > 0) {
                                     x = i*16 - width;
                                     vx = 0; // right
                                 }
-                                if (oldx >= i*16 + BLOCKSIZE && vx < 0) {
-                                    x = i*16 + BLOCKSIZE;
+                                if (oldx >= i*16 + TerrariaClone.BLOCKSIZE && vx < 0) {
+                                    x = i*16 + TerrariaClone.BLOCKSIZE;
                                     vx = 0; // left
                                 }
                             }
@@ -125,10 +127,10 @@ public class Player implements Serializable {
 
                 rect = new Rectangle(ix, iy - 1, width, height+2);
 
-                int bx1 = (int)x/BLOCKSIZE;
-                int by1 = (int)y/BLOCKSIZE;
-                int bx2 = (int)(x+width)/BLOCKSIZE;
-                int by2 = (int)(y+height)/BLOCKSIZE;
+                int bx1 = (int)x/TerrariaClone.BLOCKSIZE;
+                int by1 = (int)y/TerrariaClone.BLOCKSIZE;
+                int bx2 = (int)(x+width)/TerrariaClone.BLOCKSIZE;
+                int by2 = (int)(y+height)/TerrariaClone.BLOCKSIZE;
 
                 by1 = Math.max(0, by1);
                 by2 = Math.min(blocks.length - 1, by2);
@@ -136,7 +138,7 @@ public class Player implements Serializable {
                 for (int i = bx1; i <= bx2; i++) {
                     for (int j = by1; j <= by2; j++) {
                         if (blocks[j+v][i+u] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
-                            if (rect.intersects(new Rectangle(i*BLOCKSIZE, j*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE))) {
+                            if (rect.intersects(new Rectangle(i*TerrariaClone.BLOCKSIZE, j*TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE))) {
                                 if (oldy <= j*16 - height && vy > 0) {
                                     y = j*16 - height;
                                     if (pvy >= 10 && !DebugContext.INVINCIBLE) {
@@ -146,8 +148,8 @@ public class Player implements Serializable {
                                     vy = 0; // down
                                     pvy = 0;
                                 }
-                                if (oldy >= j*16 + BLOCKSIZE && vy < 0) {
-                                    y = j*16 + BLOCKSIZE;
+                                if (oldy >= j*16 + TerrariaClone.BLOCKSIZE && vy < 0) {
+                                    y = j*16 + TerrariaClone.BLOCKSIZE;
                                     vy = 0; // up
                                 }
                             }
