@@ -11,8 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LightConverter {
 
-    static int BLOCKSIZE = 16;
-    static int IMAGESIZE = 8;
+    private static final int IMAGE_SIZE = 8;
 
     static String[] dirs = {"center", "tdown_both", "tdown_cw", "tdown_ccw",
         "tdown", "tup_both", "tup_cw", "tup_ccw",
@@ -31,8 +30,8 @@ public class LightConverter {
             for (int j=1; j<9; j++) {
                 BufferedImage texture = loadImage("blocks/" + name + "/texture" + j + ".png");
                 texture.createGraphics().drawImage(light,
-                    0, 0, IMAGESIZE, IMAGESIZE,
-                    0, 0, IMAGESIZE, IMAGESIZE,
+                    0, 0, IMAGE_SIZE, IMAGE_SIZE,
+                    0, 0, IMAGE_SIZE, IMAGE_SIZE,
                     null);
                 try {
                     ImageIO.write(texture, "png", new File("blocks/" + name + "/texture" + j + ".png"));

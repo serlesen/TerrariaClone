@@ -413,7 +413,7 @@ public class PaintService {
     }
 
     private void paintSunMoonClouds(TerrariaClone graphicContainer) {
-        if (graphicContainer.worldContainer.player.y / 16 < graphicContainer.HEIGHT * 0.5) {
+        if (graphicContainer.worldContainer.player.y / WorldContainer.BLOCK_SIZE < graphicContainer.HEIGHT * 0.5) {
             graphics.translate(graphicContainer.getWidth() / 2, graphicContainer.getHeight() * 0.85);
             graphics.rotate((graphicContainer.worldContainer.timeOfDay - 70200) / 86400 * Math.PI * 2);
 

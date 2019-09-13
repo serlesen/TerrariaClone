@@ -421,8 +421,8 @@ public class Entity implements Serializable {
                 for (j=by1; j<=by2; j++) {
                     if (blocks[j][i] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
                         if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
-                            if (oldx <= i*16 - width && (vx > 0 || AI == EntityType.SHOOTING_STAR)) {
-                                x = i*16 - width;
+                            if (oldx <= i * WorldContainer.BLOCK_SIZE - width && (vx > 0 || AI == EntityType.SHOOTING_STAR)) {
+                                x = i * WorldContainer.BLOCK_SIZE - width;
                                 if (AI == EntityType.BUBBLE) {
                                     vx = -vx;
                                 }
@@ -440,8 +440,8 @@ public class Entity implements Serializable {
                                 }
                                 rv = true;
                             }
-                            if (oldx >= i*16 + WorldContainer.BLOCK_SIZE && (vx < 0 || AI == EntityType.SHOOTING_STAR)) {
-                                x = i*16 + WorldContainer.BLOCK_SIZE;
+                            if (oldx >= i * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE && (vx < 0 || AI == EntityType.SHOOTING_STAR)) {
+                                x = i * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE;
                                 if (AI == EntityType.BUBBLE) {
                                     vx = -vx;
                                 }
@@ -486,8 +486,8 @@ public class Entity implements Serializable {
                 for (j=by1; j<=by2; j++) {
                     if (blocks[j][i] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
                         if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
-                            if (oldy <= j*16 - height && (vy > 0 || AI == EntityType.SHOOTING_STAR)) {
-                                y = j*16 - height;
+                            if (oldy <= j * WorldContainer.BLOCK_SIZE - height && (vy > 0 || AI == EntityType.SHOOTING_STAR)) {
+                                y = j * WorldContainer.BLOCK_SIZE - height;
                                 onGround = true;
                                 if (AI == EntityType.BUBBLE) {
                                     vy = -vy;
@@ -497,8 +497,8 @@ public class Entity implements Serializable {
                                 }
                                 rv = true;
                             }
-                            if (oldy >= j*16 + WorldContainer.BLOCK_SIZE && (vy < 0 || AI == EntityType.SHOOTING_STAR)) {
-                                y = j*16 + WorldContainer.BLOCK_SIZE;
+                            if (oldy >= j * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE && (vy < 0 || AI == EntityType.SHOOTING_STAR)) {
+                                y = j * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE;
                                 if (AI == EntityType.BUBBLE) {
                                     vy = -vy;
                                 }

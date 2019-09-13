@@ -11,8 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RandConverter {
 
-    static int BLOCKSIZE = 16;
-    static int IMAGESIZE = 8;
+    private static final int IMAGE_SIZE = 8;
 
     static String[] dirs = {"center", "tdown_both", "tdown_cw", "tdown_ccw",
         "tdown", "tup_both", "tup_cw", "tup_ccw",
@@ -38,19 +37,19 @@ public class RandConverter {
                         BufferedImage texture = loadImage("outlines/" + name + "/" + dirs[k] + "1.png");
                         int i, x, y;
                         int[] xy;
-                        int[][] coords = new int[IMAGESIZE*IMAGESIZE][2];
+                        int[][] coords = new int[IMAGE_SIZE * IMAGE_SIZE][2];
                         BufferedImage result;
                         for (i=0; i<7; i++) {
-                            for (x=0; x<IMAGESIZE; x++) {
-                                for (y=0; y<IMAGESIZE; y++) {
-                                    coords[x*IMAGESIZE+y][0] = x;
-                                    coords[x*IMAGESIZE+y][1] = y;
+                            for (x=0; x< IMAGE_SIZE; x++) {
+                                for (y=0; y< IMAGE_SIZE; y++) {
+                                    coords[x* IMAGE_SIZE +y][0] = x;
+                                    coords[x* IMAGE_SIZE +y][1] = y;
                                 }
                             }
-                            result = new BufferedImage(IMAGESIZE, IMAGESIZE, BufferedImage.TYPE_INT_ARGB);
-                            for (x=0; x<IMAGESIZE; x++) {
-                                for (y=0; y<IMAGESIZE; y++) {
-                                    xy = coords[x*IMAGESIZE+y];
+                            result = new BufferedImage(IMAGE_SIZE, IMAGE_SIZE, BufferedImage.TYPE_INT_ARGB);
+                            for (x=0; x< IMAGE_SIZE; x++) {
+                                for (y=0; y< IMAGE_SIZE; y++) {
+                                    xy = coords[x* IMAGE_SIZE +y];
                                     result.setRGB(xy[0], xy[1], texture.getRGB(x, y));
                                 }
                             }
@@ -67,22 +66,22 @@ public class RandConverter {
                 BufferedImage texture = loadImage("blocks/" + name + "/texture1.png");
                 int i, x, y;
                 int[] xy;
-                int[][] coords = new int[IMAGESIZE*IMAGESIZE][2];
+                int[][] coords = new int[IMAGE_SIZE * IMAGE_SIZE][2];
                 BufferedImage result;
                 for (i=0; i<7; i++) {
-                    for (x=0; x<IMAGESIZE; x++) {
-                        for (y=0; y<IMAGESIZE; y++) {
-                            coords[x*IMAGESIZE+y][0] = x;
-                            coords[x*IMAGESIZE+y][1] = y;
+                    for (x=0; x< IMAGE_SIZE; x++) {
+                        for (y=0; y< IMAGE_SIZE; y++) {
+                            coords[x* IMAGE_SIZE +y][0] = x;
+                            coords[x* IMAGE_SIZE +y][1] = y;
                         }
                     }
                     if (option == 'R') {
                         Collections.shuffle(Arrays.asList(coords));
                     }
-                    result = new BufferedImage(IMAGESIZE, IMAGESIZE, BufferedImage.TYPE_INT_ARGB);
-                    for (x=0; x<IMAGESIZE; x++) {
-                        for (y=0; y<IMAGESIZE; y++) {
-                            xy = coords[x*IMAGESIZE+y];
+                    result = new BufferedImage(IMAGE_SIZE, IMAGE_SIZE, BufferedImage.TYPE_INT_ARGB);
+                    for (x=0; x< IMAGE_SIZE; x++) {
+                        for (y=0; y< IMAGE_SIZE; y++) {
+                            xy = coords[x* IMAGE_SIZE +y];
                             result.setRGB(xy[0], xy[1], texture.getRGB(x, y));
                         }
                     }

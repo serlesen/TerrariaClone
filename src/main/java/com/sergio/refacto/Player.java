@@ -104,12 +104,11 @@ public class Player implements Serializable {
                     for (int j = borderY1; j <= borderY2; j++) {
                         if (blocks[j+v][i+u] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
                             if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
-                                if (oldX <= i*16 - WIDTH && speedX > 0) {
-                                    x = i*16 - WIDTH;
+                                if (oldX <= i * WorldContainer.BLOCK_SIZE - WIDTH && speedX > 0) {
+                                    x = i * WorldContainer.BLOCK_SIZE - WIDTH;
                                     speedX = 0; // right
-                                }
-                                if (oldX >= i*16 + WorldContainer.BLOCK_SIZE && speedX < 0) {
-                                    x = i*16 + WorldContainer.BLOCK_SIZE;
+                                } else if (oldX >= i * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE && speedX < 0) {
+                                    x = i * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE;
                                     speedX = 0; // left
                                 }
                             }
@@ -141,17 +140,16 @@ public class Player implements Serializable {
                     for (int j = borderY1; j <= borderY2; j++) {
                         if (blocks[j+v][i+u] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
                             if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
-                                if (oldY <= j*16 - HEIGHT && speedY > 0) {
-                                    y = j*16 - HEIGHT;
+                                if (oldY <= j * WorldContainer.BLOCK_SIZE - HEIGHT && speedY > 0) {
+                                    y = j * WorldContainer.BLOCK_SIZE - HEIGHT;
                                     if (pvy >= 10 && !DebugContext.INVINCIBLE) {
                                         healthPoints -= (int)((pvy - 12.5))*2;
                                     }
                                     onGround = true;
                                     speedY = 0; // down
                                     pvy = 0;
-                                }
-                                if (oldY >= j*16 + WorldContainer.BLOCK_SIZE && speedY < 0) {
-                                    y = j*16 + WorldContainer.BLOCK_SIZE;
+                                } else if (oldY >= j * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE && speedY < 0) {
+                                    y = j * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE;
                                     speedY = 0; // up
                                 }
                             }

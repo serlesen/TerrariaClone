@@ -819,7 +819,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
         worldContainer.updateSkyLights();
 
-        if (worldContainer.player.y / 16 > HEIGHT * 0.55) {
+        if (worldContainer.player.y / WorldContainer.BLOCK_SIZE > HEIGHT * 0.55) {
             bg = Color.BLACK;
         } else {
             bg = SKYCOLORS.get(worldContainer.currentSkyLight);
@@ -2016,9 +2016,9 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
         }
         int vc = 0;
-        if (!DebugContext.INVINCIBLE && worldContainer.player.y / 16 > HEIGHT + 10) {
+        if (!DebugContext.INVINCIBLE && worldContainer.player.y / WorldContainer.BLOCK_SIZE > HEIGHT + 10) {
             vc += 1;
-            if (vc >= 1 / (Math.pow(1.001, worldContainer.player.y / 16 - HEIGHT - 10) - 1.0)) {
+            if (vc >= 1 / (Math.pow(1.001, worldContainer.player.y / WorldContainer.BLOCK_SIZE - HEIGHT - 10) - 1.0)) {
                 worldContainer.player.damage(1, false, worldContainer.inventory);
                 vc = 0;
             }
