@@ -39,14 +39,7 @@ public class PaintService {
                     int pwxc = pwx + graphicContainer.ou;
                     int pwyc = pwy + graphicContainer.ov;
                     if (graphicContainer.worldContainer.worlds[pwy][pwx] != null) {
-                        if (((graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 + Player.WIDTH >= pwxc * WorldContainer.CHUNK_SIZE &&
-                                graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 + Player.WIDTH <= pwxc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE) ||
-                                (graphicContainer.worldContainer.player.intX - graphicContainer.getWidth() / 2 + Player.WIDTH + WorldContainer.BLOCK_SIZE >= pwxc * WorldContainer.CHUNK_SIZE &&
-                                        graphicContainer.worldContainer.player.intX - graphicContainer.getWidth() / 2 + Player.WIDTH - WorldContainer.BLOCK_SIZE <= pwxc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE)) &&
-                                ((graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 + Player.HEIGHT >= pwyc * WorldContainer.CHUNK_SIZE &&
-                                        graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 + Player.HEIGHT <= pwyc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE) ||
-                                        (graphicContainer.worldContainer.player.intY - graphicContainer.getHeight() / 2 + Player.HEIGHT >= pwyc * WorldContainer.CHUNK_SIZE &&
-                                                graphicContainer.worldContainer.player.intY - graphicContainer.getHeight() / 2 + Player.HEIGHT <= pwyc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE))) {
+                        if (graphicContainer.worldContainer.player.isPlayerIntoChunk(pwxc, pwyc, graphicContainer.getWidth(), graphicContainer.getHeight())) {
                             graphicContainer.pg2.drawImage(graphicContainer.worldContainer.worlds[pwy][pwx],
                                     pwxc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2, pwyc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, pwxc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + WorldContainer.CHUNK_SIZE, pwyc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + WorldContainer.CHUNK_SIZE,
                                     0, 0, WorldContainer.CHUNK_SIZE, WorldContainer.CHUNK_SIZE,
@@ -67,14 +60,7 @@ public class PaintService {
                     int pwxc = pwx + graphicContainer.ou;
                     int pwyc = pwy + graphicContainer.ov;
                     if (graphicContainer.worldContainer.fworlds[pwy][pwx] != null) {
-                        if (((graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 + Player.WIDTH >= pwxc * WorldContainer.CHUNK_SIZE &&
-                                graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 + Player.WIDTH <= pwxc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE) ||
-                                (graphicContainer.worldContainer.player.intX - graphicContainer.getWidth() / 2 + Player.WIDTH + WorldContainer.BLOCK_SIZE >= pwxc * WorldContainer.CHUNK_SIZE &&
-                                        graphicContainer.worldContainer.player.intX - graphicContainer.getWidth() / 2 + Player.WIDTH - WorldContainer.BLOCK_SIZE <= pwxc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE)) &&
-                                ((graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 + Player.HEIGHT >= pwyc * WorldContainer.CHUNK_SIZE &&
-                                        graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 + Player.HEIGHT <= pwyc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE) ||
-                                        (graphicContainer.worldContainer.player.intY - graphicContainer.getHeight() / 2 + Player.HEIGHT >= pwyc * WorldContainer.CHUNK_SIZE &&
-                                                graphicContainer.worldContainer.player.intY - graphicContainer.getHeight() / 2 + Player.HEIGHT <= pwyc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE))) {
+                        if (graphicContainer.worldContainer.player.isPlayerIntoChunk(pwxc, pwyc, graphicContainer.getWidth(), graphicContainer.getHeight())) {
                             graphicContainer.pg2.drawImage(graphicContainer.worldContainer.fworlds[pwy][pwx],
                                     pwxc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2, pwyc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, pwxc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + WorldContainer.CHUNK_SIZE, pwyc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + WorldContainer.CHUNK_SIZE,
                                     0, 0, WorldContainer.CHUNK_SIZE, WorldContainer.CHUNK_SIZE,

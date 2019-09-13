@@ -312,4 +312,11 @@ public class Player implements Serializable {
                 TerrariaClone.armor.getIds()[2].getArmor() +
                 TerrariaClone.armor.getIds()[3].getArmor());
     }
+    
+    public boolean isPlayerIntoChunk(int chunkU, int chunkV, int screenWidth, int screenHeight) {
+        return ((intX + screenWidth / 2 + Player.WIDTH >= chunkU * WorldContainer.CHUNK_SIZE && intX + screenWidth / 2 + Player.WIDTH <= chunkU * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE)
+                || (intX - screenWidth / 2 + Player.WIDTH + WorldContainer.BLOCK_SIZE >= chunkU * WorldContainer.CHUNK_SIZE && intX - screenWidth / 2 + Player.WIDTH - WorldContainer.BLOCK_SIZE <= chunkU * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE))
+            && ((intY + screenHeight / 2 + Player.HEIGHT >= chunkV * WorldContainer.CHUNK_SIZE && intY + screenHeight / 2 + Player.HEIGHT <= chunkV * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE)
+                || (intY - screenHeight / 2 + Player.HEIGHT >= chunkV * WorldContainer.CHUNK_SIZE && intY - screenHeight / 2 + Player.HEIGHT <= chunkV * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE));
+    }
 }

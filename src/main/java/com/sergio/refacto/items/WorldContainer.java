@@ -51,7 +51,7 @@ public class WorldContainer implements Serializable {
 
     Blocks[][][] blocks;
     Directions[][][] blocksDirections;
-    Byte[][] BlocksDirectionsIntensity;
+    Byte[][] blocksDirectionsIntensity;
     Backgrounds[][] blocksBackgrounds;
     Byte[][] blocksTextureIntensity;
     Float[][] lights;
@@ -126,7 +126,7 @@ public class WorldContainer implements Serializable {
 
         this.blocks = blocks;
         this.blocksDirections = blocksDirections;
-        this.BlocksDirectionsIntensity = BlocksDirectionsIntensity;
+        this.blocksDirectionsIntensity = BlocksDirectionsIntensity;
         this.blocksBackgrounds = blocksBackgrounds;
         this.blocksTextureIntensity = blocksTextureIntensity;
         this.lights = lights;
@@ -181,7 +181,7 @@ public class WorldContainer implements Serializable {
     private void load(WorldContainer wc) {
         blocks = wc.blocks;
         blocksDirections = wc.blocksDirections;
-        BlocksDirectionsIntensity = wc.BlocksDirectionsIntensity;
+        blocksDirectionsIntensity = wc.blocksDirectionsIntensity;
         blocksBackgrounds = wc.blocksBackgrounds;
         blocksTextureIntensity = wc.blocksTextureIntensity;
         lights = wc.lights;
@@ -302,7 +302,7 @@ public class WorldContainer implements Serializable {
     public void createNewWorld() {
         blocks = new Blocks[TerrariaClone.LAYER_SIZE][TerrariaClone.SIZE][TerrariaClone.SIZE];
         blocksDirections = new Directions[TerrariaClone.LAYER_SIZE][TerrariaClone.SIZE][TerrariaClone.SIZE];
-        BlocksDirectionsIntensity = new Byte[TerrariaClone.SIZE][TerrariaClone.SIZE];
+        blocksDirectionsIntensity = new Byte[TerrariaClone.SIZE][TerrariaClone.SIZE];
         blocksBackgrounds = new Backgrounds[TerrariaClone.SIZE][TerrariaClone.SIZE];
         blocksTextureIntensity = new Byte[TerrariaClone.SIZE][TerrariaClone.SIZE];
         lights = new Float[TerrariaClone.SIZE][TerrariaClone.SIZE];
@@ -436,7 +436,7 @@ public class WorldContainer implements Serializable {
     }
 
     public WorldContainer getCopy() {
-        return new WorldContainer(blocks, blocksDirections, BlocksDirectionsIntensity, blocksBackgrounds, blocksTextureIntensity,
+        return new WorldContainer(blocks, blocksDirections, blocksDirectionsIntensity, blocksBackgrounds, blocksTextureIntensity,
                 lights, power, drawn, ldrawn, rdrawn,
                 player, inventory, cic,
                 entities, cloudsAggregate,

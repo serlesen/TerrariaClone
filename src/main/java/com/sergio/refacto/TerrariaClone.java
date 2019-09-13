@@ -394,64 +394,9 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         if (ou != uNew || ov != vNew) {
             ou = uNew;
             ov = vNew;
-            List<Chunk> chunkTemp = new ArrayList<>(0);
-            for (int twy = 0; twy < 2; twy++) {
-                for (int twx = 0; twx < 2; twx++) {
-                    if (chunkMatrix[twy][twx] != null) {
-                        chunkTemp.add(chunkMatrix[twy][twx]);
-                        chunkMatrix[twy][twx] = null;
-                    }
-                }
-            }
-            int twy, twx = 0;
-            for (twy = 0; twy < 2; twy++) {
-                for (twx = 0; twx < 2; twx++) {
-                    for (int i = chunkTemp.size() - 1; i > -1; i--) {
-                        if (chunkTemp.get(i).getCx() == twx && chunkTemp.get(i).getCy() == twy) {
-                            chunkMatrix[twy][twx] = chunkTemp.get(i);
-                            chunkTemp.remove(i);
-                            break;
-                        }
-                    }
-                    if (chunkMatrix[twy][twx] == null) {
-                        if (temporarySaveFile[twy][twx] != null) {
-                            chunkMatrix[twy][twx] = temporarySaveFile[twy][twx];
-                        } else {
-                            chunkMatrix[twy][twx] = new Chunk(twx + ou, twy + ov);
-                        }
-                    }
-                }
-            }
-            for (int i = 0; i < chunkTemp.size(); i++) {
-                temporarySaveFile[twy][twx] = chunkTemp.get(i);
-            }
-            chunkTemp = null;
-            for (twy = 0; twy < 2; twy++) {
-                for (twx = 0; twx < 2; twx++) {
-                    for (int y = 0; y < WorldContainer.CHUNK_BLOCKS; y++) {
-                        for (int x = 0; x < WorldContainer.CHUNK_BLOCKS; x++) {
-                            for (int l = 0; l < LAYER_SIZE; l++) {
-                                worldContainer.blocks[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocks()[l][y][x];
-                                worldContainer.power[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getPower()[l][y][x];
-                                pzqn[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getPzqn()[l][y][x];
-                                arbprd[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getArbprd()[l][y][x];
-                                worldContainer.blocksDirections[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocksDirections()[l][y][x];
-                            }
-                            worldContainer.BlocksDirectionsIntensity[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocksDirectionsIntensity()[y][x];
-                            worldContainer.blocksBackgrounds[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocksBackgrounds()[y][x];
-                            worldContainer.blocksTextureIntensity[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocksTextureIntesity()[y][x];
-                            worldContainer.lights[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getLights()[y][x];
-                            worldContainer.lsources[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getLsources()[y][x];
-                            zqn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getZqn()[y][x];
-                            wcnct[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getWcnct()[y][x];
-                            worldContainer.drawn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getDrawn()[y][x];
-                            worldContainer.rdrawn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getRdrawn()[y][x];
-                            worldContainer.ldrawn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getLdrawn()[y][x];
-                        }
-                    }
-                    worldContainer.worlds[twy][twx] = null;
-                }
-            }
+
+            loadChunks();
+            loadWorldContainer();
         }
         int u = -ou * WorldContainer.CHUNK_BLOCKS;
         int v = -ov * WorldContainer.CHUNK_BLOCKS;
@@ -465,14 +410,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             for (int twx = 0; twx < 2; twx++) {
                 int twxc = twx + ou;
                 int twyc = twy + ov;
-                if (((worldContainer.player.intX + getWidth() / 2 + Player.WIDTH >= twxc * WorldContainer.CHUNK_SIZE &&
-                        worldContainer.player.intX + getWidth() / 2 + Player.WIDTH <= twxc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE) ||
-                        (worldContainer.player.intX - getWidth() / 2 + Player.WIDTH + WorldContainer.BLOCK_SIZE >= twxc * WorldContainer.CHUNK_SIZE &&
-                                worldContainer.player.intX - getWidth() / 2 + Player.WIDTH - WorldContainer.BLOCK_SIZE <= twxc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE)) &&
-                        ((worldContainer.player.intY + getHeight() / 2 + Player.HEIGHT >= twyc * WorldContainer.CHUNK_SIZE &&
-                                worldContainer.player.intY + getHeight() / 2 + Player.HEIGHT <= twyc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE) ||
-                                (worldContainer.player.intY - getHeight() / 2 + Player.HEIGHT >= twyc * WorldContainer.CHUNK_SIZE &&
-                                        worldContainer.player.intY - getHeight() / 2 + Player.HEIGHT <= twyc * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE))) {
+                if (worldContainer.player.isPlayerIntoChunk(twxc, twyc, getWidth(), getHeight())) {
                     worldContainer.kworlds[twy][twx] = true;
                     if (worldContainer.worlds[twy][twx] == null) {
                         worldContainer.worlds[twy][twx] = config.createCompatibleImage(WorldContainer.CHUNK_SIZE, WorldContainer.CHUNK_SIZE, Transparency.TRANSLUCENT);
@@ -509,12 +447,12 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         for (int l = 0; l < LAYER_SIZE; l++) {
                                             if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
                                                 if (l == 2) {
-                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
                                                 } else {
-                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
@@ -565,12 +503,12 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         for (int l = 0; l < LAYER_SIZE; l++) {
                                             if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
                                                 if (l == 2) {
-                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
                                                 } else {
-                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
@@ -621,12 +559,12 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         for (int l = 0; l < LAYER_SIZE; l++) {
                                             if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
                                                 if (l == 2) {
-                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
                                                 } else {
-                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.BlocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
@@ -693,6 +631,69 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
         repaint();
         worldContainer.ready = true;
+    }
+
+    private void loadWorldContainer() {
+        for (int twy = 0; twy < 2; twy++) {
+            for (int twx = 0; twx < 2; twx++) {
+                for (int y = 0; y < WorldContainer.CHUNK_BLOCKS; y++) {
+                    for (int x = 0; x < WorldContainer.CHUNK_BLOCKS; x++) {
+                        for (int l = 0; l < LAYER_SIZE; l++) {
+                            worldContainer.blocks[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocks()[l][y][x];
+                            worldContainer.power[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getPower()[l][y][x];
+                            pzqn[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getPzqn()[l][y][x];
+                            arbprd[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getArbprd()[l][y][x];
+                            worldContainer.blocksDirections[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocksDirections()[l][y][x];
+                        }
+                        worldContainer.blocksDirectionsIntensity[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocksDirectionsIntensity()[y][x];
+                        worldContainer.blocksBackgrounds[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocksBackgrounds()[y][x];
+                        worldContainer.blocksTextureIntensity[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocksTextureIntesity()[y][x];
+                        worldContainer.lights[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getLights()[y][x];
+                        worldContainer.lsources[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getLsources()[y][x];
+                        zqn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getZqn()[y][x];
+                        wcnct[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getWcnct()[y][x];
+                        worldContainer.drawn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getDrawn()[y][x];
+                        worldContainer.rdrawn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getRdrawn()[y][x];
+                        worldContainer.ldrawn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getLdrawn()[y][x];
+                    }
+                }
+                worldContainer.worlds[twy][twx] = null;
+            }
+        }
+    }
+
+    private void loadChunks() {
+        List<Chunk> chunkTemp = new ArrayList<>(0);
+        for (int twy = 0; twy < 2; twy++) {
+            for (int twx = 0; twx < 2; twx++) {
+                if (chunkMatrix[twy][twx] != null) {
+                    chunkTemp.add(chunkMatrix[twy][twx]);
+                    chunkMatrix[twy][twx] = null;
+                }
+            }
+        }
+        int twy, twx = 0;
+        for (twy = 0; twy < 2; twy++) {
+            for (twx = 0; twx < 2; twx++) {
+                for (int i = chunkTemp.size() - 1; i > -1; i--) {
+                    if (chunkTemp.get(i).getCx() == twx && chunkTemp.get(i).getCy() == twy) {
+                        chunkMatrix[twy][twx] = chunkTemp.get(i);
+                        chunkTemp.remove(i);
+                        break;
+                    }
+                }
+                if (chunkMatrix[twy][twx] == null) {
+                    if (temporarySaveFile[twy][twx] != null) {
+                        chunkMatrix[twy][twx] = temporarySaveFile[twy][twx];
+                    } else {
+                        chunkMatrix[twy][twx] = new Chunk(twx + ou, twy + ov);
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < chunkTemp.size(); i++) {
+            temporarySaveFile[twy][twx] = chunkTemp.get(i);
+        }
     }
 
     private void handleMenuBehavior() {
@@ -1416,7 +1417,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                             Math.sqrt(Math.pow(worldContainer.player.x + worldContainer.player.image.getWidth() - ux2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2 + WIDTH * WorldContainer.BLOCK_SIZE, 2) + Math.pow(worldContainer.player.y + worldContainer.player.image.getHeight() - uy2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2)) <= 160 || DebugContext.REACH) {
                         if (Arrays.asList(TOOL_LIST).contains(worldContainer.inventory.tool())) {
                             if (worldContainer.blocks[worldContainer.layer][uy][ux] != Blocks.AIR && worldContainer.blocks[worldContainer.layer][uy][ux].getTools().contains(worldContainer.inventory.tool())) {
-                                worldContainer.BlocksDirectionsIntensity[uy][ux] = (byte) RandomTool.nextInt(5);
+                                worldContainer.blocksDirectionsIntensity[uy][ux] = (byte) RandomTool.nextInt(5);
                                 worldContainer.drawn[uy][ux] = false;
                                 if (ux == worldContainer.mx && uy == worldContainer.my && worldContainer.inventory.tool() == miningTool) {
                                     worldContainer.mining += 1;
@@ -1540,7 +1541,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
                                         for (int uly = uy - 1; uly < uy + 2; uly++) {
                                             for (int ulx = ux - 1; ulx < ux + 2; ulx++) {
-                                                worldContainer.BlocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
+                                                worldContainer.blocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
                                             }
                                         }
                                         for (int uly = uy - 1; uly < uy + 2; uly++) {
@@ -2235,7 +2236,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 worldContainer.blocks[0][uy][ux] = Blocks.AIR;
                 for (int uly = uy - 1; uly < uy + 2; uly++) {
                     for (int ulx = ux - 1; ulx < ux + 2; ulx++) {
-                        worldContainer.BlocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
+                        worldContainer.blocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
                     }
                 }
                 for (int uly = uy; uly < uy + 3; uly++) {
@@ -2248,7 +2249,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 worldContainer.blocks[0][uy + 1][ux] = Blocks.AIR;
                 for (int uly = uy; uly < uy + 3; uly++) {
                     for (int ulx = ux - 1; ulx < ux + 2; ulx++) {
-                        worldContainer.BlocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
+                        worldContainer.blocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
                     }
                 }
                 for (int uly = uy; uly < uy + 3; uly++) {
@@ -2432,7 +2433,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
             for (int uly = uy - 1; uly < uy + 2; uly++) {
                 for (int ulx = ux - 1; ulx < ux + 2; ulx++) {
-                    worldContainer.BlocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
+                    worldContainer.blocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
                 }
             }
             for (int uly = uy - 1; uly < uy + 2; uly++) {
@@ -2646,7 +2647,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
                 for (int uly = uy - 1; uly < uy + 2; uly++) {
                     for (int ulx = ux - 1; ulx < ux + 2; ulx++) {
-                        worldContainer.BlocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
+                        worldContainer.blocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
                     }
                 }
                 for (int uly = uy - 1; uly < uy + 2; uly++) {
