@@ -451,7 +451,7 @@ public class WorldContainer implements Serializable {
     }
 
     public void upgradeBlocksState(int u, int v) {
-        for (int l = 0; l < 3; l++) {
+        for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
             for (int y = 0; y < TerrariaClone.SIZE; y++) {
                 for (int x = 0; x < TerrariaClone.SIZE; x++) {
                     if (RandomTool.nextInt(22500) == 0) {
@@ -561,7 +561,7 @@ public class WorldContainer implements Serializable {
     }
 
     public void updateGrassState(int u, int v) {
-        for (int l = 0; l < 3; l++) {
+        for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
             for (int y = 0; y < TerrariaClone.SIZE; y++) {
                 for (int x = 0; x < TerrariaClone.SIZE; x++) {
                     if (RandomTool.nextInt(1000) == 0) {
@@ -611,19 +611,19 @@ public class WorldContainer implements Serializable {
     }
 
     public boolean hasOpenSpace(int x, int y, int l) {
-        try {
-            return (blocks[l][y - 1][x - 1] == Blocks.AIR || !blocks[l][y - 1][x - 1].isCds() ||
-                    blocks[l][y - 1][x] == Blocks.AIR || !blocks[l][y - 1][x].isCds() ||
-                    blocks[l][y - 1][x + 1] == Blocks.AIR || !blocks[l][y - 1][x + 1].isCds() ||
-                    blocks[l][y][x - 1] == Blocks.AIR || !blocks[l][y][x - 1].isCds() ||
-                    blocks[l][y][x + 1] == Blocks.AIR || !blocks[l][y][x + 1].isCds() ||
-                    blocks[l][y + 1][x - 1] == Blocks.AIR || !blocks[l][y + 1][x - 1].isCds() ||
-                    blocks[l][y + 1][x] == Blocks.AIR || !blocks[l][y + 1][x].isCds() ||
-                    blocks[l][y + 1][x + 1] == Blocks.AIR || !blocks[l][y + 1][x + 1].isCds());
-        } catch (ArrayIndexOutOfBoundsException e) {
-            log.warn("Out of Bounds for blocks at " + y + "/" + x + " and layer " + l, e);
+        if (x <= 0 || y <= 0 || x >= TerrariaClone.SIZE || y >= TerrariaClone.SIZE) {
+            // edges are not considered as open space
             return false;
         }
+
+        return blocks[l][y - 1][x - 1] == Blocks.AIR || !blocks[l][y - 1][x - 1].isCds() ||
+                blocks[l][y - 1][x] == Blocks.AIR || !blocks[l][y - 1][x].isCds() ||
+                blocks[l][y - 1][x + 1] == Blocks.AIR || !blocks[l][y - 1][x + 1].isCds() ||
+                blocks[l][y][x - 1] == Blocks.AIR || !blocks[l][y][x - 1].isCds() ||
+                blocks[l][y][x + 1] == Blocks.AIR || !blocks[l][y][x + 1].isCds() ||
+                blocks[l][y + 1][x - 1] == Blocks.AIR || !blocks[l][y + 1][x - 1].isCds() ||
+                blocks[l][y + 1][x] == Blocks.AIR || !blocks[l][y + 1][x].isCds() ||
+                blocks[l][y + 1][x + 1] == Blocks.AIR || !blocks[l][y + 1][x + 1].isCds();
     }
 
     public Biome checkBiome(int x, int y, int u, int v) {

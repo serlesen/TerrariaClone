@@ -18,5 +18,6 @@ Refactorings done:
 * Move some methods to objects/aggregates
 * Use Logger instead of System.out.println
 * Use local variables for for-loops instead of instance variables
+* Avoid catching ArrayIndexOutOfBoundsException and optimize the arrays index
 
 [terraria]: https://terraria.org/
