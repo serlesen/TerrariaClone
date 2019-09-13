@@ -2,6 +2,7 @@ package com.sergio.refacto.services;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
@@ -21,15 +22,17 @@ public class PaintService {
 
     BufferedImage sun, moon;
 
+    Graphics2D graphics;
+
     public PaintService() {
         sun = ResourcesLoader.loadImage("environment/sun.png");
         moon = ResourcesLoader.loadImage("environment/moon.png");
     }
 
     public void paint(TerrariaClone graphicContainer, Graphics g) {
-        graphicContainer.pg2 = graphicContainer.screen.createGraphics();
-        graphicContainer.pg2.setColor(graphicContainer.bg);
-        graphicContainer.pg2.fillRect(0, 0, graphicContainer.getWidth(), graphicContainer.getHeight());
+        graphics = graphicContainer.screen.createGraphics();
+        graphics.setColor(graphicContainer.bg);
+        graphics.fillRect(0, 0, graphicContainer.getWidth(), graphicContainer.getHeight());
         if (graphicContainer.state == State.IN_GAME) {
 
             paintSunMoonClouds(graphicContainer);
@@ -40,7 +43,7 @@ public class PaintService {
                     int pwyc = pwy + graphicContainer.ov;
                     if (graphicContainer.worldContainer.worlds[pwy][pwx] != null) {
                         if (graphicContainer.worldContainer.player.isPlayerIntoChunk(pwxc, pwyc, graphicContainer.getWidth(), graphicContainer.getHeight())) {
-                            graphicContainer.pg2.drawImage(graphicContainer.worldContainer.worlds[pwy][pwx],
+                            graphics.drawImage(graphicContainer.worldContainer.worlds[pwy][pwx],
                                     pwxc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2, pwyc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, pwxc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + WorldContainer.CHUNK_SIZE, pwyc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + WorldContainer.CHUNK_SIZE,
                                     0, 0, WorldContainer.CHUNK_SIZE, WorldContainer.CHUNK_SIZE,
                                     null);
@@ -61,7 +64,7 @@ public class PaintService {
                     int pwyc = pwy + graphicContainer.ov;
                     if (graphicContainer.worldContainer.fworlds[pwy][pwx] != null) {
                         if (graphicContainer.worldContainer.player.isPlayerIntoChunk(pwxc, pwyc, graphicContainer.getWidth(), graphicContainer.getHeight())) {
-                            graphicContainer.pg2.drawImage(graphicContainer.worldContainer.fworlds[pwy][pwx],
+                            graphics.drawImage(graphicContainer.worldContainer.fworlds[pwy][pwx],
                                     pwxc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2, pwyc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, pwxc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + WorldContainer.CHUNK_SIZE, pwyc * WorldContainer.CHUNK_SIZE - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + WorldContainer.CHUNK_SIZE,
                                     0, 0, WorldContainer.CHUNK_SIZE, WorldContainer.CHUNK_SIZE,
                                     null);
@@ -73,7 +76,7 @@ public class PaintService {
             paintInventory(graphicContainer);
 
             if (graphicContainer.worldContainer.ic != null) {
-                graphicContainer.pg2.drawImage(graphicContainer.worldContainer.ic.getImage(),
+                graphics.drawImage(graphicContainer.worldContainer.ic.getImage(),
                         6, graphicContainer.worldContainer.inventory.image.getHeight() + 46, 6 + graphicContainer.worldContainer.ic.getImage().getWidth(), graphicContainer.worldContainer.inventory.image.getHeight() + 46 + graphicContainer.worldContainer.ic.getImage().getHeight(),
                         0, 0, graphicContainer.worldContainer.ic.getImage().getWidth(), graphicContainer.worldContainer.ic.getImage().getHeight(),
                         null);
@@ -82,7 +85,7 @@ public class PaintService {
             paintCurrentLayer(graphicContainer);
 
             if (graphicContainer.worldContainer.showInv) {
-                graphicContainer.pg2.drawImage(graphicContainer.save_exit,
+                graphics.drawImage(graphicContainer.save_exit,
                         graphicContainer.getWidth() - graphicContainer.save_exit.getWidth() - 24, graphicContainer.getHeight() - graphicContainer.save_exit.getHeight() - 24, graphicContainer.getWidth() - 24, graphicContainer.getHeight() - 24,
                         0, 0, graphicContainer.save_exit.getWidth(), graphicContainer.save_exit.getHeight(),
                         null);
@@ -91,70 +94,70 @@ public class PaintService {
             if (graphicContainer.worldContainer.moveItem != Items.EMPTY) {
                 int width = TerrariaClone.itemImgs.get(graphicContainer.worldContainer.moveItem).getWidth();
                 int height = TerrariaClone.itemImgs.get(graphicContainer.worldContainer.moveItem).getHeight();
-                graphicContainer.pg2.drawImage(TerrariaClone.itemImgs.get(graphicContainer.worldContainer.moveItem),
+                graphics.drawImage(TerrariaClone.itemImgs.get(graphicContainer.worldContainer.moveItem),
                         graphicContainer.mousePos.getX() + 12 + ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * width * 2) / 2), graphicContainer.mousePos.getY() + 12 + ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * height * 2) / 2), graphicContainer.mousePos.getX() + 36 - ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * width * 2) / 2), graphicContainer.mousePos.getY() + 36 - ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * height * 2) / 2),
                         0, 0, width, height,
                         null);
                 if (graphicContainer.worldContainer.moveNum > 1) {
-                    graphicContainer.pg2.setFont(graphicContainer.font);
-                    graphicContainer.pg2.setColor(Color.WHITE);
-                    graphicContainer.pg2.drawString(graphicContainer.worldContainer.moveNum + " ", graphicContainer.mousePos.getX() + 13, graphicContainer.mousePos.getY() + 38);
+                    graphics.setFont(graphicContainer.font);
+                    graphics.setColor(Color.WHITE);
+                    graphics.drawString(graphicContainer.worldContainer.moveNum + " ", graphicContainer.mousePos.getX() + 13, graphicContainer.mousePos.getY() + 38);
                 }
             }
             for (int i = 0; i < graphicContainer.worldContainer.entities.size(); i++) {
                 if (TerrariaClone.UIENTITIES.get(graphicContainer.worldContainer.entities.get(i).getEntityType().getName()) != null && graphicContainer.worldContainer.entities.get(i).getRect() != null && graphicContainer.worldContainer.entities.get(i).getRect().contains(new Point(graphicContainer.mousePos2.getX(), graphicContainer.mousePos2.getY()))) {
-                    graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                    graphicContainer.pg2.setColor(Color.WHITE);
-                    graphicContainer.pg2.drawString(TerrariaClone.UIENTITIES.get(graphicContainer.worldContainer.entities.get(i).getEntityType()) + " (" + graphicContainer.worldContainer.entities.get(i).getHealthPoints() + "/" + graphicContainer.worldContainer.entities.get(i).getTotalHealthPoints() + ")", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                    graphics.setFont(graphicContainer.mobFont);
+                    graphics.setColor(Color.WHITE);
+                    graphics.drawString(TerrariaClone.UIENTITIES.get(graphicContainer.worldContainer.entities.get(i).getEntityType()) + " (" + graphicContainer.worldContainer.entities.get(i).getHealthPoints() + "/" + graphicContainer.worldContainer.entities.get(i).getTotalHealthPoints() + ")", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     break;
                 }
             }
 
             paintInventoryItems(graphicContainer);
 
-            graphicContainer.pg2.setFont(graphicContainer.mobFont);
-            graphicContainer.pg2.setColor(Color.WHITE);
-            graphicContainer.pg2.drawString("Health: " + graphicContainer.worldContainer.player.healthPoints + "/" + graphicContainer.worldContainer.player.totalHealthPoints, graphicContainer.getWidth() - 125, 20);
-            graphicContainer.pg2.drawString("armor: " + graphicContainer.worldContainer.player.sumArmor(), graphicContainer.getWidth() - 125, 40);
+            graphics.setFont(graphicContainer.mobFont);
+            graphics.setColor(Color.WHITE);
+            graphics.drawString("Health: " + graphicContainer.worldContainer.player.healthPoints + "/" + graphicContainer.worldContainer.player.totalHealthPoints, graphicContainer.getWidth() - 125, 20);
+            graphics.drawString("armor: " + graphicContainer.worldContainer.player.sumArmor(), graphicContainer.getWidth() - 125, 40);
             if (DebugContext.STATS) {
-                graphicContainer.pg2.drawString("(" + ((int) graphicContainer.worldContainer.player.intX / 16) + ", " + ((int) graphicContainer.worldContainer.player.intY / 16) + ")", graphicContainer.getWidth() - 125, 60);
+                graphics.drawString("(" + ((int) graphicContainer.worldContainer.player.intX / 16) + ", " + ((int) graphicContainer.worldContainer.player.intY / 16) + ")", graphicContainer.getWidth() - 125, 60);
                 if (graphicContainer.worldContainer.player.intY >= 0 && graphicContainer.worldContainer.player.intY < graphicContainer.HEIGHT * WorldContainer.BLOCK_SIZE) {
                     int u = -graphicContainer.ou * WorldContainer.CHUNK_BLOCKS;
                     int v = -graphicContainer.ov * WorldContainer.CHUNK_BLOCKS;
-                    graphicContainer.pg2.drawString(graphicContainer.worldContainer.checkBiome((int) graphicContainer.worldContainer.player.intX / 16 + u, (int) graphicContainer.worldContainer.player.intY / 16 + v, u, v).getTitle() + " " + graphicContainer.worldContainer.lights[(int) graphicContainer.worldContainer.player.intY / 16 + v][(int) graphicContainer.worldContainer.player.intX / 16 + u], graphicContainer.getWidth() - 125, 80);
+                    graphics.drawString(graphicContainer.worldContainer.checkBiome((int) graphicContainer.worldContainer.player.intX / 16 + u, (int) graphicContainer.worldContainer.player.intY / 16 + v, u, v).getTitle() + " " + graphicContainer.worldContainer.lights[(int) graphicContainer.worldContainer.player.intY / 16 + v][(int) graphicContainer.worldContainer.player.intX / 16 + u], graphicContainer.getWidth() - 125, 80);
                 }
             }
             if (graphicContainer.worldContainer.showInv) {
                 for (int ux = 0; ux < 2; ux++) {
                     for (int uy = 0; uy < 2; uy++) {
                         if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.image.getWidth() + ux * 40 + 75, graphicContainer.worldContainer.inventory.image.getWidth() + ux * 40 + 115, uy * 40 + 52, uy * 40 + 92) && graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux] != Items.EMPTY) {
-                            graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                            graphicContainer.pg2.setColor(Color.WHITE);
+                            graphics.setFont(graphicContainer.mobFont);
+                            graphics.setColor(Color.WHITE);
                             if (graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux].getDurability() != null) {
-                                graphicContainer.pg2.drawString(graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.cic.getDurs()[uy * 2 + ux] / graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                                graphics.drawString(graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.cic.getDurs()[uy * 2 + ux] / graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                             } else {
-                                graphicContainer.pg2.drawString(graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                                graphics.drawString(graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                             }
                         }
                     }
                 }
                 if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.image.getWidth() + 3 * 40 + 75, graphicContainer.worldContainer.inventory.image.getWidth() + 3 * 40 + 115, 20 + 52, 20 + 92) && graphicContainer.worldContainer.cic.getIds()[4] != Items.EMPTY) {
-                    graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                    graphicContainer.pg2.setColor(Color.WHITE);
+                    graphics.setFont(graphicContainer.mobFont);
+                    graphics.setColor(Color.WHITE);
                     if (graphicContainer.worldContainer.cic.getIds()[4].getDurability() != null) {
-                        graphicContainer.pg2.drawString(graphicContainer.worldContainer.cic.getIds()[4].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.cic.getDurs()[4] / graphicContainer.worldContainer.cic.getIds()[4].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        graphics.drawString(graphicContainer.worldContainer.cic.getIds()[4].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.cic.getDurs()[4] / graphicContainer.worldContainer.cic.getIds()[4].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     } else {
-                        graphicContainer.pg2.drawString(graphicContainer.worldContainer.cic.getIds()[4].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        graphics.drawString(graphicContainer.worldContainer.cic.getIds()[4].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
                 for (int uy = 0; uy < 4; uy++) {
                     if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.image.getWidth() + 6, graphicContainer.worldContainer.inventory.image.getWidth() + 6 + graphicContainer.armor.getImage().getWidth(), 6 + uy * 46, 6 + uy * 46 + 46) && graphicContainer.armor.getIds()[uy] != Items.EMPTY) {
-                        graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                        graphicContainer.pg2.setColor(Color.WHITE);
+                        graphics.setFont(graphicContainer.mobFont);
+                        graphics.setColor(Color.WHITE);
                         if (graphicContainer.armor.getIds()[uy].getDurability() != null) {
-                            graphicContainer.pg2.drawString(graphicContainer.armor.getIds()[uy].getUiName() + " (" + (int) ((double) graphicContainer.armor.getDurs()[uy] / graphicContainer.armor.getIds()[uy].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.armor.getIds()[uy].getUiName() + " (" + (int) ((double) graphicContainer.armor.getDurs()[uy] / graphicContainer.armor.getIds()[uy].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         } else {
-                            graphicContainer.pg2.drawString(graphicContainer.armor.getIds()[uy].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.armor.getIds()[uy].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         }
                     }
                 }
@@ -166,24 +169,24 @@ public class PaintService {
                         for (int uy = 0; uy < 3; uy++) {
                             if (graphicContainer.mousePos.isInBetween(ux * 40 + 6, ux * 40 + 46, uy * 40 + graphicContainer.worldContainer.inventory.image.getHeight() + 46, uy * 40 + graphicContainer.worldContainer.inventory.image.getHeight() + 86) &&
                                     graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux] != Items.EMPTY) {
-                                graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                                graphicContainer.pg2.setColor(Color.WHITE);
+                                graphics.setFont(graphicContainer.mobFont);
+                                graphics.setColor(Color.WHITE);
                                 if (graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux].getDurability() != null) {
-                                    graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[uy * 3 + ux] / graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                                    graphics.drawString(graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[uy * 3 + ux] / graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                                 } else {
-                                    graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                                    graphics.drawString(graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                                 }
                             }
                         }
                     }
                     if (graphicContainer.mousePos.isInBetween(4 * 40 + 6, 4 * 40 + 46, 1 * 40 + graphicContainer.worldContainer.inventory.image.getHeight() + 46, 1 * 40 + graphicContainer.worldContainer.inventory.image.getHeight() + 86) &&
                             graphicContainer.worldContainer.ic.getIds()[9] != Items.EMPTY) {
-                        graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                        graphicContainer.pg2.setColor(Color.WHITE);
+                        graphics.setFont(graphicContainer.mobFont);
+                        graphics.setColor(Color.WHITE);
                         if (graphicContainer.worldContainer.ic.getIds()[9].getDurability() != null) {
-                            graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[9].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[9] / graphicContainer.worldContainer.ic.getIds()[9].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.worldContainer.ic.getIds()[9].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[9] / graphicContainer.worldContainer.ic.getIds()[9].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         } else {
-                            graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[9].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.worldContainer.ic.getIds()[9].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         }
                     }
                 } else if (graphicContainer.worldContainer.ic.getType() == ItemType.WOODEN_CHEST || graphicContainer.worldContainer.ic.getType() == ItemType.STONE_CHEST ||
@@ -196,12 +199,12 @@ public class PaintService {
                         for (int uy = 0; uy < graphicContainer.worldContainer.inventory.CY; uy++) {
                             if (graphicContainer.mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + graphicContainer.worldContainer.inventory.image.getHeight() + 46, uy * 46 + graphicContainer.worldContainer.inventory.image.getHeight() + 86) &&
                                     graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux] != Items.EMPTY) {
-                                graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                                graphicContainer.pg2.setColor(Color.WHITE);
+                                graphics.setFont(graphicContainer.mobFont);
+                                graphics.setColor(Color.WHITE);
                                 if (graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux].getDurability() != null) {
-                                    graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[uy * graphicContainer.worldContainer.inventory.CX + ux] / graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                                    graphics.drawString(graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[uy * graphicContainer.worldContainer.inventory.CX + ux] / graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                                 } else {
-                                    graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                                    graphics.drawString(graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                                 }
                             }
                         }
@@ -210,84 +213,84 @@ public class PaintService {
                     // paint FURNACE
                     if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.image.getHeight() + 46, graphicContainer.worldContainer.inventory.image.getHeight() + 86) &&
                             graphicContainer.worldContainer.ic.getIds()[0] != Items.EMPTY) {
-                        graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                        graphicContainer.pg2.setColor(Color.WHITE);
+                        graphics.setFont(graphicContainer.mobFont);
+                        graphics.setColor(Color.WHITE);
                         if (graphicContainer.worldContainer.ic.getIds()[0].getDurability() != null) {
-                            graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[0].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[0] / graphicContainer.worldContainer.ic.getIds()[0].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.worldContainer.ic.getIds()[0].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[0] / graphicContainer.worldContainer.ic.getIds()[0].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         } else {
-                            graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[0].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.worldContainer.ic.getIds()[0].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         }
                     }
                     if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.image.getHeight() + 102, graphicContainer.worldContainer.inventory.image.getHeight() + 142) &&
                             graphicContainer.worldContainer.ic.getIds()[1] != Items.EMPTY) {
-                        graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                        graphicContainer.pg2.setColor(Color.WHITE);
+                        graphics.setFont(graphicContainer.mobFont);
+                        graphics.setColor(Color.WHITE);
                         if (graphicContainer.worldContainer.ic.getIds()[1].getDurability() != null) {
-                            graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[1].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[1] / graphicContainer.worldContainer.ic.getIds()[1].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.worldContainer.ic.getIds()[1].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[1] / graphicContainer.worldContainer.ic.getIds()[1].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         } else {
-                            graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[1].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.worldContainer.ic.getIds()[1].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         }
                     }
                     if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.image.getHeight() + 142, graphicContainer.worldContainer.inventory.image.getHeight() + 182) &&
                             graphicContainer.worldContainer.ic.getIds()[2] != Items.EMPTY) {
-                        graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                        graphicContainer.pg2.setColor(Color.WHITE);
+                        graphics.setFont(graphicContainer.mobFont);
+                        graphics.setColor(Color.WHITE);
                         if (graphicContainer.worldContainer.ic.getIds()[2].getDurability() != null) {
-                            graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[2].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[2] / graphicContainer.worldContainer.ic.getIds()[2].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.worldContainer.ic.getIds()[2].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[2] / graphicContainer.worldContainer.ic.getIds()[2].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         } else {
-                            graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[2].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.worldContainer.ic.getIds()[2].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         }
                     }
                     if (graphicContainer.mousePos.isInBetween(62, 102, graphicContainer.worldContainer.inventory.image.getHeight() + 46, graphicContainer.worldContainer.inventory.image.getHeight() + 86) &&
                             graphicContainer.worldContainer.ic.getIds()[3] != Items.EMPTY) {
-                        graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                        graphicContainer.pg2.setColor(Color.WHITE);
+                        graphics.setFont(graphicContainer.mobFont);
+                        graphics.setColor(Color.WHITE);
                         if (graphicContainer.worldContainer.ic.getIds()[3].getDurability() != null) {
-                            graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[3].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[3] / graphicContainer.worldContainer.ic.getIds()[3].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.worldContainer.ic.getIds()[3].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[3] / graphicContainer.worldContainer.ic.getIds()[3].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         } else {
-                            graphicContainer.pg2.drawString(graphicContainer.worldContainer.ic.getIds()[3].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.worldContainer.ic.getIds()[3].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         }
                     }
                 }
             }
         }
         if (graphicContainer.state == State.LOADING_GRAPHICS) {
-            graphicContainer.pg2.setFont(graphicContainer.loadFont);
-            graphicContainer.pg2.setColor(Color.GREEN);
-            graphicContainer.pg2.drawString("Loading graphics... Please wait.", graphicContainer.getWidth() / 2 - 200, graphicContainer.getHeight() / 2 - 5);
+            graphics.setFont(graphicContainer.loadFont);
+            graphics.setColor(Color.GREEN);
+            graphics.drawString("Loading graphics... Please wait.", graphicContainer.getWidth() / 2 - 200, graphicContainer.getHeight() / 2 - 5);
         }
         if (graphicContainer.state == State.TITLE_SCREEN) {
-            graphicContainer.pg2.drawImage(graphicContainer.title_screen,
+            graphics.drawImage(graphicContainer.title_screen,
                     0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                     0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                     null);
         }
         if (graphicContainer.state == State.SELECT_WORLD) {
-            graphicContainer.pg2.drawImage(graphicContainer.select_world,
+            graphics.drawImage(graphicContainer.select_world,
                     0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                     0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                     null);
             for (int i = 0; i < graphicContainer.filesInfo.size(); i++) {
-                graphicContainer.pg2.setFont(graphicContainer.worldFont);
-                graphicContainer.pg2.setColor(Color.BLACK);
-                graphicContainer.pg2.drawString(graphicContainer.filesInfo.get(i).getName(), 180, 140 + i * 35);
-                graphicContainer.pg2.fillRect(166, 150 + i * 35, 470, 3);
+                graphics.setFont(graphicContainer.worldFont);
+                graphics.setColor(Color.BLACK);
+                graphics.drawString(graphicContainer.filesInfo.get(i).getName(), 180, 140 + i * 35);
+                graphics.fillRect(166, 150 + i * 35, 470, 3);
             }
         }
         if (graphicContainer.state == State.NEW_WORLD) {
-            graphicContainer.pg2.drawImage(graphicContainer.new_world,
+            graphics.drawImage(graphicContainer.new_world,
                     0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                     0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                     null);
-            graphicContainer.pg2.drawImage(graphicContainer.newWorldName.getImage(),
+            graphics.drawImage(graphicContainer.newWorldName.getImage(),
                     200, 240, 600, 270,
                     0, 0, 400, 30,
                     null);
         }
         if (graphicContainer.state == State.GENERATING_WORLD) {
-            graphicContainer.pg2.setFont(graphicContainer.loadFont);
-            graphicContainer.pg2.setColor(Color.GREEN);
-            graphicContainer.pg2.drawString("Generating new world... Please wait.", graphicContainer.getWidth() / 2 - 200, graphicContainer.getHeight() / 2 - 5);
+            graphics.setFont(graphicContainer.loadFont);
+            graphics.setColor(Color.GREEN);
+            graphics.drawString("Generating new world... Please wait.", graphicContainer.getWidth() / 2 - 200, graphicContainer.getHeight() / 2 - 5);
         }
         g.drawImage(graphicContainer.screen,
                 0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
@@ -296,7 +299,7 @@ public class PaintService {
     }
 
     private void paintPlayer(TerrariaClone graphicContainer) {
-        graphicContainer.pg2.drawImage(graphicContainer.worldContainer.player.image,
+        graphics.drawImage(graphicContainer.worldContainer.player.image,
                 graphicContainer.getWidth() / 2 - Player.WIDTH / 2, graphicContainer.getHeight() / 2 - Player.HEIGHT / 2,
                 graphicContainer.getWidth() / 2 + Player.WIDTH / 2, graphicContainer.getHeight() / 2 + Player.HEIGHT / 2,
                 0, 0, graphicContainer.worldContainer.player.image.getWidth(), graphicContainer.worldContainer.player.image.getHeight(),
@@ -313,12 +316,12 @@ public class PaintService {
         for (int ux = 0; ux < 10; ux++) {
             for (int uy = 0; uy < ymax; uy++) {
                 if (graphicContainer.mousePos.isInBetweenInclusive(ux * 46 + 6, ux * 46 + 46, uy * 46 + 6, uy * 46 + 46) && graphicContainer.worldContainer.inventory.items[uy * 10 + ux] != Items.EMPTY) {
-                    graphicContainer.pg2.setFont(graphicContainer.mobFont);
-                    graphicContainer.pg2.setColor(Color.WHITE);
+                    graphics.setFont(graphicContainer.mobFont);
+                    graphics.setColor(Color.WHITE);
                     if (graphicContainer.worldContainer.inventory.items[uy * 10 + ux].getDurability() != null) {
-                        graphicContainer.pg2.drawString(graphicContainer.worldContainer.inventory.items[uy * 10 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.inventory.durs[uy * 10 + ux] / graphicContainer.worldContainer.inventory.items[uy * 10 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        graphics.drawString(graphicContainer.worldContainer.inventory.items[uy * 10 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.inventory.durs[uy * 10 + ux] / graphicContainer.worldContainer.inventory.items[uy * 10 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     } else {
-                        graphicContainer.pg2.drawString(graphicContainer.worldContainer.inventory.items[uy * 10 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        graphics.drawString(graphicContainer.worldContainer.inventory.items[uy * 10 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
             }
@@ -334,7 +337,7 @@ public class PaintService {
         } else if (graphicContainer.worldContainer.layer == 2) {
             layerImg = ResourcesLoader.loadImage("interface/layersF.png");
         }
-        graphicContainer.pg2.drawImage(layerImg,
+        graphics.drawImage(layerImg,
                 graphicContainer.worldContainer.inventory.image.getWidth() + 58, 6, graphicContainer.worldContainer.inventory.image.getWidth() + 58 + layerImg.getWidth(), 6 + layerImg.getHeight(),
                 0, 0, layerImg.getWidth(), layerImg.getHeight(),
                 null);
@@ -342,20 +345,20 @@ public class PaintService {
 
     private void paintInventory(TerrariaClone graphicContainer) {
         if (graphicContainer.worldContainer.showInv) {
-            graphicContainer.pg2.drawImage(graphicContainer.worldContainer.inventory.image,
+            graphics.drawImage(graphicContainer.worldContainer.inventory.image,
                     0, 0, graphicContainer.worldContainer.inventory.image.getWidth(), (int) graphicContainer.worldContainer.inventory.image.getHeight(),
                     0, 0, graphicContainer.worldContainer.inventory.image.getWidth(), (int) graphicContainer.worldContainer.inventory.image.getHeight(),
                     null);
-            graphicContainer.pg2.drawImage(graphicContainer.armor.getImage(),
+            graphics.drawImage(graphicContainer.armor.getImage(),
                     graphicContainer.worldContainer.inventory.image.getWidth() + 6, 6, graphicContainer.worldContainer.inventory.image.getWidth() + 6 + graphicContainer.armor.getImage().getWidth(), 6 + graphicContainer.armor.getImage().getHeight(),
                     0, 0, graphicContainer.armor.getImage().getWidth(), graphicContainer.armor.getImage().getHeight(),
                     null);
-            graphicContainer.pg2.drawImage(graphicContainer.worldContainer.cic.getImage(),
+            graphics.drawImage(graphicContainer.worldContainer.cic.getImage(),
                     graphicContainer.worldContainer.inventory.image.getWidth() + 75, 52, graphicContainer.worldContainer.inventory.image.getWidth() + 75 + graphicContainer.worldContainer.cic.getImage().getWidth(), 52 + graphicContainer.worldContainer.cic.getImage().getHeight(),
                     0, 0, graphicContainer.worldContainer.cic.getImage().getWidth(), graphicContainer.worldContainer.cic.getImage().getHeight(),
                     null);
         } else {
-            graphicContainer.pg2.drawImage(graphicContainer.worldContainer.inventory.image,
+            graphics.drawImage(graphicContainer.worldContainer.inventory.image,
                     0, 0, graphicContainer.worldContainer.inventory.image.getWidth(), (int) graphicContainer.worldContainer.inventory.image.getHeight() / 4,
                     0, 0, graphicContainer.worldContainer.inventory.image.getWidth(), (int) graphicContainer.worldContainer.inventory.image.getHeight() / 4,
                     null);
@@ -365,28 +368,28 @@ public class PaintService {
     private void paintAllTools(TerrariaClone graphicContainer) {
         if (graphicContainer.worldContainer.showTool && graphicContainer.tool != null) {
             if (graphicContainer.worldContainer.player.imgState == ImageState.STILL_RIGHT || graphicContainer.worldContainer.player.imgState.isWalkRight()) {
-                graphicContainer.pg2.translate(graphicContainer.getWidth() / 2 + 6, graphicContainer.getHeight() / 2);
-                graphicContainer.pg2.rotate(graphicContainer.worldContainer.toolAngle);
+                graphics.translate(graphicContainer.getWidth() / 2 + 6, graphicContainer.getHeight() / 2);
+                graphics.rotate(graphicContainer.worldContainer.toolAngle);
 
-                graphicContainer.pg2.drawImage(graphicContainer.tool,
+                graphics.drawImage(graphicContainer.tool,
                         0, -graphicContainer.tool.getHeight() * 2, graphicContainer.tool.getWidth() * 2, 0,
                         0, 0, graphicContainer.tool.getWidth(), graphicContainer.tool.getHeight(),
                         null);
 
-                graphicContainer.pg2.rotate(-graphicContainer.worldContainer.toolAngle);
-                graphicContainer.pg2.translate(-graphicContainer.getWidth() / 2 - 6, -graphicContainer.getHeight() / 2);
+                graphics.rotate(-graphicContainer.worldContainer.toolAngle);
+                graphics.translate(-graphicContainer.getWidth() / 2 - 6, -graphicContainer.getHeight() / 2);
             }
             if (graphicContainer.worldContainer.player.imgState == ImageState.STILL_LEFT || graphicContainer.worldContainer.player.imgState.isWalkLeft()) {
-                graphicContainer.pg2.translate(graphicContainer.getWidth() / 2 - 6, graphicContainer.getHeight() / 2);
-                graphicContainer.pg2.rotate((Math.PI * 1.5) - graphicContainer.worldContainer.toolAngle);
+                graphics.translate(graphicContainer.getWidth() / 2 - 6, graphicContainer.getHeight() / 2);
+                graphics.rotate((Math.PI * 1.5) - graphicContainer.worldContainer.toolAngle);
 
-                graphicContainer.pg2.drawImage(graphicContainer.tool,
+                graphics.drawImage(graphicContainer.tool,
                         0, -graphicContainer.tool.getHeight() * 2, graphicContainer.tool.getWidth() * 2, 0,
                         0, 0, graphicContainer.tool.getWidth(), graphicContainer.tool.getHeight(),
                         null);
 
-                graphicContainer.pg2.rotate(-((Math.PI * 1.5) - graphicContainer.worldContainer.toolAngle));
-                graphicContainer.pg2.translate(-graphicContainer.getWidth() / 2 + 6, -graphicContainer.getHeight() / 2);
+                graphics.rotate(-((Math.PI * 1.5) - graphicContainer.worldContainer.toolAngle));
+                graphics.translate(-graphicContainer.getWidth() / 2 + 6, -graphicContainer.getHeight() / 2);
             }
         }
     }
@@ -394,15 +397,15 @@ public class PaintService {
     private void paintAllEntities(TerrariaClone graphicContainer) {
         for (int i = 0; i < graphicContainer.worldContainer.entities.size(); i++) {
             Entity entity = graphicContainer.worldContainer.entities.get(i);
-            graphicContainer.pg2.drawImage(entity.getImage(),
+            graphics.drawImage(entity.getImage(),
                     entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2, entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + entity.getWidth(), entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + entity.getHeight(),
                     0, 0, entity.getImage().getWidth(), entity.getImage().getHeight(),
                     null);
-            graphicContainer.pg2.drawImage(entity.getImage(),
+            graphics.drawImage(entity.getImage(),
                     entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 - graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + entity.getWidth() - graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + entity.getHeight(),
                     0, 0, entity.getImage().getWidth(), entity.getImage().getHeight(),
                     null);
-            graphicContainer.pg2.drawImage(entity.getImage(),
+            graphics.drawImage(entity.getImage(),
                     entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + entity.getWidth() + graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + entity.getHeight(),
                     0, 0, entity.getImage().getWidth(), entity.getImage().getHeight(),
                     null);
@@ -411,27 +414,27 @@ public class PaintService {
 
     private void paintSunMoonClouds(TerrariaClone graphicContainer) {
         if (graphicContainer.worldContainer.player.y / 16 < graphicContainer.HEIGHT * 0.5) {
-            graphicContainer.pg2.translate(graphicContainer.getWidth() / 2, graphicContainer.getHeight() * 0.85);
-            graphicContainer.pg2.rotate((graphicContainer.worldContainer.timeOfDay - 70200) / 86400 * Math.PI * 2);
+            graphics.translate(graphicContainer.getWidth() / 2, graphicContainer.getHeight() * 0.85);
+            graphics.rotate((graphicContainer.worldContainer.timeOfDay - 70200) / 86400 * Math.PI * 2);
 
-            graphicContainer.pg2.drawImage(sun,
+            graphics.drawImage(sun,
                     (int) (-graphicContainer.getWidth() * 0.65), 0, (int) (-graphicContainer.getWidth() * 0.65 + sun.getWidth() * 2), sun.getHeight() * 2,
                     0, 0, sun.getWidth(), sun.getHeight(),
                     null);
 
-            graphicContainer.pg2.rotate(Math.PI);
+            graphics.rotate(Math.PI);
 
-            graphicContainer.pg2.drawImage(moon,
+            graphics.drawImage(moon,
                     (int) (-graphicContainer.getWidth() * 0.65), 0, (int) (-graphicContainer.getWidth() * 0.65 + moon.getWidth() * 2), moon.getHeight() * 2,
                     0, 0, moon.getWidth(), moon.getHeight(),
                     null);
 
-            graphicContainer.pg2.rotate(-(graphicContainer.worldContainer.timeOfDay - 70200) / 86400 * Math.PI * 2 - Math.PI);
-            graphicContainer.pg2.translate(-graphicContainer.getWidth() / 2, -graphicContainer.getHeight() * 0.85);
+            graphics.rotate(-(graphicContainer.worldContainer.timeOfDay - 70200) / 86400 * Math.PI * 2 - Math.PI);
+            graphics.translate(-graphicContainer.getWidth() / 2, -graphicContainer.getHeight() * 0.85);
 
             for (int i = 0; i < graphicContainer.worldContainer.cloudsAggregate.getClouds().size(); i++) {
                 BufferedImage cloudImage = graphicContainer.cloudsImages[graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getN()];
-                graphicContainer.pg2.drawImage(graphicContainer.cloudsImages[graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getN()],
+                graphics.drawImage(graphicContainer.cloudsImages[graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getN()],
                         (int) graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getX(), (int) graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getY(), (int) graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getX() + cloudImage.getWidth() * 2, (int) graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getY() + cloudImage.getHeight() * 2,
                         0, 0, cloudImage.getWidth(), cloudImage.getHeight(),
                         null);

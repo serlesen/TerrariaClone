@@ -180,8 +180,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     List<Items> FRI1, FRI2;
     List<Short> FRN1, FRN2;
 
-    Graphics2D wg2, fwg2, ug2, pg2;
-
     public static void main(String[] args) {
         JFrame f = new JFrame("TerrariaClone: Infinite worlds!");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -418,8 +416,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                         log.info("Created image at " + twx + " " + twy);
                     }
                     if (worldContainer.worlds[twy][twx] != null) {
-                        wg2 = worldContainer.worlds[twy][twx].createGraphics();
-                        fwg2 = worldContainer.fworlds[twy][twx].createGraphics();
+                        Graphics2D wg2 = worldContainer.worlds[twy][twx].createGraphics();
+                        Graphics2D fwg2 = worldContainer.fworlds[twy][twx].createGraphics();
                         for (int tly = Math.max(twy * WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intY - getHeight() / 2 + Player.HEIGHT / 2 + v * WorldContainer.BLOCK_SIZE) - 64); tly < Math.min(twy * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intY + getHeight() / 2 - Player.HEIGHT / 2 + v * WorldContainer.BLOCK_SIZE) + 128); tly += WorldContainer.BLOCK_SIZE) {
                             for (int tlx = Math.max(twx * WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intX - getWidth() / 2 + Player.WIDTH / 2 + u * WorldContainer.BLOCK_SIZE) - 64); tlx < Math.min(twx * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intX + getWidth() / 2 - Player.WIDTH / 2 + u * WorldContainer.BLOCK_SIZE) + 112); tlx += WorldContainer.BLOCK_SIZE) {
                                 int tx = (int) (tlx / WorldContainer.BLOCK_SIZE);
@@ -1437,7 +1435,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
                                     }
                                 }
-                                ug2 = null;
                             }
                         } else if (worldContainer.inventory.tool() == Items.STONE_LIGHTER) {
                             if (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE_ON) {
