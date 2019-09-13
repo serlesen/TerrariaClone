@@ -8,6 +8,7 @@ import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.KeyPressed;
+import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.tools.ResourcesLoader;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -17,12 +18,22 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PUBLIC)
 public class Player implements Serializable {
 
-    private static final int PLAYERSIZEX = 20;
-    private static final int PLAYERSIZEY = 46;
+    private static final int MAX_FLIGHT_SPEED = 14;
+    private static final int MAX_GRAVITY_SPEED = 7;
+
+    public static final int WIDTH = 20;
+    public static final int HEIGHT = 46;
 
     transient BufferedImage image;
-    int ix, iy, width, height, totalHealthPoints, healthPoints;
-    double x, y, vx, vy, pvy, oldx, oldy;
+    int intX, intY, totalHealthPoints, healthPoints;
+    private double pvy, oldX, oldY;
+
+    /** Specifies the position (in pixels) of the player in the world. */
+    double x, y;
+
+    /** Specifies the speed vector (in pixels) of the player. */
+    double speedX, speedY;
+
     private boolean onGround, onGroundDelay, grounded;
     Rectangle rect;
 
@@ -30,23 +41,20 @@ public class Player implements Serializable {
     ImageState imgState;
 
     public Player(double x, double y) {
-        oldx = this.x = x; oldy = this.y = y;
+        oldX = this.x = x; oldY = this.y = y;
 
-        vx = 0;
-        vy = 0;
+        speedX = 0;
+        speedY = 0;
         pvy = 0;
 
         onGround = false;
 
         image = ResourcesLoader.loadImage("sprites/player/right_still.png");
 
-        width = PLAYERSIZEX;
-        height = PLAYERSIZEY;
+        intX = (int)x;
+        intY = (int)y;
 
-        ix = (int)x;
-        iy = (int)y;
-
-        rect = new Rectangle(ix, iy, width, height);
+        rect = new Rectangle(intX, intY, WIDTH, HEIGHT);
 
         imgDelay = 0;
         imgState = ImageState.STILL_RIGHT;
@@ -61,13 +69,7 @@ public class Player implements Serializable {
 
         handleMovement(keyPressed);
 
-        if (!onGround) {
-            vy += 0.3;
-            pvy += 0.3;
-            if (vy > 7 && !DebugContext.FLIGHT) {
-                vy = 7;
-            }
-        }
+        handleFalling();
 
         handleStopping(keyPressed);
 
@@ -81,34 +83,34 @@ public class Player implements Serializable {
 
         onGroundDelay = onGround;
 
-        oldx = x; oldy = y;
+        oldX = x; oldY = y;
 
-        x = x + vx;
+        x = x + speedX;
 
         if (!DebugContext.NOCLIP) {
             for (int k = 0; k < 2; k++) {
 
-                ix = (int) x;
-                iy = (int) y;
+                int ix = (int) x;
+                int iy = (int) y;
 
-                rect = new Rectangle(ix-1, iy, width+2, height);
+                rect = new Rectangle(ix-1, iy, WIDTH+2, HEIGHT);
 
-                int bx1 = (int)x/TerrariaClone.BLOCKSIZE;
-                int by1 = (int)y/TerrariaClone.BLOCKSIZE;
-                int bx2 = (int)(x+width)/TerrariaClone.BLOCKSIZE;
-                int by2 = (int)(y+height)/TerrariaClone.BLOCKSIZE;
+                int borderX1 = (int) x / WorldContainer.BLOCK_SIZE;
+                int borderY1 = (int) y / WorldContainer.BLOCK_SIZE;
+                int borderX2 = (int) (x + WIDTH) / WorldContainer.BLOCK_SIZE;
+                int borderY2 = (int) (y + HEIGHT) / WorldContainer.BLOCK_SIZE;
 
-                for (int i = bx1; i <= bx2; i++) {
-                    for (int j = by1; j <= by2; j++) {
+                for (int i = borderX1; i <= borderX2; i++) {
+                    for (int j = borderY1; j <= borderY2; j++) {
                         if (blocks[j+v][i+u] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
-                            if (rect.intersects(new Rectangle(i*TerrariaClone.BLOCKSIZE, j*TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE))) {
-                                if (oldx <= i*16 - width && vx > 0) {
-                                    x = i*16 - width;
-                                    vx = 0; // right
+                            if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
+                                if (oldX <= i*16 - WIDTH && speedX > 0) {
+                                    x = i*16 - WIDTH;
+                                    speedX = 0; // right
                                 }
-                                if (oldx >= i*16 + TerrariaClone.BLOCKSIZE && vx < 0) {
-                                    x = i*16 + TerrariaClone.BLOCKSIZE;
-                                    vx = 0; // left
+                                if (oldX >= i*16 + WorldContainer.BLOCK_SIZE && speedX < 0) {
+                                    x = i*16 + WorldContainer.BLOCK_SIZE;
+                                    speedX = 0; // left
                                 }
                             }
                         }
@@ -117,40 +119,40 @@ public class Player implements Serializable {
             }
         }
 
-        y = y + vy;
+        y = y + speedY;
         onGround = false;
         if (!DebugContext.NOCLIP) {
             for (int k = 0; k < 2; k++) {
 
-                ix = (int) x;
-                iy = (int) y;
+                int ix = (int) x;
+                int iy = (int) y;
 
-                rect = new Rectangle(ix, iy - 1, width, height+2);
+                rect = new Rectangle(ix, iy - 1, WIDTH, HEIGHT+2);
 
-                int bx1 = (int)x/TerrariaClone.BLOCKSIZE;
-                int by1 = (int)y/TerrariaClone.BLOCKSIZE;
-                int bx2 = (int)(x+width)/TerrariaClone.BLOCKSIZE;
-                int by2 = (int)(y+height)/TerrariaClone.BLOCKSIZE;
+                int borderX1 = (int) x / WorldContainer.BLOCK_SIZE;
+                int borderY1 = (int) y / WorldContainer.BLOCK_SIZE;
+                int borderX2 = (int) (x + WIDTH) / WorldContainer.BLOCK_SIZE;
+                int borderY2 = (int) (y + HEIGHT) / WorldContainer.BLOCK_SIZE;
 
-                by1 = Math.max(0, by1);
-                by2 = Math.min(blocks.length - 1, by2);
+                borderY1 = Math.max(0, borderY1);
+                borderY2 = Math.min(blocks.length - 1, borderY2);
 
-                for (int i = bx1; i <= bx2; i++) {
-                    for (int j = by1; j <= by2; j++) {
+                for (int i = borderX1; i <= borderX2; i++) {
+                    for (int j = borderY1; j <= borderY2; j++) {
                         if (blocks[j+v][i+u] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
-                            if (rect.intersects(new Rectangle(i*TerrariaClone.BLOCKSIZE, j*TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE))) {
-                                if (oldy <= j*16 - height && vy > 0) {
-                                    y = j*16 - height;
+                            if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
+                                if (oldY <= j*16 - HEIGHT && speedY > 0) {
+                                    y = j*16 - HEIGHT;
                                     if (pvy >= 10 && !DebugContext.INVINCIBLE) {
                                         healthPoints -= (int)((pvy - 12.5))*2;
                                     }
                                     onGround = true;
-                                    vy = 0; // down
+                                    speedY = 0; // down
                                     pvy = 0;
                                 }
-                                if (oldy >= j*16 + TerrariaClone.BLOCKSIZE && vy < 0) {
-                                    y = j*16 + TerrariaClone.BLOCKSIZE;
-                                    vy = 0; // up
+                                if (oldY >= j*16 + WorldContainer.BLOCK_SIZE && speedY < 0) {
+                                    y = j*16 + WorldContainer.BLOCK_SIZE;
+                                    speedY = 0; // up
                                 }
                             }
                         }
@@ -159,22 +161,34 @@ public class Player implements Serializable {
             }
         }
 
-        ix = (int) x;
-        iy = (int) y;
+        intX = (int) x;
+        intY = (int) y;
 
-        rect = new Rectangle(ix - 1, iy - 1, width+2, height+2);
+        rect = new Rectangle(intX - 1, intY - 1, WIDTH+2, HEIGHT+2);
+    }
+
+    private void handleFalling() {
+        if (!onGround) {
+            speedY += 0.3;
+            pvy += 0.3;
+            if (speedY > MAX_FLIGHT_SPEED && DebugContext.FLIGHT) {
+                speedY = MAX_FLIGHT_SPEED;
+            } else if (speedY > MAX_GRAVITY_SPEED && !DebugContext.FLIGHT) {
+                speedY = MAX_GRAVITY_SPEED;
+            }
+        }
     }
 
     private void handleStopping(KeyPressed keyPressed) {
         if (keyPressed != KeyPressed.LEFT && keyPressed != KeyPressed.RIGHT) {
-            if (Math.abs(vx) < 0.3) {
-                vx = 0;
+            if (Math.abs(speedX) < 0.3) {
+                speedX = 0;
             }
-            if (vx >= 0.3) {
-                vx -= 0.3;
+            if (speedX >= 0.3) {
+                speedX -= 0.3;
             }
-            if (vx <= -0.3) {
-                vx += 0.3;
+            if (speedX <= -0.3) {
+                speedX += 0.3;
             }
             if (grounded) {
                 if (imgState == ImageState.STILL_LEFT || imgState.isWalkLeft()) {
@@ -190,8 +204,8 @@ public class Player implements Serializable {
 
     private void handleMovement(KeyPressed keyPressed) {
         if (keyPressed == KeyPressed.LEFT) {
-            if (vx > -4 || DebugContext.SPEED) {
-                vx -= 0.5;
+            if (speedX > -4 || DebugContext.SPEED) {
+                speedX -= 0.5;
             }
             if (imgState.isStill() || imgState.isWalkRight()) {
                 setMovementImageTo(ImageState.WALK_LEFT_2, "sprites/player/left_walk.png");
@@ -205,11 +219,11 @@ public class Player implements Serializable {
                     }
                 }
             } else {
-                imgDelay = imgDelay - 1;
+                imgDelay -= 1;
             }
         } else if (keyPressed == KeyPressed.RIGHT) {
-            if (vx < 4 || DebugContext.SPEED) {
-                vx += 0.5;
+            if (speedX < 4 || DebugContext.SPEED) {
+                speedX += 0.5;
             }
             if (imgState.isStill() || imgState.isWalkLeft()) {
                 setMovementImageTo(ImageState.WALK_RIGHT_2, "sprites/player/right_walk.png");
@@ -223,20 +237,28 @@ public class Player implements Serializable {
                     }
                 }
             } else {
-                imgDelay = imgDelay - 1;
+                imgDelay -= 1;
             }
         } else if (keyPressed == KeyPressed.UP) {
             if (DebugContext.FLIGHT) {
-                vy -= 1;
+                speedY -= 1;
                 pvy -= 1;
+                if (speedY < (-1 * MAX_FLIGHT_SPEED)) {
+                    speedY = (-1 * MAX_FLIGHT_SPEED);
+                    pvy = (-1 * MAX_FLIGHT_SPEED);
+                }
             } else if (onGround) {
-                    vy = -7;
-                    pvy = -7;
+                speedY = -7;
+                pvy = -7;
             }
         } else if (keyPressed == KeyPressed.DOWN) {
             if (DebugContext.FLIGHT) {
-                vy += 1;
+                speedY += 1;
                 pvy += 1;
+                if (speedY < MAX_FLIGHT_SPEED) {
+                    speedY = MAX_FLIGHT_SPEED;
+                    pvy = MAX_FLIGHT_SPEED;
+                }
             }
         }
     }

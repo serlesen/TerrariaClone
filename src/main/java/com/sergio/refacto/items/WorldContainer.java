@@ -25,9 +25,27 @@ import com.sergio.refacto.dto.Items;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @FieldDefaults(level = AccessLevel.PUBLIC)
 public class WorldContainer implements Serializable {
+
+    /** Size of the World in pixels units. */
+    private static final int WIDTH = 2400;
+    private static final int HEIGHT = 2400;
+
+    /** Block size in pixels. */
+    public static final int BLOCK_SIZE = 16;
+
+    /** Amount of blocks in the chunk. */
+    public static final int CHUNK_BLOCKS = 96;
+    /** Size of the chunk in pixels. */
+    public static final int CHUNK_SIZE = CHUNK_BLOCKS * BLOCK_SIZE;
+
+    /** Size of the World in Chunk units. */
+    public static final int WORLD_WIDTH = WIDTH / CHUNK_BLOCKS + 1;
+    public static final int WORLD_HEIGHT = HEIGHT / CHUNK_BLOCKS + 1;
 
     private static final int[] SKY_COLORS = {28800, 28980, 29160, 29340, 29520, 29700, 29880, 30060, 30240, 30420, 30600, 30780, 30960, 31140, 31320, 31500, 31680, 31860, 32040, 32220, 72000, 72180, 72360, 72540, 72720, 72900, 73080, 73260, 73440, 73620, 73800, 73980, 74160, 74340, 74520, 74700, 74880, 75060, 75240, 75420};
 
@@ -50,9 +68,9 @@ public class WorldContainer implements Serializable {
     List<Integer> machinesx, machinesy;
 
     int regenerationCounter1;
-    int regenerationCounter2;
+    private int regenerationCounter2;
     int layer;
-    int layerTemp;
+    private int layerTemp;
     Blocks blockTemp;
 
     int mx, my, icx, icy, mining, immune;
@@ -74,13 +92,7 @@ public class WorldContainer implements Serializable {
     boolean showInv;
     boolean doMobSpawn;
 
-    int WIDTH;
-    int HEIGHT;
-
-    int WORLDWIDTH;
-    int WORLDHEIGHT;
-
-    int resunlight = WIDTH;
+    private int resunlight;
 
     ItemCollection ic;
 
@@ -90,17 +102,11 @@ public class WorldContainer implements Serializable {
 
     BufferedImage[][] worlds, fworlds;
 
-    String version;
-
-    static final int CHUNKBLOCKS = 96;
+    private String version;
 
     public WorldContainer() {
         currentSkyLight = 28800;
         ready = true;
-        WIDTH = 2400;
-        HEIGHT = 2400;
-        WORLDWIDTH = WIDTH / CHUNKBLOCKS + 1;
-        WORLDHEIGHT = HEIGHT / CHUNKBLOCKS + 1;
         resunlight = WIDTH;
         version = "0.3_01";
     }
@@ -115,7 +121,6 @@ public class WorldContainer implements Serializable {
                           Items moveItem, short moveNum, Items moveItemTemp, short moveNumTemp, int msi,
                           double toolAngle, double toolSpeed, double timeOfDay, int currentSkyLight, int day, int mobCount,
                           boolean ready, boolean showTool, boolean showInv, boolean doMobSpawn,
-                          int WIDTH, int HEIGHT, int WORLDWIDTH, int WORLDHEIGHT,
                           int resunlight,
                           ItemCollection ic, boolean[][] kworlds, ItemCollection[][][] icmatrix, String version) {
 
@@ -166,10 +171,6 @@ public class WorldContainer implements Serializable {
         this.showTool = showTool;
         this.showInv = showInv;
         this.doMobSpawn = doMobSpawn;
-        this.WIDTH = WIDTH;
-        this.HEIGHT = HEIGHT;
-        this.WORLDWIDTH = WORLDWIDTH;
-        this.WORLDHEIGHT = WORLDHEIGHT;
         this.resunlight = resunlight;
         this.ic = ic;
         this.kworlds = kworlds;
@@ -222,10 +223,6 @@ public class WorldContainer implements Serializable {
         showTool = wc.showTool;
         showInv = wc.showInv;
         doMobSpawn = wc.doMobSpawn;
-        WIDTH = wc.WIDTH;
-        HEIGHT = wc.HEIGHT;
-        WORLDWIDTH = wc.WORLDWIDTH;
-        WORLDHEIGHT = wc.WORLDHEIGHT;
         resunlight = wc.resunlight;
         kworlds = wc.kworlds;
         ic = wc.ic;
@@ -267,8 +264,8 @@ public class WorldContainer implements Serializable {
             entities.get(i).reloadImage();
         }
 
-        worlds = new BufferedImage[WORLDHEIGHT][WORLDWIDTH];
-        fworlds = new BufferedImage[WORLDHEIGHT][WORLDWIDTH];
+        worlds = new BufferedImage[WORLD_HEIGHT][WORLD_WIDTH];
+        fworlds = new BufferedImage[WORLD_HEIGHT][WORLD_WIDTH];
     }
 
     public boolean loadWorld(String worldFile) {
@@ -280,10 +277,11 @@ public class WorldContainer implements Serializable {
             fileIn.close();
 
             load(wc);
-            worlds = new BufferedImage[WORLDHEIGHT][WORLDWIDTH];
-            fworlds = new BufferedImage[WORLDHEIGHT][WORLDWIDTH];
+            worlds = new BufferedImage[WORLD_HEIGHT][WORLD_WIDTH];
+            fworlds = new BufferedImage[WORLD_HEIGHT][WORLD_WIDTH];
             return true;
         } catch (Exception e) {
+            log.warn("Error while loading a world", e);
             return false;
         }
     }
@@ -297,21 +295,21 @@ public class WorldContainer implements Serializable {
             out.close();
             fileOut.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error while saving a world", e);
         }
     }
 
-    public void createNewWorld(int size) {
-        blocks = new Blocks[3][size][size];
-        blocksDirections = new Directions[3][size][size];
-        BlocksDirectionsIntensity = new Byte[size][size];
-        blocksBackgrounds = new Backgrounds[size][size];
-        blocksTextureIntensity = new Byte[size][size];
-        lights = new Float[size][size];
-        power = new Float[3][size][size];
-        lsources = new Boolean[size][size];
+    public void createNewWorld() {
+        blocks = new Blocks[TerrariaClone.LAYER_SIZE][TerrariaClone.SIZE][TerrariaClone.SIZE];
+        blocksDirections = new Directions[TerrariaClone.LAYER_SIZE][TerrariaClone.SIZE][TerrariaClone.SIZE];
+        BlocksDirectionsIntensity = new Byte[TerrariaClone.SIZE][TerrariaClone.SIZE];
+        blocksBackgrounds = new Backgrounds[TerrariaClone.SIZE][TerrariaClone.SIZE];
+        blocksTextureIntensity = new Byte[TerrariaClone.SIZE][TerrariaClone.SIZE];
+        lights = new Float[TerrariaClone.SIZE][TerrariaClone.SIZE];
+        power = new Float[TerrariaClone.LAYER_SIZE][TerrariaClone.SIZE][TerrariaClone.SIZE];
+        lsources = new Boolean[TerrariaClone.SIZE][TerrariaClone.SIZE];
 
-        player = new Player(WIDTH * 0.5 * TerrariaClone.BLOCKSIZE, 45);
+        player = new Player(WIDTH * 0.5 * BLOCK_SIZE, 45);
 
         inventory = new Inventory();
 
@@ -422,7 +420,7 @@ public class WorldContainer implements Serializable {
         machinesx = new ArrayList<>(0);
         machinesy = new ArrayList<>(0);
 
-        icmatrix = new ItemCollection[3][HEIGHT][WIDTH];
+        icmatrix = new ItemCollection[TerrariaClone.LAYER_SIZE][HEIGHT][WIDTH];
 
         kworlds = new boolean[2][2];
 
@@ -431,6 +429,10 @@ public class WorldContainer implements Serializable {
 
         worlds = new BufferedImage[2][2];
         fworlds = new BufferedImage[2][2];
+
+        drawn = new Boolean[TerrariaClone.SIZE][TerrariaClone.SIZE];
+        rdrawn = new Boolean[TerrariaClone.SIZE][TerrariaClone.SIZE];
+        ldrawn = new Boolean[TerrariaClone.SIZE][TerrariaClone.SIZE];
     }
 
     public WorldContainer getCopy() {
@@ -444,15 +446,14 @@ public class WorldContainer implements Serializable {
                 moveItem, moveNum, moveItemTemp, moveNumTemp, msi,
                 toolAngle, toolSpeed, timeOfDay, currentSkyLight, day, mobCount,
                 ready, showTool, showInv, doMobSpawn,
-                WIDTH, HEIGHT, WORLDWIDTH, WORLDHEIGHT,
                 resunlight,
                 ic, kworlds, icmatrix, version);
     }
 
-    public void upgradeBlocksState(int u, int v, int size) {
+    public void upgradeBlocksState(int u, int v) {
         for (int l = 0; l < 3; l++) {
-            for (int y = 0; y < size; y++) {
-                for (int x = 0; x < size; x++) {
+            for (int y = 0; y < TerrariaClone.SIZE; y++) {
+                for (int x = 0; x < TerrariaClone.SIZE; x++) {
                     if (RandomTool.nextInt(22500) == 0) {
                         Blocks t = Blocks.AIR;
                         switch (blocks[l][y][x]) {
@@ -559,10 +560,10 @@ public class WorldContainer implements Serializable {
         }
     }
 
-    public void updateGrassState(int u, int v, int size) {
+    public void updateGrassState(int u, int v) {
         for (int l = 0; l < 3; l++) {
-            for (int y = 0; y < size; y++) {
-                for (int x = 0; x < size; x++) {
+            for (int y = 0; y < TerrariaClone.SIZE; y++) {
+                for (int x = 0; x < TerrariaClone.SIZE; x++) {
                     if (RandomTool.nextInt(1000) == 0) {
                         if (y >= 1 && y < HEIGHT - 1) {
                             boolean doGrassGrow = false;
@@ -595,10 +596,10 @@ public class WorldContainer implements Serializable {
     }
 
 
-    public void updateTreesState(int size) {
+    public void updateTreesState() {
         for (int l = 0; l < 3; l++) {
-            for (int y = 0; y < size; y++) {
-                for (int x = 0; x < size; x++) {
+            for (int y = 0; y < TerrariaClone.SIZE; y++) {
+                for (int x = 0; x < TerrariaClone.SIZE; x++) {
                     if (RandomTool.nextInt(1000) == 0) {
                         if (blocks[1][y][x] == Blocks.TREE_NO_BARK) {
                             blocks[1][y][x] = Blocks.TREE;
@@ -620,6 +621,7 @@ public class WorldContainer implements Serializable {
                     blocks[l][y + 1][x] == Blocks.AIR || !blocks[l][y + 1][x].isCds() ||
                     blocks[l][y + 1][x + 1] == Blocks.AIR || !blocks[l][y + 1][x + 1].isCds());
         } catch (ArrayIndexOutOfBoundsException e) {
+            log.warn("Out of Bounds for blocks at " + y + "/" + x + " and layer " + l, e);
             return false;
         }
     }

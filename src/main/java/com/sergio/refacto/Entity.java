@@ -12,6 +12,7 @@ import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.EntityType;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.Items;
+import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -410,8 +411,8 @@ public class Entity implements Serializable {
 
             rect = new Rectangle(ix-1, iy, width+2, height);
 
-            bx1 = (int)x/TerrariaClone.BLOCKSIZE; by1 = (int)y/TerrariaClone.BLOCKSIZE;
-            bx2 = (int)(x+width)/TerrariaClone.BLOCKSIZE; by2 = (int)(y+height)/TerrariaClone.BLOCKSIZE;
+            bx1 = (int)x/WorldContainer.BLOCK_SIZE; by1 = (int)y/WorldContainer.BLOCK_SIZE;
+            bx2 = (int)(x+width)/WorldContainer.BLOCK_SIZE; by2 = (int)(y+height)/WorldContainer.BLOCK_SIZE;
 
             bx1 = Math.max(0, bx1); by1 = Math.max(0, by1);
             bx2 = Math.min(blocks[0].length - 1, bx2); by2 = Math.min(blocks.length - 1, by2);
@@ -419,7 +420,7 @@ public class Entity implements Serializable {
             for (i=bx1; i<=bx2; i++) {
                 for (j=by1; j<=by2; j++) {
                     if (blocks[j][i] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
-                        if (rect.intersects(new Rectangle(i*TerrariaClone.BLOCKSIZE, j*TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE))) {
+                        if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
                             if (oldx <= i*16 - width && (vx > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 x = i*16 - width;
                                 if (AI == EntityType.BUBBLE) {
@@ -439,8 +440,8 @@ public class Entity implements Serializable {
                                 }
                                 rv = true;
                             }
-                            if (oldx >= i*16 + TerrariaClone.BLOCKSIZE && (vx < 0 || AI == EntityType.SHOOTING_STAR)) {
-                                x = i*16 + TerrariaClone.BLOCKSIZE;
+                            if (oldx >= i*16 + WorldContainer.BLOCK_SIZE && (vx < 0 || AI == EntityType.SHOOTING_STAR)) {
+                                x = i*16 + WorldContainer.BLOCK_SIZE;
                                 if (AI == EntityType.BUBBLE) {
                                     vx = -vx;
                                 }
@@ -475,8 +476,8 @@ public class Entity implements Serializable {
 
             rect = new Rectangle(ix, iy-1, width, height+2);
 
-            bx1 = (int)x/TerrariaClone.BLOCKSIZE; by1 = (int)y/TerrariaClone.BLOCKSIZE;
-            bx2 = (int)(x+width)/TerrariaClone.BLOCKSIZE; by2 = (int)(y+height)/TerrariaClone.BLOCKSIZE;
+            bx1 = (int)x/WorldContainer.BLOCK_SIZE; by1 = (int)y/ WorldContainer.BLOCK_SIZE;
+            bx2 = (int)(x+width)/WorldContainer.BLOCK_SIZE; by2 = (int)(y+height)/WorldContainer.BLOCK_SIZE;
 
             bx1 = Math.max(0, bx1); by1 = Math.max(0, by1);
             bx2 = Math.min(blocks[0].length - 1, bx2); by2 = Math.min(blocks.length - 1, by2);
@@ -484,7 +485,7 @@ public class Entity implements Serializable {
             for (i=bx1; i<=bx2; i++) {
                 for (j=by1; j<=by2; j++) {
                     if (blocks[j][i] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
-                        if (rect.intersects(new Rectangle(i*TerrariaClone.BLOCKSIZE, j*TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE, TerrariaClone.BLOCKSIZE))) {
+                        if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
                             if (oldy <= j*16 - height && (vy > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 y = j*16 - height;
                                 onGround = true;
@@ -496,8 +497,8 @@ public class Entity implements Serializable {
                                 }
                                 rv = true;
                             }
-                            if (oldy >= j*16 + TerrariaClone.BLOCKSIZE && (vy < 0 || AI == EntityType.SHOOTING_STAR)) {
-                                y = j*16 + TerrariaClone.BLOCKSIZE;
+                            if (oldy >= j*16 + WorldContainer.BLOCK_SIZE && (vy < 0 || AI == EntityType.SHOOTING_STAR)) {
+                                y = j*16 + WorldContainer.BLOCK_SIZE;
                                 if (AI == EntityType.BUBBLE) {
                                     vy = -vy;
                                 }
@@ -527,7 +528,7 @@ public class Entity implements Serializable {
             healthPoints -= Math.max(1, damage - armorPoints);
             immune = true;
             if (AI == EntityType.SHOOTING_STAR) {
-                if (player.x + player.width/2 < x + width/2) {
+                if (player.x + Player.WIDTH/2 < x + width/2) {
                     vx = 4;
                 }
                 else {
@@ -535,7 +536,7 @@ public class Entity implements Serializable {
                 }
             }
             else {
-                if (player.x + player.width/2 < x + width/2) {
+                if (player.x + Player.WIDTH/2 < x + width/2) {
                     vx += 4;
                 }
                 else {

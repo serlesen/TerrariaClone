@@ -35,26 +35,25 @@ public class Chunk {
         this.cx = cx;
         this.cy = cy;
 
-        int size = TerrariaClone.CHUNKBLOCKS;
-        blocks = new Blocks[3][size][size];
-        blocksDirections = new Directions[3][size][size];
-        BlocksDirectionsIntensity = new Byte[size][size];
-        blocksBackgrounds = new Backgrounds[size][size];
-        blocksTextureIntesity = new Byte[size][size];
-        lights = new Float[size][size];
-        power = new Float[3][size][size];
-        lsources = new Boolean[size][size];
-        zqn = new Byte[size][size];
-        pzqn = new Byte[3][size][size];
-        arbprd = new Boolean[3][size][size];
-        wcnct = new Boolean[size][size];
-        drawn = new Boolean[size][size];
-        rdrawn = new Boolean[size][size];
-        ldrawn = new Boolean[size][size];
-        for (int y=0; y<size; y++) {
-            for (int x=0; x<size; x++) {
-                for (int l=0; l<3; l++) {
-                    if (l == 1 && cy*size+y >= PerlinNoise.perlinNoise((cx*size+x) / 10.0, 0.5, 0) * 30 + 50) {
+        blocks = new Blocks[TerrariaClone.LAYER_SIZE][WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        blocksDirections = new Directions[TerrariaClone.LAYER_SIZE][WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        BlocksDirectionsIntensity = new Byte[WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        blocksBackgrounds = new Backgrounds[WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        blocksTextureIntesity = new Byte[WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        lights = new Float[WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        power = new Float[TerrariaClone.LAYER_SIZE][WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        lsources = new Boolean[WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        zqn = new Byte[WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        pzqn = new Byte[TerrariaClone.LAYER_SIZE][WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        arbprd = new Boolean[TerrariaClone.LAYER_SIZE][WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        wcnct = new Boolean[WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        drawn = new Boolean[WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        rdrawn = new Boolean[WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        ldrawn = new Boolean[WorldContainer.CHUNK_BLOCKS][WorldContainer.CHUNK_BLOCKS];
+        for (int y = 0; y < WorldContainer.CHUNK_BLOCKS; y++) {
+            for (int x = 0; x < WorldContainer.CHUNK_BLOCKS; x++) {
+                for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
+                    if (l == 1 && cy* WorldContainer.CHUNK_BLOCKS +y >= PerlinNoise.perlinNoise((cx* WorldContainer.CHUNK_BLOCKS +x) / 10.0, 0.5, 0) * 30 + 50) {
                         blocks[l][y][x] = Blocks.DIRT; // dirt
                     }
                     else {
