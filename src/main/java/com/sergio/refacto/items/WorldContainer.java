@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PUBLIC)
 public class WorldContainer implements Serializable {
 
-    /** Size of the World in pixels units. */
+    /** Size of the COMPLETE World in block units. */
     private static final int WIDTH = 2400;
     private static final int HEIGHT = 2400;
 
@@ -450,7 +450,7 @@ public class WorldContainer implements Serializable {
                 ic, kworlds, icmatrix, version);
     }
 
-    public void upgradeBlocksState(int u, int v) {
+    public void upgradeBlocksState(int blockOffsetU, int blockOffsetV) {
         for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
             for (int y = 0; y < TerrariaClone.SIZE; y++) {
                 for (int x = 0; x < TerrariaClone.SIZE; x++) {
@@ -478,42 +478,42 @@ public class WorldContainer implements Serializable {
                                 }
                                 break;
                             case DRYWEED_STAGE_1:
-                                if (checkBiome(x, y, u, v) == Biome.DESERT) {
+                                if (checkBiome(x, y, blockOffsetU, blockOffsetV) == Biome.DESERT) {
                                     t = Blocks.DRYWEED_STAGE_2;
                                 }
                                 break;
                             case DRYWEED_STAGE_2:
-                                if (checkBiome(x, y, u, v) == Biome.DESERT) {
+                                if (checkBiome(x, y, blockOffsetU, blockOffsetV) == Biome.DESERT) {
                                     t = Blocks.DRYWEED_STAGE_3;
                                 }
                                 break;
                             case GREENLEAF_STAGE_1:
-                                if (checkBiome(x, y, u, v) == Biome.JUNGLE) {
+                                if (checkBiome(x, y, blockOffsetU, blockOffsetV) == Biome.JUNGLE) {
                                     t = Blocks.GREENLEAF_STAGE_2;
                                 }
                                 break;
                             case GREENLEAF_STAGE_2:
-                                if (checkBiome(x, y, u, v) == Biome.JUNGLE) {
+                                if (checkBiome(x, y, blockOffsetU, blockOffsetV) == Biome.JUNGLE) {
                                     t = Blocks.GREENLEAF_STAGE_3;
                                 }
                                 break;
                             case FROSTLEAF_STAGE_1:
-                                if (checkBiome(x, y, u, v) == Biome.FROST) {
+                                if (checkBiome(x, y, blockOffsetU, blockOffsetV) == Biome.FROST) {
                                     t = Blocks.FROSTLEAF_STAGE_2;
                                 }
                                 break;
                             case FROSTLEAF_STAGE_2:
-                                if (checkBiome(x, y, u, v) == Biome.FROST) {
+                                if (checkBiome(x, y, blockOffsetU, blockOffsetV) == Biome.FROST) {
                                     t = Blocks.FROSTLEAF_STAGE_3;
                                 }
                                 break;
                             case CAVEROOT_STAGE_1:
-                                if (checkBiome(x, y, u, v) == Biome.CAVERN || y >= 0/*stonelayer[x]*/) {
+                                if (checkBiome(x, y, blockOffsetU, blockOffsetV) == Biome.CAVERN || y >= 0/*stonelayer[x]*/) {
                                     t = Blocks.CAVEROOT_STAGE_2;
                                 }
                                 break;
                             case CAVEROOT_STAGE_2:
-                                if (checkBiome(x, y, u, v) == Biome.CAVERN || y >= 0/*stonelayer[x]*/) {
+                                if (checkBiome(x, y, blockOffsetU, blockOffsetV) == Biome.CAVERN || y >= 0/*stonelayer[x]*/) {
                                     t = Blocks.CAVEROOT_STAGE_3;
                                 }
                                 break;
@@ -538,12 +538,12 @@ public class WorldContainer implements Serializable {
                                 }
                                 break;
                             case MARSHLEAF_STAGE_1:
-                                if (checkBiome(x, y, u, v) == Biome.SWAMP) {
+                                if (checkBiome(x, y, blockOffsetU, blockOffsetV) == Biome.SWAMP) {
                                     t = Blocks.MARSHLEAF_STAGE_2;
                                 }
                                 break;
                             case MARSHLEAF_STAGE_2:
-                                if (checkBiome(x, y, u, v) == Biome.SWAMP) {
+                                if (checkBiome(x, y, blockOffsetU, blockOffsetV) == Biome.SWAMP) {
                                     t = Blocks.MARSHLEAF_STAGE_3;
                                 }
                                 break;
@@ -560,22 +560,22 @@ public class WorldContainer implements Serializable {
         }
     }
 
-    public void updateGrassState(int u, int v) {
+    public void updateGrassState(int blockOffsetU, int blockOffsetV) {
         for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
             for (int y = 0; y < TerrariaClone.SIZE; y++) {
                 for (int x = 0; x < TerrariaClone.SIZE; x++) {
                     if (RandomTool.nextInt(1000) == 0) {
                         if (y >= 1 && y < HEIGHT - 1) {
                             boolean doGrassGrow = false;
-                            if (blocks[l][y][x] == Blocks.DIRT && hasOpenSpace(x + u, y + v, l) && blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == Blocks.GRASS) {
+                            if (blocks[l][y][x] == Blocks.DIRT && hasOpenSpace(x + blockOffsetU, y + blockOffsetV, l) && blocks[l][y + RandomTool.nextInt(3) - 1 + blockOffsetU][x + RandomTool.nextInt(3) - 1 + blockOffsetV] == Blocks.GRASS) {
                                 blocks[l][y][x] = Blocks.GRASS;
                                 doGrassGrow = true;
                             }
-                            if (blocks[l][y][x] == Blocks.DIRT && hasOpenSpace(x + u, y + v, l) && blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == Blocks.JUNGLE_GRASS) {
+                            if (blocks[l][y][x] == Blocks.DIRT && hasOpenSpace(x + blockOffsetU, y + blockOffsetV, l) && blocks[l][y + RandomTool.nextInt(3) - 1 + blockOffsetU][x + RandomTool.nextInt(3) - 1 + blockOffsetV] == Blocks.JUNGLE_GRASS) {
                                 blocks[l][y][x] = Blocks.JUNGLE_GRASS;
                                 doGrassGrow = true;
                             }
-                            if (blocks[l][y][x] == Blocks.MUD && hasOpenSpace(x + u, y + v, l) && blocks[l][y + RandomTool.nextInt(3) - 1 + u][x + RandomTool.nextInt(3) - 1 + v] == Blocks.SWAMP_GRASS) {
+                            if (blocks[l][y][x] == Blocks.MUD && hasOpenSpace(x + blockOffsetU, y + blockOffsetV, l) && blocks[l][y + RandomTool.nextInt(3) - 1 + blockOffsetU][x + RandomTool.nextInt(3) - 1 + blockOffsetV] == Blocks.SWAMP_GRASS) {
                                 blocks[l][y][x] = Blocks.SWAMP_GRASS;
                                 doGrassGrow = true;
                             }
@@ -626,7 +626,7 @@ public class WorldContainer implements Serializable {
                 blocks[l][y + 1][x + 1] == Blocks.AIR || !blocks[l][y + 1][x + 1].isCds();
     }
 
-    public Biome checkBiome(int x, int y, int u, int v) {
+    public Biome checkBiome(int x, int y, int blockOffsetU, int blockOffsetV) {
         int desert = 0;
         int frost = 0;
         int swamp = 0;
@@ -634,31 +634,31 @@ public class WorldContainer implements Serializable {
         int cavern = 0;
         for (int x2 = x - 15; x2 < x + 16; x2++) {
             for (int y2 = y - 15; y2 < y + 16; y2++) {
-                if (x2 + u >= 0 && x2 + u < WIDTH && y2 + v >= 0 && y2 + v < HEIGHT) {
-                    if (blocks[1][y2 + v][x2 + u] == Blocks.SAND || blocks[1][y2 + v][x2 + u] == Blocks.SANDSTONE) {
+                if (x2 + blockOffsetU >= 0 && x2 + blockOffsetU < WIDTH && y2 + blockOffsetV >= 0 && y2 + blockOffsetV < HEIGHT) {
+                    if (blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] == Blocks.SAND || blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] == Blocks.SANDSTONE) {
                         desert += 1;
-                    } else if (blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
+                    } else if (blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] != Blocks.AIR) {
                         desert -= 1;
                     }
-                    if (blocks[1][y2 + v][x2 + u] == Blocks.DIRT || blocks[1][y2 + v][x2 + u] == Blocks.GRASS || blocks[1][y2 + v][x2 + u] == Blocks.JUNGLE_GRASS) {
+                    if (blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] == Blocks.DIRT || blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] == Blocks.GRASS || blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] == Blocks.JUNGLE_GRASS) {
                         jungle += 1;
-                    } else if (blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
+                    } else if (blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] != Blocks.AIR) {
                         jungle -= 1;
                     }
-                    if (blocks[1][y2 + v][x2 + u] == Blocks.SWAMP_GRASS || blocks[1][y2 + v][x2 + u] == Blocks.MUD) {
+                    if (blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] == Blocks.SWAMP_GRASS || blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] == Blocks.MUD) {
                         swamp += 1;
-                    } else if (blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
+                    } else if (blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] != Blocks.AIR) {
                         swamp -= 1;
                     }
-                    if (blocks[1][y2 + v][x2 + u] == Blocks.SNOW) {
+                    if (blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] == Blocks.SNOW) {
                         frost += 1;
-                    } else if (blocks[1][y2 + v][x2 + u] != Blocks.AIR) {
+                    } else if (blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] != Blocks.AIR) {
                         frost -= 1;
                     }
-                    if (blocksBackgrounds[y2 + v][x2 + u] == Backgrounds.EMPTY) {
+                    if (blocksBackgrounds[y2 + blockOffsetV][x2 + blockOffsetU] == Backgrounds.EMPTY) {
                         cavern += 1;
                     }
-                    if (blocks[1][y2 + v][x2 + u] == Blocks.DIRT || blocks[1][y2 + v][x2 + u] == Blocks.STONE) {
+                    if (blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] == Blocks.DIRT || blocks[1][y2 + blockOffsetV][x2 + blockOffsetU] == Blocks.STONE) {
                         cavern += 1;
                     } else {
                         cavern -= 1;

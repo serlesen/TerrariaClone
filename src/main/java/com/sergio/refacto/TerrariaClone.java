@@ -128,6 +128,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     State state = State.LOADING_GRAPHICS;
 
+    /** Indexes of the in-memory chunks in the COMPLETE world. */
     int ou, ov, uNew, vNew;
     double p, q;
     Items miningTool;
@@ -396,8 +397,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             loadChunks();
             loadWorldContainer();
         }
-        int u = -ou * WorldContainer.CHUNK_BLOCKS;
-        int v = -ov * WorldContainer.CHUNK_BLOCKS;
+        int blockOffsetU = -ou * WorldContainer.CHUNK_BLOCKS;
+        int blockOffsetV = -ov * WorldContainer.CHUNK_BLOCKS;
         for (int twy = 0; twy < 2; twy++) {
             for (int twx = 0; twx < 2; twx++) {
                 worldContainer.kworlds[twy][twx] = false;
@@ -418,8 +419,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     if (worldContainer.worlds[twy][twx] != null) {
                         Graphics2D wg2 = worldContainer.worlds[twy][twx].createGraphics();
                         Graphics2D fwg2 = worldContainer.fworlds[twy][twx].createGraphics();
-                        for (int tly = Math.max(twy * WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intY - getHeight() / 2 + Player.HEIGHT / 2 + v * WorldContainer.BLOCK_SIZE) - 64); tly < Math.min(twy * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intY + getHeight() / 2 - Player.HEIGHT / 2 + v * WorldContainer.BLOCK_SIZE) + 128); tly += WorldContainer.BLOCK_SIZE) {
-                            for (int tlx = Math.max(twx * WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intX - getWidth() / 2 + Player.WIDTH / 2 + u * WorldContainer.BLOCK_SIZE) - 64); tlx < Math.min(twx * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intX + getWidth() / 2 - Player.WIDTH / 2 + u * WorldContainer.BLOCK_SIZE) + 112); tlx += WorldContainer.BLOCK_SIZE) {
+                        for (int tly = Math.max(twy * WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intY - getHeight() / 2 + Player.HEIGHT / 2 + blockOffsetV * WorldContainer.BLOCK_SIZE) - 64); tly < Math.min(twy * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intY + getHeight() / 2 - Player.HEIGHT / 2 + blockOffsetV * WorldContainer.BLOCK_SIZE) + 128); tly += WorldContainer.BLOCK_SIZE) {
+                            for (int tlx = Math.max(twx * WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intX - getWidth() / 2 + Player.WIDTH / 2 + blockOffsetU * WorldContainer.BLOCK_SIZE) - 64); tlx < Math.min(twx * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE, (int) (worldContainer.player.intX + getWidth() / 2 - Player.WIDTH / 2 + blockOffsetU * WorldContainer.BLOCK_SIZE) + 112); tlx += WorldContainer.BLOCK_SIZE) {
                                 int tx = (int) (tlx / WorldContainer.BLOCK_SIZE);
                                 int ty = (int) (tly / WorldContainer.BLOCK_SIZE);
                                 if (tx >= 0 && tx < SIZE && ty >= 0 && ty < SIZE) {
@@ -619,9 +620,9 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 }
             }
         }
-        updateApp(u, v);
+        updateApp(blockOffsetU, blockOffsetV);
         updateEnvironment();
-        worldContainer.player.update(worldContainer.blocks[1], keyPressed, u, v);
+        worldContainer.player.update(worldContainer.blocks[1], keyPressed, blockOffsetU, blockOffsetV);
         if (worldContainer.timeOfDay >= 86400) {
             worldContainer.timeOfDay = 0;
             worldContainer.day += 1;
@@ -813,7 +814,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         log.info("Finished generation.");
     }
 
-    public void updateApp(int u, int v) {
+    public void updateApp(int blockOffsetU, int blockOffsetV) {
         mousePos2.setX(mousePos.getX() + worldContainer.player.intX - getWidth() / 2 + Player.WIDTH / 2);
         mousePos2.setY(mousePos.getY() + worldContainer.player.intY - getHeight() / 2 + Player.HEIGHT / 2);
 
@@ -943,8 +944,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             }
         }
 
-        worldContainer.upgradeBlocksState(u, v);
-        worldContainer.updateGrassState(u, v);
+        worldContainer.upgradeBlocksState(blockOffsetU, blockOffsetV);
+        worldContainer.updateGrassState(blockOffsetU, blockOffsetV);
         worldContainer.updateTreesState();
 
         for (int i = updatex.size() - 1; i > -1; i--) {
@@ -1036,12 +1037,12 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         }
                                     }
                                 }
-                                if (mobSpawn != null && worldContainer.checkBiome(xpos, ypos, u, v) == Biome.DESERT) {
+                                if (mobSpawn != null && worldContainer.checkBiome(xpos, ypos, blockOffsetU, blockOffsetV) == Biome.DESERT) {
                                     if (RandomTool.nextInt(3) == 0) { // 33% of all spawns in desert
                                         mobSpawn = EntityType.SANDBOT;
                                     }
                                 }
-                                if (mobSpawn != null && worldContainer.checkBiome(xpos, ypos, u, v) == Biome.FROST) {
+                                if (mobSpawn != null && worldContainer.checkBiome(xpos, ypos, blockOffsetU, blockOffsetV) == Biome.FROST) {
                                     if (RandomTool.nextInt(3) == 0) { // 33% of all spawns in desert
                                         mobSpawn = EntityType.SNOWMAN;
                                     }
@@ -1515,7 +1516,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                                 worldContainer.blockTemp = Blocks.AIR;
                                             }
                                         }
-                                        if (worldContainer.player.rect.intersects(new Rectangle(ux * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
+                                        if (worldContainer.player.occupation.intersects(new Rectangle(ux * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
                                             worldContainer.blockTemp = Blocks.AIR;
                                         }
                                     }
@@ -2029,9 +2030,9 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             if (worldContainer.entities.get(i).getNewMob() != null) {
                 worldContainer.entities.add(worldContainer.entities.get(i).getNewMob());
             }
-            if (worldContainer.entities.get(i).update(worldContainer.blocks[1], worldContainer.player, u, v)) {
+            if (worldContainer.entities.get(i).update(worldContainer.blocks[1], worldContainer.player, blockOffsetU, blockOffsetV)) {
                 worldContainer.entities.remove(i);
-            } else if (worldContainer.player.rect.intersects(worldContainer.entities.get(i).getRect())) {
+            } else if (worldContainer.player.occupation.intersects(worldContainer.entities.get(i).getRect())) {
                 if (worldContainer.entities.get(i).getEntityType() != null) {
                     if (worldContainer.immune <= 0) {
                         if (!DebugContext.INVINCIBLE) {
@@ -3737,6 +3738,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
     }
 
     public void keyReleased(KeyEvent key) {
+        log.info("Handling key released");
         if (key.getKeyCode() == key.VK_LEFT || key.getKeyCode() == key.VK_A
                 || key.getKeyCode() == key.VK_RIGHT || key.getKeyCode() == key.VK_D
                 || key.getKeyCode() == key.VK_UP || key.getKeyCode() == key.VK_W

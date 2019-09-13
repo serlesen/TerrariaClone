@@ -162,7 +162,7 @@ public class Entity implements Serializable {
         width = image.getWidth()*2; height = image.getHeight()*2;
     }
 
-    public boolean update(Blocks[][] blocks, Player player, int u, int v) {
+    public boolean update(Blocks[][] blocks, Player player, int blockOffsetU, int blockOffsetV) {
         newMob = null;
         if (entityType == null) {
             if (!onGround) {
@@ -180,11 +180,11 @@ public class Entity implements Serializable {
             else {
                 vx = 0;
             }
-            collide(blocks, player, u, v);
+            collide(blocks, player, blockOffsetU, blockOffsetV);
             mdelay -= 1;
         }
         if (AI == EntityType.BULLET) {
-            if (collide(blocks, player, u, v)) {
+            if (collide(blocks, player, blockOffsetU, blockOffsetV)) {
                 return true;
             }
         } else if (AI == EntityType.ZOMBIE) {
@@ -252,7 +252,7 @@ public class Entity implements Serializable {
                     image = loadImage("sprites/monsters/" + entityType.getFileName() + "/right_jump.png");
                 }
             }
-            collide(blocks, player, u, v);
+            collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.BUBBLE) {
             if (x > player.x) {
                 vx = Math.max(vx - 0.1, -1.2);
@@ -266,7 +266,7 @@ public class Entity implements Serializable {
             else {
                 vy = Math.min(vy + 0.1, 1.2);
             }
-            collide(blocks, player, u, v);
+            collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.FAST_BUBBLE) {
             if (x > player.x) {
                 vx = Math.max(vx - 0.2, -2.4);
@@ -280,7 +280,7 @@ public class Entity implements Serializable {
             else {
                 vy = Math.min(vy + 0.2, 2.4);
             }
-            collide(blocks, player, u, v);
+            collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.SHOOTING_STAR) {
             n = Math.atan2(player.y - y, player.x - x);
             vx += Math.cos(n)/10;
@@ -289,7 +289,7 @@ public class Entity implements Serializable {
             if (vx > 5) vx = 5;
             if (vy < -5) vy = -5;
             if (vy > 5) vy = 5;
-            collide(blocks, player, u, v);
+            collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.SANDBOT) {
             if (Math.sqrt(Math.pow(player.x - x, 2) + Math.pow(player.y - y, 2)) > 160) {
                 if (x > player.x) {
@@ -337,7 +337,7 @@ public class Entity implements Serializable {
                 image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal.png");
                 bcount = 0;
             }
-            collide(blocks, player, u, v);
+            collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.BAT) {
             if (vx > 3) {
                 vx = 3;
@@ -382,17 +382,17 @@ public class Entity implements Serializable {
                 image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal_right.png");
                 imgDelay = 10;
             }
-            collide(blocks, player, u, v);
+            collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.BEE) {
             double theta = Math.atan2(player.y - y, player.x - x);
             vx = Math.cos(theta)*2.5;
             vy = Math.sin(theta)*2.5;
-            collide(blocks, player, u, v);
+            collide(blocks, player, blockOffsetU, blockOffsetV);
         }
         return false;
     }
 
-    public boolean collide(Blocks[][] blocks, Player player, int u, int v) {
+    public boolean collide(Blocks[][] blocks, Player player, int blockOffsetU, int blockOffsetV) {
         boolean rv = false;
 
         grounded = (onGround || onGroundDelay);
@@ -419,7 +419,7 @@ public class Entity implements Serializable {
 
             for (i=bx1; i<=bx2; i++) {
                 for (j=by1; j<=by2; j++) {
-                    if (blocks[j][i] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
+                    if (blocks[j][i] != Blocks.AIR && blocks[j+blockOffsetV][i+blockOffsetU].isCds()) {
                         if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
                             if (oldx <= i * WorldContainer.BLOCK_SIZE - width && (vx > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 x = i * WorldContainer.BLOCK_SIZE - width;
@@ -484,7 +484,7 @@ public class Entity implements Serializable {
 
             for (i=bx1; i<=bx2; i++) {
                 for (j=by1; j<=by2; j++) {
-                    if (blocks[j][i] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
+                    if (blocks[j][i] != Blocks.AIR && blocks[j+blockOffsetV][i+blockOffsetU].isCds()) {
                         if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
                             if (oldy <= j * WorldContainer.BLOCK_SIZE - height && (vy > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 y = j * WorldContainer.BLOCK_SIZE - height;

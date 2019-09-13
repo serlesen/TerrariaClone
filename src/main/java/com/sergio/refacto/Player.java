@@ -35,7 +35,9 @@ public class Player implements Serializable {
     double speedX, speedY;
 
     private boolean onGround, onGroundDelay, grounded;
-    Rectangle rect;
+
+    /** Represents the rectangle occupied by the player in the world. */
+    Rectangle occupation;
 
     private int imgDelay;
     ImageState imgState;
@@ -54,7 +56,7 @@ public class Player implements Serializable {
         intX = (int)x;
         intY = (int)y;
 
-        rect = new Rectangle(intX, intY, WIDTH, HEIGHT);
+        occupation = new Rectangle(intX, intY, WIDTH, HEIGHT);
 
         imgDelay = 0;
         imgState = ImageState.STILL_RIGHT;
@@ -64,7 +66,7 @@ public class Player implements Serializable {
         healthPoints = totalHealthPoints;
     }
 
-    public void update(Blocks[][] blocks, KeyPressed keyPressed, int u, int v) {
+    public void update(Blocks[][] blocks, KeyPressed keyPressed, int blockOffsetU, int blockOffsetV) {
         grounded = (onGround || onGroundDelay);
 
         handleMovement(keyPressed);
@@ -86,47 +88,31 @@ public class Player implements Serializable {
         oldX = x; oldY = y;
 
         x = x + speedX;
-
-        if (!DebugContext.NOCLIP) {
-            for (int k = 0; k < 2; k++) {
-
-                int ix = (int) x;
-                int iy = (int) y;
-
-                rect = new Rectangle(ix-1, iy, WIDTH+2, HEIGHT);
-
-                int borderX1 = (int) x / WorldContainer.BLOCK_SIZE;
-                int borderY1 = (int) y / WorldContainer.BLOCK_SIZE;
-                int borderX2 = (int) (x + WIDTH) / WorldContainer.BLOCK_SIZE;
-                int borderY2 = (int) (y + HEIGHT) / WorldContainer.BLOCK_SIZE;
-
-                for (int i = borderX1; i <= borderX2; i++) {
-                    for (int j = borderY1; j <= borderY2; j++) {
-                        if (blocks[j+v][i+u] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
-                            if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
-                                if (oldX <= i * WorldContainer.BLOCK_SIZE - WIDTH && speedX > 0) {
-                                    x = i * WorldContainer.BLOCK_SIZE - WIDTH;
-                                    speedX = 0; // right
-                                } else if (oldX >= i * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE && speedX < 0) {
-                                    x = i * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE;
-                                    speedX = 0; // left
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        handleHorizontalBlockage(blocks, blockOffsetU, blockOffsetV);
 
         y = y + speedY;
         onGround = false;
+        handleVerticalBlockage(blocks, blockOffsetU, blockOffsetV);
+
+        intX = (int) x;
+        intY = (int) y;
+
+        occupation = new Rectangle(intX - 1, intY - 1, WIDTH+2, HEIGHT+2);
+    }
+
+    /**
+     * A vertical blockage is when the player runs vertically into a solid block that can't be overstepped.
+     * This means that we stop the vertical speed and position the player just in front of the block.
+     *
+     * @param blocks
+     * @param blockOffsetU
+     * @param blockOffsetV
+     */
+    private void handleVerticalBlockage(Blocks[][] blocks, int blockOffsetU, int blockOffsetV) {
         if (!DebugContext.NOCLIP) {
             for (int k = 0; k < 2; k++) {
 
-                int ix = (int) x;
-                int iy = (int) y;
-
-                rect = new Rectangle(ix, iy - 1, WIDTH, HEIGHT+2);
+                occupation = new Rectangle((int) x, (int) y - 1, WIDTH, HEIGHT + 2);
 
                 int borderX1 = (int) x / WorldContainer.BLOCK_SIZE;
                 int borderY1 = (int) y / WorldContainer.BLOCK_SIZE;
@@ -138,8 +124,8 @@ public class Player implements Serializable {
 
                 for (int i = borderX1; i <= borderX2; i++) {
                     for (int j = borderY1; j <= borderY2; j++) {
-                        if (blocks[j+v][i+u] != Blocks.AIR && blocks[j+v][i+u].isCds()) {
-                            if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
+                        if (blocks[j+blockOffsetV][i+blockOffsetU] != Blocks.AIR && blocks[j+blockOffsetV][i+blockOffsetU].isCds()) {
+                            if (occupation.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
                                 if (oldY <= j * WorldContainer.BLOCK_SIZE - HEIGHT && speedY > 0) {
                                     y = j * WorldContainer.BLOCK_SIZE - HEIGHT;
                                     if (pvy >= 10 && !DebugContext.INVINCIBLE) {
@@ -158,11 +144,44 @@ public class Player implements Serializable {
                 }
             }
         }
+    }
 
-        intX = (int) x;
-        intY = (int) y;
+    /**
+     * A vertical blockage is when the player runs horizontally into a solid block that can't be overstepped.
+     * This means that we stop the horizontal speed and position the player just in front of the block.
+     *
+     * @param blocks
+     * @param blockOffsetU
+     * @param blockOffsetV
+     */
+    private void handleHorizontalBlockage(Blocks[][] blocks, int blockOffsetU, int blockOffsetV) {
+        if (!DebugContext.NOCLIP) {
+            for (int k = 0; k < 2; k++) {
 
-        rect = new Rectangle(intX - 1, intY - 1, WIDTH+2, HEIGHT+2);
+                occupation = new Rectangle((int) x - 1, (int) y, WIDTH + 2, HEIGHT);
+
+                int borderX1 = (int) x / WorldContainer.BLOCK_SIZE;
+                int borderY1 = (int) y / WorldContainer.BLOCK_SIZE;
+                int borderX2 = (int) (x + WIDTH) / WorldContainer.BLOCK_SIZE;
+                int borderY2 = (int) (y + HEIGHT) / WorldContainer.BLOCK_SIZE;
+
+                for (int i = borderX1; i <= borderX2; i++) {
+                    for (int j = borderY1; j <= borderY2; j++) {
+                        if (blocks[j+blockOffsetV][i+blockOffsetU] != Blocks.AIR && blocks[j+blockOffsetV][i+blockOffsetU].isCds()) {
+                            if (occupation.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
+                                if (oldX <= i * WorldContainer.BLOCK_SIZE - WIDTH && speedX > 0) {
+                                    x = i * WorldContainer.BLOCK_SIZE - WIDTH;
+                                    speedX = 0; // right
+                                } else if (oldX >= i * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE && speedX < 0) {
+                                    x = i * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE;
+                                    speedX = 0; // left
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void handleFalling() {
