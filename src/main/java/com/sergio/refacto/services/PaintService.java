@@ -16,7 +16,9 @@ import com.sergio.refacto.dto.Items;
 import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.tools.MathTool;
 import com.sergio.refacto.tools.ResourcesLoader;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class PaintService {
 
     BufferedImage sun, moon;
@@ -29,7 +31,9 @@ public class PaintService {
     }
 
     public void paint(TerrariaClone graphicContainer, Graphics g) {
-        graphics = graphicContainer.screen.createGraphics();
+        if (graphics == null) {
+            graphics = graphicContainer.screen.createGraphics();
+        }
         graphics.setColor(graphicContainer.bg);
         graphics.fillRect(0, 0, graphicContainer.getWidth(), graphicContainer.getHeight());
 
@@ -169,11 +173,11 @@ public class PaintService {
         graphics.drawString("Health: " + graphicContainer.worldContainer.player.healthPoints + "/" + graphicContainer.worldContainer.player.totalHealthPoints, graphicContainer.getWidth() - 125, 20);
         graphics.drawString("armor: " + graphicContainer.worldContainer.player.sumArmor(), graphicContainer.getWidth() - 125, 40);
         if (DebugContext.STATS) {
-            graphics.drawString("(" + ((int) graphicContainer.worldContainer.player.intX / 16) + ", " + ((int) graphicContainer.worldContainer.player.intY / 16) + ")", graphicContainer.getWidth() - 125, 60);
+            graphics.drawString("(" + ((int) graphicContainer.worldContainer.player.intX / WorldContainer.BLOCK_SIZE) + ", " + ((int) graphicContainer.worldContainer.player.intY / WorldContainer.BLOCK_SIZE) + ")", graphicContainer.getWidth() - 125, 60);
             if (graphicContainer.worldContainer.player.intY >= 0 && graphicContainer.worldContainer.player.intY < graphicContainer.HEIGHT * WorldContainer.BLOCK_SIZE) {
                 int u = -graphicContainer.ou * WorldContainer.CHUNK_BLOCKS;
                 int v = -graphicContainer.ov * WorldContainer.CHUNK_BLOCKS;
-                graphics.drawString(graphicContainer.worldContainer.checkBiome((int) graphicContainer.worldContainer.player.intX / 16 + u, (int) graphicContainer.worldContainer.player.intY / 16 + v, u, v).getTitle() + " " + graphicContainer.worldContainer.lights[(int) graphicContainer.worldContainer.player.intY / 16 + v][(int) graphicContainer.worldContainer.player.intX / 16 + u], graphicContainer.getWidth() - 125, 80);
+                graphics.drawString(graphicContainer.worldContainer.checkBiome((int) graphicContainer.worldContainer.player.intX / WorldContainer.BLOCK_SIZE + u, (int) graphicContainer.worldContainer.player.intY / WorldContainer.BLOCK_SIZE + v, u, v).getTitle() + " " + graphicContainer.worldContainer.lights[(int) graphicContainer.worldContainer.player.intY / 16 + v][(int) graphicContainer.worldContainer.player.intX / 16 + u], graphicContainer.getWidth() - 125, 80);
             }
         }
         if (graphicContainer.worldContainer.showInv) {

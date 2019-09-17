@@ -96,6 +96,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     /** Size (in block units) of the in-memory game. */
     public static final int SIZE = WorldContainer.CHUNK_BLOCKS * 2;
+    public static final int TIMER_DELAY = 50;
 
     public static final int LAYER_SIZE = 3;
 
@@ -137,7 +138,11 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
 
     Point tp1, tp2, tp3, tp4, tp5;
 
-    public Mouse mousePos, mousePos2;
+    /** Position of the mouse (in pixels) in the screen. */
+    public Mouse mousePos;
+
+    /** Position of the mouse (in pixels) in the complete world. */
+    public Mouse mousePos2;
 
     Font font = new Font("Chalkboard", Font.BOLD, 12);
     Font mobFont = new Font("Chalkboard", Font.BOLD, 16);
@@ -369,7 +374,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                 }
             });
 
-            inGameTimer = new Timer(20, null);
+            inGameTimer = new Timer(TIMER_DELAY, null);
             inGameTimer.addActionListener(ae -> {
                 try {
                     if (worldContainer.ready) {
@@ -749,7 +754,7 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                 }
                             }
                         };
-                        createWorldTimer = new Timer(1, createWorldThread);
+                        createWorldTimer = new Timer(TIMER_DELAY, createWorldThread);
                         createWorldTimer.start();
                     }
                 }
@@ -1396,8 +1401,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                     }
                     worldContainer.showTool = true;
                     worldContainer.toolAngle = 4.7;
-                    int ux = mousePos2.getX() / WorldContainer.BLOCK_SIZE;
-                    int uy = mousePos2.getY() / WorldContainer.BLOCK_SIZE;
+                    int ux = mousePos2.getX() / WorldContainer.BLOCK_SIZE + blockOffsetU;
+                    int uy = mousePos2.getY() / WorldContainer.BLOCK_SIZE + blockOffsetV;
                     int ux2 = mousePos2.getX() / WorldContainer.BLOCK_SIZE;
                     int uy2 = mousePos2.getY() / WorldContainer.BLOCK_SIZE;
                     if (Math.sqrt(Math.pow(worldContainer.player.x + worldContainer.player.image.getWidth() - ux2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2) + Math.pow(worldContainer.player.y + worldContainer.player.image.getHeight() - uy2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2)) <= 160 ||
