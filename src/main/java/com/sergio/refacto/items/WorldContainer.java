@@ -430,9 +430,13 @@ public class WorldContainer implements Serializable {
         worlds = new BufferedImage[2][2];
         fworlds = new BufferedImage[2][2];
 
+        // FIXME new Boolean[HEIGHT][WIDTH];
         drawn = new Boolean[TerrariaClone.SIZE][TerrariaClone.SIZE];
         rdrawn = new Boolean[TerrariaClone.SIZE][TerrariaClone.SIZE];
         ldrawn = new Boolean[TerrariaClone.SIZE][TerrariaClone.SIZE];
+//        drawn = new Boolean[HEIGHT][WIDTH];
+//        rdrawn = new Boolean[HEIGHT][WIDTH];
+//        ldrawn = new Boolean[HEIGHT][WIDTH];
     }
 
     public WorldContainer getCopy() {
