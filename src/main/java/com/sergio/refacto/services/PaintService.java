@@ -13,7 +13,6 @@ import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.ItemType;
 import com.sergio.refacto.dto.Items;
-import com.sergio.refacto.dto.State;
 import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.tools.MathTool;
 import com.sergio.refacto.tools.ResourcesLoader;

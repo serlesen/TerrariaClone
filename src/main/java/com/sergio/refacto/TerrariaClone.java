@@ -429,12 +429,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         worldContainer.blocksTextureIntensity[ty][tx] = (byte) RandomTool.nextInt(8);
                                         for (int y = 0; y < WorldContainer.BLOCK_SIZE; y++) {
                                             for (int x = 0; x < WorldContainer.BLOCK_SIZE; x++) {
-                                                try {
-                                                    worldContainer.worlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twxc * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twyc * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                                    worldContainer.fworlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twxc * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twyc * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                                } catch (ArrayIndexOutOfBoundsException e) {
-                                                    //log.warn("Out of Bounds for worlds at " + twy + "/" + twx, e);
-                                                }
+                                                worldContainer.worlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
+                                                worldContainer.fworlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
                                             }
                                         }
                                         if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
@@ -485,12 +481,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         somevar = true;
                                         for (int y = 0; y < WorldContainer.BLOCK_SIZE; y++) {
                                             for (int x = 0; x < WorldContainer.BLOCK_SIZE; x++) {
-                                                try {
-                                                    worldContainer.worlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twxc * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twyc * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                                    worldContainer.fworlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twxc * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twyc * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                                } catch (ArrayIndexOutOfBoundsException e) {
-                                                    //log.warn("Out of Bounds for worlds at " + twy + "/" + twx, e);
-                                                }
+                                                worldContainer.worlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
+                                                worldContainer.fworlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
                                             }
                                         }
                                         if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
@@ -541,12 +533,8 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
                                         somevar = true;
                                         for (int y = 0; y < WorldContainer.BLOCK_SIZE; y++) {
                                             for (int x = 0; x < WorldContainer.BLOCK_SIZE; x++) {
-                                                try {
-                                                    worldContainer.worlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twxc * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twyc * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                                    worldContainer.fworlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twxc * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twyc * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                                } catch (ArrayIndexOutOfBoundsException e) {
-                                                    //log.warn("Out of Bounds for worlds at " + twy + "/" + twx, e);
-                                                }
+                                                worldContainer.worlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
+                                                worldContainer.fworlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
                                             }
                                         }
                                         if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
