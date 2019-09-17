@@ -26,8 +26,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,8 +36,6 @@ import javax.swing.Action;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 import javax.swing.Timer;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import com.sergio.refacto.dto.Backgrounds;
 import com.sergio.refacto.dto.Biome;
@@ -89,7 +85,7 @@ import static com.sergio.refacto.dto.Constants.*;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PUBLIC)
-public class TerrariaClone extends JApplet implements ChangeListener, KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
+public class TerrariaClone extends JApplet implements KeyListener, MouseListener, MouseMotionListener {
 
     private WorldService worldService;
     private PaintService paintService;
@@ -210,7 +206,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
             addKeyListener(this);
             addMouseListener(this);
             addMouseMotionListener(this);
-            addMouseWheelListener(this);
 
             screen = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
 
@@ -3784,10 +3779,6 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         //
     }
 
-    public void stateChanged(ChangeEvent e) {
-        //
-    }
-
     public void mouseEntered(MouseEvent e) {
         //
     }
@@ -3796,11 +3787,4 @@ public class TerrariaClone extends JApplet implements ChangeListener, KeyListene
         //
     }
 
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        //
-    }
-
-    public void update() {
-        //
-    }
 }
