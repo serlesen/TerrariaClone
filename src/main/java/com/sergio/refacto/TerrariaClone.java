@@ -1448,8 +1448,8 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                     worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
                                 }
                             }
-                        } else if (worldContainer.inventory.tool().getBlocks() != Blocks.AIR) {
-                            worldContainer.blockTemp = worldContainer.inventory.tool().getBlocks();
+                        } else if (Blocks.findByIndex(worldContainer.inventory.tool().getBlockIndex()) != Blocks.AIR) {
+                            worldContainer.blockTemp = Blocks.findByIndex(worldContainer.inventory.tool().getBlockIndex());
                             if (uy >= 1 && (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.AIR) &&
                                     (worldContainer.layer == 0 && (
                                             worldContainer.blocks[worldContainer.layer][uy][ux - 1] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != Blocks.AIR ||
@@ -1474,7 +1474,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                 if (!(TORCHESL.get(worldContainer.blockTemp) != null) || uy < HEIGHT - 1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux].isSolid() && worldContainer.blockTemp != Blocks.BUTTON_LEFT || worldContainer.blocks[worldContainer.layer][uy][ux + 1].isSolid() || worldContainer.blocks[worldContainer.layer][uy][ux - 1].isSolid())) {
                                     if (TORCHESL.get(worldContainer.blockTemp) != null) {
                                         if (worldContainer.blocks[worldContainer.layer][uy + 1][ux].isSolid() && worldContainer.blockTemp != Blocks.BUTTON_LEFT) {
-                                            worldContainer.blockTemp = worldContainer.blockTemp;
+                                            // do nothing
                                         } else if (worldContainer.blocks[worldContainer.layer][uy][ux - 1].isSolid()) {
                                             worldContainer.blockTemp = TORCHESL.get(worldContainer.blockTemp);
                                         } else if (worldContainer.blocks[worldContainer.layer][uy][ux + 1].isSolid()) {
@@ -2440,7 +2440,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                 }
             }
             while (true) {
-                if (TORCHESR.get(worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops().getBlocks()) != null && TORCHESR.get(worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops().getBlocks()) == worldContainer.blocks[worldContainer.layer][uy][ux - 1] || (worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops() == Items.LEVER || worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops() == Items.BUTTON)) {
+                if (TORCHESR.get(Blocks.findByIndex(worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops().getBlockIndex())) != null && TORCHESR.get(Blocks.findByIndex(worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops().getBlockIndex())) == worldContainer.blocks[worldContainer.layer][uy][ux - 1] || (worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops() == Items.LEVER || worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops() == Items.BUTTON)) {
                     worldContainer.entities.add(new Entity((ux - 1) * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, RandomTool.nextDouble() * 4 - 2, -2, worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops(), (short) 1));
                     removeBlockLighting(ux - 1, uy);
                     if (worldContainer.layer == 1) {
@@ -2456,7 +2456,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                     }
                     worldContainer.drawn[uy][ux - 1] = false;
                 }
-                if (TORCHESL.get(worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops().getBlocks()) != null && TORCHESL.get(worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops().getBlocks()) == worldContainer.blocks[worldContainer.layer][uy][ux + 1] || (worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops() == Items.LEVER || worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops() == Items.BUTTON)) {
+                if (TORCHESL.get(Blocks.findByIndex(worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops().getBlockIndex())) != null && TORCHESL.get(Blocks.findByIndex(worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops().getBlockIndex())) == worldContainer.blocks[worldContainer.layer][uy][ux + 1] || (worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops() == Items.LEVER || worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops() == Items.BUTTON)) {
                     worldContainer.entities.add(new Entity((ux + 1) * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, RandomTool.nextDouble() * 4 - 2, -2, worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops(), (short) 1));
                     removeBlockLighting(ux + 1, uy);
                     if (worldContainer.layer == 1) {

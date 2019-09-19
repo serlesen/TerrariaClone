@@ -6,7 +6,7 @@ public class DebugContext {
     public static final boolean NOCLIP = false;
     public static final boolean LIGHT = false;
     public static final boolean REACH = true;
-    public static final boolean PEACEFUL = true;
+    public static final boolean PEACEFUL = false;
     public static final int HOSTILE = 1;
     public static final boolean F1 = false;
     public static final boolean SPEED = true;
