@@ -21,6 +21,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -92,7 +94,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
 
     /** Size (in block units) of the in-memory game. */
     public static final int SIZE = WorldContainer.CHUNK_BLOCKS * 2;
-    public static final int TIMER_DELAY = 50;
+    public static final int TIMER_DELAY = 100;
 
     public static final int LAYER_SIZE = 3;
 
@@ -186,11 +188,20 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         JFrame f = new JFrame("TerrariaClone: Infinite worlds!");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setVisible(true);
+        f.setFocusable(false);
 
         JApplet ap = new TerrariaClone();
         ap.setFocusable(true);
         f.add("Center", ap);
         f.pack();
+
+        f.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent aE) {
+//                ap.requestFocus();
+                ap.requestFocusInWindow();
+            }
+        });
 
         ap.init();
     }
