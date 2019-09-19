@@ -16,6 +16,7 @@ import com.sergio.refacto.dto.ItemCollection;
 import com.sergio.refacto.dto.ItemType;
 import com.sergio.refacto.dto.Items;
 import com.sergio.refacto.dto.RecipeItem;
+import com.sergio.refacto.items.ImagesContainer;
 import com.sergio.refacto.tools.ResourcesLoader;
 import lombok.extern.slf4j.Slf4j;
 
@@ -767,9 +768,9 @@ public class Inventory implements Serializable {
             }
         }
         if (items[i] != Items.EMPTY) {
-            width = TerrariaClone.getItemImgs().get(items[i]).getWidth();
-            height = TerrariaClone.getItemImgs().get(items[i]).getHeight();
-            g2.drawImage(TerrariaClone.getItemImgs().get(items[i]),
+            width = ImagesContainer.getInstance().itemImgs.get(items[i]).getWidth();
+            height = ImagesContainer.getInstance().itemImgs.get(items[i]).getHeight();
+            g2.drawImage(ImagesContainer.getInstance().itemImgs.get(items[i]),
                 px*46+14+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+14+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), px*46+38-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+38-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                 0, 0, width, height,
                 null);
@@ -998,9 +999,9 @@ public class Inventory implements Serializable {
                 0, 0, 40, 40,
                 null);
             if (ic.getIds()[i] != Items.EMPTY) {
-                width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
-                g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
+                width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getWidth();
+                height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getHeight();
+                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]),
                     px*40+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*40+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), px*40+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*40+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
@@ -1041,9 +1042,9 @@ public class Inventory implements Serializable {
                 0, 0, 40, 40,
                 null);
             if (ic.getIds()[4] != Items.EMPTY) {
-                width = TerrariaClone.getItemImgs().get(ic.getIds()[4]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.getIds()[4]).getHeight();
-                g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[4]),
+                width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[4]).getWidth();
+                height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[4]).getHeight();
+                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[4]),
                     3*40+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), 20+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), 3*40+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), 20+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
@@ -1068,9 +1069,9 @@ public class Inventory implements Serializable {
                 0, 0, 40, 40,
                 null);
             if (ic.getIds()[i] != Items.EMPTY) {
-                width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
-                g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
+                width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getWidth();
+                height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getHeight();
+                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]),
                     px*46+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), px*46+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
@@ -1095,9 +1096,9 @@ public class Inventory implements Serializable {
                 0, 0, 40, 40,
                 null);
             if (ic.getIds()[i] != Items.EMPTY) {
-                width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
-                g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
+                width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getWidth();
+                height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getHeight();
+                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]),
                     px*40+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*40+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), px*40+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*40+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
@@ -1137,9 +1138,9 @@ public class Inventory implements Serializable {
                 0, 0, 40, 40,
                 null);
             if (ic.getIds()[9] != Items.EMPTY) {
-                width = TerrariaClone.getItemImgs().get(ic.getIds()[9]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.getIds()[9]).getHeight();
-                    g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[9]),
+                width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[9]).getWidth();
+                height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[9]).getHeight();
+                    g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[9]),
                         4*40+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), 1*40+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), 4*40+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), 1*40+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                         0, 0, width, height,
                         null);
@@ -1168,9 +1169,9 @@ public class Inventory implements Serializable {
                 0, 0, 40, 40,
                 null);
             if (ic.getIds()[i] != Items.EMPTY) {
-                width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
-                height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
-                g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
+                width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getWidth();
+                height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getHeight();
+                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]),
                     px*46+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2), px*46+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2), py*46+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
@@ -1228,9 +1229,9 @@ public class Inventory implements Serializable {
                     0, 0, 40, 40,
                     null);
                 if (ic.getIds()[i] != Items.EMPTY) {
-                    width = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getWidth();
-                    height = TerrariaClone.getItemImgs().get(ic.getIds()[i]).getHeight();
-                    g2.drawImage(TerrariaClone.getItemImgs().get(ic.getIds()[i]),
+                    width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getWidth();
+                    height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getHeight();
+                    g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]),
                         (int)(fpx*40+8+((int)(24-(double)12/this.max(width, height, 12)*width*2)/2)), (int)(fpy*40+8+((int)(24-(double)12/this.max(width, height, 12)*height*2)/2)), (int)(fpx*40+32-((int)(24-(double)12/this.max(width, height, 12)*width*2)/2)), (int)(fpy*40+32-((int)(24-(double)12/this.max(width, height, 12)*height*2)/2)),
                         0, 0, width, height,
                         null);

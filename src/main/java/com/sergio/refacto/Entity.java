@@ -12,6 +12,7 @@ import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.EntityType;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.Items;
+import com.sergio.refacto.items.ImagesContainer;
 import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
@@ -157,7 +158,7 @@ public class Entity implements Serializable {
 
         dframes = 0;
 
-        image = TerrariaClone.getItemImgs().get(item.getIndex());
+        image = ImagesContainer.getInstance().itemImgs.get(item.getIndex());
 
         width = image.getWidth()*2; height = image.getHeight()*2;
     }

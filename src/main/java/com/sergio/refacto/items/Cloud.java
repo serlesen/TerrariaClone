@@ -10,7 +10,6 @@ public class Cloud {
     double x;
     double y;
     double speed;
-    int n;
 
     public void updateXUponSpeed() {
         x = x + speed;

@@ -54,15 +54,10 @@ import com.sergio.refacto.dto.Items;
 import com.sergio.refacto.dto.KeyPressed;
 import com.sergio.refacto.dto.MousePressed;
 import com.sergio.refacto.dto.State;
-import com.sergio.refacto.init.BackgroundImagesInitializer;
-import com.sergio.refacto.init.BlockImagesInitializer;
 import com.sergio.refacto.init.DDelayInitializer;
 import com.sergio.refacto.init.DurabilityInitializer;
 import com.sergio.refacto.init.FuelsInitializer;
 import com.sergio.refacto.init.GrassDirtInitializer;
-import com.sergio.refacto.init.ItemImagesInitializer;
-import com.sergio.refacto.init.LightLevelsInitializer;
-import com.sergio.refacto.init.OutlineImagesInitializer;
 import com.sergio.refacto.init.SkyColorsInitializer;
 import com.sergio.refacto.init.TorchesLInitializer;
 import com.sergio.refacto.init.TorchesRInitializer;
@@ -70,6 +65,7 @@ import com.sergio.refacto.init.UIEntitiesInitializer;
 import com.sergio.refacto.init.WirePInitializer;
 import com.sergio.refacto.items.Chunk;
 import com.sergio.refacto.items.Cloud;
+import com.sergio.refacto.items.ImagesContainer;
 import com.sergio.refacto.items.Mouse;
 import com.sergio.refacto.items.TextField;
 import com.sergio.refacto.items.WorldContainer;
@@ -78,7 +74,6 @@ import com.sergio.refacto.services.PaintService;
 import com.sergio.refacto.services.WorldService;
 import com.sergio.refacto.tools.MathTool;
 import com.sergio.refacto.tools.RandomTool;
-import com.sergio.refacto.tools.ResourcesLoader;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -148,10 +143,6 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
     Font worldFont = new Font("Andale Mono", Font.BOLD, 16);
     Color CYANISH = new Color(75, 163, 243);
 
-    BufferedImage title_screen, select_world, new_world, save_exit;
-    BufferedImage[] cloudsImages = { ResourcesLoader.loadImage("environment/cloud1.png") };
-    BufferedImage wcnct_px = ResourcesLoader.loadImage("misc/wcnct.png");
-
     javax.swing.Timer createWorldTimer;
     KeyPressed keyPressed;
     MousePressed mousePressed;
@@ -166,14 +157,10 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
 
     BufferedImage tool;
 
-    static Map<Backgrounds, BufferedImage> backgroundImgs;
-    public static Map<Items, BufferedImage> itemImgs;
+
     static Map<Short, Map<Integer, Integer>> DURABILITY;
     public static Map<EntityType, String> UIENTITIES;
     static Map<Integer, Color> SKYCOLORS;
-    static Map<Integer, BufferedImage> LIGHTLEVELS;
-    static Map<String, BufferedImage> blockImgs;
-    static Map<String, BufferedImage> outlineImgs;
     static Map<Blocks, Blocks> GRASSDIRT;
     static Map<Items, Double> FUELS;
     static Map<Integer, Blocks> WIREP;
@@ -225,30 +212,15 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
 
             worldContainer = new WorldContainer();
 
-            title_screen = ResourcesLoader.loadImage("interface/title_screen.png");
-            select_world = ResourcesLoader.loadImage("interface/select_world.png");
-            new_world = ResourcesLoader.loadImage("interface/new_world.png");
-            save_exit = ResourcesLoader.loadImage("interface/save_exit.png");
-
             state = State.LOADING_GRAPHICS;
 
             repaint();
-
-            backgroundImgs = BackgroundImagesInitializer.init();
-
-            itemImgs = ItemImagesInitializer.init();
-
-            blockImgs = BlockImagesInitializer.init();
-
-            outlineImgs = OutlineImagesInitializer.init();
 
             DURABILITY = DurabilityInitializer.init();
 
             UIENTITIES = UIEntitiesInitializer.init();
 
             SKYCOLORS = SkyColorsInitializer.init();
-
-            LIGHTLEVELS = LightLevelsInitializer.init();
 
             GRASSDIRT = GrassDirtInitializer.init();
 
@@ -445,7 +417,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                             }
                                         }
                                         if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
-                                            wg2.drawImage(backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
+                                            wg2.drawImage(ImagesContainer.getInstance().backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
                                                     tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                     0, 0, IMAGESIZE, IMAGESIZE,
                                                     null);
@@ -466,12 +438,12 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                             }
                                             if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
                                                 if (l == 2) {
-                                                    fwg2.drawImage(wcnct_px,
+                                                    fwg2.drawImage(ImagesContainer.getInstance().wcnct_px,
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
                                                 } else {
-                                                    wg2.drawImage(wcnct_px,
+                                                    wg2.drawImage(ImagesContainer.getInstance().wcnct_px,
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
@@ -479,7 +451,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                             }
                                         }
                                         if (!DebugContext.LIGHT) {
-                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
+                                            fwg2.drawImage(ImagesContainer.getInstance().lightLevelsImgs.get((int) (float) worldContainer.lights[ty][tx]),
                                                     tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                     0, 0, IMAGESIZE, IMAGESIZE,
                                                     null);
@@ -497,7 +469,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                             }
                                         }
                                         if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
-                                            wg2.drawImage(backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
+                                            wg2.drawImage(ImagesContainer.getInstance().backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
                                                     tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                     0, 0, IMAGESIZE, IMAGESIZE,
                                                     null);
@@ -518,12 +490,12 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                             }
                                             if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
                                                 if (l == 2) {
-                                                    fwg2.drawImage(wcnct_px,
+                                                    fwg2.drawImage(ImagesContainer.getInstance().wcnct_px,
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
                                                 } else {
-                                                    wg2.drawImage(wcnct_px,
+                                                    wg2.drawImage(ImagesContainer.getInstance().wcnct_px,
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
@@ -531,7 +503,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                             }
                                         }
                                         if (!DebugContext.LIGHT) {
-                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
+                                            fwg2.drawImage(ImagesContainer.getInstance().lightLevelsImgs.get((int) (float) worldContainer.lights[ty][tx]),
                                                     tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                     0, 0, IMAGESIZE, IMAGESIZE,
                                                     null);
@@ -549,7 +521,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                             }
                                         }
                                         if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
-                                            wg2.drawImage(backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
+                                            wg2.drawImage(ImagesContainer.getInstance().backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
                                                     tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                     0, 0, IMAGESIZE, IMAGESIZE,
                                                     null);
@@ -570,12 +542,12 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                             }
                                             if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
                                                 if (l == 2) {
-                                                    fwg2.drawImage(wcnct_px,
+                                                    fwg2.drawImage(ImagesContainer.getInstance().wcnct_px,
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
                                                 } else {
-                                                    wg2.drawImage(wcnct_px,
+                                                    wg2.drawImage(ImagesContainer.getInstance().wcnct_px,
                                                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                             0, 0, IMAGESIZE, IMAGESIZE,
                                                             null);
@@ -583,7 +555,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                             }
                                         }
                                         if (!DebugContext.LIGHT) {
-                                            fwg2.drawImage(LIGHTLEVELS.get((int) (float) worldContainer.lights[ty][tx]),
+                                            fwg2.drawImage(ImagesContainer.getInstance().lightLevelsImgs.get((int) (float) worldContainer.lights[ty][tx]),
                                                     tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
                                                     0, 0, IMAGESIZE, IMAGESIZE,
                                                     null);
@@ -1120,7 +1092,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         if (mousePressed == MousePressed.LEFT_MOUSE) {
             checkBlocks = true;
             if (worldContainer.showInv) {
-                if (mousePos.isInBetweenInclusive(getWidth() - save_exit.getWidth() - 24, getWidth() - 24, getHeight() - save_exit.getHeight() - 24, getHeight() - 24)) {
+                if (mousePos.isInBetweenInclusive(getWidth() - ImagesContainer.getInstance().saveExit.getWidth() - 24, getWidth() - 24, getHeight() - ImagesContainer.getInstance().saveExit.getHeight() - 24, getHeight() - 24)) {
                     if (mousePos.isClicked()) {
                         mousePos.setReleased(true);
                         worldContainer.saveWorld(currentWorld);
@@ -1397,7 +1369,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
             }
             if (checkBlocks) {
                 if (worldContainer.inventory.tool() != Items.EMPTY && !worldContainer.showTool) {
-                    tool = itemImgs.get(worldContainer.inventory.tool());
+                    tool = ImagesContainer.getInstance().itemImgs.get(worldContainer.inventory.tool());
                     for (int i = 0; i < worldContainer.entities.size(); i++) {
                         worldContainer.entities.get(i).setImmune(false);
                     }
@@ -2697,8 +2669,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         if (RandomTool.nextInt((int) (1500 / DebugContext.ACCEL)) == 0) {
 
             Cloud cloud = new Cloud();
-            cloud.setN(RandomTool.nextInt(1));
-            BufferedImage cloudImage = cloudsImages[cloud.getN()];
+            BufferedImage cloudImage = ImagesContainer.getInstance().cloudsImage;
             if (RandomTool.nextInt(2) == 0) {
                 cloud.setX(-cloudImage.getWidth() * 2);
                 cloud.setSpeed(0.1 * DebugContext.ACCEL);
@@ -3491,12 +3462,12 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
     }
 
     public BufferedImage loadBlock(Blocks type, Directions direction, Byte directionIntensity, Byte textureIntensity, String outlineName, int x, int y, int lyr) {
-        BufferedImage outline = outlineImgs.get("outlines/" + outlineName + "/" + direction.getFileName() + (directionIntensity + 1) + ".png");
+        BufferedImage outline = ImagesContainer.getInstance().outlineImgs.get("outlines/" + outlineName + "/" + direction.getFileName() + (directionIntensity + 1) + ".png");
         String bName = type.getFileName();
-        BufferedImage texture = blockImgs.get("blocks/" + bName + "/texture" + (textureIntensity + 1) + ".png");
+        BufferedImage texture = ImagesContainer.getInstance().blockImgs.get("blocks/" + bName + "/texture" + (textureIntensity + 1) + ".png");
         BufferedImage image = config.createCompatibleImage(IMAGESIZE, IMAGESIZE, Transparency.TRANSLUCENT);
         if (GRASSDIRT.get(type) != null) {
-            BufferedImage dirtOriginal = blockImgs.get("blocks/" + GRASSDIRT.get(type).getFileName() + "/texture" + (textureIntensity + 1) + ".png");
+            BufferedImage dirtOriginal = ImagesContainer.getInstance().blockImgs.get("blocks/" + GRASSDIRT.get(type).getFileName() + "/texture" + (textureIntensity + 1) + ".png");
             BufferedImage dirt = config.createCompatibleImage(IMAGESIZE, IMAGESIZE, Transparency.TRANSLUCENT);
             for (int dy = 0; dy < IMAGESIZE; dy++) {
                 for (int dx = 0; dx < IMAGESIZE; dx++) {
@@ -3781,10 +3752,6 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         return new Dimension(800, 600);
     }
 
-
-    public static Map<Items, BufferedImage> getItemImgs() {
-        return itemImgs;
-    }
 
     public void keyTyped(KeyEvent key) {
         //

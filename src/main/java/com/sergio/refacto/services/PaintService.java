@@ -13,6 +13,7 @@ import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.ItemType;
 import com.sergio.refacto.dto.Items;
+import com.sergio.refacto.items.ImagesContainer;
 import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.tools.MathTool;
 import com.sergio.refacto.tools.ResourcesLoader;
@@ -47,13 +48,13 @@ public class PaintService {
                 graphics.drawString("Loading graphics... Please wait.", graphicContainer.getWidth() / 2 - 200, graphicContainer.getHeight() / 2 - 5);
                 break;
             case TITLE_SCREEN:
-                graphics.drawImage(graphicContainer.title_screen,
+                graphics.drawImage(ImagesContainer.getInstance().titleScreen,
                         0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                         0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                         null);
                 break;
             case SELECT_WORLD:
-                graphics.drawImage(graphicContainer.select_world,
+                graphics.drawImage(ImagesContainer.getInstance().selectWorld,
                         0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                         0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                         null);
@@ -65,7 +66,7 @@ public class PaintService {
                 }
                 break;
             case NEW_WORLD:
-                graphics.drawImage(graphicContainer.new_world,
+                graphics.drawImage(ImagesContainer.getInstance().newWorld,
                         0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                         0, 0, graphicContainer.getWidth(), graphicContainer.getHeight(),
                         null);
@@ -138,16 +139,16 @@ public class PaintService {
         paintCurrentLayer(graphicContainer);
 
         if (graphicContainer.worldContainer.showInv) {
-            graphics.drawImage(graphicContainer.save_exit,
-                    graphicContainer.getWidth() - graphicContainer.save_exit.getWidth() - 24, graphicContainer.getHeight() - graphicContainer.save_exit.getHeight() - 24, graphicContainer.getWidth() - 24, graphicContainer.getHeight() - 24,
-                    0, 0, graphicContainer.save_exit.getWidth(), graphicContainer.save_exit.getHeight(),
+            graphics.drawImage(ImagesContainer.getInstance().saveExit,
+                    graphicContainer.getWidth() - ImagesContainer.getInstance().saveExit.getWidth() - 24, graphicContainer.getHeight() - ImagesContainer.getInstance().saveExit.getHeight() - 24, graphicContainer.getWidth() - 24, graphicContainer.getHeight() - 24,
+                    0, 0, ImagesContainer.getInstance().saveExit.getWidth(), ImagesContainer.getInstance().saveExit.getHeight(),
                     null);
         }
 
         if (graphicContainer.worldContainer.moveItem != Items.EMPTY) {
-            int width = TerrariaClone.itemImgs.get(graphicContainer.worldContainer.moveItem).getWidth();
-            int height = TerrariaClone.itemImgs.get(graphicContainer.worldContainer.moveItem).getHeight();
-            graphics.drawImage(TerrariaClone.itemImgs.get(graphicContainer.worldContainer.moveItem),
+            int width = ImagesContainer.getInstance().itemImgs.get(graphicContainer.worldContainer.moveItem).getWidth();
+            int height = ImagesContainer.getInstance().itemImgs.get(graphicContainer.worldContainer.moveItem).getHeight();
+            graphics.drawImage(ImagesContainer.getInstance().itemImgs.get(graphicContainer.worldContainer.moveItem),
                     graphicContainer.mousePos.getX() + 12 + ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * width * 2) / 2), graphicContainer.mousePos.getY() + 12 + ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * height * 2) / 2), graphicContainer.mousePos.getX() + 36 - ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * width * 2) / 2), graphicContainer.mousePos.getY() + 36 - ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * height * 2) / 2),
                     0, 0, width, height,
                     null);
@@ -157,6 +158,8 @@ public class PaintService {
                 graphics.drawString(graphicContainer.worldContainer.moveNum + " ", graphicContainer.mousePos.getX() + 13, graphicContainer.mousePos.getY() + 38);
             }
         }
+
+
         for (int i = 0; i < graphicContainer.worldContainer.entities.size(); i++) {
             if (TerrariaClone.UIENTITIES.get(graphicContainer.worldContainer.entities.get(i).getEntityType().getName()) != null && graphicContainer.worldContainer.entities.get(i).getRect() != null && graphicContainer.worldContainer.entities.get(i).getRect().contains(new Point(graphicContainer.mousePos2.getX(), graphicContainer.mousePos2.getY()))) {
                 graphics.setFont(graphicContainer.mobFont);
@@ -443,8 +446,8 @@ public class PaintService {
             graphics.translate(-graphicContainer.getWidth() / 2, -graphicContainer.getHeight() * 0.85);
 
             for (int i = 0; i < graphicContainer.worldContainer.cloudsAggregate.getClouds().size(); i++) {
-                BufferedImage cloudImage = graphicContainer.cloudsImages[graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getN()];
-                graphics.drawImage(graphicContainer.cloudsImages[graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getN()],
+                BufferedImage cloudImage = ImagesContainer.getInstance().cloudsImage;
+                graphics.drawImage(cloudImage,
                         (int) graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getX(), (int) graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getY(), (int) graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getX() + cloudImage.getWidth() * 2, (int) graphicContainer.worldContainer.cloudsAggregate.getClouds().get(i).getY() + cloudImage.getHeight() * 2,
                         0, 0, cloudImage.getWidth(), cloudImage.getHeight(),
                         null);
