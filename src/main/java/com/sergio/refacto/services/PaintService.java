@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 import com.sergio.refacto.Entity;
 import com.sergio.refacto.Player;
 import com.sergio.refacto.TerrariaClone;
+import com.sergio.refacto.dto.Backgrounds;
+import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.ItemType;
@@ -29,6 +31,60 @@ public class PaintService {
     public PaintService() {
         sun = ResourcesLoader.loadImage("environment/sun.png");
         moon = ResourcesLoader.loadImage("environment/moon.png");
+    }
+
+    public void paintLights(TerrariaClone graphicContainer, Graphics g, int twx, int twy, int tx, int ty) {
+        if (!DebugContext.LIGHT) {
+            g.drawImage(ImagesContainer.getInstance().lightLevelsImgs.get((int) (float) graphicContainer.worldContainer.lights[ty][tx]),
+                    tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
+                    0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
+                    null);
+        }
+    }
+
+    public void paintBlock(TerrariaClone graphicContainer, Graphics worldGraphic, Graphics fWorldGraphic, int twx, int twy, int tx, int ty) {
+        for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
+            if (graphicContainer.worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
+                if (l == 2) {
+                    fWorldGraphic.drawImage(graphicContainer.loadBlock(graphicContainer.worldContainer.blocks[l][ty][tx], graphicContainer.worldContainer.blocksDirections[l][ty][tx], graphicContainer.worldContainer.blocksDirectionsIntensity[ty][tx], graphicContainer.worldContainer.blocksTextureIntensity[ty][tx], graphicContainer.worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
+                            0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
+                            null);
+                } else {
+                    worldGraphic.drawImage(graphicContainer.loadBlock(graphicContainer.worldContainer.blocks[l][ty][tx], graphicContainer.worldContainer.blocksDirections[l][ty][tx], graphicContainer.worldContainer.blocksDirectionsIntensity[ty][tx], graphicContainer.worldContainer.blocksTextureIntensity[ty][tx], graphicContainer.worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
+                            0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
+                            null);
+                }
+            } else if (graphicContainer.wcnct[ty][tx] && graphicContainer.worldContainer.blocks[l][ty][tx].isZythiumWire()) {
+                if (l == 2) {
+                    fWorldGraphic.drawImage(ImagesContainer.getInstance().wcnct_px,
+                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
+                            0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
+                            null);
+                } else {
+                    worldGraphic.drawImage(ImagesContainer.getInstance().wcnct_px,
+                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
+                            0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
+                            null);
+                }
+            }
+        }
+    }
+
+    public void paintBackground(TerrariaClone graphicContainer, Graphics g, int twx, int twy, int tx, int ty) {
+        for (int y = 0; y < WorldContainer.BLOCK_SIZE; y++) {
+            for (int x = 0; x < WorldContainer.BLOCK_SIZE; x++) {
+                graphicContainer.worldContainer.worlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
+                graphicContainer.worldContainer.fworlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
+            }
+        }
+        if (graphicContainer.worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
+            g.drawImage(ImagesContainer.getInstance().backgroundImgs.get(graphicContainer.worldContainer.blocksBackgrounds[ty][tx]),
+                    tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
+                    0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
+                    null);
+        }
     }
 
     public void paint(TerrariaClone graphicContainer, Graphics g) {

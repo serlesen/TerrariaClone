@@ -39,7 +39,6 @@ import javax.swing.JApplet;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
-import com.sergio.refacto.dto.Backgrounds;
 import com.sergio.refacto.dto.Biome;
 import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.DebugContext;
@@ -150,7 +149,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
     boolean checkBlocks = true;
     boolean menuPressed = false;
 
-    private static final int IMAGESIZE = 8;
+    public static final int IMAGESIZE = 8;
     private static final int BRIGHTEST = 21;
 
     int sunlightlevel = 19;
@@ -409,160 +408,15 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                 if (tx >= 0 && tx < SIZE && ty >= 0 && ty < SIZE) {
                                     if (!worldContainer.drawn[ty][tx]) {
                                         somevar = true;
-                                        worldContainer.blocksTextureIntensity[ty][tx] = (byte) RandomTool.nextInt(8);
-                                        for (int y = 0; y < WorldContainer.BLOCK_SIZE; y++) {
-                                            for (int x = 0; x < WorldContainer.BLOCK_SIZE; x++) {
-                                                worldContainer.worlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                                worldContainer.fworlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                            }
-                                        }
-                                        if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
-                                            wg2.drawImage(ImagesContainer.getInstance().backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
-                                                    tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                    null);
-                                        }
-                                        for (int l = 0; l < LAYER_SIZE; l++) {
-                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
-                                                if (l == 2) {
-                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                } else {
-                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                }
-                                            }
-                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
-                                                if (l == 2) {
-                                                    fwg2.drawImage(ImagesContainer.getInstance().wcnct_px,
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                } else {
-                                                    wg2.drawImage(ImagesContainer.getInstance().wcnct_px,
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                }
-                                            }
-                                        }
-                                        if (!DebugContext.LIGHT) {
-                                            fwg2.drawImage(ImagesContainer.getInstance().lightLevelsImgs.get((int) (float) worldContainer.lights[ty][tx]),
-                                                    tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                    null);
-                                        }
-                                        worldContainer.drawn[ty][tx] = true;
-                                        worldContainer.rdrawn[ty][tx] = true;
-                                        worldContainer.ldrawn[ty][tx] = true;
+                                        drawBlocks(twy, twx, wg2, fwg2, tx, ty);
                                     }
                                     if (!worldContainer.rdrawn[ty][tx]) {
                                         somevar = true;
-                                        for (int y = 0; y < WorldContainer.BLOCK_SIZE; y++) {
-                                            for (int x = 0; x < WorldContainer.BLOCK_SIZE; x++) {
-                                                worldContainer.worlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                                worldContainer.fworlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                            }
-                                        }
-                                        if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
-                                            wg2.drawImage(ImagesContainer.getInstance().backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
-                                                    tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                    null);
-                                        }
-                                        for (int l = 0; l < LAYER_SIZE; l++) {
-                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
-                                                if (l == 2) {
-                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                } else {
-                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                }
-                                            }
-                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
-                                                if (l == 2) {
-                                                    fwg2.drawImage(ImagesContainer.getInstance().wcnct_px,
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                } else {
-                                                    wg2.drawImage(ImagesContainer.getInstance().wcnct_px,
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                }
-                                            }
-                                        }
-                                        if (!DebugContext.LIGHT) {
-                                            fwg2.drawImage(ImagesContainer.getInstance().lightLevelsImgs.get((int) (float) worldContainer.lights[ty][tx]),
-                                                    tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                    null);
-                                        }
-                                        worldContainer.drawn[ty][tx] = true;
-                                        worldContainer.rdrawn[ty][tx] = true;
-                                        worldContainer.ldrawn[ty][tx] = true;
+                                        drawBlocks(twy, twx, wg2, fwg2, tx, ty);
                                     }
                                     if (!worldContainer.ldrawn[ty][tx] && RandomTool.nextInt(10) == 0) {
                                         somevar = true;
-                                        for (int y = 0; y < WorldContainer.BLOCK_SIZE; y++) {
-                                            for (int x = 0; x < WorldContainer.BLOCK_SIZE; x++) {
-                                                worldContainer.worlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                                worldContainer.fworlds[twy][twx].setRGB(tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE + x, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE + y, 9539985);
-                                            }
-                                        }
-                                        if (worldContainer.blocksBackgrounds[ty][tx] != Backgrounds.EMPTY) {
-                                            wg2.drawImage(ImagesContainer.getInstance().backgroundImgs.get(worldContainer.blocksBackgrounds[ty][tx]),
-                                                    tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                    null);
-                                        }
-                                        for (int l = 0; l < LAYER_SIZE; l++) {
-                                            if (worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
-                                                if (l == 2) {
-                                                    fwg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                } else {
-                                                    wg2.drawImage(loadBlock(worldContainer.blocks[l][ty][tx], worldContainer.blocksDirections[l][ty][tx], worldContainer.blocksDirectionsIntensity[ty][tx], worldContainer.blocksTextureIntensity[ty][tx], worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                }
-                                            }
-                                            if (wcnct[ty][tx] && worldContainer.blocks[l][ty][tx].isZythiumWire()) {
-                                                if (l == 2) {
-                                                    fwg2.drawImage(ImagesContainer.getInstance().wcnct_px,
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                } else {
-                                                    wg2.drawImage(ImagesContainer.getInstance().wcnct_px,
-                                                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                            0, 0, IMAGESIZE, IMAGESIZE,
-                                                            null);
-                                                }
-                                            }
-                                        }
-                                        if (!DebugContext.LIGHT) {
-                                            fwg2.drawImage(ImagesContainer.getInstance().lightLevelsImgs.get((int) (float) worldContainer.lights[ty][tx]),
-                                                    tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                                                    0, 0, IMAGESIZE, IMAGESIZE,
-                                                    null);
-                                        }
-                                        worldContainer.drawn[ty][tx] = true;
-                                        worldContainer.rdrawn[ty][tx] = true;
-                                        worldContainer.ldrawn[ty][tx] = true;
+                                        drawBlocks(twy, twx, wg2, fwg2, tx, ty);
                                     }
                                 }
                             }
@@ -601,6 +455,18 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
 
         repaint();
         worldContainer.ready = true;
+    }
+
+    private void drawBlocks(int twy, int twx, Graphics2D wg2, Graphics2D fwg2, int tx, int ty) {
+        worldContainer.blocksTextureIntensity[ty][tx] = (byte) RandomTool.nextInt(8);
+
+        paintService.paintBackground(this, wg2, twx, twy, tx, ty);
+        paintService.paintBlock(this, wg2, fwg2, twx, twy, tx, ty);
+        paintService.paintLights(this, fwg2, twx, twy, tx, ty);
+
+        worldContainer.drawn[ty][tx] = true;
+        worldContainer.rdrawn[ty][tx] = true;
+        worldContainer.ldrawn[ty][tx] = true;
     }
 
     private void loadWorldContainer() {
@@ -2199,7 +2065,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         worldContainer.immune -= 1;
     }
 
-    public void breakCurrentBlock(int ux, int uy) {
+    private void breakCurrentBlock(int ux, int uy) {
         if (DebugContext.INSTAMINE || worldContainer.mining >= DURABILITY.get(worldContainer.inventory.tool()).get(worldContainer.blocks[worldContainer.layer][uy][ux])) {
             if (worldContainer.blocks[0][uy][ux] == Blocks.TREE_ROOT) {
                 worldContainer.blocks[0][uy][ux] = Blocks.AIR;
@@ -2658,7 +2524,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
     }
 
-    public void updateEnvironment() {
+    private void updateEnvironment() {
         worldContainer.timeOfDay += 1.2 * DebugContext.ACCEL;
         for (int i = worldContainer.cloudsAggregate.getClouds().size() - 1; i > -1; i--) {
             worldContainer.cloudsAggregate.updateXUponSpeed(i);
@@ -2682,7 +2548,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
     }
 
-    public void addBlockLighting(int ux, int uy) {
+    private void addBlockLighting(int ux, int uy) {
         int n = findNonLayeredBlockLightSource(ux, uy);
         if (n != 0) {
             addTileToZQueue(ux, uy);
@@ -2692,7 +2558,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
     }
 
-    public void addBlockPower(int ux, int uy) {
+    private void addBlockPower(int ux, int uy) {
         if (worldContainer.blocks[1][uy][ux].isPower()) {
             if (worldContainer.blocks[1][uy][ux].isCompleteZythiumDelayer()) {
                 log.info("Whaaat?");
@@ -2758,11 +2624,11 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
     }
 
-    public void removeBlockLighting(int ux, int uy) {
+    private void removeBlockLighting(int ux, int uy) {
         removeBlockLighting(ux, uy, worldContainer.layer);
     }
 
-    public void removeBlockLighting(int ux, int uy, int layer) {
+    private void removeBlockLighting(int ux, int uy, int layer) {
         int n = findNonLayeredBlockLightSource(ux, uy);
         if (n != 0) {
             worldContainer.lsources[uy][ux] = isNonLayeredBlockLightSource(ux, uy, layer);
@@ -3205,7 +3071,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         return n;
     }
 
-    public void addTileToQueue(int ux, int uy) {
+    private void addTileToQueue(int ux, int uy) {
         if (!worldContainer.lqd[uy][ux]) {
             worldContainer.lqx.add(ux);
             worldContainer.lqy.add(uy);
@@ -3213,7 +3079,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
     }
 
-    public void addTileToZQueue(int ux, int uy) {
+    private void addTileToZQueue(int ux, int uy) {
         if (!zqd[uy][ux]) {
             zqx.add(ux);
             zqy.add(uy);
@@ -3222,7 +3088,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
     }
 
-    public void addTileToPQueue(int ux, int uy) {
+    private void addTileToPQueue(int ux, int uy) {
         if (!pqd[uy][ux]) {
             pqx.add(ux);
             pqy.add(uy);
@@ -3230,7 +3096,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
     }
 
-    public void addAdjacentTilesToPQueue(int ux, int uy) {
+    private void addAdjacentTilesToPQueue(int ux, int uy) {
         for (int i2 = 0; i2 < 4; i2++) {
             if (uy + cl[i2][1] >= 0 && uy + cl[i2][1] < HEIGHT) {
                 addTileToPQueue(ux + cl[i2][0], uy + cl[i2][1]);
@@ -3238,7 +3104,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
     }
 
-    public void addAdjacentTilesToPQueueConditionally(int ux, int uy) {
+    private void addAdjacentTilesToPQueueConditionally(int ux, int uy) {
         for (int i2 = 0; i2 < 4; i2++) {
             for (int l = 0; l < LAYER_SIZE; l++) {
                 if (uy + cl[i2][1] >= 0 && uy + cl[i2][1] < HEIGHT && worldContainer.power[l][uy + cl[i2][1]][ux + cl[i2][0]] > 0) {
@@ -3248,7 +3114,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
     }
 
-    public void addTileToPZQueue(int ux, int uy) {
+    private void addTileToPZQueue(int ux, int uy) {
         if (!pzqd[uy][ux]) {
             pzqx.add(ux);
             pzqy.add(uy);
@@ -3259,7 +3125,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
     }
 
-    public void resolveLightMatrix() {
+    private void resolveLightMatrix() {
         int x = 0, y = 0;
         try {
             for (int j = 0; j < worldContainer.lqx.size(); j++) {
@@ -3314,7 +3180,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         zqy.clear();
     }
 
-    public void resolvePowerMatrix() {
+    private void resolvePowerMatrix() {
         int x = 0, y = 0;
         try {
             for (int j = 0; j < pqx.size(); j++) {
