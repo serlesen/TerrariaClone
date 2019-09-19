@@ -32,7 +32,7 @@ public class Inventory implements Serializable {
     private transient Graphics2D g2;
 
     public Items[] items;
-    short[] nums;
+    public short[] nums;
     public short[] durs;
 
     private static final int TROLX = 37;

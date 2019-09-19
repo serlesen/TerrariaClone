@@ -56,7 +56,7 @@ public class PaintService {
                             0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
                             null);
                 }
-            } else if (graphicContainer.wcnct[ty][tx] && graphicContainer.worldContainer.blocks[l][ty][tx].isZythiumWire()) {
+            } else if (graphicContainer.worldContainer.wcnct[ty][tx] && graphicContainer.worldContainer.blocks[l][ty][tx].isZythiumWire()) {
                 if (l == 2) {
                     fWorldGraphic.drawImage(ImagesContainer.getInstance().wcnct_px,
                             tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
@@ -166,7 +166,7 @@ public class PaintService {
 
         paintAllEntities(graphicContainer);
 
-        paintAllTools(graphicContainer);
+        paintTool(graphicContainer);
 
         for (int pwy = 0; pwy < 2; pwy++) {
             for (int pwx = 0; pwx < 2; pwx++) {
@@ -434,15 +434,15 @@ public class PaintService {
         }
     }
 
-    private void paintAllTools(TerrariaClone graphicContainer) {
-        if (graphicContainer.worldContainer.showTool && graphicContainer.tool != null) {
+    private void paintTool(TerrariaClone graphicContainer) {
+        if (graphicContainer.worldContainer.showTool && graphicContainer.worldContainer.tool != null) {
             if (graphicContainer.worldContainer.player.imgState == ImageState.STILL_RIGHT || graphicContainer.worldContainer.player.imgState.isWalkRight()) {
                 graphics.translate(graphicContainer.getWidth() / 2 + 6, graphicContainer.getHeight() / 2);
                 graphics.rotate(graphicContainer.worldContainer.toolAngle);
 
-                graphics.drawImage(graphicContainer.tool,
-                        0, -graphicContainer.tool.getHeight() * 2, graphicContainer.tool.getWidth() * 2, 0,
-                        0, 0, graphicContainer.tool.getWidth(), graphicContainer.tool.getHeight(),
+                graphics.drawImage(graphicContainer.worldContainer.tool,
+                        0, -graphicContainer.worldContainer.tool.getHeight() * 2, graphicContainer.worldContainer.tool.getWidth() * 2, 0,
+                        0, 0, graphicContainer.worldContainer.tool.getWidth(), graphicContainer.worldContainer.tool.getHeight(),
                         null);
 
                 graphics.rotate(-graphicContainer.worldContainer.toolAngle);
@@ -452,9 +452,9 @@ public class PaintService {
                 graphics.translate(graphicContainer.getWidth() / 2 - 6, graphicContainer.getHeight() / 2);
                 graphics.rotate((Math.PI * 1.5) - graphicContainer.worldContainer.toolAngle);
 
-                graphics.drawImage(graphicContainer.tool,
-                        0, -graphicContainer.tool.getHeight() * 2, graphicContainer.tool.getWidth() * 2, 0,
-                        0, 0, graphicContainer.tool.getWidth(), graphicContainer.tool.getHeight(),
+                graphics.drawImage(graphicContainer.worldContainer.tool,
+                        0, -graphicContainer.worldContainer.tool.getHeight() * 2, graphicContainer.worldContainer.tool.getWidth() * 2, 0,
+                        0, 0, graphicContainer.worldContainer.tool.getWidth(), graphicContainer.worldContainer.tool.getHeight(),
                         null);
 
                 graphics.rotate(-((Math.PI * 1.5) - graphicContainer.worldContainer.toolAngle));
@@ -467,15 +467,15 @@ public class PaintService {
         for (int i = 0; i < graphicContainer.worldContainer.entities.size(); i++) {
             Entity entity = graphicContainer.worldContainer.entities.get(i);
             graphics.drawImage(entity.getImage(),
-                    entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2, entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + entity.getWidth(), entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + entity.getHeight(),
+                    entity.getIntX() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2, entity.getIntY() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, entity.getIntX() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + entity.getWidth(), entity.getIntY() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + entity.getHeight(),
                     0, 0, entity.getImage().getWidth(), entity.getImage().getHeight(),
                     null);
             graphics.drawImage(entity.getImage(),
-                    entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 - graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + entity.getWidth() - graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + entity.getHeight(),
+                    entity.getIntX() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 - graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIntY() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, entity.getIntX() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + entity.getWidth() - graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIntY() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + entity.getHeight(),
                     0, 0, entity.getImage().getWidth(), entity.getImage().getHeight(),
                     null);
             graphics.drawImage(entity.getImage(),
-                    entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, entity.getIx() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + entity.getWidth() + graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIy() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + entity.getHeight(),
+                    entity.getIntX() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIntY() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2, entity.getIntX() - graphicContainer.worldContainer.player.intX + graphicContainer.getWidth() / 2 - Player.WIDTH / 2 + entity.getWidth() + graphicContainer.WIDTH * WorldContainer.BLOCK_SIZE, entity.getIntY() - graphicContainer.worldContainer.player.intY + graphicContainer.getHeight() / 2 - Player.HEIGHT / 2 + entity.getHeight(),
                     0, 0, entity.getImage().getWidth(), entity.getImage().getHeight(),
                     null);
         }

@@ -17,7 +17,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.event.ActionEvent;
@@ -71,7 +70,6 @@ import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.services.OutlinesService;
 import com.sergio.refacto.services.PaintService;
 import com.sergio.refacto.services.WorldService;
-import com.sergio.refacto.tools.MathTool;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -88,7 +86,8 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
 
     /** Size (in block units) of the in-memory game. */
     public static final int SIZE = WorldContainer.CHUNK_BLOCKS * 2;
-    public static final int TIMER_DELAY = 100;
+
+    private static final int TIMER_DELAY = 100;
 
     public static final int LAYER_SIZE = 3;
 
@@ -96,7 +95,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
     BufferedImage screen;
     Color bg;
 
-    int[][] cl = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
+    public static final int[][] cl = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
 
     javax.swing.Timer inGameTimer, menuTimer;
     List<FileInfo> filesInfo;
@@ -105,19 +104,10 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
 
     WorldContainer worldContainer;
 
-    List<Integer> pqx, pqy, zqx, zqy, pzqx, pzqy;
-    Boolean[][] zqd, pqd, pzqd;
-    Byte[][] zqn;
-    Byte[][][] pzqn;
-    Boolean[][][] arbprd;
-    List<Integer> updatex, updatey, updatet, updatel;
-    Boolean[][] wcnct;
     public static ItemCollection armor;
 
     Chunk[][] temporarySaveFile;
     Chunk[][] chunkMatrix;
-
-    int iclayer;
 
     State state = State.LOADING_GRAPHICS;
 
@@ -127,8 +117,6 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
     Items miningTool;
 
     short moveDur, moveDurTemp;
-
-    Point tp1, tp2, tp3, tp4, tp5;
 
     /** Position of the mouse (in pixels) in the screen. */
     public Mouse mousePos;
@@ -150,25 +138,22 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
     boolean menuPressed = false;
 
     public static final int IMAGESIZE = 8;
-    private static final int BRIGHTEST = 21;
+    public static final int BRIGHTEST = 21;
 
     int sunlightlevel = 19;
-
-    BufferedImage tool;
-
 
     static Map<Short, Map<Integer, Integer>> DURABILITY;
     public static Map<EntityType, String> UIENTITIES;
     static Map<Integer, Color> SKYCOLORS;
     static Map<Blocks, Blocks> GRASSDIRT;
-    static Map<Items, Double> FUELS;
-    static Map<Integer, Blocks> WIREP;
+    public static Map<Items, Double> FUELS;
+    public static Map<Integer, Blocks> WIREP;
     static Map<Blocks, Blocks> TORCHESL;
     static Map<Blocks, Blocks> TORCHESR;
-    static Map<Blocks, Integer> DDELAY;
+    public static Map<Blocks, Integer> DDELAY;
 
-    List<Items> FRI1, FRI2;
-    List<Short> FRN1, FRN2;
+    public static List<Items> FRI1, FRI2;
+    public static List<Short> FRN1, FRN2;
 
     public static void main(String[] args) {
         JFrame f = new JFrame("TerrariaClone: Infinite worlds!");
@@ -477,8 +462,8 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                         for (int l = 0; l < LAYER_SIZE; l++) {
                             worldContainer.blocks[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocks()[l][y][x];
                             worldContainer.power[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getPower()[l][y][x];
-                            pzqn[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getPzqn()[l][y][x];
-                            arbprd[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getArbprd()[l][y][x];
+                            worldContainer.pzqn[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getPzqn()[l][y][x];
+                            worldContainer.arbprd[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getArbprd()[l][y][x];
                             worldContainer.blocksDirections[l][twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocksDirections()[l][y][x];
                         }
                         worldContainer.blocksDirectionsIntensity[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocksDirectionsIntensity()[y][x];
@@ -486,8 +471,8 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                         worldContainer.blocksTextureIntensity[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getBlocksTextureIntesity()[y][x];
                         worldContainer.lights[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getLights()[y][x];
                         worldContainer.lsources[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getLsources()[y][x];
-                        zqn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getZqn()[y][x];
-                        wcnct[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getWcnct()[y][x];
+                        worldContainer.zqn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getZqn()[y][x];
+                        worldContainer.wcnct[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getWcnct()[y][x];
                         worldContainer.drawn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getDrawn()[y][x];
                         worldContainer.rdrawn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getRdrawn()[y][x];
                         worldContainer.ldrawn[twy * WorldContainer.CHUNK_BLOCKS + y][twx * WorldContainer.CHUNK_BLOCKS + x] = chunkMatrix[twy][twx].getLdrawn()[y][x];
@@ -619,34 +604,14 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
 
         worldContainer.createNewWorld();
 
-        zqn = new Byte[SIZE][SIZE];
-        pzqn = new Byte[TerrariaClone.LAYER_SIZE][SIZE][SIZE];
-        arbprd = new Boolean[TerrariaClone.LAYER_SIZE][SIZE][SIZE];
-        wcnct = new Boolean[SIZE][SIZE];
-
         miningTool = Items.EMPTY;
         moveDur = 0;
 
-        pqx = new ArrayList<>();
-        pqy = new ArrayList<>();
-
         log.info("-> Adding light sources...");
 
-        zqx = new ArrayList<>();
-        zqy = new ArrayList<>();
-        pqx = new ArrayList<>();
-        pqy = new ArrayList<>();
-        pzqx = new ArrayList<>();
-        pzqy = new ArrayList<>();
-        updatex = new ArrayList<>();
-        updatey = new ArrayList<>();
-        updatet = new ArrayList<>();
-        updatel = new ArrayList<>();
-
-        log.info("-> Calculating light...");
-
-        resolvePowerMatrix();
-        resolveLightMatrix();
+        // FIXME move to worldContainer.createNewWorld();
+        worldContainer.resolvePowerMatrix();
+        worldContainer.resolveLightMatrix(sunlightlevel);
 
         log.info("Finished generation.");
     }
@@ -664,99 +629,15 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
 
         worldContainer.updateHealthPoints();
+        worldContainer.updateMachinesState();
+        worldContainer.updateItemCollection();
 
-        for (int j = 0; j < worldContainer.machinesx.size(); j++) {
-            int x = worldContainer.machinesx.get(j);
-            int y = worldContainer.machinesy.get(j);
-            for (int l = 0; l < LAYER_SIZE; l++) {
-                if (worldContainer.icmatrix[l][y][x] != null && worldContainer.icmatrix[l][y][x].getType() == ItemType.FURNACE) {
-                    if (worldContainer.icmatrix[l][y][x].isFurnaceOn()) {
-                        if (worldContainer.icmatrix[l][y][x].getIds()[1] == Items.EMPTY) {
-                            if (FUELS.get(worldContainer.icmatrix[l][y][x].getIds()[2]) != null) {
-                                worldContainer.inventory.addLocationIC(worldContainer.icmatrix[l][y][x], 1, worldContainer.icmatrix[l][y][x].getIds()[2], (short) 1);
-                                worldContainer.inventory.removeLocationIC(worldContainer.icmatrix[l][y][x], 2, (short) 1);
-                                worldContainer.icmatrix[l][y][x].setFUELP(1);
-                            } else {
-                                worldContainer.icmatrix[l][y][x].setFurnaceOn(false);
-                                removeBlockLighting(x, y);
-                                worldContainer.blocks[l][y][x] = Blocks.FURNACE;
-                                worldContainer.rdrawn[y][x] = false;
-                            }
-                        }
-                        if (FUELS.get(worldContainer.icmatrix[l][y][x].getIds()[1]) != null) {
-                            worldContainer.icmatrix[l][y][x].setFUELP(worldContainer.icmatrix[l][y][x].getFUELP() - FUELS.get(worldContainer.icmatrix[l][y][x].getIds()[1]));
-                            if (worldContainer.icmatrix[l][y][x].getFUELP() < 0) {
-                                worldContainer.icmatrix[l][y][x].setFUELP(0);
-                                worldContainer.inventory.removeLocationIC(worldContainer.icmatrix[l][y][x], 1, worldContainer.icmatrix[l][y][x].getNums()[1]);
-                            }
-                            for (int i = 0; i < FRI1.size(); i++) {
-                                if (worldContainer.icmatrix[l][y][x].getIds()[0] == FRI1.get(i) && worldContainer.icmatrix[l][y][x].getNums()[0] >= FRN1.get(i)) {
-                                    worldContainer.icmatrix[l][y][x].setSMELTP(worldContainer.icmatrix[l][y][x].getSMELTP() + Blocks.findByIndex(worldContainer.icmatrix[l][y][x].getIds()[1].getIndex()).getFSpeed());
-                                    if (worldContainer.icmatrix[l][y][x].getSMELTP() > 1) {
-                                        worldContainer.icmatrix[l][y][x].setSMELTP(0);
-                                        worldContainer.inventory.removeLocationIC(worldContainer.icmatrix[l][y][x], 0, FRN1.get(i));
-                                        worldContainer.inventory.addLocationIC(worldContainer.icmatrix[l][y][x], 3, FRI2.get(i), FRN2.get(i));
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    } else {
-                        worldContainer.icmatrix[l][y][x].setSMELTP(worldContainer.icmatrix[l][y][x].getSMELTP() - 0.00025);
-                        if (worldContainer.icmatrix[l][y][x].getSMELTP() < 0) {
-                            worldContainer.icmatrix[l][y][x].setSMELTP(0);
-                        }
-                    }
-                }
-            }
-        }
-
-        if (worldContainer.ic != null && worldContainer.ic.getType() == ItemType.FURNACE) {
-            if (worldContainer.ic.isFurnaceOn()) {
-                if (worldContainer.ic.getIds()[1] == Items.EMPTY) {
-                    if (FUELS.get(worldContainer.ic.getIds()[2]) != null) {
-                        worldContainer.inventory.addLocationIC(worldContainer.ic, 1, worldContainer.ic.getIds()[2], (short) 1);
-                        worldContainer.inventory.removeLocationIC(worldContainer.ic, 2, (short) 1);
-                        worldContainer.ic.setFUELP(1);
-                    } else {
-                        worldContainer.ic.setFurnaceOn(false);
-                        removeBlockLighting(worldContainer.icx, worldContainer.icy);
-                        worldContainer.blocks[iclayer][worldContainer.icy][worldContainer.icx] = Blocks.FURNACE;
-                        worldContainer.rdrawn[worldContainer.icy][worldContainer.icx] = false;
-                    }
-                }
-                if (FUELS.get(worldContainer.ic.getIds()[1]) != null) {
-                    worldContainer.ic.setFUELP(worldContainer.ic.getFUELP() - FUELS.get(worldContainer.ic.getIds()[1]));
-                    if (worldContainer.ic.getFUELP() < 0) {
-                        worldContainer.ic.setFUELP(0);
-                        worldContainer.inventory.removeLocationIC(worldContainer.ic, 1, worldContainer.ic.getNums()[1]);
-                    }
-                    for (int i = 0; i < FRI1.size(); i++) {
-                        if (worldContainer.ic.getIds()[0] == FRI1.get(i) && worldContainer.ic.getNums()[0] >= FRN1.get(i)) {
-                            worldContainer.ic.setSMELTP(worldContainer.ic.getSMELTP() + Blocks.findByIndex(worldContainer.ic.getIds()[1].getIndex()).getFSpeed());
-                            if (worldContainer.ic.getSMELTP() > 1) {
-                                worldContainer.ic.setSMELTP(0);
-                                worldContainer.inventory.removeLocationIC(worldContainer.ic, 0, FRN1.get(i));
-                                worldContainer.inventory.addLocationIC(worldContainer.ic, 3, FRI2.get(i), FRN2.get(i));
-                            }
-                            break;
-                        }
-                    }
-                }
-            } else {
-                worldContainer.ic.setSMELTP(worldContainer.ic.getSMELTP() - 0.00025);
-                if (worldContainer.ic.getSMELTP() < 0) {
-                    worldContainer.ic.setSMELTP(0);
-                }
-            }
-            worldContainer.inventory.updateIC(worldContainer.ic, -1);
-        }
         if (Math.sqrt(Math.pow(worldContainer.player.x + worldContainer.player.image.getWidth() - worldContainer.icx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2) + Math.pow(worldContainer.player.y + worldContainer.player.image.getHeight() - worldContainer.icy * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2)) > 160) {
             if (worldContainer.ic != null) {
                 if (worldContainer.ic.getType() != ItemType.WORKBENCH) {
                     worldContainer.machinesx.add(worldContainer.icx);
                     worldContainer.machinesy.add(worldContainer.icy);
-                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx] = new ItemCollection(worldContainer.ic);
+                    worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx] = new ItemCollection(worldContainer.ic);
                 } else if (worldContainer.ic.getType() == ItemType.WORKBENCH) {
                     if (worldContainer.player.imgState == ImageState.STILL_RIGHT || worldContainer.player.imgState.isWalkRight()) {
                         for (int i = 0; i < 9; i++) {
@@ -773,9 +654,9 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                         }
                     }
                 } else if (worldContainer.ic.getType() == ItemType.FURNACE) {
-                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setFUELP(worldContainer.ic.getFUELP());
-                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setSMELTP(worldContainer.ic.getSMELTP());
-                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setFurnaceOn(worldContainer.ic.isFurnaceOn());
+                    worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setFUELP(worldContainer.ic.getFUELP());
+                    worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setSMELTP(worldContainer.ic.getSMELTP());
+                    worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setFurnaceOn(worldContainer.ic.isFurnaceOn());
                 }
                 worldContainer.ic = null;
             }
@@ -785,52 +666,52 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         worldContainer.updateGrassState(blockOffsetU, blockOffsetV);
         worldContainer.updateTreesState();
 
-        for (int i = updatex.size() - 1; i > -1; i--) {
-            updatet.set(i, updatet.get(i) - 1);
-            if (updatet.get(i) <= 0) {
-                if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == Blocks.BUTTON_LEFT_ON) {
-                    worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
-                    removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i));
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.BUTTON_LEFT;
-                    worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
-                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == Blocks.BUTTON_RIGHT_ON) {
-                    worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
-                    removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i));
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.BUTTON_RIGHT;
-                    worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
-                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == Blocks.WOODEN_PRESSURE_PLATE_ON) {
-                    worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
-                    removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i));
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.WOODEN_PRESSURE_PLATE;
-                    worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
-                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == Blocks.STONE_PRESSURE_PLATE_ON) {
-                    worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
-                    removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i));
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.STONE_PRESSURE_PLATE;
-                    worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
-                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] == Blocks.ZYTHIUM_PRESSURE_PLATE_ON) {
-                    worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
-                    removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i));
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.ZYTHIUM_PRESSURE_PLATE;
-                    worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
-                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)].isZythiumDelayerOnAll()) {
+        for (int i = worldContainer.updatex.size() - 1; i > -1; i--) {
+            worldContainer.updatet.set(i, worldContainer.updatet.get(i) - 1);
+            if (worldContainer.updatet.get(i) <= 0) {
+                if (worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] == Blocks.BUTTON_LEFT_ON) {
+                    worldContainer.blockTemp = worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)];
+                    worldContainer.removeBlockPower(worldContainer.updatex.get(i), worldContainer.updatey.get(i), worldContainer.updatel.get(i));
+                    worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = Blocks.BUTTON_LEFT;
+                    worldContainer.rdrawn[worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = false;
+                } else if (worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] == Blocks.BUTTON_RIGHT_ON) {
+                    worldContainer.blockTemp = worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)];
+                    worldContainer.removeBlockPower(worldContainer.updatex.get(i), worldContainer.updatey.get(i), worldContainer.updatel.get(i));
+                    worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = Blocks.BUTTON_RIGHT;
+                    worldContainer.rdrawn[worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = false;
+                } else if (worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] == Blocks.WOODEN_PRESSURE_PLATE_ON) {
+                    worldContainer.blockTemp = worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)];
+                    worldContainer.removeBlockPower(worldContainer.updatex.get(i), worldContainer.updatey.get(i), worldContainer.updatel.get(i));
+                    worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = Blocks.WOODEN_PRESSURE_PLATE;
+                    worldContainer.rdrawn[worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = false;
+                } else if (worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] == Blocks.STONE_PRESSURE_PLATE_ON) {
+                    worldContainer.blockTemp = worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)];
+                    worldContainer.removeBlockPower(worldContainer.updatex.get(i), worldContainer.updatey.get(i), worldContainer.updatel.get(i));
+                    worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = Blocks.STONE_PRESSURE_PLATE;
+                    worldContainer.rdrawn[worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = false;
+                } else if (worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] == Blocks.ZYTHIUM_PRESSURE_PLATE_ON) {
+                    worldContainer.blockTemp = worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)];
+                    worldContainer.removeBlockPower(worldContainer.updatex.get(i), worldContainer.updatey.get(i), worldContainer.updatel.get(i));
+                    worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = Blocks.ZYTHIUM_PRESSURE_PLATE;
+                    worldContainer.rdrawn[worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = false;
+                } else if (worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)].isZythiumDelayerOnAll()) {
                     log.info("[DEBUG2R]");
-                    worldContainer.blockTemp = worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)];
-                    removeBlockPower(updatex.get(i), updatey.get(i), updatel.get(i), false);
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.turnZythiumDelayerOff(worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)]);
-                    worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
-                } else if (worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)].isZythiumDelayerAll()) {
+                    worldContainer.blockTemp = worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)];
+                    worldContainer.removeBlockPower(worldContainer.updatex.get(i), worldContainer.updatey.get(i), worldContainer.updatel.get(i), false);
+                    worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = Blocks.turnZythiumDelayerOff(worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)]);
+                    worldContainer.rdrawn[worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = false;
+                } else if (worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)].isZythiumDelayerAll()) {
                     log.info("[DEBUG2A]");
-                    worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)] = Blocks.turnZythiumDelayerOn(worldContainer.blocks[updatel.get(i)][updatey.get(i)][updatex.get(i)]);
-                    worldContainer.power[updatel.get(i)][updatey.get(i)][updatex.get(i)] = (float) 5;
-                    addBlockLighting(updatex.get(i), updatey.get(i));
-                    addTileToPQueue(updatex.get(i), updatey.get(i));
-                    worldContainer.rdrawn[updatey.get(i)][updatex.get(i)] = false;
+                    worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = Blocks.turnZythiumDelayerOn(worldContainer.blocks[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)]);
+                    worldContainer.power[worldContainer.updatel.get(i)][worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = (float) 5;
+                    worldContainer.addBlockLighting(worldContainer.updatex.get(i), worldContainer.updatey.get(i));
+                    worldContainer.addTileToPQueue(worldContainer.updatex.get(i), worldContainer.updatey.get(i));
+                    worldContainer.rdrawn[worldContainer.updatey.get(i)][worldContainer.updatex.get(i)] = false;
                 }
-                updatex.remove(i);
-                updatey.remove(i);
-                updatet.remove(i);
-                updatel.remove(i);
+                worldContainer.updatex.remove(i);
+                worldContainer.updatey.remove(i);
+                worldContainer.updatet.remove(i);
+                worldContainer.updatel.remove(i);
             }
         }
 
@@ -946,8 +827,8 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         for (int i = worldContainer.entities.size() - 1; i > -1; i--) {
             if (worldContainer.entities.get(i).getEntityType() != null) {
                 worldContainer.mobCount += 1;
-                if (worldContainer.entities.get(i).getIx() < worldContainer.player.intX - 2000 || worldContainer.entities.get(i).getIx() > worldContainer.player.intX + 2000 ||
-                        worldContainer.entities.get(i).getIy() < worldContainer.player.intY - 2000 || worldContainer.entities.get(i).getIy() > worldContainer.player.intY + 2000) {
+                if (worldContainer.entities.get(i).getIntX() < worldContainer.player.intX - 2000 || worldContainer.entities.get(i).getIntX() > worldContainer.player.intX + 2000 ||
+                        worldContainer.entities.get(i).getIntY() < worldContainer.player.intY - 2000 || worldContainer.entities.get(i).getIntY() > worldContainer.player.intY + 2000) {
                     if (RandomTool.nextInt(500) == 0) {
                         worldContainer.entities.remove(i);
                     }
@@ -956,903 +837,20 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         }
 
         if (mousePressed == MousePressed.LEFT_MOUSE) {
-            checkBlocks = true;
-            if (worldContainer.showInv) {
-                if (mousePos.isInBetweenInclusive(getWidth() - ImagesContainer.getInstance().saveExit.getWidth() - 24, getWidth() - 24, getHeight() - ImagesContainer.getInstance().saveExit.getHeight() - 24, getHeight() - 24)) {
-                    if (mousePos.isClicked()) {
-                        mousePos.setReleased(true);
-                        worldContainer.saveWorld(currentWorld);
-                        state = State.TITLE_SCREEN;
-                        inGameTimer.stop();
-                        menuTimer.start();
-                        return;
-                    }
-                }
-                for (int ux = 0; ux < 10; ux++) {
-                    for (int uy = 0; uy < 4; uy++) {
-                        if (mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + 6, uy * 46 + 46)) {
-                            checkBlocks = false;
-                            if (mousePos.isClicked()) {
-                                mousePos.setReleased(true);
-                                if (uy != 0 || worldContainer.inventory.selection != ux || !worldContainer.showTool) {
-                                    worldContainer.moveItemTemp = worldContainer.inventory.items[uy * 10 + ux];
-                                    worldContainer.moveNumTemp = worldContainer.inventory.nums[uy * 10 + ux];
-                                    moveDurTemp = worldContainer.inventory.durs[uy * 10 + ux];
-                                    if (worldContainer.moveItem == worldContainer.inventory.items[uy * 10 + ux]) {
-                                        worldContainer.moveNum = (short) worldContainer.inventory.addLocation(uy * 10 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                        if (worldContainer.moveNum == 0) {
-                                            worldContainer.moveItem = Items.EMPTY;
-                                            moveDur = 0;
-                                        }
-                                    } else {
-                                        worldContainer.inventory.removeLocation(uy * 10 + ux, worldContainer.inventory.nums[uy * 10 + ux]);
-                                        if (worldContainer.moveItem != Items.EMPTY) {
-                                            worldContainer.inventory.addLocation(uy * 10 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                        }
-                                        worldContainer.moveItem = worldContainer.moveItemTemp;
-                                        worldContainer.moveNum = worldContainer.moveNumTemp;
-                                        moveDur = moveDurTemp;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                for (int ux = 0; ux < 2; ux++) {
-                    for (int uy = 0; uy < 2; uy++) {
-                        if (mousePos.isInBetween(worldContainer.inventory.image.getWidth() + ux * 40 + 75, worldContainer.inventory.image.getWidth() + ux * 40 + 115, uy * 40 + 52, uy * 40 + 92)) {
-                            checkBlocks = false;
-                            if (mousePos.isClicked()) {
-                                mousePos.setReleased(true);
-                                worldContainer.moveItemTemp = worldContainer.cic.getIds()[uy * 2 + ux];
-                                worldContainer.moveNumTemp = worldContainer.cic.getNums()[uy * 2 + ux];
-                                moveDurTemp = worldContainer.cic.getDurs()[uy * 2 + ux];
-                                if (worldContainer.moveItem == worldContainer.cic.getIds()[uy * 2 + ux]) {
-                                    worldContainer.moveNum = (short) worldContainer.inventory.addLocationIC(worldContainer.cic, uy * 2 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                    if (worldContainer.moveNum == 0) {
-                                        worldContainer.moveItem = Items.EMPTY;
-                                        moveDur = 0;
-                                    }
-                                } else {
-                                    worldContainer.inventory.removeLocationIC(worldContainer.cic, uy * 2 + ux, worldContainer.cic.getNums()[uy * 2 + ux]);
-                                    if (worldContainer.moveItem != Items.EMPTY) {
-                                        worldContainer.inventory.addLocationIC(worldContainer.cic, uy * 2 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                    }
-                                    worldContainer.moveItem = worldContainer.moveItemTemp;
-                                    worldContainer.moveNum = worldContainer.moveNumTemp;
-                                    moveDur = moveDurTemp;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (mousePos.isInBetween(worldContainer.inventory.image.getWidth() + 3 * 40 + 81, worldContainer.inventory.image.getWidth() + 3 * 40 + 121, 20 + 52, 20 + 92)) {
-                    checkBlocks = false;
-                    if (mousePos.isClicked()) {
-                        if (worldContainer.moveItem == worldContainer.cic.getIds()[4] && worldContainer.moveNum + worldContainer.cic.getNums()[4] <= worldContainer.cic.getIds()[4].getMaxStacks()) {
-                            worldContainer.moveNum += worldContainer.cic.getNums()[4];
-                            worldContainer.inventory.useRecipeCIC(worldContainer.cic);
-                        }
-                        if (worldContainer.moveItem == Items.EMPTY) {
-                            worldContainer.moveItem = worldContainer.cic.getIds()[4];
-                            worldContainer.moveNum = worldContainer.cic.getNums()[4];
-                            if (worldContainer.moveItem.getDurability() != null) {
-                                moveDur = worldContainer.moveItem.getDurability().shortValue();
-                            }
-                            worldContainer.inventory.useRecipeCIC(worldContainer.cic);
-                        }
-                    }
-                }
-                if (worldContainer.ic != null) {
-                    if (worldContainer.ic.getType() == ItemType.WORKBENCH) {
-                        for (int ux = 0; ux < 3; ux++) {
-                            for (int uy = 0; uy < 3; uy++) {
-                                if (mousePos.isInBetween(ux * 40 + 6, ux * 40 + 46, uy * 40 + worldContainer.inventory.image.getHeight() + 46, uy * 40 + worldContainer.inventory.image.getHeight() + 86)) {
-                                    checkBlocks = false;
-                                    if (mousePos.isClicked()) {
-                                        mousePos.setReleased(true);
-                                        worldContainer.moveItemTemp = worldContainer.ic.getIds()[uy * 3 + ux];
-                                        worldContainer.moveNumTemp = worldContainer.ic.getNums()[uy * 3 + ux];
-                                        if (worldContainer.moveItem == worldContainer.ic.getIds()[uy * 3 + ux]) {
-                                            worldContainer.moveNum = (short) worldContainer.inventory.addLocationIC(worldContainer.ic, uy * 3 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                            if (worldContainer.moveNum == 0) {
-                                                worldContainer.moveItem = Items.EMPTY;
-                                            }
-                                        } else {
-                                            worldContainer.inventory.removeLocationIC(worldContainer.ic, uy * 3 + ux, worldContainer.ic.getNums()[uy * 3 + ux]);
-                                            if (worldContainer.moveItem != Items.EMPTY) {
-                                                worldContainer.inventory.addLocationIC(worldContainer.ic, uy * 3 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                            }
-                                            worldContainer.moveItem = worldContainer.moveItemTemp;
-                                            worldContainer.moveNum = worldContainer.moveNumTemp;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (mousePos.isInBetween(4 * 40 + 6, 4 * 40 + 46, 1 * 40 + worldContainer.inventory.image.getHeight() + 46, 1 * 40 + worldContainer.inventory.image.getHeight() + 86)) {
-                            checkBlocks = false;
-                            if (mousePos.isClicked()) {
-                                if (worldContainer.moveItem == worldContainer.ic.getIds()[9] && worldContainer.moveNum + worldContainer.ic.getNums()[9] <= worldContainer.ic.getIds()[9].getMaxStacks()) {
-                                    worldContainer.moveNum += worldContainer.ic.getNums()[9];
-                                    worldContainer.inventory.useRecipeWorkbench(worldContainer.ic);
-                                }
-                                if (worldContainer.moveItem == Items.EMPTY) {
-                                    worldContainer.moveItem = worldContainer.ic.getIds()[9];
-                                    worldContainer.moveNum = worldContainer.ic.getNums()[9];
-                                    if (worldContainer.moveItem.getDurability() != null) {
-                                        moveDur = worldContainer.moveItem.getDurability().shortValue();
-                                    }
-                                    worldContainer.inventory.useRecipeWorkbench(worldContainer.ic);
-                                }
-                            }
-                        }
-                    } else if (worldContainer.ic.getType() == ItemType.WOODEN_CHEST || worldContainer.ic.getType() == ItemType.STONE_CHEST ||
-                            worldContainer.ic.getType() == ItemType.COPPER_CHEST || worldContainer.ic.getType() == ItemType.IRON_CHEST ||
-                            worldContainer.ic.getType() == ItemType.SILVER_CHEST || worldContainer.ic.getType() == ItemType.GOLD_CHEST ||
-                            worldContainer.ic.getType() == ItemType.ZINC_CHEST || worldContainer.ic.getType() == ItemType.RHYMESTONE_CHEST ||
-                            worldContainer.ic.getType() == ItemType.OBDURITE_CHEST) {
-                        for (int ux = 0; ux < worldContainer.inventory.CX; ux++) {
-                            for (int uy = 0; uy < worldContainer.inventory.CY; uy++) {
-                                if (mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + worldContainer.inventory.image.getHeight() + 46, uy * 46 + worldContainer.inventory.image.getHeight() + 86)) {
-                                    checkBlocks = false;
-                                    if (mousePos.isClicked()) {
-                                        mousePos.setReleased(true);
-                                        worldContainer.moveItemTemp = worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux];
-                                        worldContainer.moveNumTemp = worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux];
-                                        if (worldContainer.moveItem == worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux]) {
-                                            worldContainer.moveNum = (short) worldContainer.inventory.addLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                            if (worldContainer.moveNum == 0) {
-                                                worldContainer.moveItem = Items.EMPTY;
-                                            }
-                                        } else {
-                                            worldContainer.inventory.removeLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux]);
-                                            if (worldContainer.moveItem != Items.EMPTY) {
-                                                worldContainer.inventory.addLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                            }
-                                            worldContainer.moveItem = worldContainer.moveItemTemp;
-                                            worldContainer.moveNum = worldContainer.moveNumTemp;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else if (worldContainer.ic.getType() == ItemType.FURNACE) {
-                        if (mousePos.isInBetween(6, 46, worldContainer.inventory.image.getHeight() + 46, worldContainer.inventory.image.getHeight() + 86)) {
-                            checkBlocks = false;
-                            if (mousePos.isClicked()) {
-                                mousePos.setReleased(true);
-                                worldContainer.moveItemTemp = worldContainer.ic.getIds()[0];
-                                worldContainer.moveNumTemp = worldContainer.ic.getNums()[0];
-                                if (worldContainer.moveItem == worldContainer.ic.getIds()[0]) {
-                                    worldContainer.moveNum = (short) worldContainer.inventory.addLocationIC(worldContainer.ic, 0, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                    if (worldContainer.moveNum == 0) {
-                                        worldContainer.moveItem = Items.EMPTY;
-                                    }
-                                } else {
-                                    worldContainer.inventory.removeLocationIC(worldContainer.ic, 0, worldContainer.ic.getNums()[0]);
-                                    if (worldContainer.moveItem != Items.EMPTY) {
-                                        worldContainer.inventory.addLocationIC(worldContainer.ic, 0, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                    }
-                                    worldContainer.moveItem = worldContainer.moveItemTemp;
-                                    worldContainer.moveNum = worldContainer.moveNumTemp;
-                                    worldContainer.ic.setSMELTP(0);
-                                }
-                            }
-                        }
-                        if (mousePos.isInBetween(6, 46, worldContainer.inventory.image.getHeight() + 142, worldContainer.inventory.image.getHeight() + 182)) {
-                            checkBlocks = false;
-                            if (mousePos.isClicked()) {
-                                mousePos.setReleased(true);
-                                worldContainer.moveItemTemp = worldContainer.ic.getIds()[2];
-                                worldContainer.moveNumTemp = worldContainer.ic.getNums()[2];
-                                if (worldContainer.moveItem == worldContainer.ic.getIds()[2]) {
-                                    worldContainer.moveNum = (short) worldContainer.inventory.addLocationIC(worldContainer.ic, 2, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                    if (worldContainer.moveNum == 0) {
-                                        worldContainer.moveItem = Items.EMPTY;
-                                    }
-                                } else {
-                                    worldContainer.inventory.removeLocationIC(worldContainer.ic, 2, worldContainer.ic.getNums()[2]);
-                                    if (worldContainer.moveItem != Items.EMPTY) {
-                                        worldContainer.inventory.addLocationIC(worldContainer.ic, 2, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                    }
-                                    worldContainer.moveItem = worldContainer.moveItemTemp;
-                                    worldContainer.moveNum = worldContainer.moveNumTemp;
-                                }
-                            }
-                        }
-                        if (mousePos.isInBetween(62, 102, worldContainer.inventory.image.getHeight() + 46, worldContainer.inventory.image.getHeight() + 86)) {
-                            checkBlocks = false;
-                            if (mousePos.isClicked()) {
-                                mousePos.setReleased(true);
-                                if (worldContainer.moveItem == Items.EMPTY) {
-                                    worldContainer.moveItem = worldContainer.ic.getIds()[3];
-                                    worldContainer.moveNum = worldContainer.ic.getNums()[3];
-                                    worldContainer.inventory.removeLocationIC(worldContainer.ic, 3, worldContainer.ic.getNums()[3]);
-                                } else if (worldContainer.moveItem == worldContainer.ic.getIds()[3]) {
-                                    worldContainer.moveNum += worldContainer.ic.getNums()[3];
-                                    worldContainer.inventory.removeLocationIC(worldContainer.ic, 3, worldContainer.ic.getNums()[3]);
-                                    if (worldContainer.moveNum > worldContainer.moveItem.getMaxStacks()) {
-                                        worldContainer.inventory.addLocationIC(worldContainer.ic, 3, worldContainer.moveItem, (short) (worldContainer.moveNum - worldContainer.moveItem.getMaxStacks()), moveDur);
-                                        worldContainer.moveNum = (short) worldContainer.moveItem.getMaxStacks();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                for (int uy = 0; uy < 4; uy++) {
-                    if (mousePos.isInBetween(worldContainer.inventory.image.getWidth() + 6, worldContainer.inventory.image.getWidth() + 6 + armor.getImage().getWidth(), 6 + uy * 46, 6 + uy * 46 + 40)) {
-                        checkBlocks = false;
-                        if (mousePos.isClicked()) {
-                            mousePos.setReleased(true);
-                            int i = uy;
-                            if (uy == 0 && (worldContainer.moveItem == Items.COPPER_HELMET || worldContainer.moveItem == Items.IRON_HELMET || worldContainer.moveItem == Items.SILVER_HELMET || worldContainer.moveItem == Items.GOLD_HELMET ||
-                                    worldContainer.moveItem == Items.ZINC_HELMET || worldContainer.moveItem == Items.RHYMESTONE_HELMET || worldContainer.moveItem == Items.OBDURITE_HELMET || worldContainer.moveItem == Items.ALUMINUM_HELMET ||
-                                    worldContainer.moveItem == Items.LEAD_HELMET || worldContainer.moveItem == Items.ZYTHIUM_HELMET) ||
-                                    uy == 1 && (worldContainer.moveItem == Items.COPPER_CHESTPLATE || worldContainer.moveItem == Items.IRON_CHESTPLATE || worldContainer.moveItem == Items.SILVER_CHESTPLATE || worldContainer.moveItem == Items.GOLD_CHESTPLATE ||
-                                            worldContainer.moveItem == Items.ZINC_CHESTPLATE || worldContainer.moveItem == Items.RHYMESTONE_CHESTPLATE || worldContainer.moveItem == Items.OBDURITE_CHESTPLATE || worldContainer.moveItem == Items.ALUMINUM_CHESTPLATE ||
-                                            worldContainer.moveItem == Items.LEAD_CHESTPLATE || worldContainer.moveItem == Items.ZYTHIUM_CHESTPLATE) ||
-                                    uy == 2 && (worldContainer.moveItem == Items.COPPER_LEGGINGS || worldContainer.moveItem == Items.IRON_LEGGINGS || worldContainer.moveItem == Items.SILVER_LEGGINGS || worldContainer.moveItem == Items.GOLD_LEGGINGS ||
-                                            worldContainer.moveItem == Items.ZINC_LEGGINGS || worldContainer.moveItem == Items.RHYMESTONE_LEGGINGS || worldContainer.moveItem == Items.OBDURITE_LEGGINGS || worldContainer.moveItem == Items.ALUMINUM_LEGGINGS ||
-                                            worldContainer.moveItem == Items.LEAD_LEGGINGS || worldContainer.moveItem == Items.ZYTHIUM_LEGGINGS) ||
-                                    uy == 3 && (worldContainer.moveItem == Items.COPPER_GREAVES || worldContainer.moveItem == Items.IRON_GREAVES || worldContainer.moveItem == Items.SILVER_GREAVES || worldContainer.moveItem == Items.GOLD_GREAVES ||
-                                            worldContainer.moveItem == Items.ZINC_GREAVES || worldContainer.moveItem == Items.RHYMESTONE_GREAVES || worldContainer.moveItem == Items.OBDURITE_GREAVES || worldContainer.moveItem == Items.ALUMINUM_GREAVES ||
-                                            worldContainer.moveItem == Items.LEAD_GREAVES || worldContainer.moveItem == Items.ZYTHIUM_GREAVES)) {
-                                if (armor.getIds()[i] == Items.EMPTY) {
-                                    worldContainer.inventory.addLocationIC(armor, i, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                    worldContainer.moveItem = Items.EMPTY;
-                                    worldContainer.moveNum = 0;
-                                } else {
-                                    worldContainer.moveItemTemp = armor.getIds()[i];
-                                    worldContainer.moveNumTemp = armor.getNums()[i];
-                                    worldContainer.inventory.removeLocationIC(armor, i, worldContainer.moveNumTemp);
-                                    worldContainer.inventory.addLocationIC(armor, i, worldContainer.moveItem, worldContainer.moveNum, moveDur);
-                                    worldContainer.moveItem = worldContainer.moveItemTemp;
-                                    worldContainer.moveNum = worldContainer.moveNumTemp;
-                                }
-                            } else if (worldContainer.moveItem == Items.EMPTY) {
-                                worldContainer.moveItem = armor.getIds()[i];
-                                worldContainer.moveNum = armor.getNums()[i];
-                                worldContainer.inventory.removeLocationIC(armor, i, worldContainer.moveNum);
-                            }
-                        }
-                    }
-                }
-            } else {
-                for (int ux = 0; ux < 10; ux++) {
-                    if (mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, 6, 46)) {
-                        checkBlocks = false;
-                        if (mousePos.isClicked()) {
-                            mousePos.setReleased(true);
-                            worldContainer.inventory.select2(ux);
-                        }
-                    }
-                }
-            }
-            if (mousePos.isReleased()) {
-                mousePos.setClicked(false);
-            }
-            if (checkBlocks) {
-                if (worldContainer.inventory.tool() != Items.EMPTY && !worldContainer.showTool) {
-                    tool = ImagesContainer.getInstance().itemImgs.get(worldContainer.inventory.tool());
-                    for (int i = 0; i < worldContainer.entities.size(); i++) {
-                        worldContainer.entities.get(i).setImmune(false);
-                    }
-                    worldContainer.toolSpeed = worldContainer.inventory.tool().getSpeed();
-                    if (worldContainer.inventory.tool() == Items.MAGNETITE_PICK || worldContainer.inventory.tool() == Items.MAGNETITE_AXE || worldContainer.inventory.tool() == Items.MAGNETITE_SWORD) {
-                        worldContainer.toolSpeed *= ((double) worldContainer.inventory.durs[worldContainer.inventory.selection] / worldContainer.inventory.items[worldContainer.inventory.selection].getDurability()) * (-0.714) + 1;
-                    }
-                    worldContainer.showTool = true;
-                    worldContainer.toolAngle = 4.7;
-                    int ux = mousePos2.getX() / WorldContainer.BLOCK_SIZE + blockOffsetU;
-                    int uy = mousePos2.getY() / WorldContainer.BLOCK_SIZE + blockOffsetV;
-                    int ux2 = mousePos2.getX() / WorldContainer.BLOCK_SIZE;
-                    int uy2 = mousePos2.getY() / WorldContainer.BLOCK_SIZE;
-                    if (Math.sqrt(Math.pow(worldContainer.player.x + worldContainer.player.image.getWidth() - ux2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2) + Math.pow(worldContainer.player.y + worldContainer.player.image.getHeight() - uy2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2)) <= 160 ||
-                            Math.sqrt(Math.pow(worldContainer.player.x + worldContainer.player.image.getWidth() - ux2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2 + WIDTH * WorldContainer.BLOCK_SIZE, 2) + Math.pow(worldContainer.player.y + worldContainer.player.image.getHeight() - uy2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2)) <= 160 || DebugContext.REACH) {
-                        if (Arrays.asList(TOOL_LIST).contains(worldContainer.inventory.tool())) {
-                            if (worldContainer.blocks[worldContainer.layer][uy][ux] != Blocks.AIR && worldContainer.blocks[worldContainer.layer][uy][ux].getTools().contains(worldContainer.inventory.tool())) {
-                                worldContainer.blocksDirectionsIntensity[uy][ux] = (byte) RandomTool.nextInt(5);
-                                worldContainer.drawn[uy][ux] = false;
-                                if (ux == worldContainer.mx && uy == worldContainer.my && worldContainer.inventory.tool() == miningTool) {
-                                    worldContainer.mining += 1;
-                                    worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
-                                    breakCurrentBlock(ux, uy);
-                                    if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
-                                        worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
-                                    }
-                                } else {
-                                    worldContainer.mining = 1;
-                                    miningTool = worldContainer.inventory.tool();
-                                    worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
-                                    breakCurrentBlock(ux, uy);
-                                    worldContainer.mx = ux;
-                                    worldContainer.my = uy;
-                                    if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
-                                        worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
-                                    }
-                                }
-                            }
-                        } else if (worldContainer.inventory.tool() == Items.STONE_LIGHTER) {
-                            if (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE_ON) {
-                                if (worldContainer.icmatrix[worldContainer.layer][uy][ux] != null && worldContainer.icmatrix[worldContainer.layer][uy][ux].getType() == ItemType.FURNACE) {
-                                    worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
-                                    worldContainer.icmatrix[worldContainer.layer][uy][ux].setFurnaceOn(true);
-                                    worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.FURNACE_ON;
-                                    addBlockLighting(ux, uy);
-                                    if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
-                                        worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
-                                    }
-                                    worldContainer.rdrawn[uy][ux] = false;
-                                } else {
-                                    if (worldContainer.ic != null && worldContainer.ic.getType() == ItemType.FURNACE) {
-                                        worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
-                                        worldContainer.ic.setFurnaceOn(true);
-                                        worldContainer.blocks[worldContainer.layer][worldContainer.icy][worldContainer.icx] = Blocks.FURNACE_ON;
-                                        addBlockLighting(ux, uy);
-                                        worldContainer.rdrawn[worldContainer.icy][worldContainer.icx] = false;
-                                        if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
-                                            worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
-                                        }
-                                    }
-                                }
-                            }
-                        } else if (worldContainer.inventory.tool() == Items.WRENCH) {
-                            if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayer() || worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayerOn()) {
-                                worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.increaseZythiumDelayerLevel(worldContainer.blocks[worldContainer.layer][uy][ux]);
-                                worldContainer.rdrawn[uy][ux] = false;
-                                if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
-                                    worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
-                                }
-                            } else if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayer8() || worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayer8On()) {
-                                worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.resetZythiumDelayerLevel(worldContainer.blocks[worldContainer.layer][uy][ux]);
-                                worldContainer.rdrawn[uy][ux] = false;
-                                if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
-                                    worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
-                                }
-                            }
-                        } else if (Blocks.findByIndex(worldContainer.inventory.tool().getBlockIndex()) != Blocks.AIR) {
-                            worldContainer.blockTemp = Blocks.findByIndex(worldContainer.inventory.tool().getBlockIndex());
-                            if (uy >= 1 && (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.AIR) &&
-                                    (worldContainer.layer == 0 && (
-                                            worldContainer.blocks[worldContainer.layer][uy][ux - 1] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != Blocks.AIR ||
-                                                    worldContainer.blocks[worldContainer.layer][uy - 1][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.AIR ||
-                                                    worldContainer.blocks[worldContainer.layer + 1][uy][ux] != Blocks.AIR) ||
-                                            worldContainer.layer == 1 && (
-                                                    worldContainer.blocks[worldContainer.layer][uy][ux - 1] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != Blocks.AIR ||
-                                                            worldContainer.blocks[worldContainer.layer][uy - 1][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.AIR ||
-                                                            worldContainer.blocks[worldContainer.layer - 1][uy][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer + 1][uy][ux] != Blocks.AIR) ||
-                                            worldContainer.layer == 2 && (
-                                                    worldContainer.blocks[worldContainer.layer][uy][ux - 1] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != Blocks.AIR ||
-                                                            worldContainer.blocks[worldContainer.layer][uy - 1][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.AIR ||
-                                                            worldContainer.blocks[worldContainer.layer - 1][uy][ux] != Blocks.AIR)) &&
-                                    !(worldContainer.blockTemp == Blocks.SUNFLOWER_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // sunflower
-                                            worldContainer.blockTemp == Blocks.MOONFLOWER_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // moonflower
-                                            worldContainer.blockTemp == Blocks.DRYWEED_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.SAND) || // dryweed
-                                            worldContainer.blockTemp == Blocks.GREENLEAF_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // greenleaf
-                                            worldContainer.blockTemp == Blocks.FROSTLEAF_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.SNOW) || // frostleaf
-                                            worldContainer.blockTemp == Blocks.CAVEROOT_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.STONE) || // caveroot
-                                            worldContainer.blockTemp == Blocks.SKYBLOSSOM_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // skyblossom
-                                            worldContainer.blockTemp == Blocks.VOID_ROT_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.STONE))) { // void_rot
-                                if (!(TORCHESL.get(worldContainer.blockTemp) != null) || uy < HEIGHT - 1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux].isSolid() && worldContainer.blockTemp != Blocks.BUTTON_LEFT || worldContainer.blocks[worldContainer.layer][uy][ux + 1].isSolid() || worldContainer.blocks[worldContainer.layer][uy][ux - 1].isSolid())) {
-                                    if (TORCHESL.get(worldContainer.blockTemp) != null) {
-                                        if (worldContainer.blocks[worldContainer.layer][uy + 1][ux].isSolid() && worldContainer.blockTemp != Blocks.BUTTON_LEFT) {
-                                            // do nothing
-                                        } else if (worldContainer.blocks[worldContainer.layer][uy][ux - 1].isSolid()) {
-                                            worldContainer.blockTemp = TORCHESL.get(worldContainer.blockTemp);
-                                        } else if (worldContainer.blocks[worldContainer.layer][uy][ux + 1].isSolid()) {
-                                            worldContainer.blockTemp = TORCHESR.get(worldContainer.blockTemp);
-                                        }
-                                    }
-                                    if (worldContainer.layer == 1 && !DebugContext.GPLACE && worldContainer.blockTemp.isCds()) {
-                                        for (int i = 0; i < worldContainer.entities.size(); i++) {
-                                            if (worldContainer.entities.get(i).getEntityType() != null && worldContainer.entities.get(i).getRect().intersects(new Rectangle(ux * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
-                                                worldContainer.blockTemp = Blocks.AIR;
-                                            }
-                                        }
-                                        if (worldContainer.player.occupation.intersects(new Rectangle(ux * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
-                                            worldContainer.blockTemp = Blocks.AIR;
-                                        }
-                                    }
-                                    if (worldContainer.blockTemp != Blocks.AIR) {
-                                        worldContainer.blocks[worldContainer.layer][uy][ux] = worldContainer.blockTemp;
-                                        if (worldContainer.blocks[worldContainer.layer][uy][ux].isReceive()) {
-                                            addAdjacentTilesToPQueue(ux, uy);
-                                        }
-                                        if (worldContainer.blocks[worldContainer.layer][uy][ux].isPower()) {
-                                            addBlockPower(ux, uy);
-                                        }
-                                        if (worldContainer.blocks[worldContainer.layer][uy][ux].isLTrans()) {
-                                            removeSunLighting(ux, uy);
-                                            redoBlockLighting(ux, uy);
-                                        }
-                                        addBlockLighting(ux, uy);
-                                    }
-                                    if (worldContainer.blockTemp != Blocks.AIR) {
-                                        worldContainer.inventory.removeLocation(worldContainer.inventory.selection, (short) 1);
-                                        worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
-                                        for (int uly = uy - 1; uly < uy + 2; uly++) {
-                                            for (int ulx = ux - 1; ulx < ux + 2; ulx++) {
-                                                worldContainer.blocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
-                                            }
-                                        }
-                                        for (int uly = uy - 1; uly < uy + 2; uly++) {
-                                            for (int ulx = ux - 1; ulx < ux + 2; ulx++) {
-                                                worldContainer.drawn[uly][ulx] = false;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            if (handleLeftClick(blockOffsetU, blockOffsetV)) {
+                return;
             }
         } else {
             mousePos.setClicked(true);
         }
         if (mousePressed == MousePressed.RIGHT_MOUSE) {
-            checkBlocks = true;
-            if (worldContainer.showInv) {
-                for (int ux = 0; ux < 10; ux++) {
-                    for (int uy = 0; uy < 4; uy++) {
-                        if (mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + 6, uy * 46 + 46)) {
-                            checkBlocks = false;
-                            if (mousePos2.isClicked()) {
-                                mousePos2.setReleased(true);
-                                worldContainer.moveItemTemp = worldContainer.inventory.items[uy * 10 + ux];
-                                worldContainer.moveNumTemp = (short) (worldContainer.inventory.nums[uy * 10 + ux] / 2);
-                                moveDurTemp = worldContainer.inventory.durs[uy * 10 + ux];
-                                if (worldContainer.inventory.items[uy * 10 + ux] == Items.EMPTY) {
-                                    worldContainer.inventory.addLocation(uy * 10 + ux, worldContainer.moveItem, (short) 1, moveDur);
-                                    worldContainer.moveNum -= 1;
-                                    if (worldContainer.moveNum == 0) {
-                                        worldContainer.moveItem = Items.EMPTY;
-                                        moveDur = 0;
-                                    }
-                                } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.inventory.nums[uy * 10 + ux] != 1) {
-                                    worldContainer.inventory.removeLocation(uy * 10 + ux, (short) (worldContainer.inventory.nums[uy * 10 + ux] / 2));
-                                    worldContainer.moveItem = worldContainer.moveItemTemp;
-                                    worldContainer.moveNum = worldContainer.moveNumTemp;
-                                    moveDur = moveDurTemp;
-                                } else if (worldContainer.moveItem == worldContainer.inventory.items[uy * 10 + ux] && worldContainer.inventory.nums[uy * 10 + ux] < worldContainer.inventory.items[uy * 10 + ux].getMaxStacks()) {
-                                    worldContainer.inventory.addLocation(uy * 10 + ux, worldContainer.moveItem, (short) 1, moveDur);
-                                    worldContainer.moveNum -= 1;
-                                    if (worldContainer.moveNum == 0) {
-                                        worldContainer.moveItem = Items.EMPTY;
-                                        moveDur = 0;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                for (int ux = 0; ux < 2; ux++) {
-                    for (int uy = 0; uy < 2; uy++) {
-                        if (mousePos.isInBetween(worldContainer.inventory.image.getWidth() + ux * 40 + 75, worldContainer.inventory.image.getWidth() + ux * 40 + 121, uy * 40 + 52, uy * 40 + 92)) {
-                            checkBlocks = false;
-                            if (mousePos2.isClicked()) {
-                                mousePos2.setReleased(true);
-                                worldContainer.moveItemTemp = worldContainer.cic.getIds()[uy * 2 + ux];
-                                worldContainer.moveNumTemp = (short) (worldContainer.cic.getNums()[uy * 2 + ux] / 2);
-                                if (worldContainer.cic.getIds()[uy * 2 + ux] == Items.EMPTY) {
-                                    worldContainer.inventory.addLocationIC(worldContainer.cic, uy * 2 + ux, worldContainer.moveItem, (short) 1, moveDur);
-                                    worldContainer.moveNum -= 1;
-                                    if (worldContainer.moveNum == 0) {
-                                        worldContainer.moveItem = Items.EMPTY;
-                                    }
-                                } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.cic.getNums()[uy * 2 + ux] != 1) {
-                                    worldContainer.inventory.removeLocationIC(worldContainer.cic, uy * 2 + ux, (short) (worldContainer.cic.getNums()[uy * 2 + ux] / 2));
-                                    worldContainer.moveItem = worldContainer.moveItemTemp;
-                                    worldContainer.moveNum = worldContainer.moveNumTemp;
-                                } else if (worldContainer.moveItem == worldContainer.cic.getIds()[uy * 2 + ux] && worldContainer.cic.getNums()[uy * 2 + ux] < worldContainer.cic.getIds()[uy * 2 + ux].getMaxStacks()) {
-                                    worldContainer.inventory.addLocationIC(worldContainer.cic, uy * 2 + ux, worldContainer.moveItem, (short) 1, moveDur);
-                                    worldContainer.moveNum -= 1;
-                                    if (worldContainer.moveNum == 0) {
-                                        worldContainer.moveItem = Items.EMPTY;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (worldContainer.ic != null) {
-                    if (worldContainer.ic.getType() == ItemType.WORKBENCH) {
-                        for (int ux = 0; ux < 3; ux++) {
-                            for (int uy = 0; uy < 3; uy++) {
-                                if (mousePos.isInBetween(ux * 40 + 6, ux * 40 + 46, uy * 40 + worldContainer.inventory.image.getHeight() + 46, uy * 40 + worldContainer.inventory.image.getHeight() + 86)) {
-                                    checkBlocks = false;
-                                    if (mousePos2.isClicked()) {
-                                        mousePos2.setReleased(true);
-                                        worldContainer.moveItemTemp = worldContainer.ic.getIds()[uy * 3 + ux];
-                                        worldContainer.moveNumTemp = (short) (worldContainer.ic.getNums()[uy * 3 + ux] / 2);
-                                        if (worldContainer.ic.getIds()[uy * 3 + ux] == Items.EMPTY) {
-                                            worldContainer.inventory.addLocationIC(worldContainer.ic, uy * 3 + ux, worldContainer.moveItem, (short) 1, moveDur);
-                                            worldContainer.moveNum -= 1;
-                                            if (worldContainer.moveNum == 0) {
-                                                worldContainer.moveItem = Items.EMPTY;
-                                            }
-                                        } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.ic.getNums()[uy * 3 + ux] != 1) {
-                                            worldContainer.inventory.removeLocationIC(worldContainer.ic, uy * 3 + ux, (short) (worldContainer.ic.getNums()[uy * 3 + ux] / 2));
-                                            worldContainer.moveItem = worldContainer.moveItemTemp;
-                                            worldContainer.moveNum = worldContainer.moveNumTemp;
-                                        } else if (worldContainer.moveItem == worldContainer.ic.getIds()[uy * 3 + ux] && worldContainer.ic.getNums()[uy * 3 + ux] < worldContainer.ic.getIds()[uy * 3 + ux].getMaxStacks()) {
-                                            if (worldContainer.ic.getIds()[7] == Items.BARK && worldContainer.ic.getNums()[7] == 51 && worldContainer.moveItem == Items.CLAY && uy * 3 + ux == 3 && worldContainer.ic.getNums()[8] == 0) {
-                                                worldContainer.inventory.addLocationIC(worldContainer.ic, 8, Items.WOODEN_PICK, (short) 1);
-                                            } else {
-                                                worldContainer.inventory.addLocationIC(worldContainer.ic, uy * 3 + ux, worldContainer.moveItem, (short) 1, moveDur);
-                                                worldContainer.moveNum -= 1;
-                                                if (worldContainer.moveNum == 0) {
-                                                    worldContainer.moveItem = Items.EMPTY;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (mousePos.isInBetween(4 * 40 + 6, 4 * 40 + 46, 1 * 40 + worldContainer.inventory.image.getHeight() + 46, 1 * 40 + worldContainer.inventory.image.getHeight() + 86)) {
-                            checkBlocks = false;
-                            if (mousePos2.isClicked()) {
-                                //
-                            }
-                        }
-                    } else if (worldContainer.ic.getType() == ItemType.WOODEN_CHEST || worldContainer.ic.getType() == ItemType.STONE_CHEST ||
-                            worldContainer.ic.getType() == ItemType.COPPER_CHEST || worldContainer.ic.getType() == ItemType.IRON_CHEST ||
-                            worldContainer.ic.getType() == ItemType.SILVER_CHEST || worldContainer.ic.getType() == ItemType.GOLD_CHEST ||
-                            worldContainer.ic.getType() == ItemType.ZINC_CHEST || worldContainer.ic.getType() == ItemType.RHYMESTONE_CHEST ||
-                            worldContainer.ic.getType() == ItemType.OBDURITE_CHEST) {
-                        for (int ux = 0; ux < worldContainer.inventory.CX; ux++) {
-                            for (int uy = 0; uy < worldContainer.inventory.CY; uy++) {
-                                if (mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + worldContainer.inventory.image.getHeight() + 46, uy * 46 + worldContainer.inventory.image.getHeight() + 86)) {
-                                    checkBlocks = false;
-                                    if (mousePos2.isClicked()) {
-                                        mousePos2.setReleased(true);
-                                        worldContainer.moveItemTemp = worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux];
-                                        worldContainer.moveNumTemp = (short) (worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux] / 2);
-                                        if (worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux] == Items.EMPTY) {
-                                            worldContainer.inventory.addLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, worldContainer.moveItem, (short) 1, moveDur);
-                                            worldContainer.moveNum -= 1;
-                                            if (worldContainer.moveNum == 0) {
-                                                worldContainer.moveItem = Items.EMPTY;
-                                            }
-                                        } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux] != 1) {
-                                            worldContainer.inventory.removeLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, (short) (worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux] / 2));
-                                            worldContainer.moveItem = worldContainer.moveItemTemp;
-                                            worldContainer.moveNum = worldContainer.moveNumTemp;
-                                        } else if (worldContainer.moveItem == worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux] && worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux] < worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux].getMaxStacks()) {
-                                            worldContainer.inventory.addLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, worldContainer.moveItem, (short) 1, moveDur);
-                                            worldContainer.moveNum -= 1;
-                                            if (worldContainer.moveNum == 0) {
-                                                worldContainer.moveItem = Items.EMPTY;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else if (worldContainer.ic.getType() == ItemType.FURNACE) {
-                        if (mousePos.isInBetween(6, 46, worldContainer.inventory.image.getHeight() + 46, worldContainer.inventory.image.getHeight() + 86)) {
-                            checkBlocks = false;
-                            if (mousePos2.isClicked()) {
-                                mousePos2.setReleased(true);
-                                worldContainer.moveItemTemp = worldContainer.ic.getIds()[0];
-                                worldContainer.moveNumTemp = (short) (worldContainer.ic.getNums()[0] / 2);
-                                if (worldContainer.ic.getIds()[0] == Items.EMPTY) {
-                                    worldContainer.inventory.addLocationIC(worldContainer.ic, 0, worldContainer.moveItem, (short) 1, moveDur);
-                                    worldContainer.moveNum -= 1;
-                                    if (worldContainer.moveNum == 0) {
-                                        worldContainer.moveItem = Items.EMPTY;
-                                    }
-                                } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.ic.getNums()[0] != 1) {
-                                    worldContainer.inventory.removeLocationIC(worldContainer.ic, 0, (short) (worldContainer.ic.getNums()[0] / 2));
-                                    worldContainer.moveItem = worldContainer.moveItemTemp;
-                                    worldContainer.moveNum = worldContainer.moveNumTemp;
-                                } else if (worldContainer.moveItem == worldContainer.ic.getIds()[0] && worldContainer.ic.getNums()[0] < worldContainer.ic.getIds()[0].getMaxStacks()) {
-                                    worldContainer.inventory.addLocationIC(worldContainer.ic, 0, worldContainer.moveItem, (short) 1, moveDur);
-                                    worldContainer.moveNum -= 1;
-                                    if (worldContainer.moveNum == 0) {
-                                        worldContainer.moveItem = Items.EMPTY;
-                                    }
-                                }
-                            }
-                        }
-                        if (mousePos.isInBetween(6, 46, worldContainer.inventory.image.getHeight() + 142, worldContainer.inventory.image.getHeight() + 182)) {
-                            checkBlocks = false;
-                            if (mousePos2.isClicked()) {
-                                mousePos2.setReleased(true);
-                                worldContainer.moveItemTemp = worldContainer.ic.getIds()[2];
-                                worldContainer.moveNumTemp = (short) (worldContainer.ic.getNums()[2] / 2);
-                                if (worldContainer.ic.getIds()[2] == Items.EMPTY) {
-                                    worldContainer.inventory.addLocationIC(worldContainer.ic, 2, worldContainer.moveItem, (short) 1, moveDur);
-                                    worldContainer.moveNum -= 1;
-                                    if (worldContainer.moveNum == 0) {
-                                        worldContainer.moveItem = Items.EMPTY;
-                                    }
-                                } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.ic.getNums()[2] != 1) {
-                                    worldContainer.inventory.removeLocationIC(worldContainer.ic, 2, (short) (worldContainer.ic.getNums()[2] / 2));
-                                    worldContainer.moveItem = worldContainer.moveItemTemp;
-                                    worldContainer.moveNum = worldContainer.moveNumTemp;
-                                } else if (worldContainer.moveItem == worldContainer.ic.getIds()[2] && worldContainer.ic.getNums()[2] < worldContainer.ic.getIds()[2].getMaxStacks()) {
-                                    worldContainer.inventory.addLocationIC(worldContainer.ic, 2, worldContainer.moveItem, (short) 1, moveDur);
-                                    worldContainer.moveNum -= 1;
-                                    if (worldContainer.moveNum == 0) {
-                                        worldContainer.moveItem = Items.EMPTY;
-                                    }
-                                }
-                            }
-                        }
-                        if (mousePos.isInBetween(62, 102, worldContainer.inventory.image.getHeight() + 46, worldContainer.inventory.image.getHeight() + 86)) {
-                            checkBlocks = false;
-                            if (mousePos2.isClicked()) {
-                                mousePos2.setReleased(true);
-                                worldContainer.moveItemTemp = worldContainer.ic.getIds()[3];
-                                worldContainer.moveNumTemp = (short) (worldContainer.ic.getNums()[3] / 2);
-                                if (worldContainer.moveItem == Items.EMPTY && worldContainer.ic.getNums()[3] != 1) {
-                                    worldContainer.inventory.removeLocationIC(worldContainer.ic, 3, (short) (worldContainer.ic.getNums()[3] / 2));
-                                    worldContainer.moveItem = worldContainer.moveItemTemp;
-                                    worldContainer.moveNum = worldContainer.moveNumTemp;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (checkBlocks) {
-                if (!(mousePos2.getX() < 0 || mousePos2.getX() >= WIDTH * WorldContainer.BLOCK_SIZE ||
-                        mousePos2.getY() < 0 || mousePos2.getY() >= HEIGHT * WorldContainer.BLOCK_SIZE)) {
-                    int ux = mousePos2.getX() / WorldContainer.BLOCK_SIZE;
-                    int uy = mousePos2.getY() / WorldContainer.BLOCK_SIZE;
-                    if (DebugContext.REACH || Math.sqrt(Math.pow(worldContainer.player.x + worldContainer.player.image.getWidth() - ux * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2) + Math.pow(worldContainer.player.y + worldContainer.player.image.getHeight() - uy * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2)) <= 160) {
-                        int ucx = ux - WorldContainer.CHUNK_BLOCKS * (ux / WorldContainer.CHUNK_BLOCKS);
-                        int ucy = uy - WorldContainer.CHUNK_BLOCKS * (uy / WorldContainer.CHUNK_BLOCKS);
-                        if (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.WORKBENCH
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.WOODEN_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.STONE_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.COPPER_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.IRON_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.SILVER_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.GOLD_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE_ON
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.ZINC_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.RHYMESTONE_CHEST
-                                || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.OBDURITE_CHEST) {
-                            if (worldContainer.ic != null) {
-                                if (worldContainer.ic.getType() != ItemType.WORKBENCH) {
-                                    worldContainer.machinesx.add(worldContainer.icx);
-                                    worldContainer.machinesy.add(worldContainer.icy);
-                                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx] = new ItemCollection(worldContainer.ic);
-                                } else if (worldContainer.ic.getType() == ItemType.WORKBENCH) {
-                                    if (worldContainer.player.imgState == ImageState.STILL_RIGHT || worldContainer.player.imgState.isWalkRight()) {
-                                        for (int i = 0; i < 9; i++) {
-                                            if (worldContainer.ic.getIds()[i] != Items.EMPTY) {
-                                                worldContainer.entities.add(new Entity(worldContainer.icx * WorldContainer.BLOCK_SIZE, worldContainer.icy * WorldContainer.BLOCK_SIZE, 2, -2, worldContainer.ic.getIds()[i], worldContainer.ic.getNums()[i], worldContainer.ic.getDurs()[i], 75));
-                                            }
-                                        }
-                                    }
-                                    if (worldContainer.player.imgState == ImageState.STILL_LEFT || worldContainer.player.imgState.isWalkLeft()) {
-                                        for (int i = 0; i < 9; i++) {
-                                            if (worldContainer.ic.getIds()[i] != Items.EMPTY) {
-                                                worldContainer.entities.add(new Entity(worldContainer.icx * WorldContainer.BLOCK_SIZE, worldContainer.icy * WorldContainer.BLOCK_SIZE, -2, -2, worldContainer.ic.getIds()[i], worldContainer.ic.getNums()[i], worldContainer.ic.getDurs()[i], 75));
-                                            }
-                                        }
-                                    }
-                                }
-                                if (worldContainer.ic.getType() == ItemType.FURNACE) {
-                                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setFUELP(worldContainer.ic.getFUELP());
-                                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setFUELP(worldContainer.ic.getSMELTP());
-                                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setFurnaceOn(worldContainer.ic.isFurnaceOn());
-                                }
-                                worldContainer.ic = null;
-                            }
-                            iclayer = worldContainer.layer;
-                            for (int l = 0; l < LAYER_SIZE; l++) {
-                                if (worldContainer.blocks[l][uy][ux] == Blocks.WORKBENCH) {
-                                    if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.WORKBENCH) {
-                                        worldContainer.ic = new ItemCollection(ItemType.WORKBENCH, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
-                                    } else {
-                                        worldContainer.ic = new ItemCollection(ItemType.WORKBENCH, 10);
-                                    }
-                                    worldContainer.icx = ux;
-                                    worldContainer.icy = uy;
-                                    worldContainer.inventory.renderCollection(worldContainer.ic);
-                                    worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.WOODEN_CHEST) {
-                                    if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.WOODEN_CHEST) {
-                                        worldContainer.ic = new ItemCollection(ItemType.WOODEN_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
-                                    } else {
-                                        worldContainer.ic = new ItemCollection(ItemType.WOODEN_CHEST, 9);
-                                    }
-                                    worldContainer.icx = ux;
-                                    worldContainer.icy = uy;
-                                    worldContainer.inventory.renderCollection(worldContainer.ic);
-                                    worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.STONE_CHEST) {
-                                    if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.STONE_CHEST) {
-                                        worldContainer.ic = new ItemCollection(ItemType.STONE_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
-                                    } else {
-                                        worldContainer.ic = new ItemCollection(ItemType.STONE_CHEST, 15);
-                                    }
-                                    worldContainer.icx = ux;
-                                    worldContainer.icy = uy;
-                                    worldContainer.inventory.renderCollection(worldContainer.ic);
-                                    worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.COPPER_CHEST) {
-                                    if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.COPPER_CHEST) {
-                                        worldContainer.ic = new ItemCollection(ItemType.COPPER_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
-                                    } else {
-                                        worldContainer.ic = new ItemCollection(ItemType.COPPER_CHEST, 20);
-                                    }
-                                    worldContainer.icx = ux;
-                                    worldContainer.icy = uy;
-                                    worldContainer.inventory.renderCollection(worldContainer.ic);
-                                    worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.IRON_CHEST) {
-                                    if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.IRON_CHEST) {
-                                        worldContainer.ic = new ItemCollection(ItemType.IRON_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
-                                    } else {
-                                        worldContainer.ic = new ItemCollection(ItemType.IRON_CHEST, 28);
-                                    }
-                                    worldContainer.icx = ux;
-                                    worldContainer.icy = uy;
-                                    worldContainer.inventory.renderCollection(worldContainer.ic);
-                                    worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.SILVER_CHEST) {
-                                    if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.SILVER_CHEST) {
-                                        worldContainer.ic = new ItemCollection(ItemType.SILVER_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
-                                    } else {
-                                        worldContainer.ic = new ItemCollection(ItemType.SILVER_CHEST, 35);
-                                    }
-                                    worldContainer.icx = ux;
-                                    worldContainer.icy = uy;
-                                    worldContainer.inventory.renderCollection(worldContainer.ic);
-                                    worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.GOLD_CHEST) {
-                                    if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.GOLD_CHEST) {
-                                        worldContainer.ic = new ItemCollection(ItemType.GOLD_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
-                                    } else {
-                                        worldContainer.ic = new ItemCollection(ItemType.GOLD_CHEST, 42);
-                                    }
-                                    worldContainer.icx = ux;
-                                    worldContainer.icy = uy;
-                                    worldContainer.inventory.renderCollection(worldContainer.ic);
-                                    worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.ZINC_CHEST) {
-                                    if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.ZINC_CHEST) {
-                                        worldContainer.ic = new ItemCollection(ItemType.ZINC_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
-                                    } else {
-                                        worldContainer.ic = new ItemCollection(ItemType.ZINC_CHEST, 56);
-                                    }
-                                    worldContainer.icx = ux;
-                                    worldContainer.icy = uy;
-                                    worldContainer.inventory.renderCollection(worldContainer.ic);
-                                    worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.RHYMESTONE_CHEST) {
-                                    if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.RHYMESTONE_CHEST) {
-                                        worldContainer.ic = new ItemCollection(ItemType.RHYMESTONE_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
-                                    } else {
-                                        worldContainer.ic = new ItemCollection(ItemType.RHYMESTONE_CHEST, 72);
-                                    }
-                                    worldContainer.icx = ux;
-                                    worldContainer.icy = uy;
-                                    worldContainer.inventory.renderCollection(worldContainer.ic);
-                                    worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.OBDURITE_CHEST) {
-                                    if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.OBDURITE_CHEST) {
-                                        worldContainer.ic = new ItemCollection(ItemType.OBDURITE_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
-                                    } else {
-                                        worldContainer.ic = new ItemCollection(ItemType.OBDURITE_CHEST, 100);
-                                    }
-                                    worldContainer.icx = ux;
-                                    worldContainer.icy = uy;
-                                    worldContainer.inventory.renderCollection(worldContainer.ic);
-                                    worldContainer.showInv = true;
-                                } else if (worldContainer.blocks[l][uy][ux] == Blocks.FURNACE || worldContainer.blocks[l][uy][ux] == Blocks.FURNACE_ON) {
-                                    if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.FURNACE) {
-                                        worldContainer.ic = new ItemCollection(ItemType.FURNACE, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
-                                        worldContainer.ic.setFUELP(worldContainer.icmatrix[l][uy][ux].getFUELP());
-                                        worldContainer.ic.setSMELTP(worldContainer.icmatrix[l][uy][ux].getSMELTP());
-                                        worldContainer.ic.setFurnaceOn(worldContainer.icmatrix[l][uy][ux].isFurnaceOn());
-                                        worldContainer.icmatrix[l][uy][ux] = null;
-                                    } else {
-                                        worldContainer.ic = new ItemCollection(ItemType.FURNACE, 4);
-                                    }
-                                    worldContainer.icx = ux;
-                                    worldContainer.icy = uy;
-                                    worldContainer.inventory.renderCollection(worldContainer.ic);
-                                    worldContainer.showInv = true;
-                                }
-                                if (worldContainer.ic != null && worldContainer.blocks[l][uy][ux] != Blocks.WORKBENCH) {
-                                    for (int i = worldContainer.machinesx.size() - 1; i > -1; i--) {
-                                        if (worldContainer.machinesx.get(i) == worldContainer.icx && worldContainer.machinesy.get(i) == worldContainer.icy) {
-                                            worldContainer.machinesx.remove(i);
-                                            worldContainer.machinesy.remove(i);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.TREE) {
-                            if (RandomTool.nextInt(2) == 0) {
-                                worldContainer.entities.add(new Entity(ux * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, RandomTool.nextDouble() * 8 - 4, -3, Items.BARK, (short) 1));
-                            }
-                            worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.TREE_NO_BARK;
-                        }
-                        if (mousePos2.isClicked()) {
-                            mousePos2.setReleased(true);
-                            worldContainer.blockTemp = worldContainer.blocks[worldContainer.layer][uy][ux];
-                            if (worldContainer.blocks[worldContainer.layer][uy][ux].isLever()) {
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnLeverOn(worldContainer.blocks[worldContainer.layer][uy][ux]);
-                                addBlockPower(ux, uy);
-                                worldContainer.rdrawn[uy][ux] = false;
-                            } else if (worldContainer.blocks[worldContainer.layer][uy][ux].isLeverOn()) {
-                                removeBlockPower(ux, uy, worldContainer.layer);
-                                if (wcnct[uy][ux]) {
-                                    for (int l = 0; l < LAYER_SIZE; l++) {
-                                        if (l != worldContainer.layer) {
-                                            rbpRecur(ux, uy, l);
-                                        }
-                                    }
-                                }
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnLeverOff(worldContainer.blocks[worldContainer.layer][uy][ux]);
-                                worldContainer.rdrawn[uy][ux] = false;
-                            }
-                            if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumWire()) {
-                                wcnct[uy][ux] = !wcnct[uy][ux];
-                                worldContainer.rdrawn[uy][ux] = false;
-                                redoBlockPower(ux, uy, worldContainer.layer);
-                            }
-                            if (worldContainer.blocks[worldContainer.layer][uy][ux].isCompleteZythiumAmplifier()) {
-                                removeBlockPower(ux, uy, worldContainer.layer);
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnZythiumAmplifier(worldContainer.blocks[worldContainer.layer][uy][ux]);
-                                worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
-                                worldContainer.rdrawn[uy][ux] = false;
-                                addAdjacentTilesToPQueueConditionally(ux, uy);
-                            }
-                            if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumInverterAll() || worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumInverterOnAll()) {
-                                removeBlockPower(ux, uy, worldContainer.layer);
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnZythiumInverter(worldContainer.blocks[worldContainer.layer][uy][ux]);
-                                worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
-                                worldContainer.rdrawn[uy][ux] = false;
-                                addAdjacentTilesToPQueueConditionally(ux, uy);
-                            }
-                            if (worldContainer.blocks[worldContainer.layer][uy][ux].isButton()) {
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnButtonOn(worldContainer.blocks[worldContainer.layer][uy][ux]);
-                                addBlockPower(ux, uy);
-                                worldContainer.rdrawn[uy][ux] = false;
-                                log.info("Srsly?");
-                                updatex.add(ux);
-                                updatey.add(uy);
-                                updatet.add(50);
-                                updatel.add(worldContainer.layer);
-                            }
-                            if (worldContainer.blocks[worldContainer.layer][uy][ux].isCompleteZythiumDelayer()) {
-                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnZythiumDelayer(worldContainer.blocks[worldContainer.layer][uy][ux]);
-                                worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
-                                worldContainer.rdrawn[uy][ux] = false;
-                                redoBlockPower(ux, uy, worldContainer.layer);
-                            }
-                        }
-                    }
-                }
-            }
-            if (mousePos2.isReleased()) {
-                mousePos2.setClicked(false);
-            }
+            handleRightClick();
         } else {
             mousePos2.setClicked(true);
         }
-        if (worldContainer.showTool) {
-            worldContainer.toolAngle += worldContainer.toolSpeed;
-            if (worldContainer.toolAngle >= 7.8) {
-                worldContainer.toolAngle = 4.8;
-                worldContainer.showTool = false;
-            }
-        }
+
+        worldContainer.updateToolAngle();
+
         int vc = 0;
         if (!DebugContext.INVINCIBLE && worldContainer.player.y / WorldContainer.BLOCK_SIZE > HEIGHT + 10) {
             vc += 1;
@@ -1887,7 +885,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                 } else if (worldContainer.entities.get(i).getMdelay() <= 0) {
                     int n = worldContainer.inventory.addItem(worldContainer.entities.get(i).getItem(), worldContainer.entities.get(i).getNum(), worldContainer.entities.get(i).getDur());
                     if (n != 0) {
-                        worldContainer.entities.add(new Entity(worldContainer.entities.get(i).getX(), worldContainer.entities.get(i).getY(), worldContainer.entities.get(i).getVx(), worldContainer.entities.get(i).getVy(), worldContainer.entities.get(i).getItem(), (short) (worldContainer.entities.get(i).getNum() - n), worldContainer.entities.get(i).getDur()));
+                        worldContainer.entities.add(new Entity(worldContainer.entities.get(i).getX(), worldContainer.entities.get(i).getY(), worldContainer.entities.get(i).getSpeedX(), worldContainer.entities.get(i).getSpeedY(), worldContainer.entities.get(i).getItem(), (short) (worldContainer.entities.get(i).getNum() - n), worldContainer.entities.get(i).getDur()));
                     }
                     worldContainer.entities.remove(i);
                 }
@@ -1904,7 +902,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                 if (worldContainer.ic.getType() != ItemType.WORKBENCH) {
                     worldContainer.machinesx.add(worldContainer.icx);
                     worldContainer.machinesy.add(worldContainer.icy);
-                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx] = new ItemCollection(worldContainer.ic.getType(), worldContainer.ic.getIds(), worldContainer.ic.getNums(), worldContainer.ic.getDurs());
+                    worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx] = new ItemCollection(worldContainer.ic.getType(), worldContainer.ic.getIds(), worldContainer.ic.getNums(), worldContainer.ic.getDurs());
                 } else if (worldContainer.ic.getType() == ItemType.WORKBENCH) {
                     if (worldContainer.player.imgState == ImageState.STILL_RIGHT || worldContainer.player.imgState.isWalkRight()) {
                         for (int i = 0; i < 9; i++) {
@@ -1922,9 +920,9 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                     }
                 }
                 if (worldContainer.ic.getType() == ItemType.FURNACE) {
-                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setFUELP(worldContainer.ic.getFUELP());
-                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setSMELTP(worldContainer.ic.getSMELTP());
-                    worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setFurnaceOn(worldContainer.ic.isFurnaceOn());
+                    worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setFUELP(worldContainer.ic.getFUELP());
+                    worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setSMELTP(worldContainer.ic.getSMELTP());
+                    worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setFurnaceOn(worldContainer.ic.isFurnaceOn());
                 }
                 worldContainer.ic = null;
             } else {
@@ -1969,54 +967,12 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
             worldContainer.player.speedX = 0;
             worldContainer.player.speedY = 0;
             worldContainer.player.healthPoints = worldContainer.player.totalHealthPoints;
-            tool = null;
+            worldContainer.tool = null;
             worldContainer.showTool = false;
         }
-        if (worldContainer.showTool) {
-            if (worldContainer.player.imgState == ImageState.STILL_RIGHT || worldContainer.player.imgState.isWalkRight()) {
-                tp1 = new Point((int) (worldContainer.player.x + Player.WIDTH / 2 + 6), (int) (worldContainer.player.y + Player.HEIGHT / 2));
-                tp2 = new Point((int) (worldContainer.player.x + Player.WIDTH / 2 + 6 + tool.getWidth() * 2 * Math.cos(worldContainer.toolAngle) + tool.getHeight() * 2 * Math.sin(worldContainer.toolAngle)),
-                        (int) (worldContainer.player.y + Player.HEIGHT / 2 + tool.getWidth() * 2 * Math.sin(worldContainer.toolAngle) - tool.getHeight() * 2 * Math.cos(worldContainer.toolAngle)));
-                tp3 = new Point((int) (worldContainer.player.x + Player.WIDTH / 2 + 6 + tool.getWidth() * 1 * Math.cos(worldContainer.toolAngle) + tool.getHeight() * 1 * Math.sin(worldContainer.toolAngle)),
-                        (int) (worldContainer.player.y + Player.HEIGHT / 2 + tool.getWidth() * 1 * Math.sin(worldContainer.toolAngle) - tool.getHeight() * 1 * Math.cos(worldContainer.toolAngle)));
-                tp4 = new Point((int) (worldContainer.player.x + Player.WIDTH / 2 + 6 + tool.getWidth() * 0.5 * Math.cos(worldContainer.toolAngle) + tool.getHeight() * 0.5 * Math.sin(worldContainer.toolAngle)),
-                        (int) (worldContainer.player.y + Player.HEIGHT / 2 + tool.getWidth() * 0.5 * Math.sin(worldContainer.toolAngle) - tool.getHeight() * 0.5 * Math.cos(worldContainer.toolAngle)));
-                tp5 = new Point((int) (worldContainer.player.x + Player.WIDTH / 2 + 6 + tool.getWidth() * 1.5 * Math.cos(worldContainer.toolAngle) + tool.getHeight() * 1.5 * Math.sin(worldContainer.toolAngle)),
-                        (int) (worldContainer.player.y + Player.HEIGHT / 2 + tool.getWidth() * 1.5 * Math.sin(worldContainer.toolAngle) - tool.getHeight() * 1.5 * Math.cos(worldContainer.toolAngle)));
-            }
-            if (worldContainer.player.imgState == ImageState.STILL_LEFT || worldContainer.player.imgState.isWalkLeft()) {
-                tp1 = new Point((int) (worldContainer.player.x + Player.WIDTH / 2 - 6), (int) (worldContainer.player.y + Player.HEIGHT / 2));
-                tp2 = new Point((int) (worldContainer.player.x + Player.WIDTH / 2 - 6 + tool.getWidth() * 2 * Math.cos((Math.PI * 1.5) - worldContainer.toolAngle) + tool.getHeight() * 2 * Math.sin((Math.PI * 1.5) - worldContainer.toolAngle)),
-                        (int) (worldContainer.player.y + Player.HEIGHT / 2 + tool.getWidth() * 2 * Math.sin((Math.PI * 1.5) - worldContainer.toolAngle) - tool.getHeight() * 2 * Math.cos((Math.PI * 1.5) - worldContainer.toolAngle)));
-                tp3 = new Point((int) (worldContainer.player.x + Player.WIDTH / 2 - 6 + tool.getWidth() * 1 * Math.cos((Math.PI * 1.5) - worldContainer.toolAngle) + tool.getHeight() * 1 * Math.sin((Math.PI * 1.5) - worldContainer.toolAngle)),
-                        (int) (worldContainer.player.y + Player.HEIGHT / 2 + tool.getWidth() * 1 * Math.sin((Math.PI * 1.5) - worldContainer.toolAngle) - tool.getHeight() * 1 * Math.cos((Math.PI * 1.5) - worldContainer.toolAngle)));
-                tp4 = new Point((int) (worldContainer.player.x + Player.WIDTH / 2 - 6 + tool.getWidth() * 0.5 * Math.cos((Math.PI * 1.5) - worldContainer.toolAngle) + tool.getHeight() * 0.5 * Math.sin((Math.PI * 1.5) - worldContainer.toolAngle)),
-                        (int) (worldContainer.player.y + Player.HEIGHT / 2 + tool.getWidth() * 0.5 * Math.sin((Math.PI * 1.5) - worldContainer.toolAngle) - tool.getHeight() * 0.5 * Math.cos((Math.PI * 1.5) - worldContainer.toolAngle)));
-                tp5 = new Point((int) (worldContainer.player.x + Player.WIDTH / 2 - 6 + tool.getWidth() * 1.5 * Math.cos((Math.PI * 1.5) - worldContainer.toolAngle) + tool.getHeight() * 1.5 * Math.sin((Math.PI * 1.5) - worldContainer.toolAngle)),
-                        (int) (worldContainer.player.y + Player.HEIGHT / 2 + tool.getWidth() * 1.5 * Math.sin((Math.PI * 1.5) - worldContainer.toolAngle) - tool.getHeight() * 1.5 * Math.cos((Math.PI * 1.5) - worldContainer.toolAngle)));
-            }
-            for (int i = worldContainer.entities.size() - 1; i >= 0; i--) {
-                if (worldContainer.entities.get(i).getEntityType() != null && !worldContainer.entities.get(i).isNohit() && worldContainer.showTool && (worldContainer.entities.get(i).getRect().contains(tp1) || worldContainer.entities.get(i).getRect().contains(tp2) || worldContainer.entities.get(i).getRect().contains(tp3) || worldContainer.entities.get(i).getRect().contains(tp4) || worldContainer.entities.get(i).getRect().contains(tp5)) && (!worldContainer.entities.get(i).getEntityType().equals("bee") || RandomTool.nextInt(4) == 0)) {
-                    if (worldContainer.entities.get(i).hit(worldContainer.inventory.tool().getDamage(), worldContainer.player)) {
-                        List<Items> dropList = worldContainer.entities.get(i).drops();
-                        for (int j = 0; j < dropList.size(); j++) {
-                            worldContainer.entities.add(new Entity(worldContainer.entities.get(i).getX(), worldContainer.entities.get(i).getY(), RandomTool.nextInt(4) - 2, -1, dropList.get(j), (short) 1));
-                        }
-                        worldContainer.entities.remove(i);
-                    }
-                    if (!Arrays.asList(TOOL_LIST).contains(worldContainer.inventory.items[worldContainer.inventory.selection])) {
-                        worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
-                    } else {
-                        worldContainer.inventory.durs[worldContainer.inventory.selection] -= 2;
-                    }
-                    if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
-                        worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
-                    }
-                }
-            }
-        }
 
-        int bx1, bx2, by1, by2;
+        worldContainer.updateEntitiesHit();
+
         for (int i = -1; i < worldContainer.entities.size(); i++) {
             int width, height;
             if (i == -1) {
@@ -2030,10 +986,10 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                 p = worldContainer.entities.get(i).getX();
                 q = worldContainer.entities.get(i).getY();
             }
-            bx1 = (int) p / WorldContainer.BLOCK_SIZE;
-            by1 = (int) q / WorldContainer.BLOCK_SIZE;
-            bx2 = (int) (p + width) / WorldContainer.BLOCK_SIZE;
-            by2 = (int) (q + height) / WorldContainer.BLOCK_SIZE;
+            int bx1 = (int) p / WorldContainer.BLOCK_SIZE;
+            int by1 = (int) q / WorldContainer.BLOCK_SIZE;
+            int bx2 = (int) (p + width) / WorldContainer.BLOCK_SIZE;
+            int by2 = (int) (q + height) / WorldContainer.BLOCK_SIZE;
 
             bx1 = Math.max(0, bx1);
             by1 = Math.max(0, by1);
@@ -2048,21 +1004,910 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                         if (worldContainer.blocks[worldContainer.layer][y][x].isPressurePlate()) {
                             worldContainer.blocks[worldContainer.layer][y][x] = Blocks.turnPressurePlateOn(worldContainer.blocks[worldContainer.layer][y][x]);
                             worldContainer.rdrawn[y][x] = false;
-                            addBlockPower(x, y);
+                            worldContainer.addBlockPower(x, y);
                             log.info("Srsly?");
-                            updatex.add(x);
-                            updatey.add(y);
-                            updatet.add(0);
-                            updatel.add(0);
+                            worldContainer.updatex.add(x);
+                            worldContainer.updatey.add(y);
+                            worldContainer.updatet.add(0);
+                            worldContainer.updatel.add(0);
                         }
                     }
                 }
             }
         }
 
-        resolvePowerMatrix();
-        resolveLightMatrix();
+        worldContainer.resolvePowerMatrix();
+        worldContainer.resolveLightMatrix(sunlightlevel);
         worldContainer.immune -= 1;
+    }
+
+    private boolean handleLeftClick(int blockOffsetU, int blockOffsetV) {
+        checkBlocks = true;
+        if (worldContainer.showInv) {
+            if (mousePos.isInBetweenInclusive(getWidth() - ImagesContainer.getInstance().saveExit.getWidth() - 24, getWidth() - 24, getHeight() - ImagesContainer.getInstance().saveExit.getHeight() - 24, getHeight() - 24)) {
+                if (mousePos.isClicked()) {
+                    mousePos.setReleased(true);
+                    worldContainer.saveWorld(currentWorld);
+                    state = State.TITLE_SCREEN;
+                    inGameTimer.stop();
+                    menuTimer.start();
+                    return true;
+                }
+            }
+            for (int ux = 0; ux < 10; ux++) {
+                for (int uy = 0; uy < 4; uy++) {
+                    if (mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + 6, uy * 46 + 46)) {
+                        checkBlocks = false;
+                        if (mousePos.isClicked()) {
+                            mousePos.setReleased(true);
+                            if (uy != 0 || worldContainer.inventory.selection != ux || !worldContainer.showTool) {
+                                worldContainer.moveItemTemp = worldContainer.inventory.items[uy * 10 + ux];
+                                worldContainer.moveNumTemp = worldContainer.inventory.nums[uy * 10 + ux];
+                                moveDurTemp = worldContainer.inventory.durs[uy * 10 + ux];
+                                if (worldContainer.moveItem == worldContainer.inventory.items[uy * 10 + ux]) {
+                                    worldContainer.moveNum = (short) worldContainer.inventory.addLocation(uy * 10 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                    if (worldContainer.moveNum == 0) {
+                                        worldContainer.moveItem = Items.EMPTY;
+                                        moveDur = 0;
+                                    }
+                                } else {
+                                    worldContainer.inventory.removeLocation(uy * 10 + ux, worldContainer.inventory.nums[uy * 10 + ux]);
+                                    if (worldContainer.moveItem != Items.EMPTY) {
+                                        worldContainer.inventory.addLocation(uy * 10 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                    }
+                                    worldContainer.moveItem = worldContainer.moveItemTemp;
+                                    worldContainer.moveNum = worldContainer.moveNumTemp;
+                                    moveDur = moveDurTemp;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            for (int ux = 0; ux < 2; ux++) {
+                for (int uy = 0; uy < 2; uy++) {
+                    if (mousePos.isInBetween(worldContainer.inventory.image.getWidth() + ux * 40 + 75, worldContainer.inventory.image.getWidth() + ux * 40 + 115, uy * 40 + 52, uy * 40 + 92)) {
+                        checkBlocks = false;
+                        if (mousePos.isClicked()) {
+                            mousePos.setReleased(true);
+                            worldContainer.moveItemTemp = worldContainer.cic.getIds()[uy * 2 + ux];
+                            worldContainer.moveNumTemp = worldContainer.cic.getNums()[uy * 2 + ux];
+                            moveDurTemp = worldContainer.cic.getDurs()[uy * 2 + ux];
+                            if (worldContainer.moveItem == worldContainer.cic.getIds()[uy * 2 + ux]) {
+                                worldContainer.moveNum = (short) worldContainer.inventory.addLocationIC(worldContainer.cic, uy * 2 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                if (worldContainer.moveNum == 0) {
+                                    worldContainer.moveItem = Items.EMPTY;
+                                    moveDur = 0;
+                                }
+                            } else {
+                                worldContainer.inventory.removeLocationIC(worldContainer.cic, uy * 2 + ux, worldContainer.cic.getNums()[uy * 2 + ux]);
+                                if (worldContainer.moveItem != Items.EMPTY) {
+                                    worldContainer.inventory.addLocationIC(worldContainer.cic, uy * 2 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                }
+                                worldContainer.moveItem = worldContainer.moveItemTemp;
+                                worldContainer.moveNum = worldContainer.moveNumTemp;
+                                moveDur = moveDurTemp;
+                            }
+                        }
+                    }
+                }
+            }
+            if (mousePos.isInBetween(worldContainer.inventory.image.getWidth() + 3 * 40 + 81, worldContainer.inventory.image.getWidth() + 3 * 40 + 121, 20 + 52, 20 + 92)) {
+                checkBlocks = false;
+                if (mousePos.isClicked()) {
+                    if (worldContainer.moveItem == worldContainer.cic.getIds()[4] && worldContainer.moveNum + worldContainer.cic.getNums()[4] <= worldContainer.cic.getIds()[4].getMaxStacks()) {
+                        worldContainer.moveNum += worldContainer.cic.getNums()[4];
+                        worldContainer.inventory.useRecipeCIC(worldContainer.cic);
+                    }
+                    if (worldContainer.moveItem == Items.EMPTY) {
+                        worldContainer.moveItem = worldContainer.cic.getIds()[4];
+                        worldContainer.moveNum = worldContainer.cic.getNums()[4];
+                        if (worldContainer.moveItem.getDurability() != null) {
+                            moveDur = worldContainer.moveItem.getDurability().shortValue();
+                        }
+                        worldContainer.inventory.useRecipeCIC(worldContainer.cic);
+                    }
+                }
+            }
+            if (worldContainer.ic != null) {
+                if (worldContainer.ic.getType() == ItemType.WORKBENCH) {
+                    for (int ux = 0; ux < 3; ux++) {
+                        for (int uy = 0; uy < 3; uy++) {
+                            if (mousePos.isInBetween(ux * 40 + 6, ux * 40 + 46, uy * 40 + worldContainer.inventory.image.getHeight() + 46, uy * 40 + worldContainer.inventory.image.getHeight() + 86)) {
+                                checkBlocks = false;
+                                if (mousePos.isClicked()) {
+                                    mousePos.setReleased(true);
+                                    worldContainer.moveItemTemp = worldContainer.ic.getIds()[uy * 3 + ux];
+                                    worldContainer.moveNumTemp = worldContainer.ic.getNums()[uy * 3 + ux];
+                                    if (worldContainer.moveItem == worldContainer.ic.getIds()[uy * 3 + ux]) {
+                                        worldContainer.moveNum = (short) worldContainer.inventory.addLocationIC(worldContainer.ic, uy * 3 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                        if (worldContainer.moveNum == 0) {
+                                            worldContainer.moveItem = Items.EMPTY;
+                                        }
+                                    } else {
+                                        worldContainer.inventory.removeLocationIC(worldContainer.ic, uy * 3 + ux, worldContainer.ic.getNums()[uy * 3 + ux]);
+                                        if (worldContainer.moveItem != Items.EMPTY) {
+                                            worldContainer.inventory.addLocationIC(worldContainer.ic, uy * 3 + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                        }
+                                        worldContainer.moveItem = worldContainer.moveItemTemp;
+                                        worldContainer.moveNum = worldContainer.moveNumTemp;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (mousePos.isInBetween(4 * 40 + 6, 4 * 40 + 46, 1 * 40 + worldContainer.inventory.image.getHeight() + 46, 1 * 40 + worldContainer.inventory.image.getHeight() + 86)) {
+                        checkBlocks = false;
+                        if (mousePos.isClicked()) {
+                            if (worldContainer.moveItem == worldContainer.ic.getIds()[9] && worldContainer.moveNum + worldContainer.ic.getNums()[9] <= worldContainer.ic.getIds()[9].getMaxStacks()) {
+                                worldContainer.moveNum += worldContainer.ic.getNums()[9];
+                                worldContainer.inventory.useRecipeWorkbench(worldContainer.ic);
+                            }
+                            if (worldContainer.moveItem == Items.EMPTY) {
+                                worldContainer.moveItem = worldContainer.ic.getIds()[9];
+                                worldContainer.moveNum = worldContainer.ic.getNums()[9];
+                                if (worldContainer.moveItem.getDurability() != null) {
+                                    moveDur = worldContainer.moveItem.getDurability().shortValue();
+                                }
+                                worldContainer.inventory.useRecipeWorkbench(worldContainer.ic);
+                            }
+                        }
+                    }
+                } else if (worldContainer.ic.getType() == ItemType.WOODEN_CHEST || worldContainer.ic.getType() == ItemType.STONE_CHEST ||
+                        worldContainer.ic.getType() == ItemType.COPPER_CHEST || worldContainer.ic.getType() == ItemType.IRON_CHEST ||
+                        worldContainer.ic.getType() == ItemType.SILVER_CHEST || worldContainer.ic.getType() == ItemType.GOLD_CHEST ||
+                        worldContainer.ic.getType() == ItemType.ZINC_CHEST || worldContainer.ic.getType() == ItemType.RHYMESTONE_CHEST ||
+                        worldContainer.ic.getType() == ItemType.OBDURITE_CHEST) {
+                    for (int ux = 0; ux < worldContainer.inventory.CX; ux++) {
+                        for (int uy = 0; uy < worldContainer.inventory.CY; uy++) {
+                            if (mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + worldContainer.inventory.image.getHeight() + 46, uy * 46 + worldContainer.inventory.image.getHeight() + 86)) {
+                                checkBlocks = false;
+                                if (mousePos.isClicked()) {
+                                    mousePos.setReleased(true);
+                                    worldContainer.moveItemTemp = worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux];
+                                    worldContainer.moveNumTemp = worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux];
+                                    if (worldContainer.moveItem == worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux]) {
+                                        worldContainer.moveNum = (short) worldContainer.inventory.addLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                        if (worldContainer.moveNum == 0) {
+                                            worldContainer.moveItem = Items.EMPTY;
+                                        }
+                                    } else {
+                                        worldContainer.inventory.removeLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux]);
+                                        if (worldContainer.moveItem != Items.EMPTY) {
+                                            worldContainer.inventory.addLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                        }
+                                        worldContainer.moveItem = worldContainer.moveItemTemp;
+                                        worldContainer.moveNum = worldContainer.moveNumTemp;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (worldContainer.ic.getType() == ItemType.FURNACE) {
+                    if (mousePos.isInBetween(6, 46, worldContainer.inventory.image.getHeight() + 46, worldContainer.inventory.image.getHeight() + 86)) {
+                        checkBlocks = false;
+                        if (mousePos.isClicked()) {
+                            mousePos.setReleased(true);
+                            worldContainer.moveItemTemp = worldContainer.ic.getIds()[0];
+                            worldContainer.moveNumTemp = worldContainer.ic.getNums()[0];
+                            if (worldContainer.moveItem == worldContainer.ic.getIds()[0]) {
+                                worldContainer.moveNum = (short) worldContainer.inventory.addLocationIC(worldContainer.ic, 0, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                if (worldContainer.moveNum == 0) {
+                                    worldContainer.moveItem = Items.EMPTY;
+                                }
+                            } else {
+                                worldContainer.inventory.removeLocationIC(worldContainer.ic, 0, worldContainer.ic.getNums()[0]);
+                                if (worldContainer.moveItem != Items.EMPTY) {
+                                    worldContainer.inventory.addLocationIC(worldContainer.ic, 0, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                }
+                                worldContainer.moveItem = worldContainer.moveItemTemp;
+                                worldContainer.moveNum = worldContainer.moveNumTemp;
+                                worldContainer.ic.setSMELTP(0);
+                            }
+                        }
+                    }
+                    if (mousePos.isInBetween(6, 46, worldContainer.inventory.image.getHeight() + 142, worldContainer.inventory.image.getHeight() + 182)) {
+                        checkBlocks = false;
+                        if (mousePos.isClicked()) {
+                            mousePos.setReleased(true);
+                            worldContainer.moveItemTemp = worldContainer.ic.getIds()[2];
+                            worldContainer.moveNumTemp = worldContainer.ic.getNums()[2];
+                            if (worldContainer.moveItem == worldContainer.ic.getIds()[2]) {
+                                worldContainer.moveNum = (short) worldContainer.inventory.addLocationIC(worldContainer.ic, 2, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                if (worldContainer.moveNum == 0) {
+                                    worldContainer.moveItem = Items.EMPTY;
+                                }
+                            } else {
+                                worldContainer.inventory.removeLocationIC(worldContainer.ic, 2, worldContainer.ic.getNums()[2]);
+                                if (worldContainer.moveItem != Items.EMPTY) {
+                                    worldContainer.inventory.addLocationIC(worldContainer.ic, 2, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                }
+                                worldContainer.moveItem = worldContainer.moveItemTemp;
+                                worldContainer.moveNum = worldContainer.moveNumTemp;
+                            }
+                        }
+                    }
+                    if (mousePos.isInBetween(62, 102, worldContainer.inventory.image.getHeight() + 46, worldContainer.inventory.image.getHeight() + 86)) {
+                        checkBlocks = false;
+                        if (mousePos.isClicked()) {
+                            mousePos.setReleased(true);
+                            if (worldContainer.moveItem == Items.EMPTY) {
+                                worldContainer.moveItem = worldContainer.ic.getIds()[3];
+                                worldContainer.moveNum = worldContainer.ic.getNums()[3];
+                                worldContainer.inventory.removeLocationIC(worldContainer.ic, 3, worldContainer.ic.getNums()[3]);
+                            } else if (worldContainer.moveItem == worldContainer.ic.getIds()[3]) {
+                                worldContainer.moveNum += worldContainer.ic.getNums()[3];
+                                worldContainer.inventory.removeLocationIC(worldContainer.ic, 3, worldContainer.ic.getNums()[3]);
+                                if (worldContainer.moveNum > worldContainer.moveItem.getMaxStacks()) {
+                                    worldContainer.inventory.addLocationIC(worldContainer.ic, 3, worldContainer.moveItem, (short) (worldContainer.moveNum - worldContainer.moveItem.getMaxStacks()), moveDur);
+                                    worldContainer.moveNum = (short) worldContainer.moveItem.getMaxStacks();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            for (int uy = 0; uy < 4; uy++) {
+                if (mousePos.isInBetween(worldContainer.inventory.image.getWidth() + 6, worldContainer.inventory.image.getWidth() + 6 + armor.getImage().getWidth(), 6 + uy * 46, 6 + uy * 46 + 40)) {
+                    checkBlocks = false;
+                    if (mousePos.isClicked()) {
+                        mousePos.setReleased(true);
+                        int i = uy;
+                        if (uy == 0 && (worldContainer.moveItem == Items.COPPER_HELMET || worldContainer.moveItem == Items.IRON_HELMET || worldContainer.moveItem == Items.SILVER_HELMET || worldContainer.moveItem == Items.GOLD_HELMET ||
+                                worldContainer.moveItem == Items.ZINC_HELMET || worldContainer.moveItem == Items.RHYMESTONE_HELMET || worldContainer.moveItem == Items.OBDURITE_HELMET || worldContainer.moveItem == Items.ALUMINUM_HELMET ||
+                                worldContainer.moveItem == Items.LEAD_HELMET || worldContainer.moveItem == Items.ZYTHIUM_HELMET) ||
+                                uy == 1 && (worldContainer.moveItem == Items.COPPER_CHESTPLATE || worldContainer.moveItem == Items.IRON_CHESTPLATE || worldContainer.moveItem == Items.SILVER_CHESTPLATE || worldContainer.moveItem == Items.GOLD_CHESTPLATE ||
+                                        worldContainer.moveItem == Items.ZINC_CHESTPLATE || worldContainer.moveItem == Items.RHYMESTONE_CHESTPLATE || worldContainer.moveItem == Items.OBDURITE_CHESTPLATE || worldContainer.moveItem == Items.ALUMINUM_CHESTPLATE ||
+                                        worldContainer.moveItem == Items.LEAD_CHESTPLATE || worldContainer.moveItem == Items.ZYTHIUM_CHESTPLATE) ||
+                                uy == 2 && (worldContainer.moveItem == Items.COPPER_LEGGINGS || worldContainer.moveItem == Items.IRON_LEGGINGS || worldContainer.moveItem == Items.SILVER_LEGGINGS || worldContainer.moveItem == Items.GOLD_LEGGINGS ||
+                                        worldContainer.moveItem == Items.ZINC_LEGGINGS || worldContainer.moveItem == Items.RHYMESTONE_LEGGINGS || worldContainer.moveItem == Items.OBDURITE_LEGGINGS || worldContainer.moveItem == Items.ALUMINUM_LEGGINGS ||
+                                        worldContainer.moveItem == Items.LEAD_LEGGINGS || worldContainer.moveItem == Items.ZYTHIUM_LEGGINGS) ||
+                                uy == 3 && (worldContainer.moveItem == Items.COPPER_GREAVES || worldContainer.moveItem == Items.IRON_GREAVES || worldContainer.moveItem == Items.SILVER_GREAVES || worldContainer.moveItem == Items.GOLD_GREAVES ||
+                                        worldContainer.moveItem == Items.ZINC_GREAVES || worldContainer.moveItem == Items.RHYMESTONE_GREAVES || worldContainer.moveItem == Items.OBDURITE_GREAVES || worldContainer.moveItem == Items.ALUMINUM_GREAVES ||
+                                        worldContainer.moveItem == Items.LEAD_GREAVES || worldContainer.moveItem == Items.ZYTHIUM_GREAVES)) {
+                            if (armor.getIds()[i] == Items.EMPTY) {
+                                worldContainer.inventory.addLocationIC(armor, i, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                worldContainer.moveItem = Items.EMPTY;
+                                worldContainer.moveNum = 0;
+                            } else {
+                                worldContainer.moveItemTemp = armor.getIds()[i];
+                                worldContainer.moveNumTemp = armor.getNums()[i];
+                                worldContainer.inventory.removeLocationIC(armor, i, worldContainer.moveNumTemp);
+                                worldContainer.inventory.addLocationIC(armor, i, worldContainer.moveItem, worldContainer.moveNum, moveDur);
+                                worldContainer.moveItem = worldContainer.moveItemTemp;
+                                worldContainer.moveNum = worldContainer.moveNumTemp;
+                            }
+                        } else if (worldContainer.moveItem == Items.EMPTY) {
+                            worldContainer.moveItem = armor.getIds()[i];
+                            worldContainer.moveNum = armor.getNums()[i];
+                            worldContainer.inventory.removeLocationIC(armor, i, worldContainer.moveNum);
+                        }
+                    }
+                }
+            }
+        } else {
+            for (int ux = 0; ux < 10; ux++) {
+                if (mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, 6, 46)) {
+                    checkBlocks = false;
+                    if (mousePos.isClicked()) {
+                        mousePos.setReleased(true);
+                        worldContainer.inventory.select2(ux);
+                    }
+                }
+            }
+        }
+        if (mousePos.isReleased()) {
+            mousePos.setClicked(false);
+        }
+        if (checkBlocks) {
+            if (worldContainer.inventory.tool() != Items.EMPTY && !worldContainer.showTool) {
+                worldContainer.tool = ImagesContainer.getInstance().itemImgs.get(worldContainer.inventory.tool());
+                for (int i = 0; i < worldContainer.entities.size(); i++) {
+                    worldContainer.entities.get(i).setImmune(false);
+                }
+                worldContainer.toolSpeed = worldContainer.inventory.tool().getSpeed();
+                if (worldContainer.inventory.tool() == Items.MAGNETITE_PICK || worldContainer.inventory.tool() == Items.MAGNETITE_AXE || worldContainer.inventory.tool() == Items.MAGNETITE_SWORD) {
+                    worldContainer.toolSpeed *= ((double) worldContainer.inventory.durs[worldContainer.inventory.selection] / worldContainer.inventory.items[worldContainer.inventory.selection].getDurability()) * (-0.714) + 1;
+                }
+                worldContainer.showTool = true;
+                worldContainer.toolAngle = 4.7;
+                int ux = mousePos2.getX() / WorldContainer.BLOCK_SIZE + blockOffsetU;
+                int uy = mousePos2.getY() / WorldContainer.BLOCK_SIZE + blockOffsetV;
+                int ux2 = mousePos2.getX() / WorldContainer.BLOCK_SIZE;
+                int uy2 = mousePos2.getY() / WorldContainer.BLOCK_SIZE;
+                if (Math.sqrt(Math.pow(worldContainer.player.x + worldContainer.player.image.getWidth() - ux2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2) + Math.pow(worldContainer.player.y + worldContainer.player.image.getHeight() - uy2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2)) <= 160 ||
+                        Math.sqrt(Math.pow(worldContainer.player.x + worldContainer.player.image.getWidth() - ux2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2 + WIDTH * WorldContainer.BLOCK_SIZE, 2) + Math.pow(worldContainer.player.y + worldContainer.player.image.getHeight() - uy2 * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2)) <= 160 || DebugContext.REACH) {
+                    if (Arrays.asList(TOOL_LIST).contains(worldContainer.inventory.tool())) {
+                        if (worldContainer.blocks[worldContainer.layer][uy][ux] != Blocks.AIR && worldContainer.blocks[worldContainer.layer][uy][ux].getTools().contains(worldContainer.inventory.tool())) {
+                            worldContainer.blocksDirectionsIntensity[uy][ux] = (byte) RandomTool.nextInt(5);
+                            worldContainer.drawn[uy][ux] = false;
+                            if (ux == worldContainer.mx && uy == worldContainer.my && worldContainer.inventory.tool() == miningTool) {
+                                worldContainer.mining += 1;
+                                worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
+                                breakCurrentBlock(ux, uy);
+                                if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
+                                    worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
+                                }
+                            } else {
+                                worldContainer.mining = 1;
+                                miningTool = worldContainer.inventory.tool();
+                                worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
+                                breakCurrentBlock(ux, uy);
+                                worldContainer.mx = ux;
+                                worldContainer.my = uy;
+                                if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
+                                    worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
+                                }
+                            }
+                        }
+                    } else if (worldContainer.inventory.tool() == Items.STONE_LIGHTER) {
+                        if (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE_ON) {
+                            if (worldContainer.icmatrix[worldContainer.layer][uy][ux] != null && worldContainer.icmatrix[worldContainer.layer][uy][ux].getType() == ItemType.FURNACE) {
+                                worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
+                                worldContainer.icmatrix[worldContainer.layer][uy][ux].setFurnaceOn(true);
+                                worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.FURNACE_ON;
+                                worldContainer.addBlockLighting(ux, uy);
+                                if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
+                                    worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
+                                }
+                                worldContainer.rdrawn[uy][ux] = false;
+                            } else {
+                                if (worldContainer.ic != null && worldContainer.ic.getType() == ItemType.FURNACE) {
+                                    worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
+                                    worldContainer.ic.setFurnaceOn(true);
+                                    worldContainer.blocks[worldContainer.layer][worldContainer.icy][worldContainer.icx] = Blocks.FURNACE_ON;
+                                    worldContainer.addBlockLighting(ux, uy);
+                                    worldContainer.rdrawn[worldContainer.icy][worldContainer.icx] = false;
+                                    if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
+                                        worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
+                                    }
+                                }
+                            }
+                        }
+                    } else if (worldContainer.inventory.tool() == Items.WRENCH) {
+                        if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayer() || worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayerOn()) {
+                            worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
+                            worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.increaseZythiumDelayerLevel(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                            worldContainer.rdrawn[uy][ux] = false;
+                            if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
+                                worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
+                            }
+                        } else if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayer8() || worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumDelayer8On()) {
+                            worldContainer.inventory.durs[worldContainer.inventory.selection] -= 1;
+                            worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.resetZythiumDelayerLevel(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                            worldContainer.rdrawn[uy][ux] = false;
+                            if (worldContainer.inventory.durs[worldContainer.inventory.selection] <= 0) {
+                                worldContainer.inventory.removeLocation(worldContainer.inventory.selection, worldContainer.inventory.nums[worldContainer.inventory.selection]);
+                            }
+                        }
+                    } else if (Blocks.findByIndex(worldContainer.inventory.tool().getBlockIndex()) != Blocks.AIR) {
+                        worldContainer.blockTemp = Blocks.findByIndex(worldContainer.inventory.tool().getBlockIndex());
+                        if (uy >= 1 && (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.AIR) &&
+                                (worldContainer.layer == 0 && (
+                                        worldContainer.blocks[worldContainer.layer][uy][ux - 1] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != Blocks.AIR ||
+                                                worldContainer.blocks[worldContainer.layer][uy - 1][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.AIR ||
+                                                worldContainer.blocks[worldContainer.layer + 1][uy][ux] != Blocks.AIR) ||
+                                        worldContainer.layer == 1 && (
+                                                worldContainer.blocks[worldContainer.layer][uy][ux - 1] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != Blocks.AIR ||
+                                                        worldContainer.blocks[worldContainer.layer][uy - 1][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.AIR ||
+                                                        worldContainer.blocks[worldContainer.layer - 1][uy][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer + 1][uy][ux] != Blocks.AIR) ||
+                                        worldContainer.layer == 2 && (
+                                                worldContainer.blocks[worldContainer.layer][uy][ux - 1] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy][ux + 1] != Blocks.AIR ||
+                                                        worldContainer.blocks[worldContainer.layer][uy - 1][ux] != Blocks.AIR || worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.AIR ||
+                                                        worldContainer.blocks[worldContainer.layer - 1][uy][ux] != Blocks.AIR)) &&
+                                !(worldContainer.blockTemp == Blocks.SUNFLOWER_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // sunflower
+                                        worldContainer.blockTemp == Blocks.MOONFLOWER_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // moonflower
+                                        worldContainer.blockTemp == Blocks.DRYWEED_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.SAND) || // dryweed
+                                        worldContainer.blockTemp == Blocks.GREENLEAF_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // greenleaf
+                                        worldContainer.blockTemp == Blocks.FROSTLEAF_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.SNOW) || // frostleaf
+                                        worldContainer.blockTemp == Blocks.CAVEROOT_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.STONE) || // caveroot
+                                        worldContainer.blockTemp == Blocks.SKYBLOSSOM_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.DIRT && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.GRASS && worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.JUNGLE_GRASS) || // skyblossom
+                                        worldContainer.blockTemp == Blocks.VOID_ROT_STAGE_1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux] != Blocks.STONE))) { // void_rot
+                            if (!(TORCHESL.get(worldContainer.blockTemp) != null) || uy < HEIGHT - 1 && (worldContainer.blocks[worldContainer.layer][uy + 1][ux].isSolid() && worldContainer.blockTemp != Blocks.BUTTON_LEFT || worldContainer.blocks[worldContainer.layer][uy][ux + 1].isSolid() || worldContainer.blocks[worldContainer.layer][uy][ux - 1].isSolid())) {
+                                if (TORCHESL.get(worldContainer.blockTemp) != null) {
+                                    if (worldContainer.blocks[worldContainer.layer][uy + 1][ux].isSolid() && worldContainer.blockTemp != Blocks.BUTTON_LEFT) {
+                                        // do nothing
+                                    } else if (worldContainer.blocks[worldContainer.layer][uy][ux - 1].isSolid()) {
+                                        worldContainer.blockTemp = TORCHESL.get(worldContainer.blockTemp);
+                                    } else if (worldContainer.blocks[worldContainer.layer][uy][ux + 1].isSolid()) {
+                                        worldContainer.blockTemp = TORCHESR.get(worldContainer.blockTemp);
+                                    }
+                                }
+                                if (worldContainer.layer == 1 && !DebugContext.GPLACE && worldContainer.blockTemp.isCds()) {
+                                    for (int i = 0; i < worldContainer.entities.size(); i++) {
+                                        if (worldContainer.entities.get(i).getEntityType() != null && worldContainer.entities.get(i).getRect().intersects(new Rectangle(ux * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
+                                            worldContainer.blockTemp = Blocks.AIR;
+                                        }
+                                    }
+                                    if (worldContainer.player.occupation.intersects(new Rectangle(ux * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
+                                        worldContainer.blockTemp = Blocks.AIR;
+                                    }
+                                }
+                                if (worldContainer.blockTemp != Blocks.AIR) {
+                                    worldContainer.blocks[worldContainer.layer][uy][ux] = worldContainer.blockTemp;
+                                    if (worldContainer.blocks[worldContainer.layer][uy][ux].isReceive()) {
+                                        worldContainer.addAdjacentTilesToPQueue(ux, uy);
+                                    }
+                                    if (worldContainer.blocks[worldContainer.layer][uy][ux].isPower()) {
+                                        worldContainer.addBlockPower(ux, uy);
+                                    }
+                                    if (worldContainer.blocks[worldContainer.layer][uy][ux].isLTrans()) {
+                                        worldContainer.removeSunLighting(ux, uy, sunlightlevel);
+                                        worldContainer.redoBlockLighting(ux, uy);
+                                    }
+                                    worldContainer.addBlockLighting(ux, uy);
+                                }
+                                if (worldContainer.blockTemp != Blocks.AIR) {
+                                    worldContainer.inventory.removeLocation(worldContainer.inventory.selection, (short) 1);
+                                    worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
+                                    for (int uly = uy - 1; uly < uy + 2; uly++) {
+                                        for (int ulx = ux - 1; ulx < ux + 2; ulx++) {
+                                            worldContainer.blocksDirectionsIntensity[uly][ulx] = (byte) RandomTool.nextInt(5);
+                                        }
+                                    }
+                                    for (int uly = uy - 1; uly < uy + 2; uly++) {
+                                        for (int ulx = ux - 1; ulx < ux + 2; ulx++) {
+                                            worldContainer.drawn[uly][ulx] = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private void handleRightClick() {
+        checkBlocks = true;
+        if (worldContainer.showInv) {
+            for (int ux = 0; ux < 10; ux++) {
+                for (int uy = 0; uy < 4; uy++) {
+                    if (mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + 6, uy * 46 + 46)) {
+                        checkBlocks = false;
+                        if (mousePos2.isClicked()) {
+                            mousePos2.setReleased(true);
+                            worldContainer.moveItemTemp = worldContainer.inventory.items[uy * 10 + ux];
+                            worldContainer.moveNumTemp = (short) (worldContainer.inventory.nums[uy * 10 + ux] / 2);
+                            moveDurTemp = worldContainer.inventory.durs[uy * 10 + ux];
+                            if (worldContainer.inventory.items[uy * 10 + ux] == Items.EMPTY) {
+                                worldContainer.inventory.addLocation(uy * 10 + ux, worldContainer.moveItem, (short) 1, moveDur);
+                                worldContainer.moveNum -= 1;
+                                if (worldContainer.moveNum == 0) {
+                                    worldContainer.moveItem = Items.EMPTY;
+                                    moveDur = 0;
+                                }
+                            } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.inventory.nums[uy * 10 + ux] != 1) {
+                                worldContainer.inventory.removeLocation(uy * 10 + ux, (short) (worldContainer.inventory.nums[uy * 10 + ux] / 2));
+                                worldContainer.moveItem = worldContainer.moveItemTemp;
+                                worldContainer.moveNum = worldContainer.moveNumTemp;
+                                moveDur = moveDurTemp;
+                            } else if (worldContainer.moveItem == worldContainer.inventory.items[uy * 10 + ux] && worldContainer.inventory.nums[uy * 10 + ux] < worldContainer.inventory.items[uy * 10 + ux].getMaxStacks()) {
+                                worldContainer.inventory.addLocation(uy * 10 + ux, worldContainer.moveItem, (short) 1, moveDur);
+                                worldContainer.moveNum -= 1;
+                                if (worldContainer.moveNum == 0) {
+                                    worldContainer.moveItem = Items.EMPTY;
+                                    moveDur = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            for (int ux = 0; ux < 2; ux++) {
+                for (int uy = 0; uy < 2; uy++) {
+                    if (mousePos.isInBetween(worldContainer.inventory.image.getWidth() + ux * 40 + 75, worldContainer.inventory.image.getWidth() + ux * 40 + 121, uy * 40 + 52, uy * 40 + 92)) {
+                        checkBlocks = false;
+                        if (mousePos2.isClicked()) {
+                            mousePos2.setReleased(true);
+                            worldContainer.moveItemTemp = worldContainer.cic.getIds()[uy * 2 + ux];
+                            worldContainer.moveNumTemp = (short) (worldContainer.cic.getNums()[uy * 2 + ux] / 2);
+                            if (worldContainer.cic.getIds()[uy * 2 + ux] == Items.EMPTY) {
+                                worldContainer.inventory.addLocationIC(worldContainer.cic, uy * 2 + ux, worldContainer.moveItem, (short) 1, moveDur);
+                                worldContainer.moveNum -= 1;
+                                if (worldContainer.moveNum == 0) {
+                                    worldContainer.moveItem = Items.EMPTY;
+                                }
+                            } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.cic.getNums()[uy * 2 + ux] != 1) {
+                                worldContainer.inventory.removeLocationIC(worldContainer.cic, uy * 2 + ux, (short) (worldContainer.cic.getNums()[uy * 2 + ux] / 2));
+                                worldContainer.moveItem = worldContainer.moveItemTemp;
+                                worldContainer.moveNum = worldContainer.moveNumTemp;
+                            } else if (worldContainer.moveItem == worldContainer.cic.getIds()[uy * 2 + ux] && worldContainer.cic.getNums()[uy * 2 + ux] < worldContainer.cic.getIds()[uy * 2 + ux].getMaxStacks()) {
+                                worldContainer.inventory.addLocationIC(worldContainer.cic, uy * 2 + ux, worldContainer.moveItem, (short) 1, moveDur);
+                                worldContainer.moveNum -= 1;
+                                if (worldContainer.moveNum == 0) {
+                                    worldContainer.moveItem = Items.EMPTY;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (worldContainer.ic != null) {
+                if (worldContainer.ic.getType() == ItemType.WORKBENCH) {
+                    for (int ux = 0; ux < 3; ux++) {
+                        for (int uy = 0; uy < 3; uy++) {
+                            if (mousePos.isInBetween(ux * 40 + 6, ux * 40 + 46, uy * 40 + worldContainer.inventory.image.getHeight() + 46, uy * 40 + worldContainer.inventory.image.getHeight() + 86)) {
+                                checkBlocks = false;
+                                if (mousePos2.isClicked()) {
+                                    mousePos2.setReleased(true);
+                                    worldContainer.moveItemTemp = worldContainer.ic.getIds()[uy * 3 + ux];
+                                    worldContainer.moveNumTemp = (short) (worldContainer.ic.getNums()[uy * 3 + ux] / 2);
+                                    if (worldContainer.ic.getIds()[uy * 3 + ux] == Items.EMPTY) {
+                                        worldContainer.inventory.addLocationIC(worldContainer.ic, uy * 3 + ux, worldContainer.moveItem, (short) 1, moveDur);
+                                        worldContainer.moveNum -= 1;
+                                        if (worldContainer.moveNum == 0) {
+                                            worldContainer.moveItem = Items.EMPTY;
+                                        }
+                                    } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.ic.getNums()[uy * 3 + ux] != 1) {
+                                        worldContainer.inventory.removeLocationIC(worldContainer.ic, uy * 3 + ux, (short) (worldContainer.ic.getNums()[uy * 3 + ux] / 2));
+                                        worldContainer.moveItem = worldContainer.moveItemTemp;
+                                        worldContainer.moveNum = worldContainer.moveNumTemp;
+                                    } else if (worldContainer.moveItem == worldContainer.ic.getIds()[uy * 3 + ux] && worldContainer.ic.getNums()[uy * 3 + ux] < worldContainer.ic.getIds()[uy * 3 + ux].getMaxStacks()) {
+                                        if (worldContainer.ic.getIds()[7] == Items.BARK && worldContainer.ic.getNums()[7] == 51 && worldContainer.moveItem == Items.CLAY && uy * 3 + ux == 3 && worldContainer.ic.getNums()[8] == 0) {
+                                            worldContainer.inventory.addLocationIC(worldContainer.ic, 8, Items.WOODEN_PICK, (short) 1);
+                                        } else {
+                                            worldContainer.inventory.addLocationIC(worldContainer.ic, uy * 3 + ux, worldContainer.moveItem, (short) 1, moveDur);
+                                            worldContainer.moveNum -= 1;
+                                            if (worldContainer.moveNum == 0) {
+                                                worldContainer.moveItem = Items.EMPTY;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (mousePos.isInBetween(4 * 40 + 6, 4 * 40 + 46, 1 * 40 + worldContainer.inventory.image.getHeight() + 46, 1 * 40 + worldContainer.inventory.image.getHeight() + 86)) {
+                        checkBlocks = false;
+                        if (mousePos2.isClicked()) {
+                            //
+                        }
+                    }
+                } else if (worldContainer.ic.getType() == ItemType.WOODEN_CHEST || worldContainer.ic.getType() == ItemType.STONE_CHEST ||
+                        worldContainer.ic.getType() == ItemType.COPPER_CHEST || worldContainer.ic.getType() == ItemType.IRON_CHEST ||
+                        worldContainer.ic.getType() == ItemType.SILVER_CHEST || worldContainer.ic.getType() == ItemType.GOLD_CHEST ||
+                        worldContainer.ic.getType() == ItemType.ZINC_CHEST || worldContainer.ic.getType() == ItemType.RHYMESTONE_CHEST ||
+                        worldContainer.ic.getType() == ItemType.OBDURITE_CHEST) {
+                    for (int ux = 0; ux < worldContainer.inventory.CX; ux++) {
+                        for (int uy = 0; uy < worldContainer.inventory.CY; uy++) {
+                            if (mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + worldContainer.inventory.image.getHeight() + 46, uy * 46 + worldContainer.inventory.image.getHeight() + 86)) {
+                                checkBlocks = false;
+                                if (mousePos2.isClicked()) {
+                                    mousePos2.setReleased(true);
+                                    worldContainer.moveItemTemp = worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux];
+                                    worldContainer.moveNumTemp = (short) (worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux] / 2);
+                                    if (worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux] == Items.EMPTY) {
+                                        worldContainer.inventory.addLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, worldContainer.moveItem, (short) 1, moveDur);
+                                        worldContainer.moveNum -= 1;
+                                        if (worldContainer.moveNum == 0) {
+                                            worldContainer.moveItem = Items.EMPTY;
+                                        }
+                                    } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux] != 1) {
+                                        worldContainer.inventory.removeLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, (short) (worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux] / 2));
+                                        worldContainer.moveItem = worldContainer.moveItemTemp;
+                                        worldContainer.moveNum = worldContainer.moveNumTemp;
+                                    } else if (worldContainer.moveItem == worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux] && worldContainer.ic.getNums()[uy * worldContainer.inventory.CX + ux] < worldContainer.ic.getIds()[uy * worldContainer.inventory.CX + ux].getMaxStacks()) {
+                                        worldContainer.inventory.addLocationIC(worldContainer.ic, uy * worldContainer.inventory.CX + ux, worldContainer.moveItem, (short) 1, moveDur);
+                                        worldContainer.moveNum -= 1;
+                                        if (worldContainer.moveNum == 0) {
+                                            worldContainer.moveItem = Items.EMPTY;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (worldContainer.ic.getType() == ItemType.FURNACE) {
+                    if (mousePos.isInBetween(6, 46, worldContainer.inventory.image.getHeight() + 46, worldContainer.inventory.image.getHeight() + 86)) {
+                        checkBlocks = false;
+                        if (mousePos2.isClicked()) {
+                            mousePos2.setReleased(true);
+                            worldContainer.moveItemTemp = worldContainer.ic.getIds()[0];
+                            worldContainer.moveNumTemp = (short) (worldContainer.ic.getNums()[0] / 2);
+                            if (worldContainer.ic.getIds()[0] == Items.EMPTY) {
+                                worldContainer.inventory.addLocationIC(worldContainer.ic, 0, worldContainer.moveItem, (short) 1, moveDur);
+                                worldContainer.moveNum -= 1;
+                                if (worldContainer.moveNum == 0) {
+                                    worldContainer.moveItem = Items.EMPTY;
+                                }
+                            } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.ic.getNums()[0] != 1) {
+                                worldContainer.inventory.removeLocationIC(worldContainer.ic, 0, (short) (worldContainer.ic.getNums()[0] / 2));
+                                worldContainer.moveItem = worldContainer.moveItemTemp;
+                                worldContainer.moveNum = worldContainer.moveNumTemp;
+                            } else if (worldContainer.moveItem == worldContainer.ic.getIds()[0] && worldContainer.ic.getNums()[0] < worldContainer.ic.getIds()[0].getMaxStacks()) {
+                                worldContainer.inventory.addLocationIC(worldContainer.ic, 0, worldContainer.moveItem, (short) 1, moveDur);
+                                worldContainer.moveNum -= 1;
+                                if (worldContainer.moveNum == 0) {
+                                    worldContainer.moveItem = Items.EMPTY;
+                                }
+                            }
+                        }
+                    }
+                    if (mousePos.isInBetween(6, 46, worldContainer.inventory.image.getHeight() + 142, worldContainer.inventory.image.getHeight() + 182)) {
+                        checkBlocks = false;
+                        if (mousePos2.isClicked()) {
+                            mousePos2.setReleased(true);
+                            worldContainer.moveItemTemp = worldContainer.ic.getIds()[2];
+                            worldContainer.moveNumTemp = (short) (worldContainer.ic.getNums()[2] / 2);
+                            if (worldContainer.ic.getIds()[2] == Items.EMPTY) {
+                                worldContainer.inventory.addLocationIC(worldContainer.ic, 2, worldContainer.moveItem, (short) 1, moveDur);
+                                worldContainer.moveNum -= 1;
+                                if (worldContainer.moveNum == 0) {
+                                    worldContainer.moveItem = Items.EMPTY;
+                                }
+                            } else if (worldContainer.moveItem == Items.EMPTY && worldContainer.ic.getNums()[2] != 1) {
+                                worldContainer.inventory.removeLocationIC(worldContainer.ic, 2, (short) (worldContainer.ic.getNums()[2] / 2));
+                                worldContainer.moveItem = worldContainer.moveItemTemp;
+                                worldContainer.moveNum = worldContainer.moveNumTemp;
+                            } else if (worldContainer.moveItem == worldContainer.ic.getIds()[2] && worldContainer.ic.getNums()[2] < worldContainer.ic.getIds()[2].getMaxStacks()) {
+                                worldContainer.inventory.addLocationIC(worldContainer.ic, 2, worldContainer.moveItem, (short) 1, moveDur);
+                                worldContainer.moveNum -= 1;
+                                if (worldContainer.moveNum == 0) {
+                                    worldContainer.moveItem = Items.EMPTY;
+                                }
+                            }
+                        }
+                    }
+                    if (mousePos.isInBetween(62, 102, worldContainer.inventory.image.getHeight() + 46, worldContainer.inventory.image.getHeight() + 86)) {
+                        checkBlocks = false;
+                        if (mousePos2.isClicked()) {
+                            mousePos2.setReleased(true);
+                            worldContainer.moveItemTemp = worldContainer.ic.getIds()[3];
+                            worldContainer.moveNumTemp = (short) (worldContainer.ic.getNums()[3] / 2);
+                            if (worldContainer.moveItem == Items.EMPTY && worldContainer.ic.getNums()[3] != 1) {
+                                worldContainer.inventory.removeLocationIC(worldContainer.ic, 3, (short) (worldContainer.ic.getNums()[3] / 2));
+                                worldContainer.moveItem = worldContainer.moveItemTemp;
+                                worldContainer.moveNum = worldContainer.moveNumTemp;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (checkBlocks) {
+            if (!(mousePos2.getX() < 0 || mousePos2.getX() >= WIDTH * WorldContainer.BLOCK_SIZE ||
+                    mousePos2.getY() < 0 || mousePos2.getY() >= HEIGHT * WorldContainer.BLOCK_SIZE)) {
+                int ux = mousePos2.getX() / WorldContainer.BLOCK_SIZE;
+                int uy = mousePos2.getY() / WorldContainer.BLOCK_SIZE;
+                if (DebugContext.REACH || Math.sqrt(Math.pow(worldContainer.player.x + worldContainer.player.image.getWidth() - ux * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2) + Math.pow(worldContainer.player.y + worldContainer.player.image.getHeight() - uy * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE / 2, 2)) <= 160) {
+                    int ucx = ux - WorldContainer.CHUNK_BLOCKS * (ux / WorldContainer.CHUNK_BLOCKS);
+                    int ucy = uy - WorldContainer.CHUNK_BLOCKS * (uy / WorldContainer.CHUNK_BLOCKS);
+                    if (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.WORKBENCH
+                            || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.WOODEN_CHEST
+                            || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.STONE_CHEST
+                            || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.COPPER_CHEST
+                            || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.IRON_CHEST
+                            || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.SILVER_CHEST
+                            || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.GOLD_CHEST
+                            || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE
+                            || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.FURNACE_ON
+                            || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.ZINC_CHEST
+                            || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.RHYMESTONE_CHEST
+                            || worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.OBDURITE_CHEST) {
+                        if (worldContainer.ic != null) {
+                            if (worldContainer.ic.getType() != ItemType.WORKBENCH) {
+                                worldContainer.machinesx.add(worldContainer.icx);
+                                worldContainer.machinesy.add(worldContainer.icy);
+                                worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx] = new ItemCollection(worldContainer.ic);
+                            } else if (worldContainer.ic.getType() == ItemType.WORKBENCH) {
+                                if (worldContainer.player.imgState == ImageState.STILL_RIGHT || worldContainer.player.imgState.isWalkRight()) {
+                                    for (int i = 0; i < 9; i++) {
+                                        if (worldContainer.ic.getIds()[i] != Items.EMPTY) {
+                                            worldContainer.entities.add(new Entity(worldContainer.icx * WorldContainer.BLOCK_SIZE, worldContainer.icy * WorldContainer.BLOCK_SIZE, 2, -2, worldContainer.ic.getIds()[i], worldContainer.ic.getNums()[i], worldContainer.ic.getDurs()[i], 75));
+                                        }
+                                    }
+                                }
+                                if (worldContainer.player.imgState == ImageState.STILL_LEFT || worldContainer.player.imgState.isWalkLeft()) {
+                                    for (int i = 0; i < 9; i++) {
+                                        if (worldContainer.ic.getIds()[i] != Items.EMPTY) {
+                                            worldContainer.entities.add(new Entity(worldContainer.icx * WorldContainer.BLOCK_SIZE, worldContainer.icy * WorldContainer.BLOCK_SIZE, -2, -2, worldContainer.ic.getIds()[i], worldContainer.ic.getNums()[i], worldContainer.ic.getDurs()[i], 75));
+                                        }
+                                    }
+                                }
+                            }
+                            if (worldContainer.ic.getType() == ItemType.FURNACE) {
+                                worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setFUELP(worldContainer.ic.getFUELP());
+                                worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setFUELP(worldContainer.ic.getSMELTP());
+                                worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setFurnaceOn(worldContainer.ic.isFurnaceOn());
+                            }
+                            worldContainer.ic = null;
+                        }
+                        for (int l = 0; l < LAYER_SIZE; l++) {
+                            if (worldContainer.blocks[l][uy][ux] == Blocks.WORKBENCH) {
+                                if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.WORKBENCH) {
+                                    worldContainer.ic = new ItemCollection(ItemType.WORKBENCH, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
+                                } else {
+                                    worldContainer.ic = new ItemCollection(ItemType.WORKBENCH, 10);
+                                }
+                                worldContainer.icx = ux;
+                                worldContainer.icy = uy;
+                                worldContainer.inventory.renderCollection(worldContainer.ic);
+                                worldContainer.showInv = true;
+                            } else if (worldContainer.blocks[l][uy][ux] == Blocks.WOODEN_CHEST) {
+                                if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.WOODEN_CHEST) {
+                                    worldContainer.ic = new ItemCollection(ItemType.WOODEN_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
+                                } else {
+                                    worldContainer.ic = new ItemCollection(ItemType.WOODEN_CHEST, 9);
+                                }
+                                worldContainer.icx = ux;
+                                worldContainer.icy = uy;
+                                worldContainer.inventory.renderCollection(worldContainer.ic);
+                                worldContainer.showInv = true;
+                            } else if (worldContainer.blocks[l][uy][ux] == Blocks.STONE_CHEST) {
+                                if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.STONE_CHEST) {
+                                    worldContainer.ic = new ItemCollection(ItemType.STONE_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
+                                } else {
+                                    worldContainer.ic = new ItemCollection(ItemType.STONE_CHEST, 15);
+                                }
+                                worldContainer.icx = ux;
+                                worldContainer.icy = uy;
+                                worldContainer.inventory.renderCollection(worldContainer.ic);
+                                worldContainer.showInv = true;
+                            } else if (worldContainer.blocks[l][uy][ux] == Blocks.COPPER_CHEST) {
+                                if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.COPPER_CHEST) {
+                                    worldContainer.ic = new ItemCollection(ItemType.COPPER_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
+                                } else {
+                                    worldContainer.ic = new ItemCollection(ItemType.COPPER_CHEST, 20);
+                                }
+                                worldContainer.icx = ux;
+                                worldContainer.icy = uy;
+                                worldContainer.inventory.renderCollection(worldContainer.ic);
+                                worldContainer.showInv = true;
+                            } else if (worldContainer.blocks[l][uy][ux] == Blocks.IRON_CHEST) {
+                                if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.IRON_CHEST) {
+                                    worldContainer.ic = new ItemCollection(ItemType.IRON_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
+                                } else {
+                                    worldContainer.ic = new ItemCollection(ItemType.IRON_CHEST, 28);
+                                }
+                                worldContainer.icx = ux;
+                                worldContainer.icy = uy;
+                                worldContainer.inventory.renderCollection(worldContainer.ic);
+                                worldContainer.showInv = true;
+                            } else if (worldContainer.blocks[l][uy][ux] == Blocks.SILVER_CHEST) {
+                                if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.SILVER_CHEST) {
+                                    worldContainer.ic = new ItemCollection(ItemType.SILVER_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
+                                } else {
+                                    worldContainer.ic = new ItemCollection(ItemType.SILVER_CHEST, 35);
+                                }
+                                worldContainer.icx = ux;
+                                worldContainer.icy = uy;
+                                worldContainer.inventory.renderCollection(worldContainer.ic);
+                                worldContainer.showInv = true;
+                            } else if (worldContainer.blocks[l][uy][ux] == Blocks.GOLD_CHEST) {
+                                if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.GOLD_CHEST) {
+                                    worldContainer.ic = new ItemCollection(ItemType.GOLD_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
+                                } else {
+                                    worldContainer.ic = new ItemCollection(ItemType.GOLD_CHEST, 42);
+                                }
+                                worldContainer.icx = ux;
+                                worldContainer.icy = uy;
+                                worldContainer.inventory.renderCollection(worldContainer.ic);
+                                worldContainer.showInv = true;
+                            } else if (worldContainer.blocks[l][uy][ux] == Blocks.ZINC_CHEST) {
+                                if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.ZINC_CHEST) {
+                                    worldContainer.ic = new ItemCollection(ItemType.ZINC_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
+                                } else {
+                                    worldContainer.ic = new ItemCollection(ItemType.ZINC_CHEST, 56);
+                                }
+                                worldContainer.icx = ux;
+                                worldContainer.icy = uy;
+                                worldContainer.inventory.renderCollection(worldContainer.ic);
+                                worldContainer.showInv = true;
+                            } else if (worldContainer.blocks[l][uy][ux] == Blocks.RHYMESTONE_CHEST) {
+                                if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.RHYMESTONE_CHEST) {
+                                    worldContainer.ic = new ItemCollection(ItemType.RHYMESTONE_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
+                                } else {
+                                    worldContainer.ic = new ItemCollection(ItemType.RHYMESTONE_CHEST, 72);
+                                }
+                                worldContainer.icx = ux;
+                                worldContainer.icy = uy;
+                                worldContainer.inventory.renderCollection(worldContainer.ic);
+                                worldContainer.showInv = true;
+                            } else if (worldContainer.blocks[l][uy][ux] == Blocks.OBDURITE_CHEST) {
+                                if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.OBDURITE_CHEST) {
+                                    worldContainer.ic = new ItemCollection(ItemType.OBDURITE_CHEST, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
+                                } else {
+                                    worldContainer.ic = new ItemCollection(ItemType.OBDURITE_CHEST, 100);
+                                }
+                                worldContainer.icx = ux;
+                                worldContainer.icy = uy;
+                                worldContainer.inventory.renderCollection(worldContainer.ic);
+                                worldContainer.showInv = true;
+                            } else if (worldContainer.blocks[l][uy][ux] == Blocks.FURNACE || worldContainer.blocks[l][uy][ux] == Blocks.FURNACE_ON) {
+                                if (worldContainer.icmatrix[l][uy][ux] != null && worldContainer.icmatrix[l][uy][ux].getType() == ItemType.FURNACE) {
+                                    worldContainer.ic = new ItemCollection(ItemType.FURNACE, worldContainer.icmatrix[l][uy][ux].getIds(), worldContainer.icmatrix[l][uy][ux].getNums(), worldContainer.icmatrix[l][uy][ux].getDurs());
+                                    worldContainer.ic.setFUELP(worldContainer.icmatrix[l][uy][ux].getFUELP());
+                                    worldContainer.ic.setSMELTP(worldContainer.icmatrix[l][uy][ux].getSMELTP());
+                                    worldContainer.ic.setFurnaceOn(worldContainer.icmatrix[l][uy][ux].isFurnaceOn());
+                                    worldContainer.icmatrix[l][uy][ux] = null;
+                                } else {
+                                    worldContainer.ic = new ItemCollection(ItemType.FURNACE, 4);
+                                }
+                                worldContainer.icx = ux;
+                                worldContainer.icy = uy;
+                                worldContainer.inventory.renderCollection(worldContainer.ic);
+                                worldContainer.showInv = true;
+                            }
+                            if (worldContainer.ic != null && worldContainer.blocks[l][uy][ux] != Blocks.WORKBENCH) {
+                                for (int i = worldContainer.machinesx.size() - 1; i > -1; i--) {
+                                    if (worldContainer.machinesx.get(i) == worldContainer.icx && worldContainer.machinesy.get(i) == worldContainer.icy) {
+                                        worldContainer.machinesx.remove(i);
+                                        worldContainer.machinesy.remove(i);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (worldContainer.blocks[worldContainer.layer][uy][ux] == Blocks.TREE) {
+                        if (RandomTool.nextInt(2) == 0) {
+                            worldContainer.entities.add(new Entity(ux * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, RandomTool.nextDouble() * 8 - 4, -3, Items.BARK, (short) 1));
+                        }
+                        worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.TREE_NO_BARK;
+                    }
+                    if (mousePos2.isClicked()) {
+                        mousePos2.setReleased(true);
+                        worldContainer.blockTemp = worldContainer.blocks[worldContainer.layer][uy][ux];
+                        if (worldContainer.blocks[worldContainer.layer][uy][ux].isLever()) {
+                            worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnLeverOn(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                            worldContainer.addBlockPower(ux, uy);
+                            worldContainer.rdrawn[uy][ux] = false;
+                        } else if (worldContainer.blocks[worldContainer.layer][uy][ux].isLeverOn()) {
+                            worldContainer.removeBlockPower(ux, uy, worldContainer.layer);
+                            if (worldContainer.wcnct[uy][ux]) {
+                                for (int l = 0; l < LAYER_SIZE; l++) {
+                                    if (l != worldContainer.layer) {
+                                        worldContainer.rbpRecur(ux, uy, l);
+                                    }
+                                }
+                            }
+                            worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnLeverOff(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                            worldContainer.rdrawn[uy][ux] = false;
+                        }
+                        if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumWire()) {
+                            worldContainer.wcnct[uy][ux] = !worldContainer.wcnct[uy][ux];
+                            worldContainer.rdrawn[uy][ux] = false;
+                            worldContainer.redoBlockPower(ux, uy, worldContainer.layer);
+                        }
+                        if (worldContainer.blocks[worldContainer.layer][uy][ux].isCompleteZythiumAmplifier()) {
+                            worldContainer.removeBlockPower(ux, uy, worldContainer.layer);
+                            worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnZythiumAmplifier(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                            worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
+                            worldContainer.rdrawn[uy][ux] = false;
+                            worldContainer.addAdjacentTilesToPQueueConditionally(ux, uy);
+                        }
+                        if (worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumInverterAll() || worldContainer.blocks[worldContainer.layer][uy][ux].isZythiumInverterOnAll()) {
+                            worldContainer.removeBlockPower(ux, uy, worldContainer.layer);
+                            worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnZythiumInverter(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                            worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
+                            worldContainer.rdrawn[uy][ux] = false;
+                            worldContainer.addAdjacentTilesToPQueueConditionally(ux, uy);
+                        }
+                        if (worldContainer.blocks[worldContainer.layer][uy][ux].isButton()) {
+                            worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnButtonOn(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                            worldContainer.addBlockPower(ux, uy);
+                            worldContainer.rdrawn[uy][ux] = false;
+                            log.info("Srsly?");
+                            worldContainer.updatex.add(ux);
+                            worldContainer.updatey.add(uy);
+                            worldContainer.updatet.add(50);
+                            worldContainer.updatel.add(worldContainer.layer);
+                        }
+                        if (worldContainer.blocks[worldContainer.layer][uy][ux].isCompleteZythiumDelayer()) {
+                            worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.turnZythiumDelayer(worldContainer.blocks[worldContainer.layer][uy][ux]);
+                            worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
+                            worldContainer.rdrawn[uy][ux] = false;
+                            worldContainer.redoBlockPower(ux, uy, worldContainer.layer);
+                        }
+                    }
+                }
+            }
+        }
+        if (mousePos2.isReleased()) {
+            mousePos2.setClicked(false);
+        }
     }
 
     private void breakCurrentBlock(int ux, int uy) {
@@ -2251,20 +2096,20 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                     worldContainer.entities.add(new Entity(ux * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, RandomTool.nextDouble() * 4 - 2, -2, t, (short) 1));
                 }
             }
-            removeBlockLighting(ux, uy);
+            worldContainer.removeBlockLighting(ux, uy);
             worldContainer.blockTemp = worldContainer.blocks[worldContainer.layer][uy][ux];
             worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.AIR;
             if (worldContainer.blockTemp.isZythiumWire()) {
-                redoBlockPower(ux, uy, worldContainer.layer);
+                worldContainer.redoBlockPower(ux, uy, worldContainer.layer);
             }
             if (worldContainer.blockTemp.isPower()) {
-                removeBlockPower(ux, uy, worldContainer.layer);
+                worldContainer.removeBlockPower(ux, uy, worldContainer.layer);
             }
             if (worldContainer.blockTemp.isLTrans()) {
-                addSunLighting(ux, uy);
-                redoBlockLighting(ux, uy);
+                worldContainer.addSunLighting(ux, uy, sunlightlevel);
+                worldContainer.redoBlockLighting(ux, uy);
             }
-            addSunLighting(ux, uy);
+            worldContainer.addSunLighting(ux, uy, sunlightlevel);
             worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
             for (int uly = uy - 1; uly < uy + 2; uly++) {
                 for (int ulx = ux - 1; ulx < ux + 2; ulx++) {
@@ -2308,39 +2153,39 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
             while (true) {
                 if (TORCHESR.get(Blocks.findByIndex(worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops().getBlockIndex())) != null && TORCHESR.get(Blocks.findByIndex(worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops().getBlockIndex())) == worldContainer.blocks[worldContainer.layer][uy][ux - 1] || (worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops() == Items.LEVER || worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops() == Items.BUTTON)) {
                     worldContainer.entities.add(new Entity((ux - 1) * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, RandomTool.nextDouble() * 4 - 2, -2, worldContainer.blocks[worldContainer.layer][uy][ux - 1].getDrops(), (short) 1));
-                    removeBlockLighting(ux - 1, uy);
+                    worldContainer.removeBlockLighting(ux - 1, uy);
                     if (worldContainer.layer == 1) {
-                        addSunLighting(ux - 1, uy);
+                        worldContainer.addSunLighting(ux - 1, uy, sunlightlevel);
                     }
                     worldContainer.blockTemp = worldContainer.blocks[worldContainer.layer][uy][ux - 1];
                     worldContainer.blocks[worldContainer.layer][uy][ux - 1] = Blocks.AIR;
                     if (worldContainer.blockTemp.isZythiumWire()) {
-                        redoBlockPower(ux, uy, worldContainer.layer);
+                        worldContainer.redoBlockPower(ux, uy, worldContainer.layer);
                     }
                     if (worldContainer.blockTemp.isPower()) {
-                        removeBlockPower(ux, uy, worldContainer.layer);
+                        worldContainer.removeBlockPower(ux, uy, worldContainer.layer);
                     }
                     worldContainer.drawn[uy][ux - 1] = false;
                 }
                 if (TORCHESL.get(Blocks.findByIndex(worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops().getBlockIndex())) != null && TORCHESL.get(Blocks.findByIndex(worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops().getBlockIndex())) == worldContainer.blocks[worldContainer.layer][uy][ux + 1] || (worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops() == Items.LEVER || worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops() == Items.BUTTON)) {
                     worldContainer.entities.add(new Entity((ux + 1) * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, RandomTool.nextDouble() * 4 - 2, -2, worldContainer.blocks[worldContainer.layer][uy][ux + 1].getDrops(), (short) 1));
-                    removeBlockLighting(ux + 1, uy);
+                    worldContainer.removeBlockLighting(ux + 1, uy);
                     if (worldContainer.layer == 1) {
-                        addSunLighting(ux + 1, uy);
+                        worldContainer.addSunLighting(ux + 1, uy, sunlightlevel);
                     }
                     worldContainer.blockTemp = worldContainer.blocks[worldContainer.layer][uy][ux + 1];
                     worldContainer.blocks[worldContainer.layer][uy][ux + 1] = Blocks.AIR;
                     if (worldContainer.blockTemp.isZythiumWire()) {
-                        redoBlockPower(ux, uy, worldContainer.layer);
+                        worldContainer.redoBlockPower(ux, uy, worldContainer.layer);
                     }
                     if (worldContainer.blockTemp.isPower()) {
-                        removeBlockPower(ux, uy, worldContainer.layer);
+                        worldContainer.removeBlockPower(ux, uy, worldContainer.layer);
                     }
                     worldContainer.drawn[uy][ux + 1] = false;
                 }
                 uy -= 1;
                 if (uy == -1 || !worldContainer.blocks[worldContainer.layer][uy][ux].isGSupport()) {
-                    addSunLighting(ux, uy);
+                    worldContainer.addSunLighting(ux, uy, sunlightlevel);
                     break;
                 }
                 if (worldContainer.blocks[worldContainer.layer][uy][ux].getDrops() != Items.EMPTY) {
@@ -2465,20 +2310,20 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                         worldContainer.entities.add(new Entity(ux * WorldContainer.BLOCK_SIZE, uy * WorldContainer.BLOCK_SIZE, RandomTool.nextDouble() * 4 - 2, -2, t, (short) 1));
                     }
                 }
-                removeBlockLighting(ux, uy);
+                worldContainer.removeBlockLighting(ux, uy);
                 worldContainer.blockTemp = worldContainer.blocks[worldContainer.layer][uy][ux];
                 worldContainer.blocks[worldContainer.layer][uy][ux] = Blocks.AIR;
                 if (worldContainer.blockTemp.isZythiumWire()) {
-                    redoBlockPower(ux, uy, worldContainer.layer);
+                    worldContainer.redoBlockPower(ux, uy, worldContainer.layer);
                 }
                 if (worldContainer.blockTemp.isPower()) {
-                    removeBlockPower(ux, uy, worldContainer.layer);
+                    worldContainer.removeBlockPower(ux, uy, worldContainer.layer);
                 }
                 if (worldContainer.blockTemp.isLTrans()) {
-                    addSunLighting(ux, uy);
-                    redoBlockLighting(ux, uy);
+                    worldContainer.addSunLighting(ux, uy, sunlightlevel);
+                    worldContainer.redoBlockLighting(ux, uy);
                 }
-                addSunLighting(ux, uy);
+                worldContainer.addSunLighting(ux, uy, sunlightlevel);
                 worldContainer.blocksDirections[worldContainer.layer] = OutlinesService.generateOutlines(worldContainer.blocks[worldContainer.layer], worldContainer.blocksDirections[worldContainer.layer], ux, uy);
                 for (int uly = uy - 1; uly < uy + 2; uly++) {
                     for (int ulx = ux - 1; ulx < ux + 2; ulx++) {
@@ -2546,777 +2391,6 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
             cloud.setY(RandomTool.nextDouble() * (getHeight() - cloudImage.getHeight()) + cloudImage.getHeight());
             worldContainer.cloudsAggregate.getClouds().add(cloud);
         }
-    }
-
-    private void addBlockLighting(int ux, int uy) {
-        int n = findNonLayeredBlockLightSource(ux, uy);
-        if (n != 0) {
-            addTileToZQueue(ux, uy);
-            worldContainer.lights[uy][ux] = Math.max(worldContainer.lights[uy][ux], n);
-            worldContainer.lsources[uy][ux] = true;
-            addTileToQueue(ux, uy);
-        }
-    }
-
-    private void addBlockPower(int ux, int uy) {
-        if (worldContainer.blocks[1][uy][ux].isPower()) {
-            if (worldContainer.blocks[1][uy][ux].isCompleteZythiumDelayer()) {
-                log.info("Whaaat?");
-                updatex.add(ux);
-                updatey.add(uy);
-                updatet.add(DDELAY.get(worldContainer.blocks[1][uy][ux]));
-                updatel.add(1);
-            } else {
-                addTileToPZQueue(ux, uy);
-                worldContainer.power[1][uy][ux] = (float) 5;
-                if (worldContainer.blocks[1][uy][ux].getConduct() >= 0 && wcnct[uy][ux]) {
-                    if (worldContainer.blocks[0][uy][ux].isReceive()) {
-                        worldContainer.power[0][uy][ux] = worldContainer.power[1][uy][ux] - (float) worldContainer.blocks[1][uy][ux].getConduct();
-                    }
-                    if (worldContainer.blocks[2][uy][ux].isReceive()) {
-                        worldContainer.power[2][uy][ux] = worldContainer.power[1][uy][ux] - (float) worldContainer.blocks[1][uy][ux].getConduct();
-                    }
-                }
-                addTileToPQueue(ux, uy);
-            }
-        }
-        if (worldContainer.blocks[0][uy][ux].isPower()) {
-            if (worldContainer.blocks[1][uy][ux].isCompleteZythiumDelayer()) {
-                log.info("Whaaat?");
-                updatex.add(ux);
-                updatey.add(uy);
-                updatet.add(DDELAY.get(worldContainer.blocks[0][uy][ux]));
-                updatel.add(0);
-            } else {
-                addTileToPZQueue(ux, uy);
-                worldContainer.power[0][uy][ux] = (float) 5;
-                if (worldContainer.blocks[0][uy][ux].getConduct() >= 0 && wcnct[uy][ux]) {
-                    if (worldContainer.blocks[1][uy][ux].isReceive()) {
-                        worldContainer.power[1][uy][ux] = worldContainer.power[0][uy][ux] - (float) worldContainer.blocks[0][uy][ux].getConduct();
-                    }
-                    if (worldContainer.blocks[2][uy][ux].isReceive()) {
-                        worldContainer.power[2][uy][ux] = worldContainer.power[0][uy][ux] - (float) worldContainer.blocks[0][uy][ux].getConduct();
-                    }
-                }
-                addTileToPQueue(ux, uy);
-            }
-        }
-        if (worldContainer.blocks[2][uy][ux].isPower()) {
-            if (worldContainer.blocks[1][uy][ux].isCompleteZythiumDelayer()) {
-                log.info("Whaaat?");
-                updatex.add(ux);
-                updatey.add(uy);
-                updatet.add(DDELAY.get(worldContainer.blocks[2][uy][ux]));
-                updatel.add(2);
-            } else {
-                addTileToPZQueue(ux, uy);
-                worldContainer.power[2][uy][ux] = (float) 5;
-                if (worldContainer.blocks[2][uy][ux].getConduct() >= 0 && wcnct[uy][ux]) {
-                    if (worldContainer.blocks[0][uy][ux].isReceive()) {
-                        worldContainer.power[0][uy][ux] = worldContainer.power[2][uy][ux] - (float) worldContainer.blocks[2][uy][ux].getConduct();
-                    }
-                    if (worldContainer.blocks[1][uy][ux].isReceive()) {
-                        worldContainer.power[1][uy][ux] = worldContainer.power[2][uy][ux] - (float) worldContainer.blocks[2][uy][ux].getConduct();
-                    }
-                }
-                addTileToPQueue(ux, uy);
-            }
-        }
-    }
-
-    private void removeBlockLighting(int ux, int uy) {
-        removeBlockLighting(ux, uy, worldContainer.layer);
-    }
-
-    private void removeBlockLighting(int ux, int uy, int layer) {
-        int n = findNonLayeredBlockLightSource(ux, uy);
-        if (n != 0) {
-            worldContainer.lsources[uy][ux] = isNonLayeredBlockLightSource(ux, uy, layer);
-            for (int axl = -n; axl < n + 1; axl++) {
-                for (int ayl = -n; ayl < n + 1; ayl++) {
-                    if (Math.abs(axl) + Math.abs(ayl) <= n && uy + ayl >= 0 && uy + ayl < HEIGHT && worldContainer.lights[uy + ayl][ux + axl] != 0) {
-                        addTileToZQueue(ux + axl, uy + ayl);
-                        worldContainer.lights[uy + ayl][ux + axl] = (float) 0;
-                    }
-                }
-            }
-            for (int axl = -n - BRIGHTEST; axl < n + 1 + BRIGHTEST; axl++) {
-                for (int ayl = -n - BRIGHTEST; ayl < n + 1 + BRIGHTEST; ayl++) {
-                    if (Math.abs(axl) + Math.abs(ayl) <= n + BRIGHTEST && uy + ayl >= 0 && uy + ayl < HEIGHT) {
-                        if (worldContainer.lsources[uy + ayl][ux + axl]) {
-                            addTileToQueue(ux + axl, uy + ayl);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public void rbpRecur(int ux, int uy, int lyr) {
-        arbprd[lyr][uy][ux] = true;
-        log.info("[rbpR] " + ux + " " + uy);
-        addTileToPZQueue(ux, uy);
-        boolean[] remember = { false, false, false, false };
-        int ax3, ay3;
-        for (int ir = 0; ir < 4; ir++) {
-            ax3 = ux + cl[ir][0];
-            ay3 = uy + cl[ir][1];
-            if (ay3 >= 0 && ay3 < HEIGHT && worldContainer.power[lyr][ay3][ax3] != 0) {
-                if (worldContainer.power[lyr][ay3][ax3] != 0 && !(worldContainer.power[lyr][ay3][ax3] == worldContainer.power[lyr][uy][ux] - worldContainer.blocks[lyr][uy][ux].getConduct()) &&
-                        (!(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter()) ||
-                                !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                        worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                        worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                        worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON))) {
-                    log.info("Added tile " + ax3 + " " + ay3 + " to PQueue.");
-                    addTileToPQueue(ax3, ay3);
-                    remember[ir] = true;
-                }
-            }
-        }
-        for (int ir = 0; ir < 4; ir++) {
-            log.info("[liek srsly man?] " + ir);
-            ax3 = ux + cl[ir][0];
-            ay3 = uy + cl[ir][1];
-            log.info("[rpbRecur2] " + ax3 + " " + ay3 + " " + worldContainer.power[lyr][ay3][ax3]);
-            if (ay3 >= 0 && ay3 < HEIGHT && worldContainer.power[lyr][ay3][ax3] != 0) {
-                log.info("[rbpRecur] " + worldContainer.power[lyr][ay3][ax3] + " " + worldContainer.power[lyr][uy][ux] + " " + worldContainer.blocks[lyr][uy][ux].getConduct());
-                if ((worldContainer.power[lyr][ay3][ax3] == worldContainer.power[lyr][uy][ux] - worldContainer.blocks[lyr][uy][ux].getConduct()) &&
-                        (!(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier()) ||
-                                !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON))) {
-                    if (!arbprd[lyr][ay3][ax3]) {
-                        rbpRecur(ax3, ay3, lyr);
-                        if (worldContainer.blocks[lyr][ay3][ax3].getConduct() >= 0 && wcnct[ay3][ax3]) {
-                            if (lyr == 0) {
-                                if (worldContainer.blocks[1][ay3][ax3].isReceive()) {
-                                    rbpRecur(ax3, ay3, 1);
-                                    if (worldContainer.blocks[1][ay3][ax3].isPower()) {
-                                        addTileToPQueue(ax3, ay3);
-                                    }
-                                }
-                                if (worldContainer.blocks[2][ay3][ax3].isReceive()) {
-                                    rbpRecur(ax3, ay3, 2);
-                                    if (worldContainer.blocks[2][ay3][ax3].isPower()) {
-                                        addTileToPQueue(ax3, ay3);
-                                    }
-                                }
-                            } else if (lyr == 1) {
-                                if (worldContainer.blocks[0][ay3][ax3].isReceive()) {
-                                    rbpRecur(ax3, ay3, 0);
-                                    if (worldContainer.blocks[0][ay3][ax3].isPower()) {
-                                        addTileToPQueue(ax3, ay3);
-                                    }
-                                }
-                                if (worldContainer.blocks[2][ay3][ax3].isReceive()) {
-                                    rbpRecur(ax3, ay3, 2);
-                                    if (worldContainer.blocks[2][ay3][ax3].isPower()) {
-                                        addTileToPQueue(ax3, ay3);
-                                    }
-                                }
-                            } else if (lyr == 2) {
-                                if (worldContainer.blocks[0][ay3][ax3].isReceive()) {
-                                    rbpRecur(ax3, ay3, 0);
-                                    if (worldContainer.blocks[0][ay3][ax3].isPower()) {
-                                        addTileToPQueue(ax3, ay3);
-                                    }
-                                }
-                                if (worldContainer.blocks[1][ay3][ax3].isReceive()) {
-                                    rbpRecur(ax3, ay3, 1);
-                                    if (worldContainer.blocks[1][ay3][ax3].isPower()) {
-                                        addTileToPQueue(ax3, ay3);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (worldContainer.blocks[lyr][ay3][ax3] == Blocks.ZYTHIUM_LAMP_ON || (worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer()) &&
-                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
-                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
-                if (worldContainer.blocks[lyr][ay3][ax3].isZythiumInverterOnAll()) {
-                    worldContainer.blocks[lyr][ay3][ax3] = Blocks.turnZythiumInverterOff(worldContainer.blocks[lyr][ay3][ax3]);
-                    log.info("Adding power for inverter at (" + ax3 + ", " + ay3 + ").");
-                    addBlockPower(ax3, ay3);
-                    addBlockLighting(ax3, ay3);
-                    worldContainer.rdrawn[ay3][ax3] = false;
-                }
-                removeBlockPower(ax3, ay3, lyr);
-            }
-        }
-        for (int ir = 0; ir < 4; ir++) {
-            if (remember[ir] && uy + cl[ir][1] >= 0 && uy + cl[ir][1] < HEIGHT) {
-                worldContainer.power[lyr][uy + cl[ir][1]][ux + cl[ir][0]] = (float) 5;
-            }
-        }
-        worldContainer.power[lyr][uy][ux] = (float) 0;
-        arbprd[lyr][uy][ux] = false;
-    }
-
-    public void removeBlockPower(int ux, int uy, int lyr) {
-        removeBlockPower(ux, uy, lyr, true);
-    }
-
-    public void removeBlockPower(int ux, int uy, int lyr, boolean turnOffDelayer) {
-        arbprd[lyr][uy][ux] = true;
-        log.info("[rbp ] " + ux + " " + uy + " " + lyr + " " + turnOffDelayer);
-        if (!(worldContainer.blocks[lyr][uy][ux].isZythiumDelayerOnAll() && turnOffDelayer)) {
-            int ax3, ay3;
-            for (int ir = 0; ir < 4; ir++) {
-                ax3 = ux + cl[ir][0];
-                ay3 = uy + cl[ir][1];
-                if (ay3 >= 0 && ay3 < HEIGHT && worldContainer.power[lyr][ay3][ax3] != 0) {
-                    if (!(worldContainer.power[lyr][ay3][ax3] == worldContainer.power[lyr][uy][ux] - worldContainer.blocks[lyr][uy][ux].getConduct()) &&
-                            (!(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter()) ||
-                                    !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                            worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                            !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
-                                            !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                    worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON))) {
-                        log.info("Added tile " + ax3 + " " + ay3 + " to PQueue.");
-                        addTileToPQueue(ax3, ay3);
-                    }
-                }
-            }
-            for (int ir = 0; ir < 4; ir++) {
-                ax3 = ux + cl[ir][0];
-                ay3 = uy + cl[ir][1];
-                log.info(worldContainer.blocks[lyr][ay3][ax3] + " " + worldContainer.power[lyr][ay3][ax3]);
-                if (ay3 >= 0 && ay3 < HEIGHT && worldContainer.power[lyr][ay3][ax3] != 0) {
-                    log.info(worldContainer.power[lyr][uy][ux] + " " + worldContainer.power[lyr][ay3][ax3] + " " + worldContainer.blocks[lyr][uy][ux].getConduct());
-                    if (worldContainer.power[lyr][ay3][ax3] == worldContainer.power[lyr][uy][ux] - worldContainer.blocks[lyr][uy][ux].getConduct()) {
-                        if (!(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter()) ||
-                                !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                        worldContainer.blocks[lyr][uy][ux].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
-                                        !(worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][uy][ux] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
-                            if (!arbprd[lyr][ay3][ax3]) {
-                                rbpRecur(ax3, ay3, lyr);
-                                if (worldContainer.blocks[lyr][ay3][ax3].getConduct() >= 0 && wcnct[ay3][ax3]) {
-                                    if (lyr == 0) {
-                                        if (worldContainer.blocks[1][ay3][ax3].isReceive()) {
-                                            rbpRecur(ax3, ay3, 1);
-                                            if (worldContainer.blocks[1][ay3][ax3].isPower()) {
-                                                addTileToPQueue(ax3, ay3);
-                                            }
-                                        }
-                                        if (worldContainer.blocks[2][ay3][ax3].isReceive()) {
-                                            rbpRecur(ax3, ay3, 2);
-                                            if (worldContainer.blocks[2][ay3][ax3].isPower()) {
-                                                addTileToPQueue(ax3, ay3);
-                                            }
-                                        }
-                                    }
-                                    if (lyr == 1) {
-                                        if (worldContainer.blocks[0][ay3][ax3].isReceive()) {
-                                            rbpRecur(ax3, ay3, 0);
-                                            if (worldContainer.blocks[0][ay3][ax3].isPower()) {
-                                                addTileToPQueue(ax3, ay3);
-                                            }
-                                        }
-                                        if (worldContainer.blocks[2][ay3][ax3].isReceive()) {
-                                            rbpRecur(ax3, ay3, 2);
-                                            if (worldContainer.blocks[2][ay3][ax3].isPower()) {
-                                                addTileToPQueue(ax3, ay3);
-                                            }
-                                        }
-                                    }
-                                    if (lyr == 2) {
-                                        if (worldContainer.blocks[0][ay3][ax3].isReceive()) {
-                                            rbpRecur(ax3, ay3, 0);
-                                            if (worldContainer.blocks[0][ay3][ax3].isPower()) {
-                                                addTileToPQueue(ax3, ay3);
-                                            }
-                                        }
-                                        if (worldContainer.blocks[1][ay3][ax3].isReceive()) {
-                                            rbpRecur(ax3, ay3, 1);
-                                            if (worldContainer.blocks[1][ay3][ax3].isPower()) {
-                                                addTileToPQueue(ax3, ay3);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (worldContainer.blocks[lyr][ay3][ax3] == Blocks.ZYTHIUM_LAMP_ON || (worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() || worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer()) &&
-                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumInverter() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
-                        !(worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux < ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy < ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && ux > ax3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                worldContainer.blocks[lyr][ay3][ax3].isCompleteZythiumDelayer() && uy > ay3 && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[lyr][ay3][ax3] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
-                    if (worldContainer.blocks[lyr][ay3][ax3].isZythiumInverterOnAll()) {
-                        worldContainer.blocks[lyr][ay3][ax3] = Blocks.turnZythiumInverterOff(worldContainer.blocks[lyr][ay3][ax3]);
-                        log.info("Adding power for inverter at (" + ax3 + ", " + ay3 + ").");
-                        addBlockPower(ax3, ay3);
-                        addBlockLighting(ax3, ay3);
-                        worldContainer.rdrawn[ay3][ax3] = false;
-                    }
-                    arbprd[lyr][uy][ux] = false;
-                    removeBlockPower(ax3, ay3, lyr);
-                }
-            }
-        }
-        if (worldContainer.blocks[lyr][uy][ux] == Blocks.ZYTHIUM_LAMP_ON) {
-            removeBlockLighting(ux, uy);
-            worldContainer.blocks[lyr][uy][ux] = Blocks.ZYTHIUM_LAMP;
-            worldContainer.rdrawn[uy][ux] = false;
-        }
-        if (worldContainer.blocks[lyr][uy][ux].isZythiumAmplifierOnAll()) {
-            worldContainer.blockTemp = worldContainer.blocks[lyr][uy][ux];
-            worldContainer.blocks[lyr][uy][ux] = Blocks.turnZythiumAmplifierOff(worldContainer.blocks[lyr][uy][ux]);
-            removeBlockPower(ux, uy, lyr);
-            removeBlockLighting(ux, uy);
-            worldContainer.rdrawn[uy][ux] = false;
-        }
-        if (turnOffDelayer && worldContainer.blocks[lyr][uy][ux].isCompleteZythiumDelayer()) {
-            log.info("???");
-            updatex.add(ux);
-            updatey.add(uy);
-            updatet.add(DDELAY.get(worldContainer.blocks[lyr][uy][ux]));
-            updatel.add(lyr);
-        }
-        if (!(worldContainer.blocks[lyr][uy][ux].isZythiumDelayerOnAll() && turnOffDelayer)) {
-            worldContainer.power[lyr][uy][ux] = (float) 0;
-        }
-        arbprd[lyr][uy][ux] = false;
-    }
-
-    public void redoBlockLighting(int ux, int uy) {
-        for (int ax = -BRIGHTEST; ax < BRIGHTEST + 1; ax++) {
-            for (int ay = -BRIGHTEST; ay < BRIGHTEST + 1; ay++) {
-                if (Math.abs(ax) + Math.abs(ay) <= BRIGHTEST && uy + ay >= 0 && uy + ay < HEIGHT) {
-                    addTileToZQueue(ux + ax, uy + ay);
-                    worldContainer.lights[uy + ay][ux + ax] = (float) 0;
-                }
-            }
-        }
-        for (int ax = -BRIGHTEST * 2; ax < BRIGHTEST * 2 + 1; ax++) {
-            for (int ay = -BRIGHTEST * 2; ay < BRIGHTEST * 2 + 1; ay++) {
-                if (Math.abs(ax) + Math.abs(ay) <= BRIGHTEST * 2 && uy + ay >= 0 && uy + ay < HEIGHT) {
-                    if (worldContainer.lsources[uy + ay][ux + ax]) {
-                        addTileToQueue(ux + ax, uy + ay);
-                    }
-                }
-            }
-        }
-    }
-
-    public void redoBlockPower(int ux, int uy, int lyr) {
-        if (worldContainer.blocks[lyr][uy][ux].isPower() || worldContainer.blocks[lyr][uy][ux].isZythiumWire()) {
-            addAdjacentTilesToPQueue(ux, uy);
-        } else {
-            removeBlockPower(ux, uy, lyr);
-        }
-    }
-
-    public void addSunLighting(int ux, int uy) { // And including
-        for (int y = 0; y < uy; y++) {
-            if (worldContainer.blocks[1][y][ux].isLTrans()) {
-                return;
-            }
-        }
-        boolean addSources = false;
-        for (int y = uy; y < HEIGHT - 1; y++) {
-            if (worldContainer.blocks[1][y + 1][ux - 1].isLTrans() || worldContainer.blocks[1][y + 1][ux + 1].isLTrans()) {
-                addSources = true;
-            }
-            if (addSources) {
-                addTileToQueue(ux, y);
-            }
-            if (worldContainer.blocks[1][y][ux].isLTrans()) {
-                return;
-            }
-            addTileToZQueue(ux, y);
-            worldContainer.lights[y][ux] = (float) sunlightlevel;
-            worldContainer.lsources[y][ux] = true;
-        }
-    }
-
-    public void removeSunLighting(int ux, int uy) { // And including
-        int n = sunlightlevel;
-        for (int y = 0; y < uy; y++) {
-            if (worldContainer.blocks[1][y][ux].isLTrans()) {
-                return;
-            }
-        }
-        int y;
-        for (y = uy; y < HEIGHT; y++) {
-            worldContainer.lsources[y][ux] = isBlockLightSource(ux, y);
-            if (y != uy && worldContainer.blocks[1][y][ux].isLTrans()) {
-                break;
-            }
-        }
-        for (int ax = -n; ax < n + 1; ax++) {
-            for (int ay = -n; ay < n + (y - uy) + 1; ay++) {
-                if (uy + ay >= 0 && uy + ay < WIDTH) {
-                    addTileToZQueue(ux + ax, uy + ay);
-                    worldContainer.lights[uy + ay][ux + ax] = (float) 0;
-                }
-            }
-        }
-        for (int ax = -n - BRIGHTEST; ax < n + 1 + BRIGHTEST; ax++) {
-            for (int ay = -n - BRIGHTEST; ay < n + (y - uy) + 1 + BRIGHTEST; ay++) {
-                if (uy + ay >= 0 && uy + ay < HEIGHT) {
-                    if (worldContainer.lsources[uy + ay][ux + ax]) {
-                        addTileToQueue(ux + ax, uy + ay);
-                    }
-                }
-            }
-        }
-    }
-
-    public boolean isReachedBySunlight(int ux, int uy) {
-        for (int ay = 0; ay < uy + 1; ay++) {
-            if (worldContainer.blocks[1][ay][ux].isLTrans()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean isBlockLightSource(int ux, int uy) {
-        return (worldContainer.blocks[0][uy][ux] != Blocks.AIR && worldContainer.blocks[0][uy][ux].getLights() != 0 ||
-                worldContainer.blocks[1][uy][ux] != Blocks.AIR && worldContainer.blocks[1][uy][ux].getLights() != 0 ||
-                worldContainer.blocks[2][uy][ux] != Blocks.AIR && worldContainer.blocks[2][uy][ux].getLights() != 0);
-    }
-
-    public boolean isNonLayeredBlockLightSource(int ux, int uy) {
-        return isNonLayeredBlockLightSource(ux, uy, worldContainer.layer);
-    }
-
-    public boolean isNonLayeredBlockLightSource(int ux, int uy, int layer) {
-        return (layer != 0 && worldContainer.blocks[0][uy][ux] != Blocks.AIR && worldContainer.blocks[0][uy][ux].getLights() != 0 ||
-                layer != 1 && worldContainer.blocks[1][uy][ux] != Blocks.AIR && worldContainer.blocks[1][uy][ux].getLights() != 0 ||
-                layer != 2 && worldContainer.blocks[2][uy][ux] != Blocks.AIR && worldContainer.blocks[2][uy][ux].getLights() != 0);
-    }
-
-    public int findBlockLightSource(int ux, int uy) {
-        int n = 0;
-        if (worldContainer.blocks[0][uy][ux] != Blocks.AIR) {
-            n = Math.max(worldContainer.blocks[0][uy][ux].getLights(), n);
-        }
-        if (worldContainer.blocks[1][uy][ux] != Blocks.AIR) {
-            n = Math.max(worldContainer.blocks[1][uy][ux].getLights(), n);
-        }
-        if (worldContainer.blocks[2][uy][ux] != Blocks.AIR) {
-            n = Math.max(worldContainer.blocks[2][uy][ux].getLights(), n);
-        }
-        return n;
-    }
-
-    public int findNonLayeredBlockLightSource(int ux, int uy) {
-        int n = 0;
-        if (worldContainer.blocks[0][uy][ux] != Blocks.AIR) {
-            n = Math.max(worldContainer.blocks[0][uy][ux].getLights(), n);
-        }
-        if (worldContainer.blocks[1][uy][ux] != Blocks.AIR) {
-            n = Math.max(worldContainer.blocks[1][uy][ux].getLights(), n);
-        }
-        if (worldContainer.blocks[2][uy][ux] != Blocks.AIR) {
-            n = Math.max(worldContainer.blocks[2][uy][ux].getLights(), n);
-        }
-        return n;
-    }
-
-    private void addTileToQueue(int ux, int uy) {
-        if (!worldContainer.lqd[uy][ux]) {
-            worldContainer.lqx.add(ux);
-            worldContainer.lqy.add(uy);
-            worldContainer.lqd[uy][ux] = true;
-        }
-    }
-
-    private void addTileToZQueue(int ux, int uy) {
-        if (!zqd[uy][ux]) {
-            zqx.add(ux);
-            zqy.add(uy);
-            zqn[uy][ux] = (byte) (float) worldContainer.lights[uy][ux];
-            zqd[uy][ux] = true;
-        }
-    }
-
-    private void addTileToPQueue(int ux, int uy) {
-        if (!pqd[uy][ux]) {
-            pqx.add(ux);
-            pqy.add(uy);
-            pqd[uy][ux] = true;
-        }
-    }
-
-    private void addAdjacentTilesToPQueue(int ux, int uy) {
-        for (int i2 = 0; i2 < 4; i2++) {
-            if (uy + cl[i2][1] >= 0 && uy + cl[i2][1] < HEIGHT) {
-                addTileToPQueue(ux + cl[i2][0], uy + cl[i2][1]);
-            }
-        }
-    }
-
-    private void addAdjacentTilesToPQueueConditionally(int ux, int uy) {
-        for (int i2 = 0; i2 < 4; i2++) {
-            for (int l = 0; l < LAYER_SIZE; l++) {
-                if (uy + cl[i2][1] >= 0 && uy + cl[i2][1] < HEIGHT && worldContainer.power[l][uy + cl[i2][1]][ux + cl[i2][0]] > 0) {
-                    addTileToPQueue(ux + cl[i2][0], uy + cl[i2][1]);
-                }
-            }
-        }
-    }
-
-    private void addTileToPZQueue(int ux, int uy) {
-        if (!pzqd[uy][ux]) {
-            pzqx.add(ux);
-            pzqy.add(uy);
-            pzqn[0][uy][ux] = (byte) (float) worldContainer.power[0][uy][ux];
-            pzqn[1][uy][ux] = (byte) (float) worldContainer.power[1][uy][ux];
-            pzqn[2][uy][ux] = (byte) (float) worldContainer.power[2][uy][ux];
-            pzqd[uy][ux] = true;
-        }
-    }
-
-    private void resolveLightMatrix() {
-        int x = 0, y = 0;
-        try {
-            for (int j = 0; j < worldContainer.lqx.size(); j++) {
-                x = worldContainer.lqx.get(j);
-                y = worldContainer.lqy.get(j);
-                if (worldContainer.lsources[y][x]) {
-                    int n = findBlockLightSource(x, y);
-                    if (isReachedBySunlight(x, y)) {
-                        worldContainer.lights[y][x] = MathTool.max(worldContainer.lights[y][x], n, sunlightlevel);
-                    } else {
-                        worldContainer.lights[y][x] = Math.max(worldContainer.lights[y][x], n);
-                    }
-                    addTileToZQueue(x, y);
-                }
-                for (int i = 0; i < 4; i++) {
-                    int x2 = x + cl[i][0];
-                    int y2 = y + cl[i][1];
-                    if (y2 >= 0 && y2 < HEIGHT) {
-                        if (!worldContainer.blocks[1][y2][x2].isLTrans()) {
-                            if (worldContainer.lights[y2][x2] <= worldContainer.lights[y][x] - (float) 1.0) {
-                                addTileToZQueue(x2, y2);
-                                worldContainer.lights[y2][x2] = worldContainer.lights[y][x] - (float) 1.0;
-                                addTileToQueue(x2, y2);
-                            }
-                        } else {
-                            if (worldContainer.lights[y2][x2] <= worldContainer.lights[y][x] - (float) 2.0) {
-                                addTileToZQueue(x2, y2);
-                                worldContainer.lights[y2][x2] = worldContainer.lights[y][x] - (float) 2.0;
-                                addTileToQueue(x2, y2);
-                            }
-                        }
-                    }
-                }
-
-                worldContainer.lqd[y][x] = false;
-            }
-
-            worldContainer.lqx.clear();
-            worldContainer.lqy.clear();
-        } catch (IndexOutOfBoundsException e) {
-            log.warn("Out of Bounds at " + y + "/" + x, e);
-        }
-        for (int i = 0; i < zqx.size(); i++) {
-            x = zqx.get(i);
-            y = zqy.get(i);
-            if ((int) (float) worldContainer.lights[y][x] != zqn[y][x]) {
-                worldContainer.rdrawn[y][x] = false;
-            }
-            zqd[y][x] = false;
-        }
-        zqx.clear();
-        zqy.clear();
-    }
-
-    private void resolvePowerMatrix() {
-        int x = 0, y = 0;
-        try {
-            for (int j = 0; j < pqx.size(); j++) {
-                x = pqx.get(j);
-                y = pqy.get(j);
-                for (int l = 0; l < 3; l++) {
-                    if (worldContainer.blocks[l][y][x].isPower()) {
-                        if (!worldContainer.blocks[l][y][x].isCompleteZythiumDelayer()) {
-                            addTileToPQueue(x, y);
-                            worldContainer.power[l][y][x] = (float) 5;
-                        }
-                    }
-                }
-                for (int i = 0; i < 4; i++) {
-                    int x2 = x + cl[i][0];
-                    int y2 = y + cl[i][1];
-                    if (y2 >= 0 && y2 < HEIGHT) {
-                        for (int l = 0; l < 3; l++) {
-                            if (worldContainer.power[l][y][x] > 0) {
-                                if (worldContainer.blocks[l][y][x].getConduct() >= 0 && worldContainer.blocks[l][y2][x2].isReceive() && !(worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && x < x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                        worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && y < y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                        worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && x > x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                        worldContainer.blocks[l][y2][x2].isCompleteZythiumAmplifier() && y > y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                        !(worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && x < x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && y < y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && x > x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_LEFT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumAmplifier() && y > y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_AMPLIFIER_UP_ON) &&
-                                        !(worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && x < x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && y < y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && x > x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumInverter() && y > y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
-                                        !(worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && x < x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_RIGHT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && y < y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_DOWN_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && x > x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_LEFT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumInverter() && y > y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_INVERTER_UP_ON) &&
-                                        !(worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && x < x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && y < y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && x > x2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                worldContainer.blocks[l][y2][x2].isCompleteZythiumDelayer() && y > y2 && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[l][y2][x2] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON) &&
-                                        !(worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && x < x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_RIGHT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_RIGHT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_RIGHT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_RIGHT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && y < y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_DOWN_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_DOWN_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_DOWN_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_DOWN_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && x > x2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_LEFT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_LEFT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_LEFT_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_LEFT_ON ||
-                                                worldContainer.blocks[l][y][x].isCompleteZythiumDelayer() && y > y2 && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_1_DELAY_UP_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_2_DELAY_UP_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_4_DELAY_UP_ON && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP && worldContainer.blocks[l][y][x] != Blocks.ZYTHIUM_DELAYER_8_DELAY_UP_ON)) {
-                                    if (worldContainer.power[l][y2][x2] <= worldContainer.power[l][y][x] - worldContainer.blocks[l][y][x].getConduct()) {
-                                        addTileToPZQueue(x2, y2);
-                                        if (worldContainer.blocks[l][y2][x2].isZythiumDelayerAll()) {
-                                            log.info("[DEBUG1]");
-                                            updatex.add(x2);
-                                            updatey.add(y2);
-                                            updatet.add(DDELAY.get(worldContainer.blocks[l][y2][x2]));
-                                            updatel.add(l);
-                                        } else {
-                                            worldContainer.power[l][y2][x2] = worldContainer.power[l][y][x] - (float) worldContainer.blocks[l][y][x].getConduct();
-                                            if (worldContainer.blocks[l][y2][x2].getConduct() >= 0 && wcnct[y2][x2]) {
-                                                if (l == 0) {
-                                                    if (worldContainer.blocks[1][y2][x2].isReceive()) {
-                                                        worldContainer.power[1][y2][x2] = worldContainer.power[0][y2][x2] - (float) worldContainer.blocks[0][y2][x2].getConduct();
-                                                    }
-                                                    if (worldContainer.blocks[2][y2][x2].isReceive()) {
-                                                        worldContainer.power[2][y2][x2] = worldContainer.power[0][y2][x2] - (float) worldContainer.blocks[0][y2][x2].getConduct();
-                                                    }
-                                                }
-                                                if (l == 1) {
-                                                    if (worldContainer.blocks[0][y2][x2].isReceive()) {
-                                                        worldContainer.power[0][y2][x2] = worldContainer.power[1][y2][x2] - (float) worldContainer.blocks[1][y2][x2].getConduct();
-                                                    }
-                                                    if (worldContainer.blocks[2][y2][x2].isReceive()) {
-                                                        worldContainer.power[2][y2][x2] = worldContainer.power[1][y2][x2] - (float) worldContainer.blocks[1][y2][x2].getConduct();
-                                                    }
-                                                }
-                                                if (l == 2) {
-                                                    if (worldContainer.blocks[0][y2][x2].isReceive()) {
-                                                        worldContainer.power[0][y2][x2] = worldContainer.power[2][y2][x2] - (float) worldContainer.blocks[2][y2][x2].getConduct();
-                                                    }
-                                                    if (worldContainer.blocks[1][y2][x2].isReceive()) {
-                                                        worldContainer.power[1][y2][x2] = worldContainer.power[2][y2][x2] - (float) worldContainer.blocks[2][y2][x2].getConduct();
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        if (!(worldContainer.blocks[l][y2][x2].isZythiumInverterAll())) {
-                                            addTileToPQueue(x2, y2);
-                                        }
-                                    }
-                                    if (worldContainer.power[l][y][x] - worldContainer.blocks[l][y][x].getConduct() > 0 && worldContainer.blocks[l][y2][x2].isZythiumInverterAll()) {
-                                        removeBlockPower(x2, y2, l);
-                                        worldContainer.blocks[l][y2][x2] = Blocks.turnZythiumInverterOn(worldContainer.blocks[l][y2][x2]);
-                                        removeBlockLighting(x2, y2);
-                                        worldContainer.rdrawn[y2][x2] = false;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                pqd[y][x] = false;
-                for (int l = 0; l < 3; l++) {
-                    log.info("[resolvePowerMatrix] " + x + " " + y + " " + l + " " + worldContainer.blocks[l][y][x] + " " + worldContainer.power[l][y][x]);
-                    if (worldContainer.power[l][y][x] > 0) {
-                        if (worldContainer.blocks[l][y][x] == Blocks.ZYTHIUM_LAMP) {
-                            worldContainer.blocks[l][y][x] = Blocks.ZYTHIUM_LAMP_ON;
-                            addBlockLighting(x, y);
-                            worldContainer.rdrawn[y][x] = false;
-                        }
-                        if (worldContainer.blocks[l][y][x].isZythiumAmplifierAll()) {
-                            log.info("Processed amplifier at " + x + " " + y);
-                            worldContainer.blocks[l][y][x] = Blocks.turnZythiumAmplifierOn(worldContainer.blocks[l][y][x]);
-                            addTileToPQueue(x, y);
-                            addBlockLighting(x, y);
-                            worldContainer.rdrawn[y][x] = false;
-                        }
-                    }
-                }
-            }
-
-            pqx.clear();
-            pqy.clear();
-
-        } catch (IndexOutOfBoundsException e) {
-            log.warn("Out of Bounds at " + y + "/" + x, e);
-        }
-        for (int i = 0; i < pzqx.size(); i++) {
-            x = pzqx.get(i);
-            y = pzqy.get(i);
-            for (int l = 0; l < 3; l++) {
-                if (worldContainer.blocks[l][y][x].isZythiumWire() && (int) (float) worldContainer.power[l][y][x] != pzqn[l][y][x]) {
-                    removeBlockLighting(x, y, 0);
-                    worldContainer.blocks[l][y][x] = WIREP.get((int) (float) worldContainer.power[l][y][x]);
-                    addBlockLighting(x, y);
-                    worldContainer.rdrawn[y][x] = false;
-                }
-            }
-            pzqd[y][x] = false;
-        }
-        pzqx.clear();
-        pzqy.clear();
     }
 
     public void paint(Graphics g) {
@@ -3466,7 +2540,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                     if (worldContainer.ic.getType() != ItemType.WORKBENCH) {
                         worldContainer.machinesx.add(worldContainer.icx);
                         worldContainer.machinesy.add(worldContainer.icy);
-                        worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx] = new ItemCollection(worldContainer.ic);
+                        worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx] = new ItemCollection(worldContainer.ic);
                     } else if (worldContainer.ic.getType() == ItemType.WORKBENCH) {
                         if (worldContainer.player.imgState == ImageState.STILL_RIGHT || worldContainer.player.imgState.isWalkRight()) {
                             for (int i = 0; i < 9; i++) {
@@ -3484,9 +2558,9 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                         }
                     }
                     if (worldContainer.ic.getType() == ItemType.FURNACE) {
-                        worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setFUELP(worldContainer.ic.getFUELP());
-                        worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setSMELTP(worldContainer.ic.getSMELTP());
-                        worldContainer.icmatrix[iclayer][worldContainer.icy][worldContainer.icx].setFurnaceOn(worldContainer.ic.isFurnaceOn());
+                        worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setFUELP(worldContainer.ic.getFUELP());
+                        worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setSMELTP(worldContainer.ic.getSMELTP());
+                        worldContainer.icmatrix[worldContainer.layer][worldContainer.icy][worldContainer.icx].setFurnaceOn(worldContainer.ic.isFurnaceOn());
                     }
                     worldContainer.ic = null;
                 } else {

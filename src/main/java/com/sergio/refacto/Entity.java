@@ -25,9 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Entity implements Serializable {
 
-    double x, y, vx, vy, oldx, oldy, n;
-    int ix, iy, ivx, ivy, width, height, bx1, bx2, by1, by2, bcount;
-    int i, j, k;
+    double x, y, speedX, speedY;
+    private double oldx, oldy, n;
+    int intX, intY, width, height;
+    private int intSpeedX, intSpeedY, bcount;
     double mdelay = 0;
 
     int totalHealthPoints, healthPoints, armorPoints, attackPoints;
@@ -49,16 +50,16 @@ public class Entity implements Serializable {
 
     transient BufferedImage image;
 
-    public Entity(double x, double y, double vx, double vy, EntityType entityType) {
+    public Entity(double x, double y, double speedX, double speedY, EntityType entityType) {
         this.x = x;
         this.y = y;
-        this.vx = vx;
-        this.vy = vy;
+        this.speedX = speedX;
+        this.speedY = speedY;
         this.entityType = entityType;
         oldx = x;
         oldy = y;
-        ix = (int)x;
-        iy = (int)y;
+        intX = (int)x;
+        intY = (int)y;
         nohit = false;
 
         switch (entityType) {
@@ -113,48 +114,48 @@ public class Entity implements Serializable {
         width = image.getWidth()*2;
         height = image.getHeight()*2;
 
-        ix = (int)x;
-        iy = (int)y;
-        ivx = (int)vx;
-        ivy = (int)vy;
+        intX = (int)x;
+        intY = (int)y;
+        intSpeedX = (int) speedX;
+        intSpeedY = (int) speedY;
 
-        rect = new Rectangle(ix-1, iy, width+2, height);
+        rect = new Rectangle(intX -1, intY, width+2, height);
 
         imgDelay = 0;
         bcount = 0;
         if (AI == EntityType.BAT) {
             imgState = ImageState.NORMAL_RIGHT;
-            this.vx = 3;
+            this.speedX = 3;
         } else {
             imgState = ImageState.STILL_RIGHT;
         }
     }
 
-    public Entity(double x, double y, double vx, double vy, Items item, short num) {
-        this(x, y, vx, vy, item, num, (short)0, 0);
+    public Entity(double x, double y, double speedX, double speedY, Items item, short num) {
+        this(x, y, speedX, speedY, item, num, (short)0, 0);
     }
 
-    public Entity(double x, double y, double vx, double vy, Items item, short num, int mdelay) {
-        this(x, y, vx, vy, item, num, (short)0, mdelay);
+    public Entity(double x, double y, double speedX, double speedY, Items item, short num, int mdelay) {
+        this(x, y, speedX, speedY, item, num, (short)0, mdelay);
     }
 
-    public Entity(double x, double y, double vx, double vy, Items item, short num, short dur) {
-        this(x, y, vx, vy, item, num, dur, 0);
+    public Entity(double x, double y, double speedX, double speedY, Items item, short num, short dur) {
+        this(x, y, speedX, speedY, item, num, dur, 0);
     }
 
-    public Entity(double x, double y, double vx, double vy, Items item, short num, short dur, int mdelay) {
+    public Entity(double x, double y, double speedX, double speedY, Items item, short num, short dur, int mdelay) {
         this.x = x;
         this.y = y;
-        this.vx = vx;
-        this.vy = vy;
+        this.speedX = speedX;
+        this.speedY = speedY;
         this.item = item;
         this.num = num;
         this.dur = dur;
         this.mdelay = mdelay;
         oldx = x;
         oldy = y;
-        ix = (int)x;
-        iy = (int)y;
+        intX = (int)x;
+        intY = (int)y;
 
         dframes = 0;
 
@@ -167,19 +168,19 @@ public class Entity implements Serializable {
         newMob = null;
         if (entityType == null) {
             if (!onGround) {
-                vy = vy + 0.3;
-                if (vy > 7) {
-                    vy = 7;
+                speedY = speedY + 0.3;
+                if (speedY > 7) {
+                    speedY = 7;
                 }
             }
-            if (vx < -0.15) {
-                vx = vx + 0.15;
+            if (speedX < -0.15) {
+                speedX = speedX + 0.15;
             }
-            else if (vx > 0.15) {
-                vx = vx - 0.15;
+            else if (speedX > 0.15) {
+                speedX = speedX - 0.15;
             }
             else {
-                vx = 0;
+                speedX = 0;
             }
             collide(blocks, player, blockOffsetU, blockOffsetV);
             mdelay -= 1;
@@ -190,13 +191,13 @@ public class Entity implements Serializable {
             }
         } else if (AI == EntityType.ZOMBIE) {
             if (!onGround) {
-                vy = vy + 0.3;
-                if (vy > 7) {
-                    vy = 7;
+                speedY = speedY + 0.3;
+                if (speedY > 7) {
+                    speedY = 7;
                 }
             }
             if (x > player.x) {
-                vx = Math.max(vx - 0.1, -1.2);
+                speedX = Math.max(speedX - 0.1, -1.2);
                 if (imgState.isStill() || (imgState.isWalk() && imgState.isRight())) {
                     imgDelay = 10;
                     imgState = ImageState.WALK_LEFT_2;
@@ -221,7 +222,7 @@ public class Entity implements Serializable {
                 }
             }
             else {
-                vx = Math.min(vx + 0.1, 1.2);
+                speedX = Math.min(speedX + 0.1, 1.2);
                 if (imgState.isStill() || (imgState.isWalk() && imgState.isLeft())) {
                     imgDelay = 10;
                     imgState = ImageState.WALK_RIGHT_2;
@@ -256,68 +257,68 @@ public class Entity implements Serializable {
             collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.BUBBLE) {
             if (x > player.x) {
-                vx = Math.max(vx - 0.1, -1.2);
+                speedX = Math.max(speedX - 0.1, -1.2);
             }
             else {
-                vx = Math.min(vx + 0.1, 1.2);
+                speedX = Math.min(speedX + 0.1, 1.2);
             }
             if (y > player.y) {
-                vy = Math.max(vy - 0.1, -1.2);
+                speedY = Math.max(speedY - 0.1, -1.2);
             }
             else {
-                vy = Math.min(vy + 0.1, 1.2);
+                speedY = Math.min(speedY + 0.1, 1.2);
             }
             collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.FAST_BUBBLE) {
             if (x > player.x) {
-                vx = Math.max(vx - 0.2, -2.4);
+                speedX = Math.max(speedX - 0.2, -2.4);
             }
             else {
-                vx = Math.min(vx + 0.2, 2.4);
+                speedX = Math.min(speedX + 0.2, 2.4);
             }
             if (y > player.y) {
-                vy = Math.max(vy - 0.2, -2.4);
+                speedY = Math.max(speedY - 0.2, -2.4);
             }
             else {
-                vy = Math.min(vy + 0.2, 2.4);
+                speedY = Math.min(speedY + 0.2, 2.4);
             }
             collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.SHOOTING_STAR) {
             n = Math.atan2(player.y - y, player.x - x);
-            vx += Math.cos(n)/10;
-            vy += Math.sin(n)/10;
-            if (vx < -5) vx = -5;
-            if (vx > 5) vx = 5;
-            if (vy < -5) vy = -5;
-            if (vy > 5) vy = 5;
+            speedX += Math.cos(n)/10;
+            speedY += Math.sin(n)/10;
+            if (speedX < -5) speedX = -5;
+            if (speedX > 5) speedX = 5;
+            if (speedY < -5) speedY = -5;
+            if (speedY > 5) speedY = 5;
             collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.SANDBOT) {
             if (Math.sqrt(Math.pow(player.x - x, 2) + Math.pow(player.y - y, 2)) > 160) {
                 if (x > player.x) {
-                    vx = Math.max(vx - 0.1, -1.2);
+                    speedX = Math.max(speedX - 0.1, -1.2);
                 }
                 else {
-                    vx = Math.min(vx + 0.1, 1.2);
+                    speedX = Math.min(speedX + 0.1, 1.2);
                 }
                 if (y > player.y) {
-                    vy = Math.max(vy - 0.1, -1.2);
+                    speedY = Math.max(speedY - 0.1, -1.2);
                 }
                 else {
-                    vy = Math.min(vy + 0.1, 1.2);
+                    speedY = Math.min(speedY + 0.1, 1.2);
                 }
             }
             else {
                 if (x < player.x) {
-                    vx = Math.max(vx - 0.1, -1.2);
+                    speedX = Math.max(speedX - 0.1, -1.2);
                 }
                 else {
-                    vx = Math.min(vx + 0.1, 1.2);
+                    speedX = Math.min(speedX + 0.1, 1.2);
                 }
                 if (y < player.y) {
-                    vy = Math.max(vy - 0.1, -1.2);
+                    speedY = Math.max(speedY - 0.1, -1.2);
                 }
                 else {
-                    vy = Math.min(vy + 0.1, 1.2);
+                    speedY = Math.min(speedY + 0.1, 1.2);
                 }
             }
             bcount += 1;
@@ -340,25 +341,25 @@ public class Entity implements Serializable {
             }
             collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.BAT) {
-            if (vx > 3) {
-                vx = 3;
+            if (speedX > 3) {
+                speedX = 3;
             }
-            if (vx < 3) {
-                vx = -3;
+            if (speedX < 3) {
+                speedX = -3;
             }
             if (y > player.y) {
-                vy = Math.max(vy - 0.05, -2.0);
+                speedY = Math.max(speedY - 0.05, -2.0);
             }
             else {
-                vy = Math.min(vy + 0.05, 2.0);
+                speedY = Math.min(speedY + 0.05, 2.0);
             }
             imgDelay -= 1;
-            if (vx > 0 && imgState != ImageState.NORMAL_RIGHT) {
+            if (speedX > 0 && imgState != ImageState.NORMAL_RIGHT) {
                 imgState = ImageState.NORMAL_RIGHT;
                 image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal_right.png");
                 imgDelay = 10;
             }
-            if (vx < 0 && imgState != ImageState.NORMAL_LEFT) {
+            if (speedX < 0 && imgState != ImageState.NORMAL_LEFT) {
                 imgState = ImageState.NORMAL_LEFT;
                 image = loadImage("sprites/monsters/" + entityType.getFileName() + "/normal_left.png");
                 imgDelay = 10;
@@ -386,8 +387,8 @@ public class Entity implements Serializable {
             collide(blocks, player, blockOffsetU, blockOffsetV);
         } else if (AI == EntityType.BEE) {
             double theta = Math.atan2(player.y - y, player.x - x);
-            vx = Math.cos(theta)*2.5;
-            vy = Math.sin(theta)*2.5;
+            speedX = Math.cos(theta)*2.5;
+            speedY = Math.sin(theta)*2.5;
             collide(blocks, player, blockOffsetU, blockOffsetV);
         }
         return false;
@@ -402,61 +403,63 @@ public class Entity implements Serializable {
 
         oldx = x; oldy = y;
 
-        x = x + vx;
+        x = x + speedX;
 
-        for (i=0; i<2; i++) {
-            ix = (int)x;
-            iy = (int)y;
-            ivx = (int)vx;
-            ivy = (int)vy;
+        for (int i=0; i<2; i++) {
+            intX = (int)x;
+            intY = (int)y;
+            intSpeedX = (int) speedX;
+            intSpeedY = (int) speedY;
 
-            rect = new Rectangle(ix-1, iy, width+2, height);
+            rect = new Rectangle(intX -1, intY, width+2, height);
 
-            bx1 = (int)x/WorldContainer.BLOCK_SIZE; by1 = (int)y/WorldContainer.BLOCK_SIZE;
-            bx2 = (int)(x+width)/WorldContainer.BLOCK_SIZE; by2 = (int)(y+height)/WorldContainer.BLOCK_SIZE;
+            int bx1 = (int)x/WorldContainer.BLOCK_SIZE;
+            int by1 = (int)y/WorldContainer.BLOCK_SIZE;
+            int bx2 = (int)(x+width)/WorldContainer.BLOCK_SIZE;
+            int by2 = (int)(y+height)/WorldContainer.BLOCK_SIZE;
 
             bx1 = Math.max(0, bx1); by1 = Math.max(0, by1);
             bx2 = Math.min(blocks[0].length - 1, bx2); by2 = Math.min(blocks.length - 1, by2);
 
             for (i=bx1; i<=bx2; i++) {
-                for (j=by1; j<=by2; j++) {
+                for (int j=by1; j<=by2; j++) {
                     if (blocks[j][i] != Blocks.AIR && blocks[j+blockOffsetV][i+blockOffsetU].isCds()) {
                         if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
-                            if (oldx <= i * WorldContainer.BLOCK_SIZE - width && (vx > 0 || AI == EntityType.SHOOTING_STAR)) {
+                            if (oldx <= i * WorldContainer.BLOCK_SIZE - width && (speedX > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 x = i * WorldContainer.BLOCK_SIZE - width;
                                 if (AI == EntityType.BUBBLE) {
-                                    vx = -vx;
+                                    speedX = -speedX;
                                 }
                                 else if (AI == EntityType.ZOMBIE) {
-                                    vx = 0;
+                                    speedX = 0;
                                     if (onGround && player.x > x) {
-                                        vy = -7;
+                                        speedY = -7;
                                     }
                                 }
                                 else if (AI == EntityType.BAT) {
-                                    vx = -vx;
+                                    speedX = -speedX;
                                 }
                                 else {
-                                    vx = 0; // right
+                                    speedX = 0; // right
                                 }
                                 rv = true;
                             }
-                            if (oldx >= i * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE && (vx < 0 || AI == EntityType.SHOOTING_STAR)) {
+                            if (oldx >= i * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE && (speedX < 0 || AI == EntityType.SHOOTING_STAR)) {
                                 x = i * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE;
                                 if (AI == EntityType.BUBBLE) {
-                                    vx = -vx;
+                                    speedX = -speedX;
                                 }
                                 else if (AI == EntityType.ZOMBIE) {
-                                    vx = 0;
+                                    speedX = 0;
                                     if (onGround && player.x < x) {
-                                        vy = -7;
+                                        speedY = -7;
                                     }
                                 }
                                 else if (AI == EntityType.BAT) {
-                                    vx = -vx;
+                                    speedX = -speedX;
                                 }
                                 else {
-                                    vx = 0; // left
+                                    speedX = 0; // left
                                 }
                                 rv = true;
                             }
@@ -466,45 +469,47 @@ public class Entity implements Serializable {
             }
         }
 
-        y = y + vy;
+        y = y + speedY;
         onGround = false;
 
-        for (i=0; i<2; i++) {
-            ix = (int)x;
-            iy = (int)y;
-            ivx = (int)vx;
-            ivy = (int)vy;
+        for (int i=0; i<2; i++) {
+            intX = (int)x;
+            intY = (int)y;
+            intSpeedX = (int) speedX;
+            intSpeedY = (int) speedY;
 
-            rect = new Rectangle(ix, iy-1, width, height+2);
+            rect = new Rectangle(intX, intY -1, width, height+2);
 
-            bx1 = (int)x/WorldContainer.BLOCK_SIZE; by1 = (int)y/ WorldContainer.BLOCK_SIZE;
-            bx2 = (int)(x+width)/WorldContainer.BLOCK_SIZE; by2 = (int)(y+height)/WorldContainer.BLOCK_SIZE;
+            int bx1 = (int)x/WorldContainer.BLOCK_SIZE;
+            int by1 = (int)y/ WorldContainer.BLOCK_SIZE;
+            int bx2 = (int)(x+width)/WorldContainer.BLOCK_SIZE;
+            int by2 = (int)(y+height)/WorldContainer.BLOCK_SIZE;
 
             bx1 = Math.max(0, bx1); by1 = Math.max(0, by1);
             bx2 = Math.min(blocks[0].length - 1, bx2); by2 = Math.min(blocks.length - 1, by2);
 
             for (i=bx1; i<=bx2; i++) {
-                for (j=by1; j<=by2; j++) {
+                for (int j=by1; j<=by2; j++) {
                     if (blocks[j][i] != Blocks.AIR && blocks[j+blockOffsetV][i+blockOffsetU].isCds()) {
                         if (rect.intersects(new Rectangle(i*WorldContainer.BLOCK_SIZE, j*WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE, WorldContainer.BLOCK_SIZE))) {
-                            if (oldy <= j * WorldContainer.BLOCK_SIZE - height && (vy > 0 || AI == EntityType.SHOOTING_STAR)) {
+                            if (oldy <= j * WorldContainer.BLOCK_SIZE - height && (speedY > 0 || AI == EntityType.SHOOTING_STAR)) {
                                 y = j * WorldContainer.BLOCK_SIZE - height;
                                 onGround = true;
                                 if (AI == EntityType.BUBBLE) {
-                                    vy = -vy;
+                                    speedY = -speedY;
                                 }
                                 else {
-                                    vy = 0; // down
+                                    speedY = 0; // down
                                 }
                                 rv = true;
                             }
-                            if (oldy >= j * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE && (vy < 0 || AI == EntityType.SHOOTING_STAR)) {
+                            if (oldy >= j * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE && (speedY < 0 || AI == EntityType.SHOOTING_STAR)) {
                                 y = j * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE;
                                 if (AI == EntityType.BUBBLE) {
-                                    vy = -vy;
+                                    speedY = -speedY;
                                 }
                                 else {
-                                    vy = 0; // up
+                                    speedY = 0; // up
                                 }
                                 rv = true;
                             }
@@ -514,12 +519,12 @@ public class Entity implements Serializable {
             }
         }
 
-        ix = (int)x;
-        iy = (int)y;
-        ivx = (int)vx;
-        ivy = (int)vy;
+        intX = (int)x;
+        intY = (int)y;
+        intSpeedX = (int) speedX;
+        intSpeedY = (int) speedY;
 
-        rect = new Rectangle(ix-1, iy-1, width+2, height+2);
+        rect = new Rectangle(intX -1, intY -1, width+2, height+2);
 
         return rv;
     }
@@ -530,20 +535,20 @@ public class Entity implements Serializable {
             immune = true;
             if (AI == EntityType.SHOOTING_STAR) {
                 if (player.x + Player.WIDTH/2 < x + width/2) {
-                    vx = 4;
+                    speedX = 4;
                 }
                 else {
-                    vx = -4;
+                    speedX = -4;
                 }
             }
             else {
                 if (player.x + Player.WIDTH/2 < x + width/2) {
-                    vx += 4;
+                    speedX += 4;
                 }
                 else {
-                    vx -= 4;
+                    speedX -= 4;
                 }
-                vy -= 1.2;
+                speedY -= 1.2;
             }
         }
         return healthPoints <= 0;
@@ -552,39 +557,39 @@ public class Entity implements Serializable {
     public List<Items> drops() {
         List<Items> dropList = new ArrayList<>();
         if (entityType == EntityType.BLUE_BUBBLE) {
-            for (i=0; i< RandomTool.nextInt(3); i++) {
+            for (int i=0; i< RandomTool.nextInt(3); i++) {
                 dropList.add(Items.BLUE_GOO);
             }
         } else if (entityType == EntityType.GREEN_BUBBLE) {
-            for (i=0; i<RandomTool.nextInt(3); i++) {
+            for (int i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(Items.GREEN_GOO);
             }
         } else if (entityType == EntityType.RED_BUBBLE) {
-            for (i=0; i<RandomTool.nextInt(3); i++) {
+            for (int i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(Items.RED_GOO);
             }
         } else if (entityType == EntityType.YELLOW_BUBBLE) {
-            for (i=0; i<RandomTool.nextInt(3); i++) {
+            for (int i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(Items.YELLOW_GOO);
             }
         } else if (entityType == EntityType.BLACK_BUBBLE) {
-            for (i=0; i<RandomTool.nextInt(3); i++) {
+            for (int i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(Items.BLACK_GOO);
             }
         } else if (entityType == EntityType.WHITE_BUBBLE) {
-            for (i=0; i<RandomTool.nextInt(3); i++) {
+            for (int i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(Items.WHITE_GOO);
             }
         } else if (entityType == EntityType.SHOOTING_STAR) {
-            for (i=0; i<RandomTool.nextInt(2); i++) {
+            for (int i=0; i<RandomTool.nextInt(2); i++) {
                 dropList.add(Items.ASTRAL_SHARD);
             }
         } else if (entityType == EntityType.ZOMBIE) {
-            for (i=0; i<RandomTool.nextInt(3); i++) {
+            for (int i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(Items.ROTTEN_CHUNK);
             }
         } else if (entityType == EntityType.ARMORED_ZOMBIE) {
-            for (i=0; i<RandomTool.nextInt(3); i++) {
+            for (int i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(Items.ROTTEN_CHUNK);
             }
             if (RandomTool.nextInt(15) == 0) {
@@ -600,7 +605,7 @@ public class Entity implements Serializable {
                 dropList.add(Items.IRON_GREAVES);
             }
         } else if (entityType == EntityType.SANDBOT) {
-            for (i=0; i<RandomTool.nextInt(3); i++) {
+            for (int i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(Items.SAND);
             }
             if (RandomTool.nextInt(2) == 0) {
@@ -610,7 +615,7 @@ public class Entity implements Serializable {
                 dropList.add(Items.SILICON_ORE);
             }
         } else if (entityType == EntityType.SNOWMAN) {
-            for (i=0; i<RandomTool.nextInt(3); i++) {
+            for (int i=0; i<RandomTool.nextInt(3); i++) {
                 dropList.add(Items.SNOW);
             }
         }
