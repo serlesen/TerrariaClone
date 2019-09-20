@@ -242,34 +242,34 @@ public class PaintService {
         if (graphicContainer.worldContainer.showInv) {
             for (int ux = 0; ux < 2; ux++) {
                 for (int uy = 0; uy < 2; uy++) {
-                    if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.image.getWidth() + ux * 40 + 75, graphicContainer.worldContainer.inventory.image.getWidth() + ux * 40 + 115, uy * 40 + 52, uy * 40 + 92) && graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux] != Items.EMPTY) {
+                    if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.image.getWidth() + ux * 40 + 75, graphicContainer.worldContainer.inventory.image.getWidth() + ux * 40 + 115, uy * 40 + 52, uy * 40 + 92) && graphicContainer.worldContainer.cic.getItems()[uy * 2 + ux] != Items.EMPTY) {
                         graphics.setFont(graphicContainer.mobFont);
                         graphics.setColor(Color.WHITE);
-                        if (graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux].getDurability() != null) {
-                            graphics.drawString(graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.cic.getDurs()[uy * 2 + ux] / graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        if (graphicContainer.worldContainer.cic.getItems()[uy * 2 + ux].getDurability() != null) {
+                            graphics.drawString(graphicContainer.worldContainer.cic.getItems()[uy * 2 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.cic.getDurs()[uy * 2 + ux] / graphicContainer.worldContainer.cic.getItems()[uy * 2 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         } else {
-                            graphics.drawString(graphicContainer.worldContainer.cic.getIds()[uy * 2 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            graphics.drawString(graphicContainer.worldContainer.cic.getItems()[uy * 2 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                         }
                     }
                 }
             }
-            if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.image.getWidth() + 3 * 40 + 75, graphicContainer.worldContainer.inventory.image.getWidth() + 3 * 40 + 115, 20 + 52, 20 + 92) && graphicContainer.worldContainer.cic.getIds()[4] != Items.EMPTY) {
+            if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.image.getWidth() + 3 * 40 + 75, graphicContainer.worldContainer.inventory.image.getWidth() + 3 * 40 + 115, 20 + 52, 20 + 92) && graphicContainer.worldContainer.cic.getItems()[4] != Items.EMPTY) {
                 graphics.setFont(graphicContainer.mobFont);
                 graphics.setColor(Color.WHITE);
-                if (graphicContainer.worldContainer.cic.getIds()[4].getDurability() != null) {
-                    graphics.drawString(graphicContainer.worldContainer.cic.getIds()[4].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.cic.getDurs()[4] / graphicContainer.worldContainer.cic.getIds()[4].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                if (graphicContainer.worldContainer.cic.getItems()[4].getDurability() != null) {
+                    graphics.drawString(graphicContainer.worldContainer.cic.getItems()[4].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.cic.getDurs()[4] / graphicContainer.worldContainer.cic.getItems()[4].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                 } else {
-                    graphics.drawString(graphicContainer.worldContainer.cic.getIds()[4].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                    graphics.drawString(graphicContainer.worldContainer.cic.getItems()[4].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                 }
             }
             for (int uy = 0; uy < 4; uy++) {
-                if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.image.getWidth() + 6, graphicContainer.worldContainer.inventory.image.getWidth() + 6 + graphicContainer.armor.getImage().getWidth(), 6 + uy * 46, 6 + uy * 46 + 46) && graphicContainer.armor.getIds()[uy] != Items.EMPTY) {
+                if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.image.getWidth() + 6, graphicContainer.worldContainer.inventory.image.getWidth() + 6 + graphicContainer.armor.getImage().getWidth(), 6 + uy * 46, 6 + uy * 46 + 46) && graphicContainer.armor.getItems()[uy] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
-                    if (graphicContainer.armor.getIds()[uy].getDurability() != null) {
-                        graphics.drawString(graphicContainer.armor.getIds()[uy].getUiName() + " (" + (int) ((double) graphicContainer.armor.getDurs()[uy] / graphicContainer.armor.getIds()[uy].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                    if (graphicContainer.armor.getItems()[uy].getDurability() != null) {
+                        graphics.drawString(graphicContainer.armor.getItems()[uy].getUiName() + " (" + (int) ((double) graphicContainer.armor.getDurs()[uy] / graphicContainer.armor.getItems()[uy].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     } else {
-                        graphics.drawString(graphicContainer.armor.getIds()[uy].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        graphics.drawString(graphicContainer.armor.getItems()[uy].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
             }
@@ -280,25 +280,25 @@ public class PaintService {
                 for (int ux = 0; ux < 3; ux++) {
                     for (int uy = 0; uy < 3; uy++) {
                         if (graphicContainer.mousePos.isInBetween(ux * 40 + 6, ux * 40 + 46, uy * 40 + graphicContainer.worldContainer.inventory.image.getHeight() + 46, uy * 40 + graphicContainer.worldContainer.inventory.image.getHeight() + 86) &&
-                                graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux] != Items.EMPTY) {
+                                graphicContainer.worldContainer.ic.getItems()[uy * 3 + ux] != Items.EMPTY) {
                             graphics.setFont(graphicContainer.mobFont);
                             graphics.setColor(Color.WHITE);
-                            if (graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux].getDurability() != null) {
-                                graphics.drawString(graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[uy * 3 + ux] / graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            if (graphicContainer.worldContainer.ic.getItems()[uy * 3 + ux].getDurability() != null) {
+                                graphics.drawString(graphicContainer.worldContainer.ic.getItems()[uy * 3 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[uy * 3 + ux] / graphicContainer.worldContainer.ic.getItems()[uy * 3 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                             } else {
-                                graphics.drawString(graphicContainer.worldContainer.ic.getIds()[uy * 3 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                                graphics.drawString(graphicContainer.worldContainer.ic.getItems()[uy * 3 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                             }
                         }
                     }
                 }
                 if (graphicContainer.mousePos.isInBetween(4 * 40 + 6, 4 * 40 + 46, 1 * 40 + graphicContainer.worldContainer.inventory.image.getHeight() + 46, 1 * 40 + graphicContainer.worldContainer.inventory.image.getHeight() + 86) &&
-                        graphicContainer.worldContainer.ic.getIds()[9] != Items.EMPTY) {
+                        graphicContainer.worldContainer.ic.getItems()[9] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
-                    if (graphicContainer.worldContainer.ic.getIds()[9].getDurability() != null) {
-                        graphics.drawString(graphicContainer.worldContainer.ic.getIds()[9].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[9] / graphicContainer.worldContainer.ic.getIds()[9].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                    if (graphicContainer.worldContainer.ic.getItems()[9].getDurability() != null) {
+                        graphics.drawString(graphicContainer.worldContainer.ic.getItems()[9].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[9] / graphicContainer.worldContainer.ic.getItems()[9].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     } else {
-                        graphics.drawString(graphicContainer.worldContainer.ic.getIds()[9].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        graphics.drawString(graphicContainer.worldContainer.ic.getItems()[9].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
             } else if (graphicContainer.worldContainer.ic.getType() == ItemType.WOODEN_CHEST || graphicContainer.worldContainer.ic.getType() == ItemType.STONE_CHEST ||
@@ -310,13 +310,13 @@ public class PaintService {
                 for (int ux = 0; ux < graphicContainer.worldContainer.inventory.CX; ux++) {
                     for (int uy = 0; uy < graphicContainer.worldContainer.inventory.CY; uy++) {
                         if (graphicContainer.mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + graphicContainer.worldContainer.inventory.image.getHeight() + 46, uy * 46 + graphicContainer.worldContainer.inventory.image.getHeight() + 86) &&
-                                graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux] != Items.EMPTY) {
+                                graphicContainer.worldContainer.ic.getItems()[uy * graphicContainer.worldContainer.inventory.CX + ux] != Items.EMPTY) {
                             graphics.setFont(graphicContainer.mobFont);
                             graphics.setColor(Color.WHITE);
-                            if (graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux].getDurability() != null) {
-                                graphics.drawString(graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[uy * graphicContainer.worldContainer.inventory.CX + ux] / graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            if (graphicContainer.worldContainer.ic.getItems()[uy * graphicContainer.worldContainer.inventory.CX + ux].getDurability() != null) {
+                                graphics.drawString(graphicContainer.worldContainer.ic.getItems()[uy * graphicContainer.worldContainer.inventory.CX + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[uy * graphicContainer.worldContainer.inventory.CX + ux] / graphicContainer.worldContainer.ic.getItems()[uy * graphicContainer.worldContainer.inventory.CX + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                             } else {
-                                graphics.drawString(graphicContainer.worldContainer.ic.getIds()[uy * graphicContainer.worldContainer.inventory.CX + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                                graphics.drawString(graphicContainer.worldContainer.ic.getItems()[uy * graphicContainer.worldContainer.inventory.CX + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                             }
                         }
                     }
@@ -324,43 +324,43 @@ public class PaintService {
             } else if (graphicContainer.worldContainer.ic.getType() == ItemType.FURNACE) {
                 // paint FURNACE
                 if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.image.getHeight() + 46, graphicContainer.worldContainer.inventory.image.getHeight() + 86) &&
-                        graphicContainer.worldContainer.ic.getIds()[0] != Items.EMPTY) {
+                        graphicContainer.worldContainer.ic.getItems()[0] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
-                    if (graphicContainer.worldContainer.ic.getIds()[0].getDurability() != null) {
-                        graphics.drawString(graphicContainer.worldContainer.ic.getIds()[0].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[0] / graphicContainer.worldContainer.ic.getIds()[0].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                    if (graphicContainer.worldContainer.ic.getItems()[0].getDurability() != null) {
+                        graphics.drawString(graphicContainer.worldContainer.ic.getItems()[0].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[0] / graphicContainer.worldContainer.ic.getItems()[0].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     } else {
-                        graphics.drawString(graphicContainer.worldContainer.ic.getIds()[0].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        graphics.drawString(graphicContainer.worldContainer.ic.getItems()[0].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
                 if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.image.getHeight() + 102, graphicContainer.worldContainer.inventory.image.getHeight() + 142) &&
-                        graphicContainer.worldContainer.ic.getIds()[1] != Items.EMPTY) {
+                        graphicContainer.worldContainer.ic.getItems()[1] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
-                    if (graphicContainer.worldContainer.ic.getIds()[1].getDurability() != null) {
-                        graphics.drawString(graphicContainer.worldContainer.ic.getIds()[1].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[1] / graphicContainer.worldContainer.ic.getIds()[1].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                    if (graphicContainer.worldContainer.ic.getItems()[1].getDurability() != null) {
+                        graphics.drawString(graphicContainer.worldContainer.ic.getItems()[1].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[1] / graphicContainer.worldContainer.ic.getItems()[1].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     } else {
-                        graphics.drawString(graphicContainer.worldContainer.ic.getIds()[1].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        graphics.drawString(graphicContainer.worldContainer.ic.getItems()[1].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
                 if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.image.getHeight() + 142, graphicContainer.worldContainer.inventory.image.getHeight() + 182) &&
-                        graphicContainer.worldContainer.ic.getIds()[2] != Items.EMPTY) {
+                        graphicContainer.worldContainer.ic.getItems()[2] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
-                    if (graphicContainer.worldContainer.ic.getIds()[2].getDurability() != null) {
-                        graphics.drawString(graphicContainer.worldContainer.ic.getIds()[2].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[2] / graphicContainer.worldContainer.ic.getIds()[2].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                    if (graphicContainer.worldContainer.ic.getItems()[2].getDurability() != null) {
+                        graphics.drawString(graphicContainer.worldContainer.ic.getItems()[2].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[2] / graphicContainer.worldContainer.ic.getItems()[2].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     } else {
-                        graphics.drawString(graphicContainer.worldContainer.ic.getIds()[2].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        graphics.drawString(graphicContainer.worldContainer.ic.getItems()[2].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
                 if (graphicContainer.mousePos.isInBetween(62, 102, graphicContainer.worldContainer.inventory.image.getHeight() + 46, graphicContainer.worldContainer.inventory.image.getHeight() + 86) &&
-                        graphicContainer.worldContainer.ic.getIds()[3] != Items.EMPTY) {
+                        graphicContainer.worldContainer.ic.getItems()[3] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
-                    if (graphicContainer.worldContainer.ic.getIds()[3].getDurability() != null) {
-                        graphics.drawString(graphicContainer.worldContainer.ic.getIds()[3].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[3] / graphicContainer.worldContainer.ic.getIds()[3].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                    if (graphicContainer.worldContainer.ic.getItems()[3].getDurability() != null) {
+                        graphics.drawString(graphicContainer.worldContainer.ic.getItems()[3].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[3] / graphicContainer.worldContainer.ic.getItems()[3].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     } else {
-                        graphics.drawString(graphicContainer.worldContainer.ic.getIds()[3].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        graphics.drawString(graphicContainer.worldContainer.ic.getItems()[3].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
             }

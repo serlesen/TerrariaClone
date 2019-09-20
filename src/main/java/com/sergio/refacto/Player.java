@@ -324,10 +324,10 @@ public class Player implements Serializable {
     }
 
     public int sumArmor() {
-        return (TerrariaClone.armor.getIds()[0].getArmor() +
-                TerrariaClone.armor.getIds()[1].getArmor() +
-                TerrariaClone.armor.getIds()[2].getArmor() +
-                TerrariaClone.armor.getIds()[3].getArmor());
+        return (TerrariaClone.armor.getItems()[0].getArmor() +
+                TerrariaClone.armor.getItems()[1].getArmor() +
+                TerrariaClone.armor.getItems()[2].getArmor() +
+                TerrariaClone.armor.getItems()[3].getArmor());
     }
     
     public boolean isPlayerIntoChunk(int chunkU, int chunkV, int screenWidth, int screenHeight) {

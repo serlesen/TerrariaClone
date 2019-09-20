@@ -15,37 +15,37 @@ public class ItemCollection implements Serializable {
 
     ItemType type;
     short[] nums, durs;
-    Items[] ids;
+    Items[] items;
     transient BufferedImage image;
     double FUELP = 0;
     double SMELTP = 0;
     boolean furnaceOn = false;
 
-    public ItemCollection(ItemType type, Items[] ids, short[] nums, short[] durs) {
+    public ItemCollection(ItemType type, Items[] items, short[] nums, short[] durs) {
         this.type = type;
-        this.ids = ids;
+        this.items = items;
         this.nums = nums;
         this.durs = durs;
     }
 
-    public ItemCollection(ItemType type, int size) {
-        Items[] list1 = new Items[size];
-        short[] list2 = new short[size];
-        short[] list3 = new short[size];
-        for (int i = 0; i < size; i++) {
+    public ItemCollection(ItemType type) {
+        Items[] list1 = new Items[type.getItemCollectionSize()];
+        short[] list2 = new short[type.getItemCollectionSize()];
+        short[] list3 = new short[type.getItemCollectionSize()];
+        for (int i = 0; i < type.getItemCollectionSize(); i++) {
             list1[i] = Items.EMPTY;
             list2[i] = 0;
             list3[i] = 0;
         }
         this.type = type;
-        this.ids = list1;
+        this.items = list1;
         this.nums = list2;
         this.durs = list3;
     }
 
     public ItemCollection(ItemCollection ic) {
         this.type = ic.type;
-        this.ids = ic.ids;
+        this.items = ic.items;
         this.nums = ic.nums;
         this.durs = ic.durs;
     }
@@ -54,7 +54,7 @@ public class ItemCollection implements Serializable {
         boolean valid = true;
 
         for (int i = 0; i < inputValues.length; i++) {
-            if (ids[i] != inputValues[i]) {
+            if (items[i] != inputValues[i]) {
                 valid = false;
                 break;
             }
@@ -71,12 +71,12 @@ public class ItemCollection implements Serializable {
             r3.add(inputValues[j]);
         }
         for (int j = 0; j < inputValues.length; j++) {
-            if (!r3.contains(ids[j])) {
+            if (!r3.contains(items[j])) {
                 valid = false;
                 break;
             }
             else {
-                r3.remove(ids[j]);
+                r3.remove(items[j]);
             }
         }
 

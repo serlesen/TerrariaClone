@@ -55,6 +55,8 @@ public class WorldContainer implements Serializable {
     public static final int WORLD_WIDTH = WIDTH / CHUNK_BLOCKS + 1;
     public static final int WORLD_HEIGHT = HEIGHT / CHUNK_BLOCKS + 1;
 
+    private static final int[][] CL = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
+    
     Blocks[][][] blocks;
     Directions[][][] blocksDirections;
     Byte[][] blocksDirectionsIntensity;
@@ -274,7 +276,7 @@ public class WorldContainer implements Serializable {
             inventory.renderCollection(cic);
         }
         else {
-            cic = new ItemCollection(ItemType.CIC, 5);
+            cic = new ItemCollection(ItemType.CIC);
             inventory.renderCollection(cic);
         }
         if (ic != null) {
@@ -440,7 +442,7 @@ public class WorldContainer implements Serializable {
             }
         }
 
-        cic = new ItemCollection(ItemType.CIC, 5);
+        cic = new ItemCollection(ItemType.CIC);
         inventory.renderCollection(cic);
 
         inventory.renderCollection(TerrariaClone.armor);
@@ -645,12 +647,12 @@ public class WorldContainer implements Serializable {
 
 
     public void updateTreesState() {
-        for (int l = 0; l < 3; l++) {
+        for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
             for (int y = 0; y < TerrariaClone.SIZE; y++) {
                 for (int x = 0; x < TerrariaClone.SIZE; x++) {
                     if (RandomTool.nextInt(1000) == 0) {
-                        if (blocks[1][y][x] == Blocks.TREE_NO_BARK) {
-                            blocks[1][y][x] = Blocks.TREE;
+                        if (blocks[l][y][x] == Blocks.TREE_NO_BARK) {
+                            blocks[l][y][x] = Blocks.TREE;
                         }
                     }
                 }
@@ -758,9 +760,9 @@ public class WorldContainer implements Serializable {
             for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
                 if (icmatrix[l][y][x] != null && icmatrix[l][y][x].getType() == ItemType.FURNACE) {
                     if (icmatrix[l][y][x].isFurnaceOn()) {
-                        if (icmatrix[l][y][x].getIds()[1] == Items.EMPTY) {
-                            if (TerrariaClone.FUELS.get(icmatrix[l][y][x].getIds()[2]) != null) {
-                                inventory.addLocationIC(icmatrix[l][y][x], 1, icmatrix[l][y][x].getIds()[2], (short) 1);
+                        if (icmatrix[l][y][x].getItems()[1] == Items.EMPTY) {
+                            if (TerrariaClone.FUELS.get(icmatrix[l][y][x].getItems()[2]) != null) {
+                                inventory.addLocationIC(icmatrix[l][y][x], 1, icmatrix[l][y][x].getItems()[2], (short) 1);
                                 inventory.removeLocationIC(icmatrix[l][y][x], 2, (short) 1);
                                 icmatrix[l][y][x].setFUELP(1);
                             } else {
@@ -770,15 +772,15 @@ public class WorldContainer implements Serializable {
                                 rdrawn[y][x] = false;
                             }
                         }
-                        if (TerrariaClone.FUELS.get(icmatrix[l][y][x].getIds()[1]) != null) {
-                            icmatrix[l][y][x].setFUELP(icmatrix[l][y][x].getFUELP() - TerrariaClone.FUELS.get(icmatrix[l][y][x].getIds()[1]));
+                        if (TerrariaClone.FUELS.get(icmatrix[l][y][x].getItems()[1]) != null) {
+                            icmatrix[l][y][x].setFUELP(icmatrix[l][y][x].getFUELP() - TerrariaClone.FUELS.get(icmatrix[l][y][x].getItems()[1]));
                             if (icmatrix[l][y][x].getFUELP() < 0) {
                                 icmatrix[l][y][x].setFUELP(0);
                                 inventory.removeLocationIC(icmatrix[l][y][x], 1, icmatrix[l][y][x].getNums()[1]);
                             }
                             for (int i = 0; i < TerrariaClone.FRI1.size(); i++) {
-                                if (icmatrix[l][y][x].getIds()[0] == TerrariaClone.FRI1.get(i) && icmatrix[l][y][x].getNums()[0] >= TerrariaClone.FRN1.get(i)) {
-                                    icmatrix[l][y][x].setSMELTP(icmatrix[l][y][x].getSMELTP() + Blocks.findByIndex(icmatrix[l][y][x].getIds()[1].getIndex()).getFSpeed());
+                                if (icmatrix[l][y][x].getItems()[0] == TerrariaClone.FRI1.get(i) && icmatrix[l][y][x].getNums()[0] >= TerrariaClone.FRN1.get(i)) {
+                                    icmatrix[l][y][x].setSMELTP(icmatrix[l][y][x].getSMELTP() + Blocks.findByIndex(icmatrix[l][y][x].getItems()[1].getIndex()).getFSpeed());
                                     if (icmatrix[l][y][x].getSMELTP() > 1) {
                                         icmatrix[l][y][x].setSMELTP(0);
                                         inventory.removeLocationIC(icmatrix[l][y][x], 0, TerrariaClone.FRN1.get(i));
@@ -802,9 +804,9 @@ public class WorldContainer implements Serializable {
     public void updateItemCollection() {
         if (ic != null && ic.getType() == ItemType.FURNACE) {
             if (ic.isFurnaceOn()) {
-                if (ic.getIds()[1] == Items.EMPTY) {
-                    if (TerrariaClone.FUELS.get(ic.getIds()[2]) != null) {
-                        inventory.addLocationIC(ic, 1, ic.getIds()[2], (short) 1);
+                if (ic.getItems()[1] == Items.EMPTY) {
+                    if (TerrariaClone.FUELS.get(ic.getItems()[2]) != null) {
+                        inventory.addLocationIC(ic, 1, ic.getItems()[2], (short) 1);
                         inventory.removeLocationIC(ic, 2, (short) 1);
                         ic.setFUELP(1);
                     } else {
@@ -814,15 +816,15 @@ public class WorldContainer implements Serializable {
                         rdrawn[icy][icx] = false;
                     }
                 }
-                if (TerrariaClone.FUELS.get(ic.getIds()[1]) != null) {
-                    ic.setFUELP(ic.getFUELP() - TerrariaClone.FUELS.get(ic.getIds()[1]));
+                if (TerrariaClone.FUELS.get(ic.getItems()[1]) != null) {
+                    ic.setFUELP(ic.getFUELP() - TerrariaClone.FUELS.get(ic.getItems()[1]));
                     if (ic.getFUELP() < 0) {
                         ic.setFUELP(0);
                         inventory.removeLocationIC(ic, 1, ic.getNums()[1]);
                     }
                     for (int i = 0; i < TerrariaClone.FRI1.size(); i++) {
-                        if (ic.getIds()[0] == TerrariaClone.FRI1.get(i) && ic.getNums()[0] >= TerrariaClone.FRN1.get(i)) {
-                            ic.setSMELTP(ic.getSMELTP() + Blocks.findByIndex(ic.getIds()[1].getIndex()).getFSpeed());
+                        if (ic.getItems()[0] == TerrariaClone.FRI1.get(i) && ic.getNums()[0] >= TerrariaClone.FRN1.get(i)) {
+                            ic.setSMELTP(ic.getSMELTP() + Blocks.findByIndex(ic.getItems()[1].getIndex()).getFSpeed());
                             if (ic.getSMELTP() > 1) {
                                 ic.setSMELTP(0);
                                 inventory.removeLocationIC(ic, 0, TerrariaClone.FRN1.get(i));
@@ -1000,9 +1002,9 @@ public class WorldContainer implements Serializable {
                     }
                     addTileToZQueue(x, y);
                 }
-                for (int i = 0; i < 4; i++) {
-                    int x2 = x + TerrariaClone.cl[i][0];
-                    int y2 = y + TerrariaClone.cl[i][1];
+                for (int i = 0; i < CL.length; i++) {
+                    int x2 = x + CL[i][0];
+                    int y2 = y + CL[i][1];
                     if (y2 >= 0 && y2 < HEIGHT) {
                         if (!blocks[1][y2][x2].isLTrans()) {
                             if (lights[y2][x2] <= lights[y][x] - (float) 1.0) {
@@ -1155,18 +1157,18 @@ public class WorldContainer implements Serializable {
     }
 
     public void addAdjacentTilesToPQueue(int ux, int uy) {
-        for (int i2 = 0; i2 < 4; i2++) {
-            if (uy + TerrariaClone.cl[i2][1] >= 0 && uy + TerrariaClone.cl[i2][1] < HEIGHT) {
-                addTileToPQueue(ux + TerrariaClone.cl[i2][0], uy + TerrariaClone.cl[i2][1]);
+        for (int i = 0; i < CL.length; i++) {
+            if (uy + CL[i][1] >= 0 && uy + CL[i][1] < HEIGHT) {
+                addTileToPQueue(ux + CL[i][0], uy + CL[i][1]);
             }
         }
     }
 
     public void addAdjacentTilesToPQueueConditionally(int ux, int uy) {
-        for (int i2 = 0; i2 < 4; i2++) {
+        for (int i = 0; i < CL.length; i++) {
             for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
-                if (uy + TerrariaClone.cl[i2][1] >= 0 && uy + TerrariaClone.cl[i2][1] < HEIGHT && power[l][uy + TerrariaClone.cl[i2][1]][ux + TerrariaClone.cl[i2][0]] > 0) {
-                    addTileToPQueue(ux + TerrariaClone.cl[i2][0], uy + TerrariaClone.cl[i2][1]);
+                if (uy + CL[i][1] >= 0 && uy + CL[i][1] < HEIGHT && power[l][uy + CL[i][1]][ux + CL[i][0]] > 0) {
+                    addTileToPQueue(ux + CL[i][0], uy + CL[i][1]);
                 }
             }
         }
@@ -1178,7 +1180,7 @@ public class WorldContainer implements Serializable {
             for (int j = 0; j < pqx.size(); j++) {
                 x = pqx.get(j);
                 y = pqy.get(j);
-                for (int l = 0; l < 3; l++) {
+                for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
                     if (blocks[l][y][x].isPower()) {
                         if (!blocks[l][y][x].isCompleteZythiumDelayer()) {
                             addTileToPQueue(x, y);
@@ -1186,11 +1188,11 @@ public class WorldContainer implements Serializable {
                         }
                     }
                 }
-                for (int i = 0; i < 4; i++) {
-                    int x2 = x + TerrariaClone.cl[i][0];
-                    int y2 = y + TerrariaClone.cl[i][1];
+                for (int i = 0; i < CL.length; i++) {
+                    int x2 = x + CL[i][0];
+                    int y2 = y + CL[i][1];
                     if (y2 >= 0 && y2 < HEIGHT) {
-                        for (int l = 0; l < 3; l++) {
+                        for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
                             if (power[l][y][x] > 0) {
                                 if (blocks[l][y][x].getConduct() >= 0 && blocks[l][y2][x2].isReceive() && !(blocks[l][y2][x2].isCompleteZythiumAmplifier() && x < x2 && blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT && blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_RIGHT_ON ||
                                         blocks[l][y2][x2].isCompleteZythiumAmplifier() && y < y2 && blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_DOWN && blocks[l][y2][x2] != Blocks.ZYTHIUM_AMPLIFIER_DOWN_ON ||
@@ -1269,7 +1271,7 @@ public class WorldContainer implements Serializable {
                     }
                 }
                 pqd[y][x] = false;
-                for (int l = 0; l < 3; l++) {
+                for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
                     log.info("[resolvePowerMatrix] " + x + " " + y + " " + l + " " + blocks[l][y][x] + " " + power[l][y][x]);
                     if (power[l][y][x] > 0) {
                         if (blocks[l][y][x] == Blocks.ZYTHIUM_LAMP) {
@@ -1297,7 +1299,7 @@ public class WorldContainer implements Serializable {
         for (int i = 0; i < pzqx.size(); i++) {
             x = pzqx.get(i);
             y = pzqy.get(i);
-            for (int l = 0; l < 3; l++) {
+            for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
                 if (blocks[l][y][x].isZythiumWire() && (int) (float) power[l][y][x] != pzqn[l][y][x]) {
                     removeBlockLighting(x, y, 0);
                     blocks[l][y][x] = TerrariaClone.WIREP.get((int) (float) power[l][y][x]);
@@ -1320,9 +1322,9 @@ public class WorldContainer implements Serializable {
         log.info("[rbp ] " + ux + " " + uy + " " + lyr + " " + turnOffDelayer);
         if (!(blocks[lyr][uy][ux].isZythiumDelayerOnAll() && turnOffDelayer)) {
             int ax3, ay3;
-            for (int ir = 0; ir < 4; ir++) {
-                ax3 = ux + TerrariaClone.cl[ir][0];
-                ay3 = uy + TerrariaClone.cl[ir][1];
+            for (int ir = 0; ir < CL.length; ir++) {
+                ax3 = ux + CL[ir][0];
+                ay3 = uy + CL[ir][1];
                 if (ay3 >= 0 && ay3 < HEIGHT && power[lyr][ay3][ax3] != 0) {
                     if (!(power[lyr][ay3][ax3] == power[lyr][uy][ux] - blocks[lyr][uy][ux].getConduct()) &&
                             (!(blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || blocks[lyr][ay3][ax3].isCompleteZythiumInverter()) ||
@@ -1343,9 +1345,9 @@ public class WorldContainer implements Serializable {
                     }
                 }
             }
-            for (int ir = 0; ir < 4; ir++) {
-                ax3 = ux + TerrariaClone.cl[ir][0];
-                ay3 = uy + TerrariaClone.cl[ir][1];
+            for (int ir = 0; ir < CL.length; ir++) {
+                ax3 = ux + CL[ir][0];
+                ay3 = uy + CL[ir][1];
                 log.info(blocks[lyr][ay3][ax3] + " " + power[lyr][ay3][ax3]);
                 if (ay3 >= 0 && ay3 < HEIGHT && power[lyr][ay3][ax3] != 0) {
                     log.info(power[lyr][uy][ux] + " " + power[lyr][ay3][ax3] + " " + blocks[lyr][uy][ux].getConduct());
@@ -1543,9 +1545,9 @@ public class WorldContainer implements Serializable {
         addTileToPZQueue(ux, uy);
         boolean[] remember = { false, false, false, false };
         int ax3, ay3;
-        for (int ir = 0; ir < 4; ir++) {
-            ax3 = ux + TerrariaClone.cl[ir][0];
-            ay3 = uy + TerrariaClone.cl[ir][1];
+        for (int ir = 0; ir < CL.length; ir++) {
+            ax3 = ux + CL[ir][0];
+            ay3 = uy + CL[ir][1];
             if (ay3 >= 0 && ay3 < HEIGHT && power[lyr][ay3][ax3] != 0) {
                 if (power[lyr][ay3][ax3] != 0 && !(power[lyr][ay3][ax3] == power[lyr][uy][ux] - blocks[lyr][uy][ux].getConduct()) &&
                         (!(blocks[lyr][ay3][ax3].isCompleteZythiumAmplifier() || blocks[lyr][ay3][ax3].isCompleteZythiumInverter()) ||
@@ -1567,10 +1569,10 @@ public class WorldContainer implements Serializable {
                 }
             }
         }
-        for (int ir = 0; ir < 4; ir++) {
+        for (int ir = 0; ir < CL.length; ir++) {
             log.info("[liek srsly man?] " + ir);
-            ax3 = ux + TerrariaClone.cl[ir][0];
-            ay3 = uy + TerrariaClone.cl[ir][1];
+            ax3 = ux + CL[ir][0];
+            ay3 = uy + CL[ir][1];
             log.info("[rpbRecur2] " + ax3 + " " + ay3 + " " + power[lyr][ay3][ax3]);
             if (ay3 >= 0 && ay3 < HEIGHT && power[lyr][ay3][ax3] != 0) {
                 log.info("[rbpRecur] " + power[lyr][ay3][ax3] + " " + power[lyr][uy][ux] + " " + blocks[lyr][uy][ux].getConduct());
@@ -1658,12 +1660,30 @@ public class WorldContainer implements Serializable {
                 removeBlockPower(ax3, ay3, lyr);
             }
         }
-        for (int ir = 0; ir < 4; ir++) {
-            if (remember[ir] && uy + TerrariaClone.cl[ir][1] >= 0 && uy + TerrariaClone.cl[ir][1] < HEIGHT) {
-                power[lyr][uy + TerrariaClone.cl[ir][1]][ux + TerrariaClone.cl[ir][0]] = (float) 5;
+        for (int ir = 0; ir < CL.length; ir++) {
+            if (remember[ir] && uy + CL[ir][1] >= 0 && uy + CL[ir][1] < HEIGHT) {
+                power[lyr][uy + CL[ir][1]][ux + CL[ir][0]] = (float) 5;
             }
         }
         power[lyr][uy][ux] = (float) 0;
         arbprd[lyr][uy][ux] = false;
+    }
+    
+    public void updateFurnaceState() {
+        icmatrix[layer][icy][icx].setFUELP(ic.getFUELP());
+        icmatrix[layer][icy][icx].setSMELTP(ic.getSMELTP());
+        icmatrix[layer][icy][icx].setFurnaceOn(ic.isFurnaceOn());
+    }
+    
+    public void setItemCollection(ItemType item, int layer, int ux, int uy) {
+        if (icmatrix[layer][uy][ux] != null && icmatrix[layer][uy][ux].getType() == item) {
+            ic = new ItemCollection(item, icmatrix[layer][uy][ux].getItems(), icmatrix[layer][uy][ux].getNums(), icmatrix[layer][uy][ux].getDurs());
+        } else {
+            ic = new ItemCollection(item);
+        }
+        icx = ux;
+        icy = uy;
+        inventory.renderCollection(ic);
+        showInv = true;
     }
 }

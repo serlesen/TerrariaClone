@@ -810,7 +810,7 @@ public class Inventory implements Serializable {
         if (ic.getType() == ItemType.CIC) {
             if (ic.getImage() == null) {
                 ic.setImage(ResourcesLoader.loadImage("interface/cic.png"));
-                for (int i=0; i<4; i++) {
+                for (int i=0; i<ItemType.CIC.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
@@ -819,14 +819,14 @@ public class Inventory implements Serializable {
                 ic.setImage(ResourcesLoader.loadImage("interface/armor.png"));
                 CX = 1;
                 CY = 4;
-                for (int i=0; i<4; i++) {
+                for (int i=0; i<ItemType.ARMOR.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.WORKBENCH) {
             if (ic.getImage() == null) {
                 ic.setImage(ResourcesLoader.loadImage("interface/workbench.png"));
-                for (int i=0; i<9; i++) {
+                for (int i=0; i<ItemType.WORKBENCH.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
@@ -835,7 +835,7 @@ public class Inventory implements Serializable {
                 ic.setImage(ResourcesLoader.loadImage("interface/wooden_chest.png"));
                 CX = 3;
                 CY = 3;
-                for (int i=0; i<9; i++) {
+                for (int i=0; i<ItemType.WOODEN_CHEST.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
@@ -844,7 +844,7 @@ public class Inventory implements Serializable {
                 ic.setImage(ResourcesLoader.loadImage("interface/stone_chest.png"));
                 CX = 5;
                 CY = 3;
-                for (int i=0; i<15; i++) {
+                for (int i=0; i<ItemType.STONE_CHEST.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
@@ -853,7 +853,7 @@ public class Inventory implements Serializable {
                 ic.setImage(ResourcesLoader.loadImage("interface/copper_chest.png"));
                 CX = 5;
                 CY = 4;
-                for (int i=0; i<20; i++) {
+                for (int i=0; i<ItemType.COPPER_CHEST.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
@@ -862,7 +862,7 @@ public class Inventory implements Serializable {
                 ic.setImage(ResourcesLoader.loadImage("interface/iron_chest.png"));
                 CX = 7;
                 CY = 4;
-                for (int i=0; i<28; i++) {
+                for (int i=0; i<ItemType.IRON_CHEST.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
@@ -871,7 +871,7 @@ public class Inventory implements Serializable {
                 ic.setImage(ResourcesLoader.loadImage("interface/silver_chest.png"));
                 CX = 7;
                 CY = 5;
-                for (int i=0; i<35; i++) {
+                for (int i=0; i<ItemType.SILVER_CHEST.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
@@ -880,7 +880,7 @@ public class Inventory implements Serializable {
                 ic.setImage(ResourcesLoader.loadImage("interface/gold_chest.png"));
                 CX = 7;
                 CY = 6;
-                for (int i=0; i<42; i++) {
+                for (int i=0; i<ItemType.GOLD_CHEST.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
@@ -889,7 +889,7 @@ public class Inventory implements Serializable {
                 ic.setImage(ResourcesLoader.loadImage("interface/zinc_chest.png"));
                 CX = 7;
                 CY = 8;
-                for (int i=0; i<56; i++) {
+                for (int i=0; i<ItemType.ZINC_CHEST.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
@@ -898,7 +898,7 @@ public class Inventory implements Serializable {
                 ic.setImage(ResourcesLoader.loadImage("interface/rhymestone_chest.png"));
                 CX = 8;
                 CY = 9;
-                for (int i=0; i<72; i++) {
+                for (int i=0; i<ItemType.RHYMESTONE_CHEST.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
@@ -907,14 +907,14 @@ public class Inventory implements Serializable {
                 ic.setImage(ResourcesLoader.loadImage("interface/obdurite_chest.png"));
                 CX = 10;
                 CY = 10;
-                for (int i=0; i<100; i++) {
+                for (int i=0; i<ItemType.OBDURITE_CHEST.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.FURNACE) {
             if (ic.getImage() == null) {
                 ic.setImage(ResourcesLoader.loadImage("interface/furnace.png"));
-                for (int i=-1; i<4; i++) {
+                for (int i=-1; i<ItemType.FURNACE.getItemCollectionIterable(); i++) {
                     updateIC(ic, i);
                 }
             }
@@ -926,8 +926,8 @@ public class Inventory implements Serializable {
     }
 
     public int addLocationIC(ItemCollection ic, int i, Items item, short quantity, short durability) {
-        if (ic.getIds()[i] == item) {
-            if (ic.getIds()[i].getMaxStacks() - ic.getNums()[i] >= quantity) {
+        if (ic.getItems()[i] == item) {
+            if (ic.getItems()[i].getMaxStacks() - ic.getNums()[i] >= quantity) {
                 ic.getNums()[i] += quantity;
                 if (ic.getImage() != null) {
                     updateIC(ic, i);
@@ -935,15 +935,15 @@ public class Inventory implements Serializable {
                 return 0;
             }
             else {
-                quantity -= ic.getIds()[i].getMaxStacks() - ic.getNums()[i];
-                ic.getNums()[i] = (short) ic.getIds()[i].getMaxStacks();
+                quantity -= ic.getItems()[i].getMaxStacks() - ic.getNums()[i];
+                ic.getNums()[i] = (short) ic.getItems()[i].getMaxStacks();
                 if (ic.getImage() != null) {
                     updateIC(ic, i);
                 }
             }
         } else {
-            if (quantity <= ic.getIds()[i].getMaxStacks()) {
-                ic.getIds()[i] = item;
+            if (quantity <= ic.getItems()[i].getMaxStacks()) {
+                ic.getItems()[i] = item;
                 ic.getNums()[i] = quantity;
                 ic.getNums()[i] = durability;
                 if (ic.getImage() != null) {
@@ -952,7 +952,7 @@ public class Inventory implements Serializable {
                 return 0;
             }
             else {
-                quantity -= ic.getIds()[i].getMaxStacks();
+                quantity -= ic.getItems()[i].getMaxStacks();
                 return quantity;
             }
         }
@@ -963,7 +963,7 @@ public class Inventory implements Serializable {
         if (ic.getNums()[i] >= quantity) {
             ic.getNums()[i] -= quantity;
             if (ic.getNums()[i] == 0) {
-                ic.getIds()[i] = Items.EMPTY;
+                ic.getItems()[i] = Items.EMPTY;
             }
             if (ic.getImage() != null) {
                 updateIC(ic, i);
@@ -973,7 +973,7 @@ public class Inventory implements Serializable {
         else {
             quantity -= ic.getNums()[i];
             ic.getNums()[i] = 0;
-            ic.getIds()[i] = Items.EMPTY;
+            ic.getItems()[i] = Items.EMPTY;
             if (ic.getImage() != null) {
                 updateIC(ic, i);
             }
@@ -995,10 +995,10 @@ public class Inventory implements Serializable {
                 px*40, py*40, px*40+40, py*40+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[i] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getHeight();
-                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]),
+            if (ic.getItems()[i] != Items.EMPTY) {
+				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
+				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
+                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
                     px*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), px*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
@@ -1008,11 +1008,11 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.getNums()[i] + " ", px*40+9, py*40+34);
                 }
             }
-            ic.getIds()[4] = Items.EMPTY;
-            ic.getIds()[4] = Items.EMPTY;
+            ic.getItems()[4] = Items.EMPTY;
+            ic.getItems()[4] = Items.EMPTY;
             for (RecipeItem r2 : RECIPES.get("cic")) {
                 if (ic.areIdsEquals(r2.getIngredients())) {
-                    ic.getIds()[4] = r2.getResultingItem();
+                    ic.getItems()[4] = r2.getResultingItem();
                     ic.getNums()[4] = r2.getNum();
                     if (r2.getResultingItem().getDurability() != null)
                         ic.getDurs()[4] = r2.getResultingItem().getDurability().shortValue();
@@ -1021,7 +1021,7 @@ public class Inventory implements Serializable {
             }
             for (RecipeItem r2 : RECIPES.get("shapeless_cic")) {
                 if (ic.areInvalidIds(r2.getIngredients())) {
-                    ic.getIds()[4] = r2.getResultingItem();
+                    ic.getItems()[4] = r2.getResultingItem();
                     ic.getNums()[4] = r2.getNum();
                     if (r2.getResultingItem().getDurability() != null)
                         ic.getDurs()[4] = r2.getResultingItem().getDurability().shortValue();
@@ -1038,10 +1038,10 @@ public class Inventory implements Serializable {
                 3*40, 20, 3*40+40, 20+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[4] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[4]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[4]).getHeight();
-                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[4]),
+            if (ic.getItems()[4] != Items.EMPTY) {
+				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[4]).getWidth();
+				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[4]).getHeight();
+                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[4]),
                     3*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), 20+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), 3*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), 20+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
@@ -1065,10 +1065,10 @@ public class Inventory implements Serializable {
                 px*46, py*46, px*46+40, py*46+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[i] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getHeight();
-                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]),
+            if (ic.getItems()[i] != Items.EMPTY) {
+				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
+				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
+                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
                     px*46+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*46+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), px*46+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*46+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
@@ -1092,10 +1092,10 @@ public class Inventory implements Serializable {
                 px*40, py*40, px*40+40, py*40+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[i] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getHeight();
-                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]),
+            if (ic.getItems()[i] != Items.EMPTY) {
+				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
+				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
+                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
                     px*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), px*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
@@ -1105,10 +1105,10 @@ public class Inventory implements Serializable {
                     g2.drawString(ic.getNums()[i] + " ", px*40+9, py*40+34);
                 }
             }
-            ic.getIds()[9] = Items.EMPTY;
+            ic.getItems()[9] = Items.EMPTY;
             for (RecipeItem r2 : RECIPES.get("workbench")) {
                 if (ic.areIdsEquals(r2.getIngredients())) {
-                    ic.getIds()[9] = r2.getResultingItem();
+                    ic.getItems()[9] = r2.getResultingItem();
                     ic.getNums()[9] = r2.getNum();
                     if (r2.getResultingItem().getDurability() != null)
                         ic.getDurs()[9] = r2.getResultingItem().getDurability().shortValue();
@@ -1117,7 +1117,7 @@ public class Inventory implements Serializable {
             }
             for (RecipeItem r2 : RECIPES.get("shapeless")) {
                 if (ic.areInvalidIds(r2.getIngredients())) {
-                    ic.getIds()[9] = r2.getResultingItem();
+                    ic.getItems()[9] = r2.getResultingItem();
                     ic.getNums()[9] = r2.getNum();
                     if (r2.getResultingItem().getDurability() != null)
                         ic.getDurs()[9] = r2.getResultingItem().getDurability().shortValue();
@@ -1134,10 +1134,10 @@ public class Inventory implements Serializable {
                 4*40, 1*40, 4*40+40, 1*40+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[9] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[9]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[9]).getHeight();
-                    g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[9]),
+            if (ic.getItems()[9] != Items.EMPTY) {
+				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[9]).getWidth();
+				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[9]).getHeight();
+                    g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[9]),
                         4*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), 1*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), 4*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), 1*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
                         0, 0, width, height,
                         null);
@@ -1165,10 +1165,10 @@ public class Inventory implements Serializable {
                 px*46, py*46, px*46+40, py*46+40,
                 0, 0, 40, 40,
                 null);
-            if (ic.getIds()[i] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getHeight();
-                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]),
+            if (ic.getItems()[i] != Items.EMPTY) {
+				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
+				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
+                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
                     px*46+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*46+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), px*46+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*46+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
                     0, 0, width, height,
                     null);
@@ -1223,10 +1223,10 @@ public class Inventory implements Serializable {
                     (int)(fpx*40), (int)(fpy*40), (int)(fpx*40+40), (int)(fpy*40+40),
                     0, 0, 40, 40,
                     null);
-                if (ic.getIds()[i] != Items.EMPTY) {
-					int width = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getWidth();
-					int height = ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]).getHeight();
-                    g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getIds()[i]),
+                if (ic.getItems()[i] != Items.EMPTY) {
+					int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
+					int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
+                    g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
                         (int)(fpx*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2)), (int)(fpy*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2)), (int)(fpx*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2)), (int)(fpy*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2)),
                         0, 0, width, height,
                         null);
@@ -1244,7 +1244,7 @@ public class Inventory implements Serializable {
     public void useRecipeWorkbench(ItemCollection ic) {
         for (RecipeItem r2 : RECIPES.get("workbench")) {
             if (ic.areIdsEquals(r2.getIngredients())) {
-                for (int i=0; i<9; i++) {
+                for (int i=0; i<ItemType.WORKBENCH.getItemCollectionIterable(); i++) {
                     removeLocationIC(ic, i, (short) 1);
                     updateIC(ic, i);
                 }
@@ -1256,8 +1256,8 @@ public class Inventory implements Serializable {
                 for (int k=0; k<r2.getIngredients().length; k++) {
                     r3.add(r2.getIngredients()[k]);
                 }
-                for (int k=0; k<9; k++) {
-                    r3.remove(ic.getIds()[k]);
+                for (int k=0; k<ItemType.WORKBENCH.getItemCollectionIterable(); k++) {
+                    r3.remove(ic.getItems()[k]);
                     removeLocationIC(ic, k, (short) 1);
                     updateIC(ic, k);
                 }
@@ -1269,7 +1269,7 @@ public class Inventory implements Serializable {
     public void useRecipeCIC(ItemCollection ic) {
         for (RecipeItem r2 : RECIPES.get("cic")) {
             if (ic.areIdsEquals(r2.getIngredients())) {
-                for (int i=0; i<4; i++) {
+                for (int i=0; i<ItemType.CIC.getItemCollectionIterable(); i++) {
                     removeLocationIC(ic, i, (short) 1);
                     updateIC(ic, i);
                 }
@@ -1281,8 +1281,8 @@ public class Inventory implements Serializable {
                 for (int k=0; k<r2.getIngredients().length-2; k++) {
                     r3.add(r2.getIngredients()[k]);
                 }
-                for (int k=0; k<4; k++) {
-                    r3.remove(ic.getIds()[k]);
+                for (int k=0; k<ItemType.CIC.getItemCollectionIterable(); k++) {
+                    r3.remove(ic.getItems()[k]);
                     removeLocationIC(ic, k, (short) 1);
                     updateIC(ic, k);
                 }
