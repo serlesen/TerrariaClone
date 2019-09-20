@@ -26,6 +26,7 @@ import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.ItemCollection;
 import com.sergio.refacto.dto.ItemType;
 import com.sergio.refacto.dto.Items;
+import com.sergio.refacto.services.TimeService;
 import com.sergio.refacto.tools.MathTool;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
@@ -53,8 +54,6 @@ public class WorldContainer implements Serializable {
     /** Size of the World in Chunk units. */
     public static final int WORLD_WIDTH = WIDTH / CHUNK_BLOCKS + 1;
     public static final int WORLD_HEIGHT = HEIGHT / CHUNK_BLOCKS + 1;
-
-    private static final int[] SKY_COLORS = {28800, 28980, 29160, 29340, 29520, 29700, 29880, 30060, 30240, 30420, 30600, 30780, 30960, 31140, 31320, 31500, 31680, 31860, 32040, 32220, 72000, 72180, 72360, 72540, 72720, 72900, 73080, 73260, 73440, 73620, 73800, 73980, 74160, 74340, 74520, 74700, 74880, 75060, 75240, 75420};
 
     Blocks[][][] blocks;
     Directions[][][] blocksDirections;
@@ -100,9 +99,11 @@ public class WorldContainer implements Serializable {
     /** Tool handled by the player. */
     public BufferedImage tool;
 
-    double timeOfDay;  // 28000 (before dusk), 32000 (after dusk)
     int currentSkyLight;
-    int day;
+
+    /** Those fields are only there to serialize them when save/load a world. */
+    private double timeOfDay;  // 28000 (before dusk), 32000 (after dusk)
+    private int day;
 
     int mobCount;
 
@@ -130,18 +131,18 @@ public class WorldContainer implements Serializable {
         version = "0.3_01";
     }
 
-    public WorldContainer(Blocks[][][] blocks, Directions[][][] blocksDirections, Byte[][] BlocksDirectionsIntensity, Backgrounds[][] blocksBackgrounds, Byte[][] blocksTextureIntensity,
-                          Float[][] lights, Float[][][] power, Boolean[][] drawn, Boolean[][] ldrawn, Boolean[][] rdrawn,
-                          Player player, Inventory inventory, ItemCollection cic,
-                          List<Entity> entities, CloudsAggregate cloudsAggregate,
-                          List<Integer> machinesx, List<Integer> machinesy, Boolean[][] lsources, List<Integer> lqx, List<Integer> lqy, Boolean[][] lqd,
-                          int regenerationCounter1, int regenerationCounter2, int layer, int layerTemp, Blocks blockTemp,
-                          int mx, int my, int icx, int icy, int mining, int immune,
-                          Items moveItem, short moveNum, Items moveItemTemp, short moveNumTemp, int msi,
-                          double toolAngle, double toolSpeed, double timeOfDay, int currentSkyLight, int day, int mobCount,
-                          boolean ready, boolean showTool, boolean showInv, boolean doMobSpawn,
-                          int resunlight,
-                          ItemCollection ic, boolean[][] kworlds, ItemCollection[][][] icmatrix, String version) {
+    private WorldContainer(Blocks[][][] blocks, Directions[][][] blocksDirections, Byte[][] BlocksDirectionsIntensity, Backgrounds[][] blocksBackgrounds, Byte[][] blocksTextureIntensity,
+                           Float[][] lights, Float[][][] power, Boolean[][] drawn, Boolean[][] ldrawn, Boolean[][] rdrawn,
+                           Player player, Inventory inventory, ItemCollection cic,
+                           List<Entity> entities, CloudsAggregate cloudsAggregate,
+                           List<Integer> machinesx, List<Integer> machinesy, Boolean[][] lsources, List<Integer> lqx, List<Integer> lqy, Boolean[][] lqd,
+                           int regenerationCounter1, int regenerationCounter2, int layer, int layerTemp, Blocks blockTemp,
+                           int mx, int my, int icx, int icy, int mining, int immune,
+                           Items moveItem, short moveNum, Items moveItemTemp, short moveNumTemp, int msi,
+                           double toolAngle, double toolSpeed, int currentSkyLight, int mobCount,
+                           boolean ready, boolean showTool, boolean showInv, boolean doMobSpawn,
+                           int resunlight,
+                           ItemCollection ic, boolean[][] kworlds, ItemCollection[][][] icmatrix, String version) {
 
         this.blocks = blocks;
         this.blocksDirections = blocksDirections;
@@ -182,9 +183,7 @@ public class WorldContainer implements Serializable {
         this.msi = msi;
         this.toolAngle = toolAngle;
         this.toolSpeed = toolSpeed;
-        this.timeOfDay = timeOfDay;
         this.currentSkyLight = currentSkyLight;
-        this.day = day;
         this.mobCount = mobCount;
         this.ready = ready;
         this.showTool = showTool;
@@ -195,6 +194,9 @@ public class WorldContainer implements Serializable {
         this.kworlds = kworlds;
         this.icmatrix = icmatrix;
         this.version = version;
+
+        this.timeOfDay = TimeService.getInstance().getTime();
+        this.day = TimeService.getInstance().getDay();
     }
 
     private void load(WorldContainer wc) {
@@ -234,9 +236,7 @@ public class WorldContainer implements Serializable {
         msi = wc.msi;
         toolAngle = wc.toolAngle;
         toolSpeed = wc.toolSpeed;
-        timeOfDay = wc.timeOfDay;
         currentSkyLight = wc.currentSkyLight;
-        day = wc.day;
         mobCount = wc.mobCount;
         ready = wc.ready;
         showTool = wc.showTool;
@@ -247,6 +247,7 @@ public class WorldContainer implements Serializable {
         ic = wc.ic;
         icmatrix = wc.icmatrix;
         version = wc.version;
+        TimeService.getInstance().load(wc.timeOfDay, wc.day);
 
         drawn = new Boolean[HEIGHT][WIDTH];
         for (int y = 0; y < HEIGHT; y++) {
@@ -318,7 +319,7 @@ public class WorldContainer implements Serializable {
         }
     }
 
-    public void createNewWorld() {
+    public void createNewWorld(int sunlightlevel) {
         blocks = new Blocks[TerrariaClone.LAYER_SIZE][TerrariaClone.SIZE][TerrariaClone.SIZE];
         blocksDirections = new Directions[TerrariaClone.LAYER_SIZE][TerrariaClone.SIZE][TerrariaClone.SIZE];
         blocksDirectionsIntensity = new Byte[TerrariaClone.SIZE][TerrariaClone.SIZE];
@@ -475,9 +476,14 @@ public class WorldContainer implements Serializable {
 //        drawn = new Boolean[HEIGHT][WIDTH];
 //        rdrawn = new Boolean[HEIGHT][WIDTH];
 //        ldrawn = new Boolean[HEIGHT][WIDTH];
+
+        log.info("-> Adding light sources...");
+
+        resolvePowerMatrix();
+        resolveLightMatrix(sunlightlevel);
     }
 
-    public WorldContainer getCopy() {
+    private WorldContainer getCopy() {
         return new WorldContainer(blocks, blocksDirections, blocksDirectionsIntensity, blocksBackgrounds, blocksTextureIntensity,
                 lights, power, drawn, ldrawn, rdrawn,
                 player, inventory, cic,
@@ -486,7 +492,7 @@ public class WorldContainer implements Serializable {
                 regenerationCounter1, regenerationCounter2, layer, layerTemp, blockTemp,
                 mx, my, icx, icy, mining, immune,
                 moveItem, moveNum, moveItemTemp, moveNumTemp, msi,
-                toolAngle, toolSpeed, timeOfDay, currentSkyLight, day, mobCount,
+                toolAngle, toolSpeed, currentSkyLight, mobCount,
                 ready, showTool, showInv, doMobSpawn,
                 resunlight,
                 ic, kworlds, icmatrix, version);
@@ -500,22 +506,22 @@ public class WorldContainer implements Serializable {
                         Blocks t = Blocks.AIR;
                         switch (blocks[l][y][x]) {
                             case SUNFLOWER_STAGE_1:
-                                if (timeOfDay >= 75913 || timeOfDay < 28883) {
+                                if (TimeService.getInstance().isNight()) {
                                     t = Blocks.SUNFLOWER_STAGE_2;
                                 }
                                 break;
                             case SUNFLOWER_STAGE_2:
-                                if (timeOfDay >= 75913 || timeOfDay < 28883) {
+                                if (TimeService.getInstance().isNight()) {
                                     t = Blocks.SUNFLOWER_STAGE_3;
                                 }
                                 break;
                             case MOONFLOWER_STAGE_1:
-                                if (timeOfDay >= 32302 && timeOfDay < 72093) {
+                                if (TimeService.getInstance().isNight()) {
                                     t = Blocks.MOONFLOWER_STAGE_2;
                                 }
                                 break;
                             case MOONFLOWER_STAGE_2:
-                                if (timeOfDay >= 32302 && timeOfDay < 72093) {
+                                if (TimeService.getInstance().isNight()) {
                                     t = Blocks.MOONFLOWER_STAGE_3;
                                 }
                                 break;
@@ -652,7 +658,7 @@ public class WorldContainer implements Serializable {
         }
     }
 
-    public boolean hasOpenSpace(int x, int y, int l) {
+    private boolean hasOpenSpace(int x, int y, int l) {
         if (x <= 0 || y <= 0 || x >= TerrariaClone.SIZE || y >= TerrariaClone.SIZE) {
             // edges are not considered as open space
             return false;
@@ -727,12 +733,7 @@ public class WorldContainer implements Serializable {
     }
 
     public void updateSkyLights() {
-        currentSkyLight = SKY_COLORS[0];
-        for (int i = 0; i < SKY_COLORS.length; i++) {
-            if (timeOfDay >= SKY_COLORS[i]) {
-                currentSkyLight = SKY_COLORS[i];
-            }
-        }
+        currentSkyLight = TimeService.getInstance().getSkyLights();
     }
 
     public void updateHealthPoints() {
@@ -973,7 +974,7 @@ public class WorldContainer implements Serializable {
         }
     }
 
-    public void addTileToPZQueue(int ux, int uy) {
+    private void addTileToPZQueue(int ux, int uy) {
         if (!pzqd[uy][ux]) {
             pzqx.add(ux);
             pzqy.add(uy);

@@ -69,6 +69,7 @@ import com.sergio.refacto.items.TextField;
 import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.services.OutlinesService;
 import com.sergio.refacto.services.PaintService;
+import com.sergio.refacto.services.TimeService;
 import com.sergio.refacto.services.WorldService;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
@@ -181,6 +182,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         try {
             paintService = new PaintService();
             worldService = new WorldService();
+            TimeService.getInstance().init();
 
             setLayout(new BorderLayout());
             bg = Color.BLACK;
@@ -433,10 +435,6 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
         updateApp(blockOffsetU, blockOffsetV);
         updateEnvironment();
         worldContainer.player.update(worldContainer.blocks[1], keyPressed, blockOffsetU, blockOffsetV);
-        if (worldContainer.timeOfDay >= 86400) {
-            worldContainer.timeOfDay = 0;
-            worldContainer.day += 1;
-        }
 
         repaint();
         worldContainer.ready = true;
@@ -602,16 +600,10 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
 
         armor = new ItemCollection(ItemType.ARMOR, 4);
 
-        worldContainer.createNewWorld();
+        worldContainer.createNewWorld(sunlightlevel);
 
         miningTool = Items.EMPTY;
         moveDur = 0;
-
-        log.info("-> Adding light sources...");
-
-        // FIXME move to worldContainer.createNewWorld();
-        worldContainer.resolvePowerMatrix();
-        worldContainer.resolveLightMatrix(sunlightlevel);
 
         log.info("Finished generation.");
     }
@@ -727,7 +719,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                             if (xpos > 0 && xpos < WIDTH - 1 && ypos > 0 && ypos < HEIGHT - 1 && (worldContainer.blocks[1][ypos][xpos] == Blocks.AIR || !worldContainer.blocks[1][ypos][xpos].isCds() &&
                                     xpos2 > 0 && xpos2 < WIDTH - 1 && ypos2 > 0 && ypos2 < HEIGHT - 1 && worldContainer.blocks[1][ypos2][xpos2] != Blocks.AIR && worldContainer.blocks[1][ypos2][xpos2].isCds())) {
                                 EntityType mobSpawn = null;
-                                if ((worldContainer.day != 0 || DebugContext.HOSTILE > 1) && (worldContainer.timeOfDay >= 75913 || worldContainer.timeOfDay < 28883)) {
+                                if ((TimeService.getInstance().getDay() != 0 || DebugContext.HOSTILE > 1) && TimeService.getInstance().isNight()) {
                                     if (RandomTool.nextInt(350) == 0) {
                                         int rnum = RandomTool.nextInt(100);
                                         if (rnum >= 0 && rnum < 45) {
@@ -741,7 +733,7 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
                                         }
                                     }
                                 }
-                                if (worldContainer.timeOfDay >= 32302 && worldContainer.timeOfDay < 72093) {
+                                if (TimeService.getInstance().isDay()) {
                                     if (RandomTool.nextInt(200) == 0) {
                                         int rnum = RandomTool.nextInt(100);
                                         if (rnum >= 0 && rnum < 80) {
@@ -2370,7 +2362,8 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
     }
 
     private void updateEnvironment() {
-        worldContainer.timeOfDay += 1.2 * DebugContext.ACCEL;
+        TimeService.getInstance().increaseTime();
+
         for (int i = worldContainer.cloudsAggregate.getClouds().size() - 1; i > -1; i--) {
             worldContainer.cloudsAggregate.updateXUponSpeed(i);
             if (worldContainer.cloudsAggregate.isOutsideBounds(i, getWidth())) {

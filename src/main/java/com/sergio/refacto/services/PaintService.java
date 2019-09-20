@@ -484,7 +484,7 @@ public class PaintService {
     private void paintSunMoonClouds(TerrariaClone graphicContainer) {
         if (graphicContainer.worldContainer.player.y / WorldContainer.BLOCK_SIZE < graphicContainer.HEIGHT * 0.5) {
             graphics.translate(graphicContainer.getWidth() / 2, graphicContainer.getHeight() * 0.85);
-            graphics.rotate((graphicContainer.worldContainer.timeOfDay - 70200) / 86400 * Math.PI * 2);
+            graphics.rotate(TimeService.getInstance().getSunsPosition());
 
             graphics.drawImage(sun,
                     (int) (-graphicContainer.getWidth() * 0.65), 0, (int) (-graphicContainer.getWidth() * 0.65 + sun.getWidth() * 2), sun.getHeight() * 2,
@@ -498,7 +498,7 @@ public class PaintService {
                     0, 0, moon.getWidth(), moon.getHeight(),
                     null);
 
-            graphics.rotate(-(graphicContainer.worldContainer.timeOfDay - 70200) / 86400 * Math.PI * 2 - Math.PI);
+            graphics.rotate(TimeService.getInstance().getMoonsPosition());
             graphics.translate(-graphicContainer.getWidth() / 2, -graphicContainer.getHeight() * 0.85);
 
             for (int i = 0; i < graphicContainer.worldContainer.cloudsAggregate.getClouds().size(); i++) {
