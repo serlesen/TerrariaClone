@@ -21,7 +21,8 @@ public enum ItemType {
     STONE_CHEST(15, 15),
     WORKBENCH(10, 9),
     WOODEN_CHEST(9, 9),
-    ZINC_CHEST(56, 56);
+    ZINC_CHEST(56, 56),
+    INVENTORY(40, 40);
 
     int itemCollectionSize;
     int itemCollectionIterable;

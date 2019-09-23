@@ -14,6 +14,7 @@ import com.sergio.refacto.dto.ItemCollection;
 import com.sergio.refacto.dto.ItemType;
 import com.sergio.refacto.dto.Items;
 import com.sergio.refacto.dto.RecipeItem;
+import com.sergio.refacto.dto.RecipeType;
 import com.sergio.refacto.items.ImagesContainer;
 import com.sergio.refacto.tools.MathTool;
 import com.sergio.refacto.tools.ResourcesLoader;
@@ -24,70 +25,42 @@ public class Inventory implements Serializable {
 
 	public int selection;
 
-	public transient BufferedImage image;
-	transient BufferedImage box;
-	transient BufferedImage box_selected;
-    private Font font = new Font("Chalkboard", Font.PLAIN, 12);
+	private static transient BufferedImage box;
+	private static transient BufferedImage box_selected;
+    private static final Font FONT = new Font("Chalkboard", Font.PLAIN, 12);
 
-    private transient Graphics2D g2;
-
-    public Items[] items;
-    public short[] nums;
-    public short[] durs;
+    public ItemCollection ic;
 
     private static final int TROLX = 37;
-    private static final  int TROLY = 17;
+    private static final int TROLY = 17;
 
-    public int CX, CY;
+	public static int CX, CY;
 
-    private Map<String, RecipeItem[]> RECIPES;
+    private static Map<RecipeType, RecipeItem[]> RECIPES;
 
     private static final int MAXIMUM_ITEMS = 40;
 
+    private static final int BOX_SIZE = 40;
+    private static final int MARGIN = 6;
+    private static final int BOX_WITH_MARGIN = BOX_SIZE + MARGIN;
+
     public Inventory() {
-        items = new Items[MAXIMUM_ITEMS];
-        nums = new short[MAXIMUM_ITEMS];
-        durs = new short[MAXIMUM_ITEMS];
-        for (int i=0; i<MAXIMUM_ITEMS; i++) {
-            items[i] = Items.EMPTY;
-            nums[i] = 0;
-            durs[i] = 0;
-        }
+    	ic = new ItemCollection(ItemType.INVENTORY);
+
         selection = 0;
-        image = new BufferedImage(466, 190, BufferedImage.TYPE_INT_ARGB);
+        ic.setImage(new BufferedImage(466, 190, BufferedImage.TYPE_INT_ARGB));
         box = ResourcesLoader.loadImage("interface/inventory.png");
         box_selected = ResourcesLoader.loadImage("interface/inventory_selected.png");
-        g2 = image.createGraphics();
+		Graphics2D g2 = ic.getImage().createGraphics();
         for (int x=0; x<10; x++) {
             for (int y=0; y<4; y++) {
-                if (x == 0 && y == 0) {
-                    g2.drawImage(box_selected,
-                        x*46+6, y*46+6, x*46+46, y*46+46,
-                        0, 0, 40, 40,
-                        null);
-                    if (y == 0) {
-                        g2.setFont(font);
-                        g2.setColor(Color.BLACK);
-                        g2.drawString(increment(x) + " ", x*46+ TROLX, y*46+ TROLY);
-                    }
-                }
-                else {
-                    g2.drawImage(box,
-                        x*46+6, y*46+6, x*46+46, y*46+46,
-                        0, 0, 40, 40,
-                        null);
-                    if (y == 0) {
-                        g2.setFont(font);
-                        g2.setColor(Color.BLACK);
-                        g2.drawString(increment(x) + " ", x*46+ TROLX, y*46+ TROLY);
-                    }
-                }
+				drawBox(x == 0 && y == 0, x, y, g2);
             }
         }
 
         RECIPES = new HashMap<>();
 
-        RecipeItem[] list_thing1 = {
+        RecipeItem[] workbenchRecipes = {
             new RecipeItem(new Items[]{Items.WOOD, Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
 					Items.WOODEN_PICK, (short) 1), // Wooden Pick
             new RecipeItem(new Items[]{Items.STONE, Items.STONE, Items.STONE, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
@@ -548,9 +521,9 @@ public class Inventory implements Serializable {
 					Items.ZYTHIUM_PRESSURE_PLATE, (short) 1)
         };
 
-        RECIPES.put("workbench", list_thing1);
+        RECIPES.put(RecipeType.WORKBENCH, workbenchRecipes);
 
-        RecipeItem[] list_thing2 = {
+        RecipeItem[] cicRecipes = {
             new RecipeItem(new Items[]{Items.WOOD, Items.WOOD, Items.WOOD, Items.WOOD},
 					Items.WORKBENCH, (short) 1), // Workbench
             new RecipeItem(new Items[]{Items.BARK, Items.BARK, Items.BARK, Items.BARK},
@@ -591,25 +564,25 @@ public class Inventory implements Serializable {
 					Items.STONE_PRESSURE_PLATE, (short) 1)
         };
 
-        RECIPES.put("cic", list_thing2);
+        RECIPES.put(RecipeType.CIC, cicRecipes);
 
-        RecipeItem[] list_thing3 = {
+        RecipeItem[] shapelessRecipes = {
             new RecipeItem(new Items[]{Items.WOOD, Items.VARNISH, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
 					Items.VARNISHED_WOOD, (short) 1),
             new RecipeItem(new Items[]{Items.CHISELED_STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY, Items.EMPTY},
 					Items.BUTTON, (short) 1)
         };
 
-        RECIPES.put("shapeless", list_thing3);
+        RECIPES.put(RecipeType.SHAPELESS, shapelessRecipes);
 
-        RecipeItem[] list_thing4 = {
+        RecipeItem[] shapelessCicRecipes = {
             new RecipeItem(new Items[]{Items.WOOD, Items.VARNISH, Items.EMPTY, Items.EMPTY},
 					Items.VARNISHED_WOOD, (short) 1),
             new RecipeItem(new Items[]{Items.CHISELED_STONE, Items.EMPTY, Items.EMPTY, Items.EMPTY},
 					Items.BUTTON, (short) 1)
         };
 
-        RECIPES.put("shapeless_cic", list_thing4);
+        RECIPES.put(RecipeType.SHAPELESS_CIC, shapelessCicRecipes);
     }
 
     public int addItem(Items item, short quantity) {
@@ -623,30 +596,30 @@ public class Inventory implements Serializable {
 
     public int addItem(Items item, short quantity, short durability) {
         for (int i = 0; i < MAXIMUM_ITEMS; i++) {
-            if (items[i] == item && nums[i] < items[i].getMaxStacks()) {
-                if (quantity + nums[i] <= items[i].getMaxStacks()) {
-                    nums[i] += quantity;
+            if (ic.getItems()[i] == item && ic.getNums()[i] < ic.getItems()[i].getMaxStacks()) {
+                if (quantity + ic.getNums()[i] <= ic.getItems()[i].getMaxStacks()) {
+					ic.getNums()[i] += quantity;
                     update(i);
                     return 0;
                 } else {
-                    quantity -= items[i].getMaxStacks() - nums[i];
-                    nums[i] = (short) items[i].getMaxStacks();
+                    quantity -= ic.getItems()[i].getMaxStacks() - ic.getNums()[i];
+					ic.getNums()[i] = (short) ic.getItems()[i].getMaxStacks();
                     update(i);
                 }
             }
         }
         for (int i = 0; i < MAXIMUM_ITEMS; i++) {
-            if (items[i] == Items.EMPTY) {
-                items[i] = item;
-                if (quantity <= items[i].getMaxStacks()) {
-                    nums[i] = quantity;
-                    durs[i] = durability;
+            if (ic.getItems()[i] == Items.EMPTY) {
+				ic.getItems()[i] = item;
+                if (quantity <= ic.getItems()[i].getMaxStacks()) {
+					ic.getNums()[i] = quantity;
+					ic.getDurs()[i] = durability;
                     update(i);
                     return 0;
                 } else {
-                    nums[i] = (short) items[i].getMaxStacks();
-                    durs[i] = durability;
-                    quantity -= items[i].getMaxStacks();
+					ic.getNums()[i] = (short) ic.getItems()[i].getMaxStacks();
+					ic.getDurs()[i] = durability;
+                    quantity -= ic.getItems()[i].getMaxStacks();
                     update(i);
                 }
             }
@@ -655,78 +628,117 @@ public class Inventory implements Serializable {
     }
 
     public int addLocation(int i, Items item, short quantity, short durability) {
-        if (items[i] == item) {
-            if (quantity + nums[i] <= items[i].getMaxStacks()) {
-                nums[i] += quantity;
+        if (ic.getItems()[i] == item) {
+            if (quantity + ic.getNums()[i] <= ic.getItems()[i].getMaxStacks()) {
+				ic.getNums()[i] += quantity;
                 update(i);
                 return 0;
             } else {
-                quantity -= items[i].getMaxStacks() - nums[i];
-                nums[i] = (short) items[i].getMaxStacks();
+                quantity -= ic.getItems()[i].getMaxStacks() - ic.getNums()[i];
+				ic.getNums()[i] = (short) ic.getItems()[i].getMaxStacks();
                 update(i);
             }
         } else {
-            if (quantity <= items[i].getMaxStacks()) {
-                items[i] = item;
-                nums[i] = quantity;
-                durs[i] = durability;
+            if (quantity <= ic.getItems()[i].getMaxStacks()) {
+				ic.getItems()[i] = item;
+				ic.getNums()[i] = quantity;
+                ic.getDurs()[i] = durability;
                 update(i);
                 return 0;
             } else {
-                quantity -= items[i].getMaxStacks();
+                quantity -= ic.getItems()[i].getMaxStacks();
                 return quantity;
             }
         }
         return quantity;
     }
 
+	public int addLocationIC(ItemCollection ic, int i, Items item, short quantity) {
+		return addLocationIC(ic, i, item, quantity, (short)0);
+	}
+
+	public int addLocationIC(ItemCollection ic, int i, Items item, short quantity, short durability) {
+		if (ic.getItems()[i] == item) {
+			if (ic.getItems()[i].getMaxStacks() - ic.getNums()[i] >= quantity) {
+				ic.getNums()[i] += quantity;
+				if (ic.getImage() != null) {
+					updateIC(ic, i);
+				}
+				return 0;
+			}
+			else {
+				quantity -= ic.getItems()[i].getMaxStacks() - ic.getNums()[i];
+				ic.getNums()[i] = (short) ic.getItems()[i].getMaxStacks();
+				if (ic.getImage() != null) {
+					updateIC(ic, i);
+				}
+			}
+		} else {
+			if (quantity <= ic.getItems()[i].getMaxStacks()) {
+				ic.getItems()[i] = item;
+				ic.getNums()[i] = quantity;
+				ic.getDurs()[i] = durability;
+				if (ic.getImage() != null) {
+					updateIC(ic, i);
+				}
+				return 0;
+			}
+			else {
+				quantity -= ic.getItems()[i].getMaxStacks();
+				return quantity;
+			}
+		}
+		return quantity;
+	}
+
     public int removeLocation(int i, short quantity) {
-        if (nums[i] >= quantity) {
-            nums[i] -= quantity;
-            if (nums[i] == 0) {
-                items[i] = Items.EMPTY;
+        if (ic.getNums()[i] >= quantity) {
+			ic.getNums()[i] -= quantity;
+            if (ic.getNums()[i] == 0) {
+				ic.getItems()[i] = Items.EMPTY;
             }
             update(i);
             return 0;
         }
         else {
-            quantity -= nums[i];
-            nums[i] = 0;
-            items[i] = Items.EMPTY;
+            quantity -= ic.getNums()[i];
+			ic.getNums()[i] = 0;
+			ic.getItems()[i] = Items.EMPTY;
             update(i);
         }
         return quantity;
     }
 
+	public int removeLocationIC(ItemCollection ic, int i, short quantity) {
+		if (ic.getNums()[i] >= quantity) {
+			ic.getNums()[i] -= quantity;
+			if (ic.getNums()[i] == 0) {
+				ic.getItems()[i] = Items.EMPTY;
+			}
+			if (ic.getImage() != null) {
+				updateIC(ic, i);
+			}
+			return 0;
+		}
+		else {
+			quantity -= ic.getNums()[i];
+			ic.getNums()[i] = 0;
+			ic.getItems()[i] = Items.EMPTY;
+			if (ic.getImage() != null) {
+				updateIC(ic, i);
+			}
+		}
+		return quantity;
+	}
+
     public void reloadImage() {
-        image = new BufferedImage(466, 190, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = new BufferedImage(466, 190, BufferedImage.TYPE_INT_ARGB);
         box = ResourcesLoader.loadImage("interface/inventory.png");
         box_selected = ResourcesLoader.loadImage("interface/inventory_selected.png");
-        g2 = image.createGraphics();
+		Graphics2D g2 = image.createGraphics();
         for (int x=0; x<10; x++) {
             for (int y=0; y<4; y++) {
-                if (x == 0 && y == 0) {
-                    g2.drawImage(box_selected,
-                        x*46+6, y*46+6, x*46+46, y*46+46,
-                        0, 0, 40, 40,
-                        null);
-                    if (y == 0) {
-                        g2.setFont(font);
-                        g2.setColor(Color.BLACK);
-                        g2.drawString(increment(x) + " ", x*46+ TROLX, y*46+ TROLY);
-                    }
-                }
-                else {
-                    g2.drawImage(box,
-                        x*46+6, y*46+6, x*46+46, y*46+46,
-                        0, 0, 40, 40,
-                        null);
-                    if (y == 0) {
-                        g2.setFont(font);
-                        g2.setColor(Color.BLACK);
-                        g2.drawString(increment(x) + " ", x*46+ TROLX, y*46+ TROLY);
-                    }
-                }
+            	drawBox(x == 0 && y == 0, x, y, g2);
             }
         }
         for (int i=0; i<MAXIMUM_ITEMS; i++) {
@@ -734,51 +746,242 @@ public class Inventory implements Serializable {
         }
     }
 
-    public void update(int i) {
+	/**
+	 * Draw the template box of the item.
+	 * @param selected if the item is the selected one or not.
+	 * @param x horizontal position of the item
+	 * @param y vertical position of the item
+	 */
+    private static void drawBox(boolean selected, int x, int y, Graphics2D g2) {
+		if (selected) {
+			g2.drawImage(box_selected,
+					x * BOX_WITH_MARGIN + MARGIN, y * BOX_WITH_MARGIN + MARGIN, x * BOX_WITH_MARGIN + BOX_WITH_MARGIN, y * BOX_WITH_MARGIN + BOX_WITH_MARGIN,
+					0, 0, BOX_SIZE, BOX_SIZE,
+					null);
+		} else {
+			g2.drawImage(box,
+					x * BOX_WITH_MARGIN + MARGIN, y * BOX_WITH_MARGIN + MARGIN, x * BOX_WITH_MARGIN + BOX_WITH_MARGIN, y * BOX_WITH_MARGIN + BOX_WITH_MARGIN,
+					0, 0, BOX_SIZE, BOX_SIZE,
+					null);
+		}
+
+		if (y == 0) {
+			g2.setFont(FONT);
+			g2.setColor(Color.BLACK);
+			g2.drawString(increment(x) + " ", x * BOX_WITH_MARGIN+ TROLX, y * BOX_WITH_MARGIN+ TROLY);
+		}
+	}
+
+	/**
+	 * Draw the image item of the given collection.
+	 * @param ic items collection
+	 * @param i index of the item
+	 * @param x horizontal position of the item
+	 * @param y veritcal position of the item
+	 * @param boxWidth width of the box (with the margin) where the image will be drawn
+	 * @param boxHeight height of the box (with the margin) where the image will be drawn
+	 */
+	private static void drawImage(ItemCollection ic, int i, int x, int y, int boxWidth, int boxHeight) {
+		Graphics2D g2 = ic.getImage().createGraphics();
+		g2.drawImage(box,
+				x * boxWidth, y * boxHeight, x * boxWidth + 40, y * boxHeight + 40,
+				0, 0, BOX_SIZE, BOX_SIZE,
+				null);
+
+		if (ic.getItems()[i] != Items.EMPTY) {
+			int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
+			int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
+			g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
+					x * boxWidth + 8 + ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * width * 2) / 2),
+					y * boxHeight + 8 + ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * height * 2) / 2),
+					x * boxWidth + 32 - ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * width * 2) / 2),
+					y * boxHeight + 32 - ((int) (24 - (double) 12 / MathTool.max(width, height, 12) * height * 2) / 2),
+					0, 0, width, height,
+					null);
+
+			if (ic.getNums()[i] > 1) {
+				g2.setFont(FONT);
+				g2.setColor(Color.WHITE);
+				g2.drawString(ic.getNums()[i] + " ", x * boxWidth + 9, y * boxHeight + 34);
+			}
+		}
+	}
+
+    private void update(int i) {
         int py = i/10;
         int px = i-(py*10);
-        for (int x=px*46+6; x<px*46+46; x++) {
-            for (int y=py*46+6; y<py*46+46; y++) {
-                image.setRGB(x, y, 9539985);
+        for (int x = px * BOX_WITH_MARGIN + MARGIN; x < px * BOX_WITH_MARGIN + BOX_WITH_MARGIN; x++) {
+            for (int y = py * BOX_WITH_MARGIN + MARGIN; y< py * BOX_WITH_MARGIN + BOX_WITH_MARGIN; y++) {
+                ic.getImage().setRGB(x, y, 9539985);
             }
         }
-        g2 = image.createGraphics();
-        if (i == selection) {
-            g2.drawImage(box_selected,
-                px*46+6, py*46+6, px*46+46, py*46+46,
-                0, 0, 40, 40,
-                null);
-            if (py == 0) {
-                g2.setFont(font);
-                g2.setColor(Color.BLACK);
-                g2.drawString(increment(px) + " ", px*46+ TROLX, py*46+ TROLY);
-            }
-        } else {
-            g2.drawImage(box,
-                px*46+6, py*46+6, px*46+46, py*46+46,
-                0, 0, 40, 40,
-                null);
-            if (py == 0) {
-                g2.setFont(font);
-                g2.setColor(Color.BLACK);
-                g2.drawString(increment(px) + " ", px*46+ TROLX, py*46+ TROLY);
-            }
-        }
-        if (items[i] != Items.EMPTY) {
-            int width = ImagesContainer.getInstance().itemImgs.get(items[i]).getWidth();
-			int height = ImagesContainer.getInstance().itemImgs.get(items[i]).getHeight();
-            g2.drawImage(ImagesContainer.getInstance().itemImgs.get(items[i]),
-                px*46+14+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*46+14+((int)(24-(double)12/ MathTool.max(width, height, 12)*height*2)/2), px*46+38-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*46+38-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
+		Graphics2D g2 = ic.getImage().createGraphics();
+
+        drawBox(i == selection, px, py, g2);
+
+        if (ic.getItems()[i] != Items.EMPTY) {
+            int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
+			int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
+            g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
+                px*BOX_WITH_MARGIN+14+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*BOX_WITH_MARGIN+14+((int)(24-(double)12/ MathTool.max(width, height, 12)*height*2)/2), px*BOX_WITH_MARGIN+38-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*BOX_WITH_MARGIN+38-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
                 0, 0, width, height,
                 null);
 
-            if (nums[i] > 1) {
-                g2.setFont(font);
+            if (ic.getNums()[i] > 1) {
+                g2.setFont(FONT);
                 g2.setColor(Color.WHITE);
-                g2.drawString(nums[i] + " ", px*46+15, py*46+40);
+                g2.drawString(ic.getNums()[i] + " ", px*BOX_WITH_MARGIN+15, py*BOX_WITH_MARGIN+40);
             }
         }
     }
+
+	public static void updateIC(ItemCollection ic, int i) {
+		if (ic.getType() == ItemType.CIC) {
+			int py = (int)(i/2);
+			int px = i-(py*2);
+			for (int x=px*40; x<px*40+40; x++) {
+				for (int y=py*40; y<py*40+40; y++) {
+					ic.getImage().setRGB(x, y, 9539985);
+				}
+			}
+
+			drawImage(ic, i, px, py, 40, 40);
+
+			ic.getItems()[4] = Items.EMPTY;
+			ic.getItems()[4] = Items.EMPTY;
+			for (RecipeItem r2 : RECIPES.get(RecipeType.CIC)) {
+				if (ic.areIdsEquals(r2.getIngredients())) {
+					ic.getItems()[4] = r2.getResultingItem();
+					ic.getNums()[4] = r2.getNum();
+					if (r2.getResultingItem().getDurability() != null)
+						ic.getDurs()[4] = r2.getResultingItem().getDurability().shortValue();
+					break;
+				}
+			}
+			for (RecipeItem r2 : RECIPES.get(RecipeType.SHAPELESS_CIC)) {
+				if (ic.areInvalidIds(r2.getIngredients())) {
+					ic.getItems()[4] = r2.getResultingItem();
+					ic.getNums()[4] = r2.getNum();
+					if (r2.getResultingItem().getDurability() != null)
+						ic.getDurs()[4] = r2.getResultingItem().getDurability().shortValue();
+					break;
+				}
+			}
+			for (int x=3*40; x<3*40+40; x++) {
+				for (int y=20; y<20+40; y++) {
+					ic.getImage().setRGB(x, y, 9539985);
+				}
+			}
+
+			drawImage(ic, 4, 3, 1, 40, 20);
+
+		} else if (ic.getType() == ItemType.ARMOR) {
+			int py = (int)(i/CX);
+			int px = i-(py*CX);
+			for (int x=px*BOX_WITH_MARGIN; x<px*BOX_WITH_MARGIN+40; x++) {
+				for (int y=py*BOX_WITH_MARGIN; y<py*BOX_WITH_MARGIN+40; y++) {
+					ic.getImage().setRGB(x, y, 9539985);
+				}
+			}
+			drawImage(ic, i, px, py, BOX_WITH_MARGIN, BOX_WITH_MARGIN);
+
+		} else if (ic.getType() == ItemType.WORKBENCH) {
+			int py = (int)(i/3);
+			int px = i-(py*3);
+			for (int x=px*40; x<px*40+40; x++) {
+				for (int y=py*40; y<py*40+40; y++) {
+					ic.getImage().setRGB(x, y, 9539985);
+				}
+			}
+
+			drawImage(ic, i, px, py, 40, 40);
+
+			ic.getItems()[9] = Items.EMPTY;
+			for (RecipeItem r2 : RECIPES.get(RecipeType.WORKBENCH)) {
+				if (ic.areIdsEquals(r2.getIngredients())) {
+					ic.getItems()[9] = r2.getResultingItem();
+					ic.getNums()[9] = r2.getNum();
+					if (r2.getResultingItem().getDurability() != null)
+						ic.getDurs()[9] = r2.getResultingItem().getDurability().shortValue();
+					break;
+				}
+			}
+			for (RecipeItem r2 : RECIPES.get(RecipeType.SHAPELESS)) {
+				if (ic.areInvalidIds(r2.getIngredients())) {
+					ic.getItems()[9] = r2.getResultingItem();
+					ic.getNums()[9] = r2.getNum();
+					if (r2.getResultingItem().getDurability() != null)
+						ic.getDurs()[9] = r2.getResultingItem().getDurability().shortValue();
+					break;
+				}
+			}
+			for (int x=4*40; x<4*40+40; x++) {
+				for (int y=1*40; y<1*40+40; y++) {
+					ic.getImage().setRGB(x, y, 9539985);
+				}
+			}
+
+			drawImage(ic, 9, 4, 1, 40, 40);
+
+		} else if (ic.getType() == ItemType.WOODEN_CHEST || ic.getType() == ItemType.STONE_CHEST ||
+				ic.getType() == ItemType.COPPER_CHEST || ic.getType() == ItemType.IRON_CHEST ||
+				ic.getType() == ItemType.SILVER_CHEST || ic.getType() == ItemType.GOLD_CHEST ||
+				ic.getType() == ItemType.ZINC_CHEST || ic.getType() == ItemType.RHYMESTONE_CHEST ||
+				ic.getType() == ItemType.OBDURITE_CHEST) {
+			int py = (int)(i/CX);
+			int px = i-(py*CX);
+			for (int x=px*BOX_WITH_MARGIN; x<px*BOX_WITH_MARGIN+40; x++) {
+				for (int y=py*BOX_WITH_MARGIN; y<py*BOX_WITH_MARGIN+40; y++) {
+					ic.getImage().setRGB(x, y, 9539985);
+				}
+			}
+
+			drawImage(ic, i, px, py, BOX_WITH_MARGIN, BOX_WITH_MARGIN);
+
+		} else if (ic.getType() == ItemType.FURNACE) {
+			if (i == -1) {
+				for (int y=0; y<5; y++) {
+					for (int x=0; x<ic.getFUELP()*38; x++) {
+						ic.getImage().setRGB(x+1, y+51, new Color(255, 0, 0).getRGB());
+					}
+					for (int x=(int)(ic.getFUELP()*38); x<38; x++) {
+						ic.getImage().setRGB(x+1, y+51, new Color(145, 145, 145).getRGB());
+					}
+				}
+				for (int x=0; x<5; x++) {
+					for (int y=0; y<ic.getSMELTP()*38; y++) {
+						ic.getImage().setRGB(x+40, y+1, new Color(255, 0, 0).getRGB());
+					}
+					for (int y=(int)(ic.getSMELTP()*38); y<38; y++) {
+						ic.getImage().setRGB(x+40, y+1, new Color(145, 145, 145).getRGB());
+					}
+				}
+			}
+			else {
+				double fpx = 0, fpy = 0;
+				if (i == 0) {
+					fpx = 0;
+					fpy = 0;
+				} else if (i == 1) {
+					fpx = 0;
+					fpy = 1.4;
+				} else if (i == 2) {
+					fpx = 0;
+					fpy = 2.4;
+				} else if (i == 3) {
+					fpx = 1.4;
+					fpy = 0;
+				}
+				for (int x=(int)(fpx*40); x<fpx*40+40; x++) {
+					for (int y=(int)(fpy*40); y<fpy*40+40; y++) {
+						ic.getImage().setRGB(x, y, 9539985);
+					}
+				}
+
+				drawImage(ic, i, (int) fpx, (int) fpy, 40, 40);
+			}
+		}
+	}
 
     public void select(int i) {
         if (i == 0) {
@@ -803,7 +1006,7 @@ public class Inventory implements Serializable {
     }
 
     public Items tool() {
-        return items[selection];
+        return ic.getItems()[selection];
     }
 
     public void renderCollection(ItemCollection ic) {
@@ -921,328 +1124,8 @@ public class Inventory implements Serializable {
         }
     }
 
-    public int addLocationIC(ItemCollection ic, int i, Items item, short quantity) {
-        return addLocationIC(ic, i, item, quantity, (short)0);
-    }
-
-    public int addLocationIC(ItemCollection ic, int i, Items item, short quantity, short durability) {
-        if (ic.getItems()[i] == item) {
-            if (ic.getItems()[i].getMaxStacks() - ic.getNums()[i] >= quantity) {
-                ic.getNums()[i] += quantity;
-                if (ic.getImage() != null) {
-                    updateIC(ic, i);
-                }
-                return 0;
-            }
-            else {
-                quantity -= ic.getItems()[i].getMaxStacks() - ic.getNums()[i];
-                ic.getNums()[i] = (short) ic.getItems()[i].getMaxStacks();
-                if (ic.getImage() != null) {
-                    updateIC(ic, i);
-                }
-            }
-        } else {
-            if (quantity <= ic.getItems()[i].getMaxStacks()) {
-                ic.getItems()[i] = item;
-                ic.getNums()[i] = quantity;
-                ic.getNums()[i] = durability;
-                if (ic.getImage() != null) {
-                    updateIC(ic, i);
-                }
-                return 0;
-            }
-            else {
-                quantity -= ic.getItems()[i].getMaxStacks();
-                return quantity;
-            }
-        }
-        return quantity;
-    }
-
-    public int removeLocationIC(ItemCollection ic, int i, short quantity) {
-        if (ic.getNums()[i] >= quantity) {
-            ic.getNums()[i] -= quantity;
-            if (ic.getNums()[i] == 0) {
-                ic.getItems()[i] = Items.EMPTY;
-            }
-            if (ic.getImage() != null) {
-                updateIC(ic, i);
-            }
-            return 0;
-        }
-        else {
-            quantity -= ic.getNums()[i];
-            ic.getNums()[i] = 0;
-            ic.getItems()[i] = Items.EMPTY;
-            if (ic.getImage() != null) {
-                updateIC(ic, i);
-            }
-        }
-        return quantity;
-    }
-
-    public void updateIC(ItemCollection ic, int i) {
-        if (ic.getType() == ItemType.CIC) {
-            int py = (int)(i/2);
-            int px = i-(py*2);
-            for (int x=px*40; x<px*40+40; x++) {
-                for (int y=py*40; y<py*40+40; y++) {
-                    ic.getImage().setRGB(x, y, 9539985);
-                }
-            }
-            g2 = ic.getImage().createGraphics();
-            g2.drawImage(box,
-                px*40, py*40, px*40+40, py*40+40,
-                0, 0, 40, 40,
-                null);
-            if (ic.getItems()[i] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
-                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
-                    px*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), px*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
-                    0, 0, width, height,
-                    null);
-                if (ic.getNums()[i] > 1) {
-                    g2.setFont(font);
-                    g2.setColor(Color.WHITE);
-                    g2.drawString(ic.getNums()[i] + " ", px*40+9, py*40+34);
-                }
-            }
-            ic.getItems()[4] = Items.EMPTY;
-            ic.getItems()[4] = Items.EMPTY;
-            for (RecipeItem r2 : RECIPES.get("cic")) {
-                if (ic.areIdsEquals(r2.getIngredients())) {
-                    ic.getItems()[4] = r2.getResultingItem();
-                    ic.getNums()[4] = r2.getNum();
-                    if (r2.getResultingItem().getDurability() != null)
-                        ic.getDurs()[4] = r2.getResultingItem().getDurability().shortValue();
-                    break;
-                }
-            }
-            for (RecipeItem r2 : RECIPES.get("shapeless_cic")) {
-                if (ic.areInvalidIds(r2.getIngredients())) {
-                    ic.getItems()[4] = r2.getResultingItem();
-                    ic.getNums()[4] = r2.getNum();
-                    if (r2.getResultingItem().getDurability() != null)
-                        ic.getDurs()[4] = r2.getResultingItem().getDurability().shortValue();
-                    break;
-                }
-            }
-            for (int x=3*40; x<3*40+40; x++) {
-                for (int y=20; y<20+40; y++) {
-                    ic.getImage().setRGB(x, y, 9539985);
-                }
-            }
-            g2 = ic.getImage().createGraphics();
-            g2.drawImage(box,
-                3*40, 20, 3*40+40, 20+40,
-                0, 0, 40, 40,
-                null);
-            if (ic.getItems()[4] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[4]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[4]).getHeight();
-                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[4]),
-                    3*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), 20+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), 3*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), 20+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
-                    0, 0, width, height,
-                    null);
-
-                if (ic.getNums()[4] > 1) {
-                    g2.setFont(font);
-                    g2.setColor(Color.WHITE);
-                    g2.drawString(ic.getNums()[4] + " ", 3*40+9, 20+34);
-                }
-            }
-        } else if (ic.getType() == ItemType.ARMOR) {
-            int py = (int)(i/CX);
-            int px = i-(py*CX);
-            for (int x=px*46; x<px*46+40; x++) {
-                for (int y=py*46; y<py*46+40; y++) {
-                    ic.getImage().setRGB(x, y, 9539985);
-                }
-            }
-            g2 = ic.getImage().createGraphics();
-            g2.drawImage(box,
-                px*46, py*46, px*46+40, py*46+40,
-                0, 0, 40, 40,
-                null);
-            if (ic.getItems()[i] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
-                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
-                    px*46+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*46+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), px*46+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*46+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
-                    0, 0, width, height,
-                    null);
-
-                if (ic.getNums()[i] > 1) {
-                    g2.setFont(font);
-                    g2.setColor(Color.WHITE);
-                    g2.drawString(ic.getNums()[i] + " ", px*46+9, py*46+34);
-                }
-            }
-        } else if (ic.getType() == ItemType.WORKBENCH) {
-            int py = (int)(i/3);
-            int px = i-(py*3);
-            for (int x=px*40; x<px*40+40; x++) {
-                for (int y=py*40; y<py*40+40; y++) {
-                    ic.getImage().setRGB(x, y, 9539985);
-                }
-            }
-            g2 = ic.getImage().createGraphics();
-            g2.drawImage(box,
-                px*40, py*40, px*40+40, py*40+40,
-                0, 0, 40, 40,
-                null);
-            if (ic.getItems()[i] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
-                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
-                    px*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), px*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
-                    0, 0, width, height,
-                    null);
-                if (ic.getNums()[i] > 1) {
-                    g2.setFont(font);
-                    g2.setColor(Color.WHITE);
-                    g2.drawString(ic.getNums()[i] + " ", px*40+9, py*40+34);
-                }
-            }
-            ic.getItems()[9] = Items.EMPTY;
-            for (RecipeItem r2 : RECIPES.get("workbench")) {
-                if (ic.areIdsEquals(r2.getIngredients())) {
-                    ic.getItems()[9] = r2.getResultingItem();
-                    ic.getNums()[9] = r2.getNum();
-                    if (r2.getResultingItem().getDurability() != null)
-                        ic.getDurs()[9] = r2.getResultingItem().getDurability().shortValue();
-                    break;
-                }
-            }
-            for (RecipeItem r2 : RECIPES.get("shapeless")) {
-                if (ic.areInvalidIds(r2.getIngredients())) {
-                    ic.getItems()[9] = r2.getResultingItem();
-                    ic.getNums()[9] = r2.getNum();
-                    if (r2.getResultingItem().getDurability() != null)
-                        ic.getDurs()[9] = r2.getResultingItem().getDurability().shortValue();
-                    break;
-                }
-            }
-            for (int x=4*40; x<4*40+40; x++) {
-                for (int y=1*40; y<1*40+40; y++) {
-                    ic.getImage().setRGB(x, y, 9539985);
-                }
-            }
-            g2 = ic.getImage().createGraphics();
-            g2.drawImage(box,
-                4*40, 1*40, 4*40+40, 1*40+40,
-                0, 0, 40, 40,
-                null);
-            if (ic.getItems()[9] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[9]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[9]).getHeight();
-                    g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[9]),
-                        4*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), 1*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), 4*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), 1*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
-                        0, 0, width, height,
-                        null);
-
-                if (ic.getNums()[9] > 1) {
-                    g2.setFont(font);
-                    g2.setColor(Color.WHITE);
-                    g2.drawString(ic.getNums()[9] + " ", 4*40+9, 1*40+34);
-                }
-            }
-        } else if (ic.getType() == ItemType.WOODEN_CHEST || ic.getType() == ItemType.STONE_CHEST ||
-            ic.getType() == ItemType.COPPER_CHEST || ic.getType() == ItemType.IRON_CHEST ||
-            ic.getType() == ItemType.SILVER_CHEST || ic.getType() == ItemType.GOLD_CHEST ||
-            ic.getType() == ItemType.ZINC_CHEST || ic.getType() == ItemType.RHYMESTONE_CHEST ||
-            ic.getType() == ItemType.OBDURITE_CHEST) {
-            int py = (int)(i/CX);
-            int px = i-(py*CX);
-            for (int x=px*46; x<px*46+40; x++) {
-                for (int y=py*46; y<py*46+40; y++) {
-                    ic.getImage().setRGB(x, y, 9539985);
-                }
-            }
-            g2 = ic.getImage().createGraphics();
-            g2.drawImage(box,
-                px*46, py*46, px*46+40, py*46+40,
-                0, 0, 40, 40,
-                null);
-            if (ic.getItems()[i] != Items.EMPTY) {
-				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
-				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
-                g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
-                    px*46+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*46+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2), px*46+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*46+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
-                    0, 0, width, height,
-                    null);
-
-                if (ic.getNums()[i] > 1) {
-                    g2.setFont(font);
-                    g2.setColor(Color.WHITE);
-                    g2.drawString(ic.getNums()[i] + " ", px*46+9, py*46+34);
-                }
-            }
-        } else if (ic.getType() == ItemType.FURNACE) {
-            if (i == -1) {
-                for (int y=0; y<5; y++) {
-                    for (int x=0; x<ic.getFUELP()*38; x++) {
-                        ic.getImage().setRGB(x+1, y+51, new Color(255, 0, 0).getRGB());
-                    }
-                    for (int x=(int)(ic.getFUELP()*38); x<38; x++) {
-                        ic.getImage().setRGB(x+1, y+51, new Color(145, 145, 145).getRGB());
-                    }
-                }
-                for (int x=0; x<5; x++) {
-                    for (int y=0; y<ic.getSMELTP()*38; y++) {
-                        ic.getImage().setRGB(x+40, y+1, new Color(255, 0, 0).getRGB());
-                    }
-                    for (int y=(int)(ic.getSMELTP()*38); y<38; y++) {
-                        ic.getImage().setRGB(x+40, y+1, new Color(145, 145, 145).getRGB());
-                    }
-                }
-            }
-            else {
-            	double fpx = 0, fpy = 0;
-                if (i == 0) {
-                    fpx = 0;
-                    fpy = 0;
-                } else if (i == 1) {
-                    fpx = 0;
-                    fpy = 1.4;
-                } else if (i == 2) {
-                    fpx = 0;
-                    fpy = 2.4;
-                } else if (i == 3) {
-                    fpx = 1.4;
-                    fpy = 0;
-                }
-                for (int x=(int)(fpx*40); x<fpx*40+40; x++) {
-                    for (int y=(int)(fpy*40); y<fpy*40+40; y++) {
-                        ic.getImage().setRGB(x, y, 9539985);
-                    }
-                }
-                g2 = ic.getImage().createGraphics();
-                g2.drawImage(box,
-                    (int)(fpx*40), (int)(fpy*40), (int)(fpx*40+40), (int)(fpy*40+40),
-                    0, 0, 40, 40,
-                    null);
-                if (ic.getItems()[i] != Items.EMPTY) {
-					int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
-					int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
-                    g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
-                        (int)(fpx*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2)), (int)(fpy*40+8+((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2)), (int)(fpx*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2)), (int)(fpy*40+32-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2)),
-                        0, 0, width, height,
-                        null);
-
-                    if (ic.getNums()[i] > 1) {
-                        g2.setFont(font);
-                        g2.setColor(Color.WHITE);
-                        g2.drawString(ic.getNums()[i] + " ", (int)(fpx*40+9), (int)(fpy*40+34));
-                    }
-                }
-            }
-        }
-    }
-
     public void useRecipeWorkbench(ItemCollection ic) {
-        for (RecipeItem r2 : RECIPES.get("workbench")) {
+        for (RecipeItem r2 : RECIPES.get(RecipeType.WORKBENCH)) {
             if (ic.areIdsEquals(r2.getIngredients())) {
                 for (int i=0; i<ItemType.WORKBENCH.getItemCollectionIterable(); i++) {
                     removeLocationIC(ic, i, (short) 1);
@@ -1250,7 +1133,7 @@ public class Inventory implements Serializable {
                 }
             }
         }
-        for (RecipeItem r2 : RECIPES.get("shapeless")) {
+        for (RecipeItem r2 : RECIPES.get(RecipeType.SHAPELESS)) {
             if (ic.areInvalidIds(r2.getIngredients())) {
                 List<Items> r3 = new ArrayList<>(11);
                 for (int k=0; k<r2.getIngredients().length; k++) {
@@ -1267,7 +1150,7 @@ public class Inventory implements Serializable {
     }
 
     public void useRecipeCIC(ItemCollection ic) {
-        for (RecipeItem r2 : RECIPES.get("cic")) {
+        for (RecipeItem r2 : RECIPES.get(RecipeType.CIC)) {
             if (ic.areIdsEquals(r2.getIngredients())) {
                 for (int i=0; i<ItemType.CIC.getItemCollectionIterable(); i++) {
                     removeLocationIC(ic, i, (short) 1);
@@ -1275,7 +1158,7 @@ public class Inventory implements Serializable {
                 }
             }
         }
-        for (RecipeItem r2 : RECIPES.get("shapeless_cic")) {
+        for (RecipeItem r2 : RECIPES.get(RecipeType.SHAPELESS_CIC)) {
             if (ic.areInvalidIds(r2.getIngredients())) {
                 List<Items> r3 = new ArrayList<>(6);
                 for (int k=0; k<r2.getIngredients().length-2; k++) {

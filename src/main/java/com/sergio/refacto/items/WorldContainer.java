@@ -890,13 +890,13 @@ public class WorldContainer implements Serializable {
                         }
                         entities.remove(i);
                     }
-                    if (!Arrays.asList(TOOL_LIST).contains(inventory.items[inventory.selection])) {
-                        inventory.durs[inventory.selection] -= 1;
+                    if (!Arrays.asList(TOOL_LIST).contains(inventory.ic.getItems()[inventory.selection])) {
+                        inventory.ic.getDurs()[inventory.selection] -= 1;
                     } else {
-                        inventory.durs[inventory.selection] -= 2;
+                        inventory.ic.getDurs()[inventory.selection] -= 2;
                     }
-                    if (inventory.durs[inventory.selection] <= 0) {
-                        inventory.removeLocation(inventory.selection, inventory.nums[inventory.selection]);
+                    if (inventory.ic.getDurs()[inventory.selection] <= 0) {
+                        inventory.removeLocation(inventory.selection, inventory.ic.getNums()[inventory.selection]);
                     }
                 }
             }
