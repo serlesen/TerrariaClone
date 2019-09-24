@@ -85,19 +85,12 @@ public class WorldContainer implements Serializable {
     int regenerationCounter1;
     private int regenerationCounter2;
     int layer;
-    private int layerTemp;
-    Blocks blockTemp;
 
     int mx, my, icx, icy, mining, immune;
 
-    short moveNum, moveNumTemp;
-    Items moveItem, moveItemTemp;
+    short moveNum;
+    Items moveItem;
     int msi;
-
-    double toolAngle, toolSpeed;
-
-    /** Tool handled by the player. */
-    public BufferedImage tool;
 
     int currentSkyLight;
 
@@ -108,7 +101,6 @@ public class WorldContainer implements Serializable {
     int mobCount;
 
     boolean ready;
-    boolean showTool;
     boolean showInv;
     boolean doMobSpawn;
 
@@ -136,11 +128,11 @@ public class WorldContainer implements Serializable {
                            Player player, ItemCollection inventory, ItemCollection cic,
                            List<Entity> entities, CloudsAggregate cloudsAggregate,
                            List<Integer> machinesx, List<Integer> machinesy, Boolean[][] lsources, List<Integer> lqx, List<Integer> lqy, Boolean[][] lqd,
-                           int regenerationCounter1, int regenerationCounter2, int layer, int layerTemp, Blocks blockTemp,
+                           int regenerationCounter1, int regenerationCounter2, int layer,
                            int mx, int my, int icx, int icy, int mining, int immune,
-                           Items moveItem, short moveNum, Items moveItemTemp, short moveNumTemp, int msi,
-                           double toolAngle, double toolSpeed, int currentSkyLight, int mobCount,
-                           boolean ready, boolean showTool, boolean showInv, boolean doMobSpawn,
+                           Items moveItem, short moveNum, int msi,
+                           int currentSkyLight, int mobCount,
+                           boolean ready, boolean showInv, boolean doMobSpawn,
                            int resunlight,
                            ItemCollection ic, boolean[][] kworlds, ItemCollection[][][] icmatrix, String version) {
 
@@ -168,8 +160,6 @@ public class WorldContainer implements Serializable {
         this.regenerationCounter1 = regenerationCounter1;
         this.regenerationCounter2 = regenerationCounter2;
         this.layer = layer;
-        this.layerTemp = layerTemp;
-        this.blockTemp = blockTemp;
         this.mx = mx;
         this.my = my;
         this.icx = icx;
@@ -178,15 +168,10 @@ public class WorldContainer implements Serializable {
         this.immune = immune;
         this.moveItem = moveItem;
         this.moveNum = moveNum;
-        this.moveItemTemp = moveItemTemp;
-        this.moveNumTemp = moveNumTemp;
         this.msi = msi;
-        this.toolAngle = toolAngle;
-        this.toolSpeed = toolSpeed;
         this.currentSkyLight = currentSkyLight;
         this.mobCount = mobCount;
         this.ready = ready;
-        this.showTool = showTool;
         this.showInv = showInv;
         this.doMobSpawn = doMobSpawn;
         this.resunlight = resunlight;
@@ -221,8 +206,6 @@ public class WorldContainer implements Serializable {
         regenerationCounter1 = wc.regenerationCounter1;
         regenerationCounter2 = wc.regenerationCounter2;
         layer = wc.layer;
-        layerTemp = wc.layerTemp;
-        blockTemp = wc.blockTemp;
         mx = wc.mx;
         my = wc.my;
         icx = wc.icx;
@@ -231,15 +214,10 @@ public class WorldContainer implements Serializable {
         immune = wc.immune;
         moveItem = wc.moveItem;
         moveNum = wc.moveNum;
-        moveItemTemp = wc.moveItemTemp;
-        moveNumTemp = wc.moveNumTemp;
         msi = wc.msi;
-        toolAngle = wc.toolAngle;
-        toolSpeed = wc.toolSpeed;
         currentSkyLight = wc.currentSkyLight;
         mobCount = wc.mobCount;
         ready = wc.ready;
-        showTool = wc.showTool;
         showInv = wc.showInv;
         doMobSpawn = wc.doMobSpawn;
         resunlight = wc.resunlight;
@@ -446,7 +424,6 @@ public class WorldContainer implements Serializable {
 
         InventoryService.getInstance().renderCollection(TerrariaClone.armor);
 
-        toolAngle = 4.7;
         mining = 0;
 
         mx = 0; my = 0;
@@ -490,11 +467,11 @@ public class WorldContainer implements Serializable {
                 player, inventory, cic,
                 entities, cloudsAggregate,
                 machinesx, machinesy, lsources, lqx, lqy, lqd,
-                regenerationCounter1, regenerationCounter2, layer, layerTemp, blockTemp,
+                regenerationCounter1, regenerationCounter2, layer,
                 mx, my, icx, icy, mining, immune,
-                moveItem, moveNum, moveItemTemp, moveNumTemp, msi,
-                toolAngle, toolSpeed, currentSkyLight, mobCount,
-                ready, showTool, showInv, doMobSpawn,
+                moveItem, moveNum, msi,
+                currentSkyLight, mobCount,
+                ready, showInv, doMobSpawn,
                 resunlight,
                 ic, kworlds, icmatrix, version);
     }
@@ -843,45 +820,35 @@ public class WorldContainer implements Serializable {
         }
     }
 
-    public void updateToolAngle() {
-        if (showTool) {
-            toolAngle += toolSpeed;
-            if (toolAngle >= 7.8) {
-                toolAngle = 4.8;
-                showTool = false;
-            }
-        }
-    }
-
     /**
      * When the entities are hit by the player.
      */
     public void updateEntitiesHit() {
-        if (showTool) {
+        if (player.showTool) {
             Point tp1, tp2, tp3, tp4, tp5;
             if (player.imgState == ImageState.STILL_RIGHT || player.imgState.isWalkRight()) {
                 tp1 = new Point((int) (player.x + Player.WIDTH / 2 + 6), (int) (player.y + Player.HEIGHT / 2));
-                tp2 = new Point((int) (player.x + Player.WIDTH / 2 + 6 + tool.getWidth() * 2 * Math.cos(toolAngle) + tool.getHeight() * 2 * Math.sin(toolAngle)),
-                        (int) (player.y + Player.HEIGHT / 2 + tool.getWidth() * 2 * Math.sin(toolAngle) - tool.getHeight() * 2 * Math.cos(toolAngle)));
-                tp3 = new Point((int) (player.x + Player.WIDTH / 2 + 6 + tool.getWidth() * 1 * Math.cos(toolAngle) + tool.getHeight() * 1 * Math.sin(toolAngle)),
-                        (int) (player.y + Player.HEIGHT / 2 + tool.getWidth() * 1 * Math.sin(toolAngle) - tool.getHeight() * 1 * Math.cos(toolAngle)));
-                tp4 = new Point((int) (player.x + Player.WIDTH / 2 + 6 + tool.getWidth() * 0.5 * Math.cos(toolAngle) + tool.getHeight() * 0.5 * Math.sin(toolAngle)),
-                        (int) (player.y + Player.HEIGHT / 2 + tool.getWidth() * 0.5 * Math.sin(toolAngle) - tool.getHeight() * 0.5 * Math.cos(toolAngle)));
-                tp5 = new Point((int) (player.x + Player.WIDTH / 2 + 6 + tool.getWidth() * 1.5 * Math.cos(toolAngle) + tool.getHeight() * 1.5 * Math.sin(toolAngle)),
-                        (int) (player.y + Player.HEIGHT / 2 + tool.getWidth() * 1.5 * Math.sin(toolAngle) - tool.getHeight() * 1.5 * Math.cos(toolAngle)));
+                tp2 = new Point((int) (player.x + Player.WIDTH / 2 + 6 + player.tool.getWidth() * 2 * Math.cos(player.toolAngle) + player.tool.getHeight() * 2 * Math.sin(player.toolAngle)),
+                        (int) (player.y + Player.HEIGHT / 2 + player.tool.getWidth() * 2 * Math.sin(player.toolAngle) - player.tool.getHeight() * 2 * Math.cos(player.toolAngle)));
+                tp3 = new Point((int) (player.x + Player.WIDTH / 2 + 6 + player.tool.getWidth() * 1 * Math.cos(player.toolAngle) + player.tool.getHeight() * 1 * Math.sin(player.toolAngle)),
+                        (int) (player.y + Player.HEIGHT / 2 + player.tool.getWidth() * 1 * Math.sin(player.toolAngle) - player.tool.getHeight() * 1 * Math.cos(player.toolAngle)));
+                tp4 = new Point((int) (player.x + Player.WIDTH / 2 + 6 + player.tool.getWidth() * 0.5 * Math.cos(player.toolAngle) + player.tool.getHeight() * 0.5 * Math.sin(player.toolAngle)),
+                        (int) (player.y + Player.HEIGHT / 2 + player.tool.getWidth() * 0.5 * Math.sin(player.toolAngle) - player.tool.getHeight() * 0.5 * Math.cos(player.toolAngle)));
+                tp5 = new Point((int) (player.x + Player.WIDTH / 2 + 6 + player.tool.getWidth() * 1.5 * Math.cos(player.toolAngle) + player.tool.getHeight() * 1.5 * Math.sin(player.toolAngle)),
+                        (int) (player.y + Player.HEIGHT / 2 + player.tool.getWidth() * 1.5 * Math.sin(player.toolAngle) - player.tool.getHeight() * 1.5 * Math.cos(player.toolAngle)));
             } else { // LEFT
                 tp1 = new Point((int) (player.x + Player.WIDTH / 2 - 6), (int) (player.y + Player.HEIGHT / 2));
-                tp2 = new Point((int) (player.x + Player.WIDTH / 2 - 6 + tool.getWidth() * 2 * Math.cos((Math.PI * 1.5) - toolAngle) + tool.getHeight() * 2 * Math.sin((Math.PI * 1.5) - toolAngle)),
-                        (int) (player.y + Player.HEIGHT / 2 + tool.getWidth() * 2 * Math.sin((Math.PI * 1.5) - toolAngle) - tool.getHeight() * 2 * Math.cos((Math.PI * 1.5) - toolAngle)));
-                tp3 = new Point((int) (player.x + Player.WIDTH / 2 - 6 + tool.getWidth() * 1 * Math.cos((Math.PI * 1.5) - toolAngle) + tool.getHeight() * 1 * Math.sin((Math.PI * 1.5) - toolAngle)),
-                        (int) (player.y + Player.HEIGHT / 2 + tool.getWidth() * 1 * Math.sin((Math.PI * 1.5) - toolAngle) - tool.getHeight() * 1 * Math.cos((Math.PI * 1.5) - toolAngle)));
-                tp4 = new Point((int) (player.x + Player.WIDTH / 2 - 6 + tool.getWidth() * 0.5 * Math.cos((Math.PI * 1.5) - toolAngle) + tool.getHeight() * 0.5 * Math.sin((Math.PI * 1.5) - toolAngle)),
-                        (int) (player.y + Player.HEIGHT / 2 + tool.getWidth() * 0.5 * Math.sin((Math.PI * 1.5) - toolAngle) - tool.getHeight() * 0.5 * Math.cos((Math.PI * 1.5) - toolAngle)));
-                tp5 = new Point((int) (player.x + Player.WIDTH / 2 - 6 + tool.getWidth() * 1.5 * Math.cos((Math.PI * 1.5) - toolAngle) + tool.getHeight() * 1.5 * Math.sin((Math.PI * 1.5) - toolAngle)),
-                        (int) (player.y + Player.HEIGHT / 2 + tool.getWidth() * 1.5 * Math.sin((Math.PI * 1.5) - toolAngle) - tool.getHeight() * 1.5 * Math.cos((Math.PI * 1.5) - toolAngle)));
+                tp2 = new Point((int) (player.x + Player.WIDTH / 2 - 6 + player.tool.getWidth() * 2 * Math.cos((Math.PI * 1.5) - player.toolAngle) + player.tool.getHeight() * 2 * Math.sin((Math.PI * 1.5) - player.toolAngle)),
+                        (int) (player.y + Player.HEIGHT / 2 + player.tool.getWidth() * 2 * Math.sin((Math.PI * 1.5) - player.toolAngle) - player.tool.getHeight() * 2 * Math.cos((Math.PI * 1.5) - player.toolAngle)));
+                tp3 = new Point((int) (player.x + Player.WIDTH / 2 - 6 + player.tool.getWidth() * 1 * Math.cos((Math.PI * 1.5) - player.toolAngle) + player.tool.getHeight() * 1 * Math.sin((Math.PI * 1.5) - player.toolAngle)),
+                        (int) (player.y + Player.HEIGHT / 2 + player.tool.getWidth() * 1 * Math.sin((Math.PI * 1.5) - player.toolAngle) - player.tool.getHeight() * 1 * Math.cos((Math.PI * 1.5) - player.toolAngle)));
+                tp4 = new Point((int) (player.x + Player.WIDTH / 2 - 6 + player.tool.getWidth() * 0.5 * Math.cos((Math.PI * 1.5) - player.toolAngle) + player.tool.getHeight() * 0.5 * Math.sin((Math.PI * 1.5) - player.toolAngle)),
+                        (int) (player.y + Player.HEIGHT / 2 + player.tool.getWidth() * 0.5 * Math.sin((Math.PI * 1.5) - player.toolAngle) - player.tool.getHeight() * 0.5 * Math.cos((Math.PI * 1.5) - player.toolAngle)));
+                tp5 = new Point((int) (player.x + Player.WIDTH / 2 - 6 + player.tool.getWidth() * 1.5 * Math.cos((Math.PI * 1.5) - player.toolAngle) + player.tool.getHeight() * 1.5 * Math.sin((Math.PI * 1.5) - player.toolAngle)),
+                        (int) (player.y + Player.HEIGHT / 2 + player.tool.getWidth() * 1.5 * Math.sin((Math.PI * 1.5) - player.toolAngle) - player.tool.getHeight() * 1.5 * Math.cos((Math.PI * 1.5) - player.toolAngle)));
             }
             for (int i = entities.size() - 1; i >= 0; i--) {
-                if (entities.get(i).getEntityType() != null && !entities.get(i).isNohit() && showTool && (entities.get(i).getRect().contains(tp1) || entities.get(i).getRect().contains(tp2) || entities.get(i).getRect().contains(tp3) || entities.get(i).getRect().contains(tp4) || entities.get(i).getRect().contains(tp5)) && (entities.get(i).getEntityType() != EntityType.BEE || RandomTool.nextInt(4) == 0)) {
+                if (entities.get(i).getEntityType() != null && !entities.get(i).isNohit() && player.showTool && (entities.get(i).getRect().contains(tp1) || entities.get(i).getRect().contains(tp2) || entities.get(i).getRect().contains(tp3) || entities.get(i).getRect().contains(tp4) || entities.get(i).getRect().contains(tp5)) && (entities.get(i).getEntityType() != EntityType.BEE || RandomTool.nextInt(4) == 0)) {
                     if (entities.get(i).hit(inventory.getItems()[inventory.getSelection()].getDamage(), player)) {
                         List<Items> dropList = entities.get(i).drops();
                         for (int j = 0; j < dropList.size(); j++) {
@@ -1445,7 +1412,6 @@ public class WorldContainer implements Serializable {
             rdrawn[uy][ux] = false;
         }
         if (blocks[lyr][uy][ux].isZythiumAmplifierOnAll()) {
-            blockTemp = blocks[lyr][uy][ux];
             blocks[lyr][uy][ux] = Blocks.turnZythiumAmplifierOff(blocks[lyr][uy][ux]);
             removeBlockPower(ux, uy, lyr);
             removeBlockLighting(ux, uy);

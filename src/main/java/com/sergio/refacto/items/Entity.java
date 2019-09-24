@@ -35,19 +35,19 @@ public class Entity implements Serializable {
     Items item;
     short num, dur;
 
-    boolean onGround, immune, grounded, onGroundDelay, nohit;
+    private boolean onGround, immune, grounded, onGroundDelay, nohit;
 
-    int dframes, imgDelay;
+    private int dframes, imgDelay;
 
-    EntityType entityType, AI;
+    private EntityType entityType, AI;
 
-    ImageState imgState;
+    private ImageState imgState;
 
-    Rectangle rect;
+    private Rectangle rect;
 
-    Entity newMob;
+    private Entity newMob;
 
-    transient BufferedImage image;
+    private transient BufferedImage image;
 
     public Entity(double x, double y, double speedX, double speedY, EntityType entityType) {
         this.x = x;
@@ -158,9 +158,10 @@ public class Entity implements Serializable {
 
         dframes = 0;
 
-        image = ImagesContainer.getInstance().itemImgs.get(item.getIndex());
+        image = ImagesContainer.getInstance().itemImgs.get(item);
 
-        width = image.getWidth()*2; height = image.getHeight()*2;
+        width = image.getWidth()*2;
+        height = image.getHeight()*2;
     }
 
     public boolean update(Blocks[][] blocks, Player player, int blockOffsetU, int blockOffsetV) {

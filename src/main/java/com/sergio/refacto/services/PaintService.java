@@ -52,29 +52,27 @@ public class PaintService {
     public void paintBlock(TerrariaClone graphicContainer, Graphics worldGraphic, Graphics fWorldGraphic, int twx, int twy, int tx, int ty) {
         for (int l = 0; l < TerrariaClone.LAYER_SIZE; l++) {
             if (graphicContainer.worldContainer.blocks[l][ty][tx] != Blocks.AIR) {
+                Graphics g;
                 if (l == 2) {
-                    fWorldGraphic.drawImage(graphicContainer.loadBlock(graphicContainer.worldContainer.blocks[l][ty][tx], graphicContainer.worldContainer.blocksDirections[l][ty][tx], graphicContainer.worldContainer.blocksDirectionsIntensity[ty][tx], graphicContainer.worldContainer.blocksTextureIntensity[ty][tx], graphicContainer.worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                            0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
-                            null);
+                    g = fWorldGraphic;
                 } else {
-                    worldGraphic.drawImage(graphicContainer.loadBlock(graphicContainer.worldContainer.blocks[l][ty][tx], graphicContainer.worldContainer.blocksDirections[l][ty][tx], graphicContainer.worldContainer.blocksDirectionsIntensity[ty][tx], graphicContainer.worldContainer.blocksTextureIntensity[ty][tx], graphicContainer.worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
-                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                            0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
-                            null);
+                    g = worldGraphic;
                 }
+                g.drawImage(graphicContainer.loadBlock(graphicContainer.worldContainer.blocks[l][ty][tx], graphicContainer.worldContainer.blocksDirections[l][ty][tx], graphicContainer.worldContainer.blocksDirectionsIntensity[ty][tx], graphicContainer.worldContainer.blocksTextureIntensity[ty][tx], graphicContainer.worldContainer.blocks[l][ty][tx].getOutline(), tx, ty, l),
+                        tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
+                        0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
+                        null);
             } else if (graphicContainer.worldContainer.wcnct[ty][tx] && graphicContainer.worldContainer.blocks[l][ty][tx].isZythiumWire()) {
+                Graphics g;
                 if (l == 2) {
-                    fWorldGraphic.drawImage(ImagesContainer.getInstance().wcnct_px,
-                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                            0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
-                            null);
+                    g = fWorldGraphic;
                 } else {
-                    worldGraphic.drawImage(ImagesContainer.getInstance().wcnct_px,
-                            tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
-                            0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
-                            null);
+                    g = worldGraphic;
                 }
+                g.drawImage(ImagesContainer.getInstance().wcnct_px,
+                        tx * WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE, tx * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twx * WorldContainer.CHUNK_SIZE, ty * WorldContainer.BLOCK_SIZE + WorldContainer.BLOCK_SIZE - twy * WorldContainer.CHUNK_SIZE,
+                        0, 0, TerrariaClone.IMAGESIZE, TerrariaClone.IMAGESIZE,
+                        null);
             }
         }
     }
@@ -442,29 +440,29 @@ public class PaintService {
     }
 
     private void paintTool(TerrariaClone graphicContainer) {
-        if (graphicContainer.worldContainer.showTool && graphicContainer.worldContainer.tool != null) {
+        if (graphicContainer.worldContainer.player.showTool && graphicContainer.worldContainer.player.tool != null) {
             if (graphicContainer.worldContainer.player.imgState == ImageState.STILL_RIGHT || graphicContainer.worldContainer.player.imgState.isWalkRight()) {
                 graphics.translate(graphicContainer.getWidth() / 2 + 6, graphicContainer.getHeight() / 2);
-                graphics.rotate(graphicContainer.worldContainer.toolAngle);
+                graphics.rotate(graphicContainer.worldContainer.player.toolAngle);
 
-                graphics.drawImage(graphicContainer.worldContainer.tool,
-                        0, -graphicContainer.worldContainer.tool.getHeight() * 2, graphicContainer.worldContainer.tool.getWidth() * 2, 0,
-                        0, 0, graphicContainer.worldContainer.tool.getWidth(), graphicContainer.worldContainer.tool.getHeight(),
+                graphics.drawImage(graphicContainer.worldContainer.player.tool,
+                        0, -graphicContainer.worldContainer.player.tool.getHeight() * 2, graphicContainer.worldContainer.player.tool.getWidth() * 2, 0,
+                        0, 0, graphicContainer.worldContainer.player.tool.getWidth(), graphicContainer.worldContainer.player.tool.getHeight(),
                         null);
 
-                graphics.rotate(-graphicContainer.worldContainer.toolAngle);
+                graphics.rotate(-graphicContainer.worldContainer.player.toolAngle);
                 graphics.translate(-graphicContainer.getWidth() / 2 - 6, -graphicContainer.getHeight() / 2);
             }
             if (graphicContainer.worldContainer.player.imgState == ImageState.STILL_LEFT || graphicContainer.worldContainer.player.imgState.isWalkLeft()) {
                 graphics.translate(graphicContainer.getWidth() / 2 - 6, graphicContainer.getHeight() / 2);
-                graphics.rotate((Math.PI * 1.5) - graphicContainer.worldContainer.toolAngle);
+                graphics.rotate((Math.PI * 1.5) - graphicContainer.worldContainer.player.toolAngle);
 
-                graphics.drawImage(graphicContainer.worldContainer.tool,
-                        0, -graphicContainer.worldContainer.tool.getHeight() * 2, graphicContainer.worldContainer.tool.getWidth() * 2, 0,
-                        0, 0, graphicContainer.worldContainer.tool.getWidth(), graphicContainer.worldContainer.tool.getHeight(),
+                graphics.drawImage(graphicContainer.worldContainer.player.tool,
+                        0, -graphicContainer.worldContainer.player.tool.getHeight() * 2, graphicContainer.worldContainer.player.tool.getWidth() * 2, 0,
+                        0, 0, graphicContainer.worldContainer.player.tool.getWidth(), graphicContainer.worldContainer.player.tool.getHeight(),
                         null);
 
-                graphics.rotate(-((Math.PI * 1.5) - graphicContainer.worldContainer.toolAngle));
+                graphics.rotate(-((Math.PI * 1.5) - graphicContainer.worldContainer.player.toolAngle));
                 graphics.translate(-graphicContainer.getWidth() / 2 + 6, -graphicContainer.getHeight() / 2);
             }
         }

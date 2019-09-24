@@ -43,8 +43,15 @@ public class Player implements Serializable {
     private int imgDelay;
     ImageState imgState;
 
+    /** Tool handled by the player. */
+    public BufferedImage tool;
+    boolean showTool;
+    double toolAngle, toolSpeed;
+
     public Player(double x, double y) {
         oldX = this.x = x; oldY = this.y = y;
+
+        toolAngle = 4.7;
 
         speedX = 0;
         speedY = 0;
@@ -336,5 +343,15 @@ public class Player implements Serializable {
                 || (intX - screenWidth / 2 + Player.WIDTH + WorldContainer.BLOCK_SIZE >= chunkU * WorldContainer.CHUNK_SIZE && intX - screenWidth / 2 + Player.WIDTH - WorldContainer.BLOCK_SIZE <= chunkU * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE))
             && ((intY + screenHeight / 2 + Player.HEIGHT >= chunkV * WorldContainer.CHUNK_SIZE && intY + screenHeight / 2 + Player.HEIGHT <= chunkV * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE)
                 || (intY - screenHeight / 2 + Player.HEIGHT >= chunkV * WorldContainer.CHUNK_SIZE && intY - screenHeight / 2 + Player.HEIGHT <= chunkV * WorldContainer.CHUNK_SIZE + WorldContainer.CHUNK_SIZE));
+    }
+
+    public void updateToolAngle() {
+        if (showTool) {
+            toolAngle += toolSpeed;
+            if (toolAngle >= 7.8) {
+                toolAngle = 4.8;
+                showTool = false;
+            }
+        }
     }
 }
