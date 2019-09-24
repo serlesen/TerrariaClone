@@ -20,6 +20,7 @@ public class ItemCollection implements Serializable {
     double FUELP = 0;
     double SMELTP = 0;
     boolean furnaceOn = false;
+    int selection;
 
     public ItemCollection(ItemType type, Items[] items, short[] nums, short[] durs) {
         this.type = type;

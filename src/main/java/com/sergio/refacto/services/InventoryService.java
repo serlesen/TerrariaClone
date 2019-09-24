@@ -1,4 +1,4 @@
-package com.sergio.refacto;
+package com.sergio.refacto.services;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -21,45 +21,38 @@ import com.sergio.refacto.tools.ResourcesLoader;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Inventory implements Serializable {
+public class InventoryService implements Serializable {
 
-	public int selection;
+	private static InventoryService instance;
 
-	private static transient BufferedImage box;
-	private static transient BufferedImage box_selected;
+	private transient BufferedImage box;
+	private transient BufferedImage box_selected;
     private static final Font FONT = new Font("Chalkboard", Font.PLAIN, 12);
-
-    public ItemCollection ic;
 
     private static final int TROLX = 37;
     private static final int TROLY = 17;
 
-	public static int CX, CY;
+	public int CX, CY;
 
-    private static Map<RecipeType, RecipeItem[]> RECIPES;
-
-    private static final int MAXIMUM_ITEMS = 40;
+    private static final Map<RecipeType, RecipeItem[]> RECIPES = new HashMap<>();
 
     private static final int BOX_SIZE = 40;
     private static final int MARGIN = 6;
     private static final int BOX_WITH_MARGIN = BOX_SIZE + MARGIN;
 
-    public Inventory() {
-    	ic = new ItemCollection(ItemType.INVENTORY);
+    private InventoryService() {
+		// private constructor
+	}
 
-        selection = 0;
-        ic.setImage(new BufferedImage(466, 190, BufferedImage.TYPE_INT_ARGB));
-        box = ResourcesLoader.loadImage("interface/inventory.png");
-        box_selected = ResourcesLoader.loadImage("interface/inventory_selected.png");
-		Graphics2D g2 = ic.getImage().createGraphics();
-        for (int x=0; x<10; x++) {
-            for (int y=0; y<4; y++) {
-				drawBox(x == 0 && y == 0, x, y, g2);
-            }
-        }
+	public static InventoryService getInstance() {
+    	if (instance == null) {
+    		instance = new InventoryService();
+		}
 
-        RECIPES = new HashMap<>();
+    	return instance;
+	}
 
+    public void init() {
         RecipeItem[] workbenchRecipes = {
             new RecipeItem(new Items[]{Items.WOOD, Items.WOOD, Items.WOOD, Items.EMPTY, Items.WOOD, Items.EMPTY, Items.EMPTY, Items.WOOD, Items.EMPTY},
 					Items.WOODEN_PICK, (short) 1), // Wooden Pick
@@ -585,84 +578,58 @@ public class Inventory implements Serializable {
         RECIPES.put(RecipeType.SHAPELESS_CIC, shapelessCicRecipes);
     }
 
-    public int addItem(Items item, short quantity) {
+    public int addItem(ItemCollection ic, Items item, short quantity) {
         if (item.getDurability() != null) {
-            return addItem(item, quantity, item.getDurability().shortValue());
+            return addItem(ic, item, quantity, item.getDurability().shortValue());
         }
         else {
-            return addItem(item, quantity, (short)0);
+            return addItem(ic, item, quantity, (short)0);
         }
     }
 
-    public int addItem(Items item, short quantity, short durability) {
-        for (int i = 0; i < MAXIMUM_ITEMS; i++) {
+    public int addItem(ItemCollection ic, Items item, short quantity, short durability) {
+        for (int i = 0; i < ic.getType().getItemCollectionIterable(); i++) {
             if (ic.getItems()[i] == item && ic.getNums()[i] < ic.getItems()[i].getMaxStacks()) {
                 if (quantity + ic.getNums()[i] <= ic.getItems()[i].getMaxStacks()) {
 					ic.getNums()[i] += quantity;
-                    update(i);
+                    update(ic, i);
                     return 0;
                 } else {
                     quantity -= ic.getItems()[i].getMaxStacks() - ic.getNums()[i];
 					ic.getNums()[i] = (short) ic.getItems()[i].getMaxStacks();
-                    update(i);
+					update(ic, i);
                 }
             }
         }
-        for (int i = 0; i < MAXIMUM_ITEMS; i++) {
+        for (int i = 0; i < ic.getType().getItemCollectionIterable(); i++) {
             if (ic.getItems()[i] == Items.EMPTY) {
 				ic.getItems()[i] = item;
                 if (quantity <= ic.getItems()[i].getMaxStacks()) {
 					ic.getNums()[i] = quantity;
 					ic.getDurs()[i] = durability;
-                    update(i);
+					update(ic, i);
                     return 0;
                 } else {
 					ic.getNums()[i] = (short) ic.getItems()[i].getMaxStacks();
 					ic.getDurs()[i] = durability;
                     quantity -= ic.getItems()[i].getMaxStacks();
-                    update(i);
+					update(ic, i);
                 }
             }
         }
         return quantity;
     }
 
-    public int addLocation(int i, Items item, short quantity, short durability) {
-        if (ic.getItems()[i] == item) {
-            if (quantity + ic.getNums()[i] <= ic.getItems()[i].getMaxStacks()) {
-				ic.getNums()[i] += quantity;
-                update(i);
-                return 0;
-            } else {
-                quantity -= ic.getItems()[i].getMaxStacks() - ic.getNums()[i];
-				ic.getNums()[i] = (short) ic.getItems()[i].getMaxStacks();
-                update(i);
-            }
-        } else {
-            if (quantity <= ic.getItems()[i].getMaxStacks()) {
-				ic.getItems()[i] = item;
-				ic.getNums()[i] = quantity;
-                ic.getDurs()[i] = durability;
-                update(i);
-                return 0;
-            } else {
-                quantity -= ic.getItems()[i].getMaxStacks();
-                return quantity;
-            }
-        }
-        return quantity;
-    }
-
-	public int addLocationIC(ItemCollection ic, int i, Items item, short quantity) {
-		return addLocationIC(ic, i, item, quantity, (short)0);
+	public int addLocation(ItemCollection ic, int i, Items item, short quantity) {
+		return addLocation(ic, i, item, quantity, (short)0);
 	}
 
-	public int addLocationIC(ItemCollection ic, int i, Items item, short quantity, short durability) {
+	public int addLocation(ItemCollection ic, int i, Items item, short quantity, short durability) {
 		if (ic.getItems()[i] == item) {
 			if (ic.getItems()[i].getMaxStacks() - ic.getNums()[i] >= quantity) {
 				ic.getNums()[i] += quantity;
 				if (ic.getImage() != null) {
-					updateIC(ic, i);
+					update(ic, i);
 				}
 				return 0;
 			}
@@ -670,7 +637,7 @@ public class Inventory implements Serializable {
 				quantity -= ic.getItems()[i].getMaxStacks() - ic.getNums()[i];
 				ic.getNums()[i] = (short) ic.getItems()[i].getMaxStacks();
 				if (ic.getImage() != null) {
-					updateIC(ic, i);
+					update(ic, i);
 				}
 			}
 		} else {
@@ -679,7 +646,7 @@ public class Inventory implements Serializable {
 				ic.getNums()[i] = quantity;
 				ic.getDurs()[i] = durability;
 				if (ic.getImage() != null) {
-					updateIC(ic, i);
+					update(ic, i);
 				}
 				return 0;
 			}
@@ -691,32 +658,14 @@ public class Inventory implements Serializable {
 		return quantity;
 	}
 
-    public int removeLocation(int i, short quantity) {
-        if (ic.getNums()[i] >= quantity) {
-			ic.getNums()[i] -= quantity;
-            if (ic.getNums()[i] == 0) {
-				ic.getItems()[i] = Items.EMPTY;
-            }
-            update(i);
-            return 0;
-        }
-        else {
-            quantity -= ic.getNums()[i];
-			ic.getNums()[i] = 0;
-			ic.getItems()[i] = Items.EMPTY;
-            update(i);
-        }
-        return quantity;
-    }
-
-	public int removeLocationIC(ItemCollection ic, int i, short quantity) {
+	public int removeLocation(ItemCollection ic, int i, short quantity) {
 		if (ic.getNums()[i] >= quantity) {
 			ic.getNums()[i] -= quantity;
 			if (ic.getNums()[i] == 0) {
 				ic.getItems()[i] = Items.EMPTY;
 			}
 			if (ic.getImage() != null) {
-				updateIC(ic, i);
+				update(ic, i);
 			}
 			return 0;
 		}
@@ -725,26 +674,11 @@ public class Inventory implements Serializable {
 			ic.getNums()[i] = 0;
 			ic.getItems()[i] = Items.EMPTY;
 			if (ic.getImage() != null) {
-				updateIC(ic, i);
+				update(ic, i);
 			}
 		}
 		return quantity;
 	}
-
-    public void reloadImage() {
-        BufferedImage image = new BufferedImage(466, 190, BufferedImage.TYPE_INT_ARGB);
-        box = ResourcesLoader.loadImage("interface/inventory.png");
-        box_selected = ResourcesLoader.loadImage("interface/inventory_selected.png");
-		Graphics2D g2 = image.createGraphics();
-        for (int x=0; x<10; x++) {
-            for (int y=0; y<4; y++) {
-            	drawBox(x == 0 && y == 0, x, y, g2);
-            }
-        }
-        for (int i=0; i<MAXIMUM_ITEMS; i++) {
-            update(i);
-        }
-    }
 
 	/**
 	 * Draw the template box of the item.
@@ -752,7 +686,7 @@ public class Inventory implements Serializable {
 	 * @param x horizontal position of the item
 	 * @param y vertical position of the item
 	 */
-    private static void drawBox(boolean selected, int x, int y, Graphics2D g2) {
+    private void drawBox(boolean selected, int x, int y, Graphics2D g2) {
 		if (selected) {
 			g2.drawImage(box_selected,
 					x * BOX_WITH_MARGIN + MARGIN, y * BOX_WITH_MARGIN + MARGIN, x * BOX_WITH_MARGIN + BOX_WITH_MARGIN, y * BOX_WITH_MARGIN + BOX_WITH_MARGIN,
@@ -781,7 +715,7 @@ public class Inventory implements Serializable {
 	 * @param boxWidth width of the box (with the margin) where the image will be drawn
 	 * @param boxHeight height of the box (with the margin) where the image will be drawn
 	 */
-	private static void drawImage(ItemCollection ic, int i, int x, int y, int boxWidth, int boxHeight) {
+	private void drawImage(ItemCollection ic, int i, int x, int y, int boxWidth, int boxHeight) {
 		Graphics2D g2 = ic.getImage().createGraphics();
 		g2.drawImage(box,
 				x * boxWidth, y * boxHeight, x * boxWidth + 40, y * boxHeight + 40,
@@ -807,36 +741,34 @@ public class Inventory implements Serializable {
 		}
 	}
 
-    private void update(int i) {
-        int py = i/10;
-        int px = i-(py*10);
-        for (int x = px * BOX_WITH_MARGIN + MARGIN; x < px * BOX_WITH_MARGIN + BOX_WITH_MARGIN; x++) {
-            for (int y = py * BOX_WITH_MARGIN + MARGIN; y< py * BOX_WITH_MARGIN + BOX_WITH_MARGIN; y++) {
-                ic.getImage().setRGB(x, y, 9539985);
-            }
-        }
-		Graphics2D g2 = ic.getImage().createGraphics();
+	public void update(ItemCollection ic, int i) {
+		if (ic.getType() == ItemType.INVENTORY) {
+			int py = i/10;
+			int px = i-(py*10);
+			for (int x = px * BOX_WITH_MARGIN + MARGIN; x < px * BOX_WITH_MARGIN + BOX_WITH_MARGIN; x++) {
+				for (int y = py * BOX_WITH_MARGIN + MARGIN; y< py * BOX_WITH_MARGIN + BOX_WITH_MARGIN; y++) {
+					ic.getImage().setRGB(x, y, 9539985);
+				}
+			}
+			Graphics2D g2 = ic.getImage().createGraphics();
 
-        drawBox(i == selection, px, py, g2);
+			drawBox(i == ic.getSelection(), px, py, g2);
 
-        if (ic.getItems()[i] != Items.EMPTY) {
-            int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
-			int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
-            g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
-                px*BOX_WITH_MARGIN+14+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*BOX_WITH_MARGIN+14+((int)(24-(double)12/ MathTool.max(width, height, 12)*height*2)/2), px*BOX_WITH_MARGIN+38-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*BOX_WITH_MARGIN+38-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
-                0, 0, width, height,
-                null);
+			if (ic.getItems()[i] != Items.EMPTY) {
+				int width = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getWidth();
+				int height = ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]).getHeight();
+				g2.drawImage(ImagesContainer.getInstance().itemImgs.get(ic.getItems()[i]),
+						px*BOX_WITH_MARGIN+14+((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*BOX_WITH_MARGIN+14+((int)(24-(double)12/ MathTool.max(width, height, 12)*height*2)/2), px*BOX_WITH_MARGIN+38-((int)(24-(double)12/MathTool.max(width, height, 12)*width*2)/2), py*BOX_WITH_MARGIN+38-((int)(24-(double)12/MathTool.max(width, height, 12)*height*2)/2),
+						0, 0, width, height,
+						null);
 
-            if (ic.getNums()[i] > 1) {
-                g2.setFont(FONT);
-                g2.setColor(Color.WHITE);
-                g2.drawString(ic.getNums()[i] + " ", px*BOX_WITH_MARGIN+15, py*BOX_WITH_MARGIN+40);
-            }
-        }
-    }
-
-	public static void updateIC(ItemCollection ic, int i) {
-		if (ic.getType() == ItemType.CIC) {
+				if (ic.getNums()[i] > 1) {
+					g2.setFont(FONT);
+					g2.setColor(Color.WHITE);
+					g2.drawString(ic.getNums()[i] + " ", px*BOX_WITH_MARGIN+15, py*BOX_WITH_MARGIN+40);
+				}
+			}
+		} else if (ic.getType() == ItemType.CIC) {
 			int py = (int)(i/2);
 			int px = i-(py*2);
 			for (int x=px*40; x<px*40+40; x++) {
@@ -983,38 +915,46 @@ public class Inventory implements Serializable {
 		}
 	}
 
-    public void select(int i) {
+    public int select(ItemCollection ic, int i, int actualSelection) {
         if (i == 0) {
-            int n = selection;
-            selection = 9;
-            update(n);
-            update(9);
-        }
-        else {
-            int n = selection;
-            selection = i - 1;
-            update(n);
-            update(i - 1);
+            int n = actualSelection;
+            update(ic, n);
+			update(ic, 9);
+            return 9;
+        } else {
+            int n = actualSelection;
+			update(ic, n);
+			update(ic, i - 1);
+            return i - 1;
         }
     }
 
-    public void select2(int i) {
-        int n = selection;
-        selection = i;
-        update(n);
-        update(i);
-    }
-
-    public Items tool() {
-        return ic.getItems()[selection];
+    public int select2(ItemCollection ic, int i, int actualSelection) {
+        int n = actualSelection;
+		update(ic, n);
+		update(ic, i);
+        return i;
     }
 
     public void renderCollection(ItemCollection ic) {
-        if (ic.getType() == ItemType.CIC) {
+		if (ic.getType() == ItemType.INVENTORY) {
+			ic.setImage(new BufferedImage(466, 190, BufferedImage.TYPE_INT_ARGB));
+			box = ResourcesLoader.loadImage("interface/inventory.png");
+			box_selected = ResourcesLoader.loadImage("interface/inventory_selected.png");
+			Graphics2D g2 = ic.getImage().createGraphics();
+			for (int x=0; x<10; x++) {
+				for (int y=0; y<4; y++) {
+					drawBox(x == 0 && y == 0, x, y, g2);
+				}
+			}
+			for (int i=0; i<ItemType.INVENTORY.getItemCollectionIterable(); i++) {
+				update(ic, i);
+			}
+		} else if (ic.getType() == ItemType.CIC) {
             if (ic.getImage() == null) {
                 ic.setImage(ResourcesLoader.loadImage("interface/cic.png"));
                 for (int i=0; i<ItemType.CIC.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.ARMOR) {
@@ -1023,14 +963,14 @@ public class Inventory implements Serializable {
                 CX = 1;
                 CY = 4;
                 for (int i=0; i<ItemType.ARMOR.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.WORKBENCH) {
             if (ic.getImage() == null) {
                 ic.setImage(ResourcesLoader.loadImage("interface/workbench.png"));
                 for (int i=0; i<ItemType.WORKBENCH.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.WOODEN_CHEST) {
@@ -1039,7 +979,7 @@ public class Inventory implements Serializable {
                 CX = 3;
                 CY = 3;
                 for (int i=0; i<ItemType.WOODEN_CHEST.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.STONE_CHEST) {
@@ -1048,7 +988,7 @@ public class Inventory implements Serializable {
                 CX = 5;
                 CY = 3;
                 for (int i=0; i<ItemType.STONE_CHEST.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.COPPER_CHEST) {
@@ -1057,7 +997,7 @@ public class Inventory implements Serializable {
                 CX = 5;
                 CY = 4;
                 for (int i=0; i<ItemType.COPPER_CHEST.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.IRON_CHEST) {
@@ -1066,7 +1006,7 @@ public class Inventory implements Serializable {
                 CX = 7;
                 CY = 4;
                 for (int i=0; i<ItemType.IRON_CHEST.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.SILVER_CHEST) {
@@ -1075,7 +1015,7 @@ public class Inventory implements Serializable {
                 CX = 7;
                 CY = 5;
                 for (int i=0; i<ItemType.SILVER_CHEST.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.GOLD_CHEST) {
@@ -1084,7 +1024,7 @@ public class Inventory implements Serializable {
                 CX = 7;
                 CY = 6;
                 for (int i=0; i<ItemType.GOLD_CHEST.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.ZINC_CHEST) {
@@ -1093,7 +1033,7 @@ public class Inventory implements Serializable {
                 CX = 7;
                 CY = 8;
                 for (int i=0; i<ItemType.ZINC_CHEST.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.RHYMESTONE_CHEST) {
@@ -1102,7 +1042,7 @@ public class Inventory implements Serializable {
                 CX = 8;
                 CY = 9;
                 for (int i=0; i<ItemType.RHYMESTONE_CHEST.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.OBDURITE_CHEST) {
@@ -1111,14 +1051,14 @@ public class Inventory implements Serializable {
                 CX = 10;
                 CY = 10;
                 for (int i=0; i<ItemType.OBDURITE_CHEST.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         } else if (ic.getType() == ItemType.FURNACE) {
             if (ic.getImage() == null) {
                 ic.setImage(ResourcesLoader.loadImage("interface/furnace.png"));
                 for (int i=-1; i<ItemType.FURNACE.getItemCollectionIterable(); i++) {
-                    updateIC(ic, i);
+                    update(ic, i);
                 }
             }
         }
@@ -1128,8 +1068,8 @@ public class Inventory implements Serializable {
         for (RecipeItem r2 : RECIPES.get(RecipeType.WORKBENCH)) {
             if (ic.areIdsEquals(r2.getIngredients())) {
                 for (int i=0; i<ItemType.WORKBENCH.getItemCollectionIterable(); i++) {
-                    removeLocationIC(ic, i, (short) 1);
-                    updateIC(ic, i);
+                    removeLocation(ic, i, (short) 1);
+                    update(ic, i);
                 }
             }
         }
@@ -1141,8 +1081,8 @@ public class Inventory implements Serializable {
                 }
                 for (int k=0; k<ItemType.WORKBENCH.getItemCollectionIterable(); k++) {
                     r3.remove(ic.getItems()[k]);
-                    removeLocationIC(ic, k, (short) 1);
-                    updateIC(ic, k);
+                    removeLocation(ic, k, (short) 1);
+                    update(ic, k);
                 }
                 break;
             }
@@ -1153,8 +1093,8 @@ public class Inventory implements Serializable {
         for (RecipeItem r2 : RECIPES.get(RecipeType.CIC)) {
             if (ic.areIdsEquals(r2.getIngredients())) {
                 for (int i=0; i<ItemType.CIC.getItemCollectionIterable(); i++) {
-                    removeLocationIC(ic, i, (short) 1);
-                    updateIC(ic, i);
+                    removeLocation(ic, i, (short) 1);
+                    update(ic, i);
                 }
             }
         }
@@ -1166,8 +1106,8 @@ public class Inventory implements Serializable {
                 }
                 for (int k=0; k<ItemType.CIC.getItemCollectionIterable(); k++) {
                     r3.remove(ic.getItems()[k]);
-                    removeLocationIC(ic, k, (short) 1);
-                    updateIC(ic, k);
+                    removeLocation(ic, k, (short) 1);
+                    update(ic, k);
                 }
                 break;
             }

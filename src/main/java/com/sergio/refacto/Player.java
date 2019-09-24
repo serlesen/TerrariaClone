@@ -9,6 +9,7 @@ import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.KeyPressed;
 import com.sergio.refacto.items.WorldContainer;
+import com.sergio.refacto.services.InventoryService;
 import com.sergio.refacto.tools.ResourcesLoader;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -306,14 +307,14 @@ public class Player implements Serializable {
         }
     }
 
-    public void damage(int damage, boolean useArmor, Inventory inventory) {
+    public void damage(int damage, boolean useArmor) {
         int fd = damage;
         if (useArmor) {
             fd -= sumArmor();
             for (int i = 0; i < 4; i++) {
                 TerrariaClone.armor.getDurs()[i] -= 1;
                 if (TerrariaClone.armor.getDurs()[i] <= 0) {
-                    inventory.removeLocationIC(TerrariaClone.armor, i, TerrariaClone.armor.getNums()[i]);
+                    InventoryService.getInstance().removeLocation(TerrariaClone.armor, i, TerrariaClone.armor.getNums()[i]);
                 }
             }
         }

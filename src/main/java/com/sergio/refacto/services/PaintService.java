@@ -187,7 +187,7 @@ public class PaintService {
 
         if (graphicContainer.worldContainer.ic != null) {
             graphics.drawImage(graphicContainer.worldContainer.ic.getImage(),
-                    6, graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 46, 6 + graphicContainer.worldContainer.ic.getImage().getWidth(), graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 46 + graphicContainer.worldContainer.ic.getImage().getHeight(),
+                    6, graphicContainer.worldContainer.inventory.getImage().getHeight() + 46, 6 + graphicContainer.worldContainer.ic.getImage().getWidth(), graphicContainer.worldContainer.inventory.getImage().getHeight() + 46 + graphicContainer.worldContainer.ic.getImage().getHeight(),
                     0, 0, graphicContainer.worldContainer.ic.getImage().getWidth(), graphicContainer.worldContainer.ic.getImage().getHeight(),
                     null);
         }
@@ -242,7 +242,7 @@ public class PaintService {
         if (graphicContainer.worldContainer.showInv) {
             for (int ux = 0; ux < 2; ux++) {
                 for (int uy = 0; uy < 2; uy++) {
-                    if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + ux * 40 + 75, graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + ux * 40 + 115, uy * 40 + 52, uy * 40 + 92) && graphicContainer.worldContainer.cic.getItems()[uy * 2 + ux] != Items.EMPTY) {
+                    if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.getImage().getWidth() + ux * 40 + 75, graphicContainer.worldContainer.inventory.getImage().getWidth() + ux * 40 + 115, uy * 40 + 52, uy * 40 + 92) && graphicContainer.worldContainer.cic.getItems()[uy * 2 + ux] != Items.EMPTY) {
                         graphics.setFont(graphicContainer.mobFont);
                         graphics.setColor(Color.WHITE);
                         if (graphicContainer.worldContainer.cic.getItems()[uy * 2 + ux].getDurability() != null) {
@@ -253,7 +253,7 @@ public class PaintService {
                     }
                 }
             }
-            if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + 3 * 40 + 75, graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + 3 * 40 + 115, 20 + 52, 20 + 92) && graphicContainer.worldContainer.cic.getItems()[4] != Items.EMPTY) {
+            if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.getImage().getWidth() + 3 * 40 + 75, graphicContainer.worldContainer.inventory.getImage().getWidth() + 3 * 40 + 115, 20 + 52, 20 + 92) && graphicContainer.worldContainer.cic.getItems()[4] != Items.EMPTY) {
                 graphics.setFont(graphicContainer.mobFont);
                 graphics.setColor(Color.WHITE);
                 if (graphicContainer.worldContainer.cic.getItems()[4].getDurability() != null) {
@@ -263,7 +263,7 @@ public class PaintService {
                 }
             }
             for (int uy = 0; uy < 4; uy++) {
-                if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + 6, graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + 6 + graphicContainer.armor.getImage().getWidth(), 6 + uy * 46, 6 + uy * 46 + 46) && graphicContainer.armor.getItems()[uy] != Items.EMPTY) {
+                if (graphicContainer.mousePos.isInBetween(graphicContainer.worldContainer.inventory.getImage().getWidth() + 6, graphicContainer.worldContainer.inventory.getImage().getWidth() + 6 + graphicContainer.armor.getImage().getWidth(), 6 + uy * 46, 6 + uy * 46 + 46) && graphicContainer.armor.getItems()[uy] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
                     if (graphicContainer.armor.getItems()[uy].getDurability() != null) {
@@ -279,7 +279,7 @@ public class PaintService {
                 // paint WORKBENCH
                 for (int ux = 0; ux < 3; ux++) {
                     for (int uy = 0; uy < 3; uy++) {
-                        if (graphicContainer.mousePos.isInBetween(ux * 40 + 6, ux * 40 + 46, uy * 40 + graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 46, uy * 40 + graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 86) &&
+                        if (graphicContainer.mousePos.isInBetween(ux * 40 + 6, ux * 40 + 46, uy * 40 + graphicContainer.worldContainer.inventory.getImage().getHeight() + 46, uy * 40 + graphicContainer.worldContainer.inventory.getImage().getHeight() + 86) &&
                                 graphicContainer.worldContainer.ic.getItems()[uy * 3 + ux] != Items.EMPTY) {
                             graphics.setFont(graphicContainer.mobFont);
                             graphics.setColor(Color.WHITE);
@@ -291,7 +291,7 @@ public class PaintService {
                         }
                     }
                 }
-                if (graphicContainer.mousePos.isInBetween(4 * 40 + 6, 4 * 40 + 46, 1 * 40 + graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 46, 1 * 40 + graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 86) &&
+                if (graphicContainer.mousePos.isInBetween(4 * 40 + 6, 4 * 40 + 46, 1 * 40 + graphicContainer.worldContainer.inventory.getImage().getHeight() + 46, 1 * 40 + graphicContainer.worldContainer.inventory.getImage().getHeight() + 86) &&
                         graphicContainer.worldContainer.ic.getItems()[9] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
@@ -307,23 +307,23 @@ public class PaintService {
                     graphicContainer.worldContainer.ic.getType() == ItemType.ZINC_CHEST || graphicContainer.worldContainer.ic.getType() == ItemType.RHYMESTONE_CHEST ||
                     graphicContainer.worldContainer.ic.getType() == ItemType.OBDURITE_CHEST) {
                 // paint CHEST graphicContainer.armor
-                for (int ux = 0; ux < graphicContainer.worldContainer.inventory.CX; ux++) {
-                    for (int uy = 0; uy < graphicContainer.worldContainer.inventory.CY; uy++) {
-                        if (graphicContainer.mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 46, uy * 46 + graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 86) &&
-                                graphicContainer.worldContainer.ic.getItems()[uy * graphicContainer.worldContainer.inventory.CX + ux] != Items.EMPTY) {
+                for (int ux = 0; ux < InventoryService.getInstance().CX; ux++) {
+                    for (int uy = 0; uy < InventoryService.getInstance().CY; uy++) {
+                        if (graphicContainer.mousePos.isInBetween(ux * 46 + 6, ux * 46 + 46, uy * 46 + graphicContainer.worldContainer.inventory.getImage().getHeight() + 46, uy * 46 + graphicContainer.worldContainer.inventory.getImage().getHeight() + 86) &&
+                                graphicContainer.worldContainer.ic.getItems()[uy * InventoryService.getInstance().CX + ux] != Items.EMPTY) {
                             graphics.setFont(graphicContainer.mobFont);
                             graphics.setColor(Color.WHITE);
-                            if (graphicContainer.worldContainer.ic.getItems()[uy * graphicContainer.worldContainer.inventory.CX + ux].getDurability() != null) {
-                                graphics.drawString(graphicContainer.worldContainer.ic.getItems()[uy * graphicContainer.worldContainer.inventory.CX + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[uy * graphicContainer.worldContainer.inventory.CX + ux] / graphicContainer.worldContainer.ic.getItems()[uy * graphicContainer.worldContainer.inventory.CX + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                            if (graphicContainer.worldContainer.ic.getItems()[uy * InventoryService.getInstance().CX + ux].getDurability() != null) {
+                                graphics.drawString(graphicContainer.worldContainer.ic.getItems()[uy * InventoryService.getInstance().CX + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.ic.getDurs()[uy * InventoryService.getInstance().CX + ux] / graphicContainer.worldContainer.ic.getItems()[uy * InventoryService.getInstance().CX + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                             } else {
-                                graphics.drawString(graphicContainer.worldContainer.ic.getItems()[uy * graphicContainer.worldContainer.inventory.CX + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                                graphics.drawString(graphicContainer.worldContainer.ic.getItems()[uy * InventoryService.getInstance().CX + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                             }
                         }
                     }
                 }
             } else if (graphicContainer.worldContainer.ic.getType() == ItemType.FURNACE) {
                 // paint FURNACE
-                if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 46, graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 86) &&
+                if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.getImage().getHeight() + 46, graphicContainer.worldContainer.inventory.getImage().getHeight() + 86) &&
                         graphicContainer.worldContainer.ic.getItems()[0] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
@@ -333,7 +333,7 @@ public class PaintService {
                         graphics.drawString(graphicContainer.worldContainer.ic.getItems()[0].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
-                if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 102, graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 142) &&
+                if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.getImage().getHeight() + 102, graphicContainer.worldContainer.inventory.getImage().getHeight() + 142) &&
                         graphicContainer.worldContainer.ic.getItems()[1] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
@@ -343,7 +343,7 @@ public class PaintService {
                         graphics.drawString(graphicContainer.worldContainer.ic.getItems()[1].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
-                if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 142, graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 182) &&
+                if (graphicContainer.mousePos.isInBetween(6, 46, graphicContainer.worldContainer.inventory.getImage().getHeight() + 142, graphicContainer.worldContainer.inventory.getImage().getHeight() + 182) &&
                         graphicContainer.worldContainer.ic.getItems()[2] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
@@ -353,7 +353,7 @@ public class PaintService {
                         graphics.drawString(graphicContainer.worldContainer.ic.getItems()[2].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
-                if (graphicContainer.mousePos.isInBetween(62, 102, graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 46, graphicContainer.worldContainer.inventory.ic.getImage().getHeight() + 86) &&
+                if (graphicContainer.mousePos.isInBetween(62, 102, graphicContainer.worldContainer.inventory.getImage().getHeight() + 46, graphicContainer.worldContainer.inventory.getImage().getHeight() + 86) &&
                         graphicContainer.worldContainer.ic.getItems()[3] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
@@ -384,13 +384,13 @@ public class PaintService {
         }
         for (int ux = 0; ux < 10; ux++) {
             for (int uy = 0; uy < ymax; uy++) {
-                if (graphicContainer.mousePos.isInBetweenInclusive(ux * 46 + 6, ux * 46 + 46, uy * 46 + 6, uy * 46 + 46) && graphicContainer.worldContainer.inventory.ic.getItems()[uy * 10 + ux] != Items.EMPTY) {
+                if (graphicContainer.mousePos.isInBetweenInclusive(ux * 46 + 6, ux * 46 + 46, uy * 46 + 6, uy * 46 + 46) && graphicContainer.worldContainer.inventory.getItems()[uy * 10 + ux] != Items.EMPTY) {
                     graphics.setFont(graphicContainer.mobFont);
                     graphics.setColor(Color.WHITE);
-                    if (graphicContainer.worldContainer.inventory.ic.getItems()[uy * 10 + ux].getDurability() != null) {
-                        graphics.drawString(graphicContainer.worldContainer.inventory.ic.getItems()[uy * 10 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.inventory.ic.getDurs()[uy * 10 + ux] / graphicContainer.worldContainer.inventory.ic.getItems()[uy * 10 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                    if (graphicContainer.worldContainer.inventory.getItems()[uy * 10 + ux].getDurability() != null) {
+                        graphics.drawString(graphicContainer.worldContainer.inventory.getItems()[uy * 10 + ux].getUiName() + " (" + (int) ((double) graphicContainer.worldContainer.inventory.getDurs()[uy * 10 + ux] / graphicContainer.worldContainer.inventory.getItems()[uy * 10 + ux].getDurability() * 100) + "%)", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     } else {
-                        graphics.drawString(graphicContainer.worldContainer.inventory.ic.getItems()[uy * 10 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                        graphics.drawString(graphicContainer.worldContainer.inventory.getItems()[uy * 10 + ux].getUiName(), graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                     }
                 }
             }
@@ -407,29 +407,29 @@ public class PaintService {
             layerImg = ResourcesLoader.loadImage("interface/layersF.png");
         }
         graphics.drawImage(layerImg,
-                graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + 58, 6, graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + 58 + layerImg.getWidth(), 6 + layerImg.getHeight(),
+                graphicContainer.worldContainer.inventory.getImage().getWidth() + 58, 6, graphicContainer.worldContainer.inventory.getImage().getWidth() + 58 + layerImg.getWidth(), 6 + layerImg.getHeight(),
                 0, 0, layerImg.getWidth(), layerImg.getHeight(),
                 null);
     }
 
     private void paintInventory(TerrariaClone graphicContainer) {
         if (graphicContainer.worldContainer.showInv) {
-            graphics.drawImage(graphicContainer.worldContainer.inventory.ic.getImage(),
-                    0, 0, graphicContainer.worldContainer.inventory.ic.getImage().getWidth(), (int) graphicContainer.worldContainer.inventory.ic.getImage().getHeight(),
-                    0, 0, graphicContainer.worldContainer.inventory.ic.getImage().getWidth(), (int) graphicContainer.worldContainer.inventory.ic.getImage().getHeight(),
+            graphics.drawImage(graphicContainer.worldContainer.inventory.getImage(),
+                    0, 0, graphicContainer.worldContainer.inventory.getImage().getWidth(), (int) graphicContainer.worldContainer.inventory.getImage().getHeight(),
+                    0, 0, graphicContainer.worldContainer.inventory.getImage().getWidth(), (int) graphicContainer.worldContainer.inventory.getImage().getHeight(),
                     null);
             graphics.drawImage(graphicContainer.armor.getImage(),
-                    graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + 6, 6, graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + 6 + graphicContainer.armor.getImage().getWidth(), 6 + graphicContainer.armor.getImage().getHeight(),
+                    graphicContainer.worldContainer.inventory.getImage().getWidth() + 6, 6, graphicContainer.worldContainer.inventory.getImage().getWidth() + 6 + graphicContainer.armor.getImage().getWidth(), 6 + graphicContainer.armor.getImage().getHeight(),
                     0, 0, graphicContainer.armor.getImage().getWidth(), graphicContainer.armor.getImage().getHeight(),
                     null);
             graphics.drawImage(graphicContainer.worldContainer.cic.getImage(),
-                    graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + 75, 52, graphicContainer.worldContainer.inventory.ic.getImage().getWidth() + 75 + graphicContainer.worldContainer.cic.getImage().getWidth(), 52 + graphicContainer.worldContainer.cic.getImage().getHeight(),
+                    graphicContainer.worldContainer.inventory.getImage().getWidth() + 75, 52, graphicContainer.worldContainer.inventory.getImage().getWidth() + 75 + graphicContainer.worldContainer.cic.getImage().getWidth(), 52 + graphicContainer.worldContainer.cic.getImage().getHeight(),
                     0, 0, graphicContainer.worldContainer.cic.getImage().getWidth(), graphicContainer.worldContainer.cic.getImage().getHeight(),
                     null);
         } else {
-            graphics.drawImage(graphicContainer.worldContainer.inventory.ic.getImage(),
-                    0, 0, graphicContainer.worldContainer.inventory.ic.getImage().getWidth(), (int) graphicContainer.worldContainer.inventory.ic.getImage().getHeight() / 4,
-                    0, 0, graphicContainer.worldContainer.inventory.ic.getImage().getWidth(), (int) graphicContainer.worldContainer.inventory.ic.getImage().getHeight() / 4,
+            graphics.drawImage(graphicContainer.worldContainer.inventory.getImage(),
+                    0, 0, graphicContainer.worldContainer.inventory.getImage().getWidth(), (int) graphicContainer.worldContainer.inventory.getImage().getHeight() / 4,
+                    0, 0, graphicContainer.worldContainer.inventory.getImage().getWidth(), (int) graphicContainer.worldContainer.inventory.getImage().getHeight() / 4,
                     null);
         }
     }

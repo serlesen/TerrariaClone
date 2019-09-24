@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.sergio.refacto.Entity;
-import com.sergio.refacto.Inventory;
+import com.sergio.refacto.services.InventoryService;
 import com.sergio.refacto.Player;
 import com.sergio.refacto.TerrariaClone;
 import com.sergio.refacto.dto.Backgrounds;
@@ -69,7 +69,7 @@ public class WorldContainer implements Serializable {
     Boolean[][] lqd;
     Boolean[][] drawn, ldrawn, rdrawn;
     Player player;
-    Inventory inventory;
+    ItemCollection inventory;
     ItemCollection cic;
     List<Entity> entities;
     CloudsAggregate cloudsAggregate;
@@ -135,7 +135,7 @@ public class WorldContainer implements Serializable {
 
     private WorldContainer(Blocks[][][] blocks, Directions[][][] blocksDirections, Byte[][] BlocksDirectionsIntensity, Backgrounds[][] blocksBackgrounds, Byte[][] blocksTextureIntensity,
                            Float[][] lights, Float[][][] power, Boolean[][] drawn, Boolean[][] ldrawn, Boolean[][] rdrawn,
-                           Player player, Inventory inventory, ItemCollection cic,
+                           Player player, ItemCollection inventory, ItemCollection cic,
                            List<Entity> entities, CloudsAggregate cloudsAggregate,
                            List<Integer> machinesx, List<Integer> machinesy, Boolean[][] lsources, List<Integer> lqx, List<Integer> lqy, Boolean[][] lqd,
                            int regenerationCounter1, int regenerationCounter2, int layer, int layerTemp, Blocks blockTemp,
@@ -271,16 +271,16 @@ public class WorldContainer implements Serializable {
         }
 
         player.reloadImage();
-        inventory.reloadImage();
+        InventoryService.getInstance().renderCollection(inventory);
         if (cic != null) {
-            inventory.renderCollection(cic);
+            InventoryService.getInstance().renderCollection(cic);
         }
         else {
             cic = new ItemCollection(ItemType.CIC);
-            inventory.renderCollection(cic);
+            InventoryService.getInstance().renderCollection(cic);
         }
         if (ic != null) {
-            inventory.renderCollection(ic);
+            InventoryService.getInstance().renderCollection(ic);
         }
         for (int i = 0; i < entities.size(); i++) {
             entities.get(i).reloadImage();
@@ -352,100 +352,101 @@ public class WorldContainer implements Serializable {
 
         player = new Player(WIDTH * 0.5 * BLOCK_SIZE, 45);
 
-        inventory = new Inventory();
+        inventory = new ItemCollection(ItemType.INVENTORY);
+        inventory.setImage(new BufferedImage(466, 190, BufferedImage.TYPE_INT_ARGB));
 
         if (DebugContext.ITEMS != null) {
             if (DebugContext.ITEMS.equals("normal")) {
-                inventory.addItem(Items.IRRADIUM_PICK, (short) 1);
-                inventory.addItem(Items.IRRADIUM_AXE, (short) 1);
-                inventory.addItem(Items.IRRADIUM_SWORD, (short) 1);
-                inventory.addItem(Items.STONE_BRICKS, (short) 100);
-                inventory.addItem(Items.WOODEN_TORCH, (short) 100);
-                inventory.addItem(Items.COAL_TORCH, (short) 100);
-                inventory.addItem(Items.LUMENSTONE_TORCH, (short) 100);
-                inventory.addItem(Items.WORKBENCH, (short) 5);
-                inventory.addItem(Items.FURNACE, (short) 5);
-                inventory.addItem(Items.STONE_LIGHTER, (short) 1);
-                inventory.addItem(Items.COAL, (short) 100);
-                inventory.addItem(Items.MAGNETITE_ORE, (short) 100);
-                inventory.addItem(Items.DIRT, (short) 100);
-                inventory.addItem(Items.STONE, (short) 100);
-                inventory.addItem(Items.WOOD, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.IRRADIUM_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.IRRADIUM_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.IRRADIUM_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.STONE_BRICKS, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.WOODEN_TORCH, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.COAL_TORCH, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.LUMENSTONE_TORCH, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.WORKBENCH, (short) 5);
+                InventoryService.getInstance().addItem(inventory, Items.FURNACE, (short) 5);
+                InventoryService.getInstance().addItem(inventory, Items.STONE_LIGHTER, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.COAL, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.MAGNETITE_ORE, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.DIRT, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.STONE, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.WOOD, (short) 100);
             } else if (DebugContext.ITEMS.equals("tools")) {
-                inventory.addItem(Items.WOODEN_PICK, (short) 1);
-                inventory.addItem(Items.WOODEN_AXE, (short) 1);
-                inventory.addItem(Items.WOODEN_SWORD, (short) 1);
-                inventory.addItem(Items.STONE_PICK, (short) 1);
-                inventory.addItem(Items.STONE_AXE, (short) 1);
-                inventory.addItem(Items.STONE_SWORD, (short) 1);
-                inventory.addItem(Items.COPPER_PICK, (short) 1);
-                inventory.addItem(Items.COPPER_AXE, (short) 1);
-                inventory.addItem(Items.IRON_AXE, (short) 1);
-                inventory.addItem(Items.IRON_PICK, (short) 1);
-                inventory.addItem(Items.SILVER_AXE, (short) 1);
-                inventory.addItem(Items.GOLD_AXE, (short) 1);
-                inventory.addItem(Items.SILVER_PICK, (short) 1);
-                inventory.addItem(Items.COPPER_SWORD, (short) 1);
-                inventory.addItem(Items.IRON_SWORD, (short) 1);
-                inventory.addItem(Items.GOLD_PICK, (short) 1);
-                inventory.addItem(Items.SILVER_SWORD, (short) 1);
-                inventory.addItem(Items.STONE_LIGHTER, (short) 1);
-                inventory.addItem(Items.ZINC_PICK, (short) 1);
-                inventory.addItem(Items.ZINC_AXE, (short) 1);
-                inventory.addItem(Items.ZINC_SWORD, (short) 1);
-                inventory.addItem(Items.RHYMESTONE_PICK, (short) 1);
-                inventory.addItem(Items.RHYMESTONE_AXE, (short) 1);
-                inventory.addItem(Items.RHYMESTONE_SWORD, (short) 1);
-                inventory.addItem(Items.OBDURITE_PICK, (short) 1);
-                inventory.addItem(Items.OBDURITE_AXE, (short) 1);
-                inventory.addItem(Items.OBDURITE_SWORD, (short) 1);
-                inventory.addItem(Items.ALUMINUM_PICK, (short) 1);
-                inventory.addItem(Items.ALUMINUM_AXE, (short) 1);
-                inventory.addItem(Items.ALUMINUM_SWORD, (short) 1);
-                inventory.addItem(Items.LEAD_PICK, (short) 1);
-                inventory.addItem(Items.LEAD_AXE, (short) 1);
-                inventory.addItem(Items.LEAD_SWORD, (short) 1);
-                inventory.addItem(Items.MAGNETITE_PICK, (short) 1);
-                inventory.addItem(Items.MAGNETITE_AXE, (short) 1);
-                inventory.addItem(Items.MAGNETITE_SWORD, (short) 1);
-                inventory.addItem(Items.IRRADIUM_PICK, (short) 1);
-                inventory.addItem(Items.IRRADIUM_AXE, (short) 1);
-                inventory.addItem(Items.IRRADIUM_SWORD, (short) 1);
-
-                inventory.addItem(Items.GOLD_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.WOODEN_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.WOODEN_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.WOODEN_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.STONE_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.STONE_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.STONE_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.COPPER_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.COPPER_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.IRON_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.IRON_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.SILVER_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.GOLD_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.SILVER_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.COPPER_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.IRON_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.GOLD_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.SILVER_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.STONE_LIGHTER, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.ZINC_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.ZINC_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.ZINC_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.RHYMESTONE_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.RHYMESTONE_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.RHYMESTONE_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.OBDURITE_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.OBDURITE_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.OBDURITE_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.ALUMINUM_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.ALUMINUM_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.ALUMINUM_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.LEAD_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.LEAD_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.LEAD_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.MAGNETITE_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.MAGNETITE_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.MAGNETITE_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.IRRADIUM_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.IRRADIUM_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.IRRADIUM_SWORD, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.GOLD_SWORD, (short) 1);
             } else if (DebugContext.ITEMS.equals("testing")) {
-                inventory.addItem(Items.IRRADIUM_PICK, (short) 1);
-                inventory.addItem(Items.IRRADIUM_AXE, (short) 1);
-                inventory.addItem(Items.ZYTHIUM_WIRE, (short) 100);
-                inventory.addItem(Items.WOOD, (short) 100);
-                inventory.addItem(Items.WOODEN_TORCH, (short) 100);
-                inventory.addItem(Items.COAL_TORCH, (short) 100);
-                inventory.addItem(Items.LUMENSTONE_TORCH, (short) 100);
-                inventory.addItem(Items.ZYTHIUM_TORCH, (short) 100);
-                inventory.addItem(Items.ZYTHIUM_LAMP, (short) 100);
-                inventory.addItem(Items.LEVER, (short) 100);
-                inventory.addItem(Items.FURNACE, (short) 100);
-                inventory.addItem(Items.STONE_LIGHTER, (short) 1);
-                inventory.addItem(Items.FROSTLEAF, (short) 100);
-                inventory.addItem(Items.SKYSTONE, (short) 100);
-                inventory.addItem(Items.ZYTHIUM_AMPLIFIER, (short) 100);
-                inventory.addItem(Items.ZYTHIUM_INVERTER, (short) 100);
-                inventory.addItem(Items.BUTTON, (short) 100);
-                inventory.addItem(Items.WOODEN_PRESSURE_PLATE, (short) 100);
-                inventory.addItem(Items.STONE_PRESSURE_PLATE, (short) 100);
-                inventory.addItem(Items.ZYTHIUM_PRESSURE_PLATE, (short) 100);
-                inventory.addItem(Items.ZYTHIUM_DELAYER_1, (short) 100);
-                inventory.addItem(Items.ZYTHIUM_DELAYER_2, (short) 100);
-                inventory.addItem(Items.ZYTHIUM_DELAYER_4, (short) 100);
-                inventory.addItem(Items.ZYTHIUM_DELAYER_8, (short) 100);
-                inventory.addItem(Items.WRENCH, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.IRRADIUM_PICK, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.IRRADIUM_AXE, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.ZYTHIUM_WIRE, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.WOOD, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.WOODEN_TORCH, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.COAL_TORCH, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.LUMENSTONE_TORCH, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.ZYTHIUM_TORCH, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.ZYTHIUM_LAMP, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.LEVER, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.FURNACE, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.STONE_LIGHTER, (short) 1);
+                InventoryService.getInstance().addItem(inventory, Items.FROSTLEAF, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.SKYSTONE, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.ZYTHIUM_AMPLIFIER, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.ZYTHIUM_INVERTER, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.BUTTON, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.WOODEN_PRESSURE_PLATE, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.STONE_PRESSURE_PLATE, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.ZYTHIUM_PRESSURE_PLATE, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.ZYTHIUM_DELAYER_1, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.ZYTHIUM_DELAYER_2, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.ZYTHIUM_DELAYER_4, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.ZYTHIUM_DELAYER_8, (short) 100);
+                InventoryService.getInstance().addItem(inventory, Items.WRENCH, (short) 1);
             }
         }
+        InventoryService.getInstance().renderCollection(inventory);
 
         cic = new ItemCollection(ItemType.CIC);
-        inventory.renderCollection(cic);
+        InventoryService.getInstance().renderCollection(cic);
 
-        inventory.renderCollection(TerrariaClone.armor);
+        InventoryService.getInstance().renderCollection(TerrariaClone.armor);
 
         toolAngle = 4.7;
         mining = 0;
@@ -762,8 +763,8 @@ public class WorldContainer implements Serializable {
                     if (icmatrix[l][y][x].isFurnaceOn()) {
                         if (icmatrix[l][y][x].getItems()[1] == Items.EMPTY) {
                             if (TerrariaClone.FUELS.get(icmatrix[l][y][x].getItems()[2]) != null) {
-                                inventory.addLocationIC(icmatrix[l][y][x], 1, icmatrix[l][y][x].getItems()[2], (short) 1);
-                                inventory.removeLocationIC(icmatrix[l][y][x], 2, (short) 1);
+                                InventoryService.getInstance().addLocation(icmatrix[l][y][x], 1, icmatrix[l][y][x].getItems()[2], (short) 1);
+                                InventoryService.getInstance().removeLocation(icmatrix[l][y][x], 2, (short) 1);
                                 icmatrix[l][y][x].setFUELP(1);
                             } else {
                                 icmatrix[l][y][x].setFurnaceOn(false);
@@ -776,15 +777,15 @@ public class WorldContainer implements Serializable {
                             icmatrix[l][y][x].setFUELP(icmatrix[l][y][x].getFUELP() - TerrariaClone.FUELS.get(icmatrix[l][y][x].getItems()[1]));
                             if (icmatrix[l][y][x].getFUELP() < 0) {
                                 icmatrix[l][y][x].setFUELP(0);
-                                inventory.removeLocationIC(icmatrix[l][y][x], 1, icmatrix[l][y][x].getNums()[1]);
+                                InventoryService.getInstance().removeLocation(icmatrix[l][y][x], 1, icmatrix[l][y][x].getNums()[1]);
                             }
                             for (int i = 0; i < TerrariaClone.FRI1.size(); i++) {
                                 if (icmatrix[l][y][x].getItems()[0] == TerrariaClone.FRI1.get(i) && icmatrix[l][y][x].getNums()[0] >= TerrariaClone.FRN1.get(i)) {
                                     icmatrix[l][y][x].setSMELTP(icmatrix[l][y][x].getSMELTP() + Blocks.findByIndex(icmatrix[l][y][x].getItems()[1].getIndex()).getFSpeed());
                                     if (icmatrix[l][y][x].getSMELTP() > 1) {
                                         icmatrix[l][y][x].setSMELTP(0);
-                                        inventory.removeLocationIC(icmatrix[l][y][x], 0, TerrariaClone.FRN1.get(i));
-                                        inventory.addLocationIC(icmatrix[l][y][x], 3, TerrariaClone.FRI2.get(i), TerrariaClone.FRN2.get(i));
+                                        InventoryService.getInstance().removeLocation(icmatrix[l][y][x], 0, TerrariaClone.FRN1.get(i));
+                                        InventoryService.getInstance().addLocation(icmatrix[l][y][x], 3, TerrariaClone.FRI2.get(i), TerrariaClone.FRN2.get(i));
                                     }
                                     break;
                                 }
@@ -806,8 +807,8 @@ public class WorldContainer implements Serializable {
             if (ic.isFurnaceOn()) {
                 if (ic.getItems()[1] == Items.EMPTY) {
                     if (TerrariaClone.FUELS.get(ic.getItems()[2]) != null) {
-                        inventory.addLocationIC(ic, 1, ic.getItems()[2], (short) 1);
-                        inventory.removeLocationIC(ic, 2, (short) 1);
+                        InventoryService.getInstance().addLocation(ic, 1, ic.getItems()[2], (short) 1);
+                        InventoryService.getInstance().removeLocation(ic, 2, (short) 1);
                         ic.setFUELP(1);
                     } else {
                         ic.setFurnaceOn(false);
@@ -820,15 +821,15 @@ public class WorldContainer implements Serializable {
                     ic.setFUELP(ic.getFUELP() - TerrariaClone.FUELS.get(ic.getItems()[1]));
                     if (ic.getFUELP() < 0) {
                         ic.setFUELP(0);
-                        inventory.removeLocationIC(ic, 1, ic.getNums()[1]);
+                        InventoryService.getInstance().removeLocation(ic, 1, ic.getNums()[1]);
                     }
                     for (int i = 0; i < TerrariaClone.FRI1.size(); i++) {
                         if (ic.getItems()[0] == TerrariaClone.FRI1.get(i) && ic.getNums()[0] >= TerrariaClone.FRN1.get(i)) {
                             ic.setSMELTP(ic.getSMELTP() + Blocks.findByIndex(ic.getItems()[1].getIndex()).getFSpeed());
                             if (ic.getSMELTP() > 1) {
                                 ic.setSMELTP(0);
-                                inventory.removeLocationIC(ic, 0, TerrariaClone.FRN1.get(i));
-                                inventory.addLocationIC(ic, 3, TerrariaClone.FRI2.get(i), TerrariaClone.FRN2.get(i));
+                                InventoryService.getInstance().removeLocation(ic, 0, TerrariaClone.FRN1.get(i));
+                                InventoryService.getInstance().addLocation(ic, 3, TerrariaClone.FRI2.get(i), TerrariaClone.FRN2.get(i));
                             }
                             break;
                         }
@@ -840,7 +841,7 @@ public class WorldContainer implements Serializable {
                     ic.setSMELTP(0);
                 }
             }
-            inventory.updateIC(ic, -1);
+            InventoryService.getInstance().update(ic, -1);
         }
     }
 
@@ -883,20 +884,20 @@ public class WorldContainer implements Serializable {
             }
             for (int i = entities.size() - 1; i >= 0; i--) {
                 if (entities.get(i).getEntityType() != null && !entities.get(i).isNohit() && showTool && (entities.get(i).getRect().contains(tp1) || entities.get(i).getRect().contains(tp2) || entities.get(i).getRect().contains(tp3) || entities.get(i).getRect().contains(tp4) || entities.get(i).getRect().contains(tp5)) && (entities.get(i).getEntityType() != EntityType.BEE || RandomTool.nextInt(4) == 0)) {
-                    if (entities.get(i).hit(inventory.tool().getDamage(), player)) {
+                    if (entities.get(i).hit(inventory.getItems()[inventory.getSelection()].getDamage(), player)) {
                         List<Items> dropList = entities.get(i).drops();
                         for (int j = 0; j < dropList.size(); j++) {
                             entities.add(new Entity(entities.get(i).getX(), entities.get(i).getY(), RandomTool.nextInt(4) - 2, -1, dropList.get(j), (short) 1));
                         }
                         entities.remove(i);
                     }
-                    if (!Arrays.asList(TOOL_LIST).contains(inventory.ic.getItems()[inventory.selection])) {
-                        inventory.ic.getDurs()[inventory.selection] -= 1;
+                    if (!Arrays.asList(TOOL_LIST).contains(inventory.getItems()[inventory.getSelection()])) {
+                        inventory.getDurs()[inventory.getSelection()] -= 1;
                     } else {
-                        inventory.ic.getDurs()[inventory.selection] -= 2;
+                        inventory.getDurs()[inventory.getSelection()] -= 2;
                     }
-                    if (inventory.ic.getDurs()[inventory.selection] <= 0) {
-                        inventory.removeLocation(inventory.selection, inventory.ic.getNums()[inventory.selection]);
+                    if (inventory.getDurs()[inventory.getSelection()] <= 0) {
+                        InventoryService.getInstance().removeLocation(inventory, inventory.getSelection(), inventory.getNums()[inventory.getSelection()]);
                     }
                 }
             }
@@ -1683,7 +1684,7 @@ public class WorldContainer implements Serializable {
         }
         icx = ux;
         icy = uy;
-        inventory.renderCollection(ic);
+        InventoryService.getInstance().renderCollection(ic);
         showInv = true;
     }
 }
