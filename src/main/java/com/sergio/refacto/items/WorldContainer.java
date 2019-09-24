@@ -12,9 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.sergio.refacto.Entity;
 import com.sergio.refacto.services.InventoryService;
-import com.sergio.refacto.Player;
 import com.sergio.refacto.TerrariaClone;
 import com.sergio.refacto.dto.Backgrounds;
 import com.sergio.refacto.dto.Biome;

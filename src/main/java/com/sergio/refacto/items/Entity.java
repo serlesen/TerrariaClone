@@ -1,4 +1,4 @@
-package com.sergio.refacto;
+package com.sergio.refacto.items;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -8,12 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 
+import com.sergio.refacto.TerrariaClone;
 import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.EntityType;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.Items;
-import com.sergio.refacto.items.ImagesContainer;
-import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.tools.RandomTool;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -22,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PUBLIC)
 public class Entity implements Serializable {
 
     double x, y, speedX, speedY;

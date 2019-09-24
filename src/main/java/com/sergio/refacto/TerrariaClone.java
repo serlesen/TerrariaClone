@@ -59,12 +59,13 @@ import com.sergio.refacto.init.GrassDirtInitializer;
 import com.sergio.refacto.init.SkyColorsInitializer;
 import com.sergio.refacto.init.TorchesLInitializer;
 import com.sergio.refacto.init.TorchesRInitializer;
-import com.sergio.refacto.init.UIEntitiesInitializer;
 import com.sergio.refacto.init.WirePInitializer;
 import com.sergio.refacto.items.Chunk;
 import com.sergio.refacto.items.Cloud;
+import com.sergio.refacto.items.Entity;
 import com.sergio.refacto.items.ImagesContainer;
 import com.sergio.refacto.items.Mouse;
+import com.sergio.refacto.items.Player;
 import com.sergio.refacto.items.TextField;
 import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.services.InventoryService;
@@ -143,7 +144,6 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
     int sunlightlevel = 19;
 
     static Map<Short, Map<Integer, Integer>> DURABILITY;
-    public static Map<EntityType, String> UIENTITIES;
     static Map<Integer, Color> SKYCOLORS;
     static Map<Blocks, Blocks> GRASSDIRT;
     public static Map<Items, Double> FUELS;
@@ -203,8 +203,6 @@ public class TerrariaClone extends JApplet implements KeyListener, MouseListener
             repaint();
 
             DURABILITY = DurabilityInitializer.init();
-
-            UIENTITIES = UIEntitiesInitializer.init();
 
             SKYCOLORS = SkyColorsInitializer.init();
 

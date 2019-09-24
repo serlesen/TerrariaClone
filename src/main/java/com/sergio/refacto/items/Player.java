@@ -1,14 +1,14 @@
-package com.sergio.refacto;
+package com.sergio.refacto.items;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
+import com.sergio.refacto.TerrariaClone;
 import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.DebugContext;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.KeyPressed;
-import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.services.InventoryService;
 import com.sergio.refacto.tools.ResourcesLoader;
 import lombok.AccessLevel;

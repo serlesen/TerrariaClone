@@ -5,16 +5,19 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.util.Map;
 
-import com.sergio.refacto.Entity;
-import com.sergio.refacto.Player;
+import com.sergio.refacto.items.Entity;
+import com.sergio.refacto.items.Player;
 import com.sergio.refacto.TerrariaClone;
 import com.sergio.refacto.dto.Backgrounds;
 import com.sergio.refacto.dto.Blocks;
 import com.sergio.refacto.dto.DebugContext;
+import com.sergio.refacto.dto.EntityType;
 import com.sergio.refacto.dto.ImageState;
 import com.sergio.refacto.dto.ItemType;
 import com.sergio.refacto.dto.Items;
+import com.sergio.refacto.init.UIEntitiesInitializer;
 import com.sergio.refacto.items.ImagesContainer;
 import com.sergio.refacto.items.WorldContainer;
 import com.sergio.refacto.tools.MathTool;
@@ -28,7 +31,11 @@ public class PaintService {
 
     Graphics2D graphics;
 
+    private static Map<EntityType, String> UIENTITIES;
+
     public PaintService() {
+        UIENTITIES = UIEntitiesInitializer.init();
+
         sun = ResourcesLoader.loadImage("environment/sun.png");
         moon = ResourcesLoader.loadImage("environment/moon.png");
     }
@@ -217,10 +224,10 @@ public class PaintService {
 
 
         for (int i = 0; i < graphicContainer.worldContainer.entities.size(); i++) {
-            if (TerrariaClone.UIENTITIES.get(graphicContainer.worldContainer.entities.get(i).getEntityType().getName()) != null && graphicContainer.worldContainer.entities.get(i).getRect() != null && graphicContainer.worldContainer.entities.get(i).getRect().contains(new Point(graphicContainer.mousePos2.getX(), graphicContainer.mousePos2.getY()))) {
+            if (UIENTITIES.get(graphicContainer.worldContainer.entities.get(i).getEntityType().getName()) != null && graphicContainer.worldContainer.entities.get(i).getRect() != null && graphicContainer.worldContainer.entities.get(i).getRect().contains(new Point(graphicContainer.mousePos2.getX(), graphicContainer.mousePos2.getY()))) {
                 graphics.setFont(graphicContainer.mobFont);
                 graphics.setColor(Color.WHITE);
-                graphics.drawString(TerrariaClone.UIENTITIES.get(graphicContainer.worldContainer.entities.get(i).getEntityType()) + " (" + graphicContainer.worldContainer.entities.get(i).getHealthPoints() + "/" + graphicContainer.worldContainer.entities.get(i).getTotalHealthPoints() + ")", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
+                graphics.drawString(UIENTITIES.get(graphicContainer.worldContainer.entities.get(i).getEntityType()) + " (" + graphicContainer.worldContainer.entities.get(i).getHealthPoints() + "/" + graphicContainer.worldContainer.entities.get(i).getTotalHealthPoints() + ")", graphicContainer.mousePos.getX(), graphicContainer.mousePos.getY());
                 break;
             }
         }
